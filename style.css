@@ -115,7 +115,6 @@ button:hover,
     margin: 40px auto;
     max-width: 1000px;
 }
-
 .treat-card {
     background: white;
     width: 260px;
@@ -123,6 +122,14 @@ button:hover,
     border-radius: 25px;
     text-align: center;
     box-shadow: 0 4px 15px rgba(0,0,0,.08);
+    text-decoration: none;
+    color: #5A2A1E;
+    transition: 0.2s ease;
+}
+
+.treat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
 }
 
 .treat-card h3 {
