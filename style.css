@@ -191,3 +191,9 @@ h1, h2 {
     margin-top: 10px;
     color: #be37b7;
 }
+.mascot{
+    display:block;
+    width:320px;
+    max-width:90%;
+    margin:30px auto;
+}
