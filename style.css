@@ -138,3 +138,7 @@ input, textarea {
 form button {
     margin-top: 10px;
 }
+.logo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
