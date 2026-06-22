@@ -197,3 +197,13 @@ h1, h2 {
     max-width:90%;
     margin:30px auto;
 }
+.mascot{
+    display:block;
+    width:320px;
+    max-width:90%;
+    margin:20px auto;
+}
+
+.mascot-section{
+    position:relative;
+}
