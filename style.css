@@ -184,3 +184,10 @@ nav a {
 h1, h2 {
     font-family: 'Lilita One', cursive;
 }
+.hero-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 10px;
+    color: #be37b7;
+}
