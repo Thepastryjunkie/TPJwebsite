@@ -1,9 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Poppins:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Poppins:wght@300;400;500;600;700&family=Viaoda+Libre&display=swap');
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #FFF8F2;
-    color:#5A2A1E
+    color:color: #5A2A1E;
     margin: 0;
     text-align: center;
 
@@ -53,8 +52,8 @@ p {
 
 .logo {
     display: block;
-    width: 500px;
-    max-width: 90%;
+    width: 800px;
+    max-width: 95%;
     margin: 20px auto;
 }
 
@@ -71,9 +70,9 @@ p {
 
 .mascot {
     display: block;
-    width: 320px;
+    width: 450px;
     max-width: 90%;
-    margin: 30px auto;
+    margin: 25px auto;
 }
 
 button,
@@ -191,4 +190,11 @@ input, textarea {
 
 form button {
     margin-top: 10px;
+}
+.hero h2 {
+    font-family: 'Viaoda Libre', serif;
+    font-size: 52px;
+    font-weight: normal;
+    color: #5A2A1E;
+    margin-bottom: 20px;
 }
