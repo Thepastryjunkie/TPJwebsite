@@ -3,7 +3,7 @@
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #FFF8F2;
-    color: #BA7B5C,;
+    color:#5A2A1E
     margin: 0;
     text-align: center;
 
@@ -102,7 +102,7 @@ button:hover,
 .section-title {
     font-family: 'Lilita One', cursive;
     font-size: 42px;
-    color: #5A2A1E;
+    color: #BA7B5C;
     text-align: center;
     margin-top: 60px;
 }
