@@ -197,13 +197,34 @@ h1, h2 {
     max-width:90%;
     margin:30px auto;
 }
-.mascot{
-    display:block;
-    width:320px;
-    max-width:90%;
-    margin:20px auto;
-}
 
 .mascot-section{
     position:relative;
+}
+.treat-grid{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+    margin:40px auto;
+    max-width:1000px;
+}
+
+.treat-card{
+    background:white;
+    width:260px;
+    padding:25px;
+    border-radius:25px;
+    text-align:center;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.treat-card h3{
+    font-family:'Lilita One', cursive;
+    color:#5A2A1E;
+}
+
+.treat-card p{
+    font-family:'Poppins', sans-serif;
 }
