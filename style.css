@@ -14,7 +14,7 @@ nav {
     display: flex;
     justify-content: center;
     gap: 25px;
-    padding: 20px 0;
+    padding: 5px 0 15px 0;
     border-bottom: 1px solid #ffd1e6;
     margin-bottom: 20px;
 }
@@ -54,7 +54,7 @@ p {
     display: block;
     width: 800px;
     max-width: 95%;
-    margin: 20px auto;
+    margin: 10px auto 0 auto;
 }
 
 .hero {
