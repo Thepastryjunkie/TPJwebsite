@@ -1,62 +1,295 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="The Pastry Junkie creates loaded desserts, custom cakes, dessert jars, stuffed apples, and celebration-worthy sweets."
+    >
+
+    <title>The Pastry Junkie</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="site-container">
+    <!-- =========================
+         STICKY WEBSITE HEADER
+    ========================== -->
 
-<div class="logo-wrap">
-    <img src="images/TPJ Logo.png" alt="The Pastry Junkie Logo" class="logo">
-</div>
+    <header class="site-header">
 
-<nav>
-    <a href="index.html">Home</a>
-    <a href="pages/gallery.html">Gallery</a>
-    <a href="pages/menu.html">Menu</a>
-    <a href="pages/about.html">About</a>
-    <a href="pages/contact.html">Contact</a>
-</nav>
+        <!-- Pink icing drip across the top -->
+        <img
+            src="images/animations/TPJPinkDrip.png"
+            alt=""
+            class="header-drip"
+            aria-hidden="true"
+        >
 
-<section class="hero">
-    <h2>There's a Piece of Love in Every Crumb </h2>
+        <div class="header-inner">
 
-    <img src="images/TPJ Mascot.PNG"
-     class="mascot">
-    <a href="pages/gallery.html">
-        <button>View Cakes</button>
-    </a>
+            <!-- Mobile hamburger button -->
+            <button
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="mainNavigation"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
 
-</section>
-<section class="preview">
+            <!-- Official chocolate buttercream logo -->
+            <a
+                href="index.html"
+                class="header-logo-link"
+                aria-label="The Pastry Junkie homepage"
+            >
+                <img
+                    src="images/brand/TPJLogoButtercream.png"
+                    alt="The Pastry Junkie"
+                    class="header-logo"
+                >
+            </a>
 
-    <h2>Popular Treats</h2>
+            <!-- Main navigation -->
+            <nav
+                class="main-navigation"
+                id="mainNavigation"
+                aria-label="Main navigation"
+            >
+                <a href="index.html" class="active-nav-link">Home</a>
+                <a href="pages/shop.html">Shop</a>
+                <a href="pages/custom-cakes.html">Custom Cakes</a>
+                <a href="pages/gallery.html">Gallery</a>
+                <a href="pages/about.html">About</a>
+                <a href="pages/contact.html">Contact</a>
+            </nav>
 
-    <div class="treat-grid">
+            <!-- Search, account, and cart controls -->
+            <div class="header-actions">
 
-        <a href="pages/gallery.html" class="treat-card">
-            <h3>Custom Cakes</h3>
-            <p>Designed for birthdays, celebrations, and sweet memories.</p>
-        </a>
+                <button
+                    class="header-icon-button search-button"
+                    type="button"
+                    aria-label="Search"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+                    </svg>
+                </button>
 
-        <a href="pages/gallery.html" class="treat-card">
-            <h3>Dessert Jars</h3>
-            <p>Layered desserts packed with flavor and personality.</p>
-        </a>
+                <button
+                    class="header-icon-button account-button"
+                    type="button"
+                    aria-label="Customer account"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="8" r="4"></circle>
+                        <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+                    </svg>
+                </button>
 
-        <a href="pages/menu.html" class="treat-card">
-            <h3>Sweet Creations</h3>
-            <p>From chocolate-covered treats to specialty desserts.</p>
-        </a>
+                <button
+                    class="header-icon-button cart-button"
+                    type="button"
+                    aria-label="Shopping cart with zero items"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"></path>
+                        <circle cx="10" cy="20" r="1"></circle>
+                        <circle cx="18" cy="20" r="1"></circle>
+                    </svg>
 
-    </div>
+                    <span class="cart-count" aria-hidden="true">0</span>
+                </button>
 
-</section>
+            </div>
 
-</div>
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- =========================
+             HORIZONTAL HERO CAMPAIGN
+        ========================== -->
+
+        <section class="hero-section">
+
+            <!-- Faint decorative sprinkle texture -->
+            <img
+                src="images/animations/TPJSprinklesFlat.png"
+                alt=""
+                class="hero-sprinkle-texture hero-sprinkles-left"
+                aria-hidden="true"
+            >
+
+            <img
+                src="images/animations/TPJSprinklesFlat.png"
+                alt=""
+                class="hero-sprinkle-texture hero-sprinkles-right"
+                aria-hidden="true"
+            >
+
+            <div class="hero-inner">
+
+                <!-- Left side: branding and calls to action -->
+                <div class="hero-copy">
+
+                    <img
+                        src="images/brand/TPJLogoButtercream.png"
+                        alt="The Pastry Junkie"
+                        class="hero-logo"
+                    >
+
+                    <img
+                        src="images/brand/TPJHeadlineObsession.png"
+                        alt="Obsession Starts Here"
+                        class="hero-headline-graphic"
+                    >
+
+                    <p class="hero-supporting-copy">
+                        For people who take dessert very seriously.
+                    </p>
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="pages/shop.html"
+                            class="button button-primary"
+                        >
+                            Shop the Loaded Goods
+                        </a>
+
+                        <a
+                            href="pages/custom-cakes.html"
+                            class="button button-secondary"
+                        >
+                            Secure Your Cake
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Right side: niece brand photograph -->
+                <div class="hero-visual">
+
+                    <img
+                        src="images/hero/TPJHeroNieceCakeCupcake.png"
+                        alt="Young baker holding a cupcake and a pink celebration cake"
+                        class="hero-niece-image"
+                    >
+
+                    <!-- Independently animated decorative objects -->
+
+                    <img
+                        src="images/animations/TPJFloatMacaron.png"
+                        alt=""
+                        class="hero-floating-item hero-macaron"
+                        aria-hidden="true"
+                    >
+
+                    <img
+                        src="images/animations/TPJFloatCupcake.png"
+                        alt=""
+                        class="hero-floating-item hero-cupcake"
+                        aria-hidden="true"
+                    >
+
+                    <img
+                        src="images/animations/TPJSprinklesShadow.png"
+                        alt=""
+                        class="hero-floating-item hero-sprinkle-cluster"
+                        aria-hidden="true"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             BRAND PROMISE MARQUEE
+        ========================== -->
+
+        <section
+            class="brand-marquee"
+            aria-label="The Pastry Junkie brand promises"
+        >
+            <div class="marquee-track">
+
+                <span>Heavy on the Fillings</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Made for the Sweet-Obsessed</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Freshly Made</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Celebration Ready</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Dessert Obsession Encouraged</span>
+                <span class="marquee-divider">♥</span>
+
+                <!-- Repeated so the movement loops smoothly -->
+
+                <span>Heavy on the Fillings</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Made for the Sweet-Obsessed</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Freshly Made</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Celebration Ready</span>
+                <span class="marquee-divider">♥</span>
+
+                <span>Dessert Obsession Encouraged</span>
+                <span class="marquee-divider">♥</span>
+
+            </div>
+        </section>
+
+
+        <!-- The next homepage section will be added here. -->
+
+    </main>
+
+
+    <script src="js/main.js"></script>
 
 </body>
+
 </html>
