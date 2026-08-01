@@ -11,120 +11,135 @@
 
     <meta
         name="description"
-        content="The Pastry Junkie creates loaded desserts, custom cakes, dessert jars, stuffed apples, and celebration-worthy sweets."
+        content="The Pastry Junkie creates custom cakes and loaded desserts for serious sweet tooth celebrations in Dallas-Fort Worth."
     >
 
-    <title>The Pastry Junkie</title>
+    <title>The Pastry Junkie | Custom Cakes & Loaded Desserts</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- =========================
-         STICKY WEBSITE HEADER
-    ========================== -->
+    <!-- Fixed dessert-room atmosphere used throughout the homepage -->
+    <div
+        class="site-background"
+        aria-hidden="true"
+    ></div>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
     <header class="site-header">
 
-        <!-- Pink icing drip across the top -->
-        <img
-            src="images/animations/TPJPinkDrip.png"
-            alt=""
-            class="header-drip"
-            aria-hidden="true"
-        >
-
         <div class="header-inner">
 
-            <!-- Mobile hamburger button -->
             <button
                 class="mobile-menu-button"
                 id="mobileMenuButton"
                 type="button"
                 aria-label="Open navigation menu"
-                aria-expanded="false"
                 aria-controls="mainNavigation"
+                aria-expanded="false"
             >
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
 
-            <!-- Official chocolate buttercream logo -->
+
             <a
                 href="index.html"
                 class="header-logo-link"
                 aria-label="The Pastry Junkie homepage"
             >
                 <img
-                    src="images/brand/TPJLogoButtercream.png"
+                    src="images/brand/TPJPrimaryWordmarkStraight.png"
                     alt="The Pastry Junkie"
                     class="header-logo"
                 >
             </a>
 
-            <!-- Main navigation -->
+
             <nav
                 class="main-navigation"
                 id="mainNavigation"
                 aria-label="Main navigation"
             >
-                <a href="index.html" class="active-nav-link">Home</a>
-                <a href="pages/shop.html">Shop</a>
-                <a href="pages/custom-cakes.html">Custom Cakes</a>
-                <a href="pages/gallery.html">Gallery</a>
-                <a href="pages/about.html">About</a>
-                <a href="pages/contact.html">Contact</a>
+
+                <a
+                    href="index.html"
+                    class="active-nav-link"
+                >
+                    Home
+                </a>
+
+                <a href="pages/shop.html">
+                    Shop
+                </a>
+
+                <a href="pages/custom-cakes.html">
+                    Custom Cakes
+                </a>
+
+                <a href="pages/gallery.html">
+                    Gallery
+                </a>
+
+                <a href="pages/about.html">
+                    About
+                </a>
+
+                <a href="pages/contact.html">
+                    Contact
+                </a>
+
             </nav>
 
-            <!-- Search, account, and cart controls -->
+
             <div class="header-actions">
 
-                <button
+                <a
+                    href="pages/shop.html"
                     class="header-icon-button search-button"
-                    type="button"
-                    aria-label="Search"
+                    aria-label="Search desserts"
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
                         <circle cx="11" cy="11" r="7"></circle>
                         <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
                     </svg>
-                </button>
+                </a>
 
-                <button
+
+                <a
+                    href="pages/contact.html"
                     class="header-icon-button account-button"
-                    type="button"
-                    aria-label="Customer account"
+                    aria-label="Contact The Pastry Junkie"
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
                         <circle cx="12" cy="8" r="4"></circle>
                         <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
                     </svg>
-                </button>
+                </a>
 
-                <button
+
+                <a
+                    href="pages/shop.html"
                     class="header-icon-button cart-button"
-                    type="button"
-                    aria-label="Shopping cart with zero items"
+                    aria-label="Shopping cart"
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"></path>
                         <circle cx="10" cy="20" r="1"></circle>
                         <circle cx="18" cy="20" r="1"></circle>
                     </svg>
 
-                    <span class="cart-count" aria-hidden="true">0</span>
-                </button>
+                    <span class="cart-count">
+                        0
+                    </span>
+                </a>
 
             </div>
 
@@ -135,62 +150,335 @@
 
     <main>
 
-        <!-- =========================
-             HORIZONTAL HERO CAMPAIGN
-        ========================== -->
+        <!-- =========================================
+             HERO
+        ========================================== -->
 
-        <section class="hero-section">
-
-            <!-- Faint decorative sprinkle texture -->
-            <img
-                src="images/animations/TPJSprinklesFlat.png"
-                alt=""
-                class="hero-sprinkle-texture hero-sprinkles-left"
-                aria-hidden="true"
-            >
+        <section class="editorial-hero">
 
             <img
-                src="images/animations/TPJSprinklesFlat.png"
-                alt=""
-                class="hero-sprinkle-texture hero-sprinkles-right"
-                aria-hidden="true"
+                src="images/hero/TPJNieceDessertRoom.png"
+                alt="Young baker surrounded by cakes, cupcakes, cookies, donuts and macarons"
+                class="editorial-hero-image"
             >
 
-            <div class="hero-inner">
 
-                <!-- Left side: branding and calls to action -->
-                <div class="hero-copy">
+            <div
+                class="editorial-hero-overlay"
+                aria-hidden="true"
+            ></div>
 
-                    <img
-                        src="images/brand/TPJLogoButtercream.png"
-                        alt="The Pastry Junkie"
-                        class="hero-logo"
-                    >
 
-                    <img
-                        src="images/brand/TPJHeadlineObsession.png"
-                        alt="Obsession Starts Here"
-                        class="hero-headline-graphic"
-                    >
+            <div class="editorial-hero-inner">
 
-                    <p class="hero-supporting-copy">
-                        For people who take dessert very seriously.
+                <div class="editorial-hero-content">
+
+                    <p class="hero-eyebrow">
+                        Dallas-Fort Worth Desserts
                     </p>
+
+
+                    <h1 class="hero-headline">
+
+                        <span class="hero-headline-pink">
+                            Obsession
+                        </span>
+
+                        <span class="hero-headline-brown">
+                            Starts Here
+                        </span>
+
+                    </h1>
+
+
+                    <p class="hero-description">
+                        Over-the-top desserts for people with a serious
+                        sweet tooth.
+                    </p>
+
 
                     <div class="hero-buttons">
 
                         <a
-                            href="pages/shop.html"
+                            href="pages/custom-cakes.html"
                             class="button button-primary"
                         >
-                            Shop the Loaded Goods
+                            Start Your Cake
                         </a>
 
                         <a
-                            href="pages/custom-cakes.html"
+                            href="pages/shop.html"
                             class="button button-secondary"
                         >
-                            Secure Your Cake
+                            Shop Loaded Treats
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             BRAND MARQUEE
+        ========================================== -->
+
+        <section
+            class="brand-marquee"
+            aria-label="The Pastry Junkie highlights"
+        >
+
+            <div class="marquee-track">
+
+                <span>
+                    For Serious Sweet Tooth Celebrations
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Custom Cakes Made To Make An Entrance
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Loaded Desserts Made Fresh
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Dallas-Fort Worth
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+
+                <span>
+                    For Serious Sweet Tooth Celebrations
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Custom Cakes Made To Make An Entrance
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Loaded Desserts Made Fresh
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+                <span>
+                    Dallas-Fort Worth
+                </span>
+
+                <span class="marquee-symbol">
+                    ♥
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             REAL FROSTING TRANSITION
+             Cropped from the hero image
+        ========================================== -->
+
+        <div
+            class="hero-frosting-divider hero-frosting-divider-top"
+            aria-hidden="true"
+        ></div>
+
+
+        <!-- =========================================
+             SWEET TOOTH SOCIETY
+        ========================================== -->
+
+        <section class="society-section reveal">
+
+            <div class="society-inner">
+
+                <div class="society-art">
+
+                    <img
+                        src="images/animations/TPJSprinklesFlat.png"
+                        alt=""
+                        class="society-sprinkles society-sprinkles-left"
+                        aria-hidden="true"
+                    >
+
+
+                    <img
+                        src="images/brand/TPJMascotNameApron.png"
+                        alt="The Pastry Junkie mascot holding a cupcake and cake"
+                        class="society-mascot"
+                    >
+
+
+                    <img
+                        src="images/animations/TPJSprinklesFlat.png"
+                        alt=""
+                        class="society-sprinkles society-sprinkles-right"
+                        aria-hidden="true"
+                    >
+
+
+                    <span class="society-note society-note-one">
+                        Dessert Is The Occasion
+                    </span>
+
+
+                    <span class="society-note society-note-two">
+                        Sweetness With Personality
+                    </span>
+
+                </div>
+
+
+                <div class="society-copy">
+
+                    <p class="section-eyebrow">
+                        Welcome To The Sweet Tooth Society
+                    </p>
+
+
+                    <h2>
+                        You’re In The<br>
+                        Right Place.
+                    </h2>
+
+
+                    <div class="society-statement">
+
+                        <p>
+                            This is for the people who save room for dessert.
+                        </p>
+
+                        <p>
+                            The ones who believe extra frosting is the
+                            entire point and somehow leave with more than
+                            they planned.
+                        </p>
+
+                        <p>
+                            The Pastry Junkie brings colorful celebrations,
+                            playful details and serious dessert cravings
+                            together in one sweet little world.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="pages/about.html"
+                        class="text-arrow-link"
+                    >
+                        Meet The Original Pastry Junkie
+
+                        <span>
+                            →
+                        </span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             DESSERT ROOM WINDOW
+        ========================================== -->
+
+        <div
+            class="dessert-room-window"
+            aria-hidden="true"
+        ></div>
+
+
+        <!-- =========================================
+             CUSTOM CAKES
+        ========================================== -->
+
+        <section class="cake-feature-section reveal">
+
+            <div class="cake-feature-inner">
+
+                <div class="cake-feature-copy">
+
+                    <p class="section-eyebrow">
+                        Your Sweet Tooth Celebration
+                    </p>
+
+
+                    <h2>
+                        Cakes Made<br>
+                        For The Moment.
+                    </h2>
+
+
+                    <p class="cake-feature-description">
+                        Custom cakes created for birthdays, milestones and
+                        celebrations that deserve more than ordinary.
+                    </p>
+
+
+                    <div class="cake-feature-points">
+
+                        <span>
+                            Custom colors
+                        </span>
+
+                        <span>
+                            Personalized details
+                        </span>
+
+                        <span>
+                            Celebration-ready designs
+                        </span>
+
+                    </div>
+
+
+                    <div class="section-buttons">
+
+                        <a
+                            href="pages/custom-cakes.html"
+                            class="button button-primary"
+                        >
+                            Start Your Cake
+                        </a>
+
+                        <a
+                            href="pages/gallery.html"
+                            class="button button-secondary"
+                        >
+                            See More Cakes
                         </a>
 
                     </div>
@@ -198,36 +486,12 @@
                 </div>
 
 
-                <!-- Right side: niece brand photograph -->
-                <div class="hero-visual">
+                <div class="cake-feature-visual">
 
                     <img
-                        src="images/hero/TPJHeroNieceCakeCupcake.png"
-                        alt="Young baker holding a cupcake and a pink celebration cake"
-                        class="hero-niece-image"
-                    >
-
-                    <!-- Independently animated decorative objects -->
-
-                    <img
-                        src="images/animations/TPJFloatMacaron.png"
-                        alt=""
-                        class="hero-floating-item hero-macaron"
-                        aria-hidden="true"
-                    >
-
-                    <img
-                        src="images/animations/TPJFloatCupcake.png"
-                        alt=""
-                        class="hero-floating-item hero-cupcake"
-                        aria-hidden="true"
-                    >
-
-                    <img
-                        src="images/animations/TPJSprinklesShadow.png"
-                        alt=""
-                        class="hero-floating-item hero-sprinkle-cluster"
-                        aria-hidden="true"
+                        src="images/products/TPJBlueCrownCake.png"
+                        alt="Blue and gold custom birthday cake with crown"
+                        class="cake-feature-image"
                     >
 
                 </div>
@@ -237,223 +501,468 @@
         </section>
 
 
-        <!-- =========================
-             BRAND PROMISE MARQUEE
-        ========================== -->
+        <!-- =========================================
+             LOADED TREATS
+        ========================================== -->
 
-        <section
-            class="brand-marquee"
-            aria-label="The Pastry Junkie brand promises"
-        >
-            <div class="marquee-track">
+        <section class="loaded-treats-section reveal">
 
-                <span>Heavy on the Fillings</span>
-                <span class="marquee-divider">♥</span>
+            <div class="loaded-treats-inner">
 
-                <span>Made for the Sweet-Obsessed</span>
-                <span class="marquee-divider">♥</span>
+                <div class="loaded-treats-visual">
 
-                <span>Freshly Made</span>
-                <span class="marquee-divider">♥</span>
+                    <img
+                        src="images/products/TPJBananaPuddingExplosion.png"
+                        alt="Loaded banana pudding surrounded by bananas, cookies and pudding splashes"
+                        class="loaded-main-image"
+                    >
 
-                <span>Celebration Ready</span>
-                <span class="marquee-divider">♥</span>
+                </div>
 
-                <span>Dessert Obsession Encouraged</span>
-                <span class="marquee-divider">♥</span>
 
-                <!-- Repeated so the movement loops smoothly -->
+                <div class="loaded-treats-copy">
 
-                <span>Heavy on the Fillings</span>
-                <span class="marquee-divider">♥</span>
+                    <p class="section-eyebrow section-eyebrow-light">
+                        Feed Your Sweet Tooth
+                    </p>
 
-                <span>Made for the Sweet-Obsessed</span>
-                <span class="marquee-divider">♥</span>
 
-                <span>Freshly Made</span>
-                <span class="marquee-divider">♥</span>
+                    <h2>
+                        Loaded On<br>
+                        Purpose.
+                    </h2>
 
-                <span>Celebration Ready</span>
-                <span class="marquee-divider">♥</span>
 
-                <span>Dessert Obsession Encouraged</span>
-                <span class="marquee-divider">♥</span>
+                    <p>
+                        Loaded cupcakes, dessert jars, stuffed cheesecake
+                        apples, banana pudding and rotating sweet-tooth
+                        favorites made for cravings that refuse to be ignored.
+                    </p>
+
+
+                    <div class="sweet-tooth-list">
+
+                        <div>
+
+                            <span>
+                                01
+                            </span>
+
+                            <strong>
+                                Loaded
+                            </strong>
+
+                            <p>
+                                Heavy on fillings, toppings and flavor.
+                            </p>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                02
+                            </span>
+
+                            <strong>
+                                Fresh
+                            </strong>
+
+                            <p>
+                                Made in small batches for scheduled pickup.
+                            </p>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                03
+                            </span>
+
+                            <strong>
+                                Rotating
+                            </strong>
+
+                            <p>
+                                Flavors and seasonal drops change regularly.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="pages/shop.html"
+                        class="button button-cream"
+                    >
+                        Shop Loaded Treats
+                    </a>
+
+                </div>
 
             </div>
+
         </section>
-<!-- =========================
-     CHOOSE YOUR OBSESSION
-========================== -->
 
-<section class="obsession-section">
 
-    <div class="section-heading">
+        <!-- =========================================
+             REAL FROSTING TRANSITION
+        ========================================== -->
 
-        <p class="section-eyebrow">Pick Your Poison</p>
+        <div
+            class="hero-frosting-divider hero-frosting-divider-bottom"
+            aria-hidden="true"
+        ></div>
 
-        <h2>Choose Your Obsession</h2>
 
-        <p class="section-description">
-            Loaded, layered, stuffed, and absolutely not interested
-            in being subtle.
-        </p>
+        <!-- =========================================
+             PROCESS
+        ========================================== -->
 
-    </div>
+        <section class="process-section reveal">
 
-    <div class="obsession-grid">
+            <div class="section-heading">
 
-        <!-- Loaded Treats -->
-
-        <a
-            href="pages/shop.html"
-            class="obsession-card obsession-card-pink"
-        >
-            <div class="obsession-card-image-wrap">
-
-                <img
-                    src="images/products/TPJLoadedTreatsTrio.png"
-                    alt="A colorful assortment of loaded desserts"
-                    class="obsession-card-image"
-                >
-
-            </div>
-
-            <div class="obsession-card-content">
-
-                <p class="obsession-card-number">01</p>
-
-                <h3>Loaded Treats</h3>
-
-                <p>
-                    Cupcakes, sundaes, jars, and sweet stacks built
-                    with zero restraint.
+                <p class="section-eyebrow">
+                    Behind The Buttercream
                 </p>
 
-                <span class="obsession-card-link">
-                    Shop Loaded Treats
-                    <span aria-hidden="true">→</span>
-                </span>
 
-            </div>
-        </a>
+                <h2>
+                    Every Detail<br>
+                    Has A Purpose.
+                </h2>
 
-
-        <!-- Dessert Jars -->
-
-        <a
-            href="pages/shop.html"
-            class="obsession-card obsession-card-blue"
-        >
-            <div class="obsession-card-image-wrap">
-
-                <img
-                    src="images/products/TPJDessertJarsCollection.jpg"
-                    alt="A collection of layered dessert jars"
-                    class="obsession-card-image"
-                >
-
-            </div>
-
-            <div class="obsession-card-content">
-
-                <p class="obsession-card-number">02</p>
-
-                <h3>Dessert Jars</h3>
 
                 <p>
-                    Creamy layers, crunchy toppings, and spoonfuls
-                    designed to disappear quickly.
+                    From the first layer of frosting to the final strawberry,
+                    every order is finished by hand.
                 </p>
 
-                <span class="obsession-card-link">
-                    Browse Dessert Jars
-                    <span aria-hidden="true">→</span>
-                </span>
-
-            </div>
-        </a>
-
-
-        <!-- Stuffed Apples -->
-
-        <a
-            href="pages/shop.html"
-            class="obsession-card obsession-card-yellow"
-        >
-            <div class="obsession-card-image-wrap">
-
-                <img
-                    src="images/products/TPJStuffedApplesPedestal.png"
-                    alt="Decorated stuffed cheesecake apples on a pedestal"
-                    class="obsession-card-image"
-                >
-
             </div>
 
-            <div class="obsession-card-content">
 
-                <p class="obsession-card-number">03</p>
+            <div class="process-filmstrip">
 
-                <h3>Stuffed Apples</h3>
+                <figure class="process-card">
+
+                    <img
+                        src="images/process/TPJFrostingSpread.PNG"
+                        alt="Frosting being spread onto a cake"
+                    >
+
+                    <figcaption>
+                        <span>01</span>
+                        Frosting Applied
+                    </figcaption>
+
+                </figure>
+
+
+                <figure class="process-card">
+
+                    <img
+                        src="images/process/TPJAcrylicScraper.PNG"
+                        alt="Cake being smoothed with an acrylic scraper"
+                    >
+
+                    <figcaption>
+                        <span>02</span>
+                        Smoothed By Hand
+                    </figcaption>
+
+                </figure>
+
+
+                <figure class="process-card">
+
+                    <img
+                        src="images/process/TPJPipingRosette.PNG"
+                        alt="Buttercream rosette being piped onto a cake"
+                    >
+
+                    <figcaption>
+                        <span>03</span>
+                        Details Piped
+                    </figcaption>
+
+                </figure>
+
+
+                <figure class="process-card">
+
+                    <img
+                        src="images/process/TPJSprinkleFinish.PNG"
+                        alt="Sprinkles being added to a cake"
+                    >
+
+                    <figcaption>
+                        <span>04</span>
+                        Sprinkles Added
+                    </figcaption>
+
+                </figure>
+
+
+                <figure class="process-card">
+
+                    <img
+                        src="images/process/TPJStrawberryPlacement.PNG"
+                        alt="Chocolate-covered strawberry being placed on a finished cake"
+                    >
+
+                    <figcaption>
+                        <span>05</span>
+                        Final Touch
+                    </figcaption>
+
+                </figure>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             REVIEWS
+        ========================================== -->
+
+        <section class="reviews-section reveal">
+
+            <div class="reviews-card">
+
+                <p class="section-eyebrow">
+                    Sweet Words
+                </p>
+
+
+                <h2>
+                    Reviews Are<br>
+                    On The Way.
+                </h2>
+
 
                 <p>
-                    Crisp apples stuffed with cheesecake and dressed
-                    for their main-character moment.
+                    Customer reviews will appear here as the Sweet Tooth
+                    Society grows.
                 </p>
 
-                <span class="obsession-card-link">
-                    See Stuffed Apples
-                    <span aria-hidden="true">→</span>
-                </span>
-
             </div>
-        </a>
+
+        </section>
 
 
-        <!-- Custom Cakes -->
+        <!-- =========================================
+             NEWSLETTER
+        ========================================== -->
 
-        <a
-            href="pages/custom-cakes.html"
-            class="obsession-card obsession-card-lavender"
-        >
-            <div class="obsession-card-image-wrap">
+        <section class="newsletter-section reveal">
 
-                <img
-                    src="images/products/TPJPinkHeartGiftSet.jpg"
-                    alt="Pink heart cake with matching decorated cupcakes"
-                    class="obsession-card-image"
+            <div class="newsletter-card">
+
+                <div class="newsletter-copy">
+
+                    <p class="section-eyebrow">
+                        The Sweet Tooth Society
+                    </p>
+
+
+                    <h2>
+                        Got A<br>
+                        Sweet Tooth?
+                    </h2>
+
+
+                    <p>
+                        Join for new dessert drops, seasonal flavors and
+                        early access to upcoming batches.
+                    </p>
+
+                </div>
+
+
+                <form
+                    class="newsletter-form"
+                    id="newsletterForm"
+                    action="#"
+                    method="post"
                 >
 
+                    <label
+                        for="newsletterEmail"
+                        class="visually-hidden"
+                    >
+                        Email address
+                    </label>
+
+
+                    <input
+                        type="email"
+                        id="newsletterEmail"
+                        name="email"
+                        placeholder="Enter your email address"
+                        required
+                    >
+
+
+                    <button type="submit">
+                        Join The Society
+                    </button>
+
+
+                    <small>
+                        Cravings delivered. Spam never.
+                    </small>
+
+
+                    <p
+                        class="newsletter-message"
+                        id="newsletterMessage"
+                        aria-live="polite"
+                    ></p>
+
+                </form>
+
             </div>
 
-            <div class="obsession-card-content">
-
-                <p class="obsession-card-number">04</p>
-
-                <h3>Custom Cakes</h3>
-
-                <p>
-                    Celebration cakes made for birthdays, milestones,
-                    grand entrances, and excellent pictures.
-                </p>
-
-                <span class="obsession-card-link">
-                    Start Your Cake
-                    <span aria-hidden="true">→</span>
-                </span>
-
-            </div>
-        </a>
-
-    </div>
-
-</section>
-
-
-<!-- The next homepage campaign section will be added here. -->
-    
+        </section>
 
     </main>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-inner">
+
+            <div class="footer-brand">
+
+                <img
+                    src="images/brand/TPJLogoBubbleHorizontal.png"
+                    alt="The Pastry Junkie"
+                    class="footer-logo"
+                >
+
+
+                <p>
+                    Custom cakes and loaded desserts made for serious
+                    sweet tooth celebrations.
+                </p>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h3>
+                    Celebrate
+                </h3>
+
+                <a href="pages/custom-cakes.html">
+                    Custom Cakes
+                </a>
+
+                <a href="pages/gallery.html">
+                    Cake Gallery
+                </a>
+
+                <a href="pages/custom-cakes.html">
+                    Start An Inquiry
+                </a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h3>
+                    Feed Your Sweet Tooth
+                </h3>
+
+                <a href="pages/shop.html">
+                    Loaded Treats
+                </a>
+
+                <a href="pages/shop.html">
+                    Current Menu
+                </a>
+
+                <a href="pages/shop.html">
+                    Seasonal Drops
+                </a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h3>
+                    The Details
+                </h3>
+
+                <a href="pages/about.html">
+                    About
+                </a>
+
+                <a href="pages/contact.html">
+                    Contact
+                </a>
+
+                <a href="pages/faq.html">
+                    FAQ
+                </a>
+
+                <a href="pages/policies.html">
+                    Order Policies
+                </a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h3>
+                    Stay Sweet
+                </h3>
+
+                <a href="mailto:business@thepastryjunkie.com">
+                    business@thepastryjunkie.com
+                </a>
+
+                <p>
+                    Dallas-Fort Worth, Texas
+                </p>
+
+                <p>
+                    Pickup by appointment
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <p>
+                © <span id="currentYear"></span>
+                The Pastry Junkie. All rights reserved.
+            </p>
+
+            <a href="pages/terms.html">
+                Terms And Conditions
+            </a>
+
+        </div>
+
+    </footer>
 
 
     <script src="js/main.js"></script>
