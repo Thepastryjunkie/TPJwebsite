@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Lilita+One&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 
 /* =========================================
@@ -17,10 +17,10 @@
     --signature-pink: #FF4FA3;
 
     /*
-       Warmer frosting pink that belongs
-       inside the dessert-room photograph.
+       Final light pink selected to coordinate
+       with the straight wordmark.
     */
-    --headline-pink: #F7B6D2;
+    --headline-pink: #FCD2F0;
 
     --soft-pink: #FBD4E5;
     --frosting-pink: #F7B6D2;
@@ -46,8 +46,6 @@ html {
 }
 
 body {
-    position: relative;
-
     margin: 0;
     min-width: 320px;
 
@@ -84,12 +82,6 @@ a {
     -webkit-tap-highlight-color: transparent;
 }
 
-main,
-.site-footer {
-    position: relative;
-    z-index: 2;
-}
-
 .visually-hidden {
     position: absolute;
 
@@ -104,31 +96,6 @@ main,
     white-space: nowrap;
 
     border: 0;
-}
-
-
-/* =========================================
-   FIXED DESSERT-ROOM BACKGROUND
-========================================= */
-
-.site-background {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-
-    width: 100%;
-    height: 100%;
-
-    background-image:
-        url("images/hero/TPJNieceDessertRoom.png");
-
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-
-    opacity: 0.3;
-
-    pointer-events: none;
 }
 
 
@@ -287,14 +254,14 @@ main,
     padding: 5px var(--side-padding);
 
     display: grid;
-    grid-template-columns: minmax(720px, 910px) 1fr auto;
+    grid-template-columns: minmax(730px, 930px) 1fr auto;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
 }
 
 .header-logo-link {
     width: 100%;
-    height: 116px;
+    height: 118px;
 
     display: flex;
     align-items: center;
@@ -306,20 +273,16 @@ main,
 }
 
 .header-logo {
-    width: 900px;
+    width: 965px;
     max-width: none;
-    height: 112px;
+    height: 116px;
 
     object-fit: contain;
     object-position: left center;
 
-    /*
-       Same approved size.
-       Only moved farther left.
-    */
     transform:
-        translateX(-34px)
-        scale(1.32);
+        translateX(-58px)
+        scale(1.36);
 
     transform-origin: left center;
 }
@@ -515,18 +478,14 @@ main,
     inset: 0;
     z-index: 2;
 
-    /*
-       Smaller soft glow behind the text.
-       It does not bleach the entire left half.
-    */
     background:
         radial-gradient(
-            ellipse at 15% 50%,
-            rgba(255, 248, 242, 0.97) 0%,
-            rgba(255, 248, 242, 0.93) 22%,
-            rgba(255, 248, 242, 0.69) 35%,
-            rgba(255, 248, 242, 0.2) 50%,
-            transparent 67%
+            ellipse at 14% 50%,
+            rgba(255, 248, 242, 0.96) 0%,
+            rgba(255, 248, 242, 0.9) 20%,
+            rgba(255, 248, 242, 0.65) 33%,
+            rgba(255, 248, 242, 0.18) 48%,
+            transparent 65%
         );
 
     pointer-events: none;
@@ -582,14 +541,10 @@ main,
 .hero-headline-pink {
     color: var(--headline-pink);
 
-    /*
-       Soft blush edge and shallow chocolate shadow.
-       No thick white block underneath.
-    */
     text-shadow:
-        1px 1px 0 #FCE1EC,
-        2px 2px 0 #FCE1EC,
-        4px 5px 0 rgba(90, 42, 30, 0.92);
+        1px 1px 0 rgba(255, 255, 255, 0.45),
+        2px 2px 0 rgba(255, 255, 255, 0.3),
+        3px 4px 0 rgba(90, 42, 30, 0.65);
 
     animation: headlineRise 760ms 120ms ease both;
 }
@@ -600,8 +555,7 @@ main,
     color: var(--chocolate);
 
     text-shadow:
-        1px 1px 0 #FBE1EC,
-        3px 4px 0 rgba(247, 182, 210, 0.95);
+        2px 3px 0 rgba(252, 210, 240, 0.82);
 
     animation: headlineRise 760ms 210ms ease both;
 }
@@ -664,48 +618,7 @@ main,
 
 
 /* =========================================
-   REAL FROSTING TRANSITIONS
-   Cropped from the dessert-room hero image
-========================================= */
-
-.hero-frosting-divider {
-    position: relative;
-    z-index: 3;
-
-    width: 100%;
-    height: 90px;
-
-    background-image:
-        url("images/hero/TPJNieceDessertRoom.png");
-
-    background-repeat: no-repeat;
-    background-size: cover;
-
-    box-shadow:
-        inset 0 7px 14px rgba(90, 42, 30, 0.08),
-        inset 0 -7px 14px rgba(90, 42, 30, 0.08);
-}
-
-.hero-frosting-divider-top {
-    background-position: center top;
-}
-
-.hero-frosting-divider-bottom {
-    background-position: center bottom;
-}
-
-.dessert-room-window {
-    position: relative;
-    z-index: 2;
-
-    height: 76px;
-
-    background: transparent;
-}
-
-
-/* =========================================
-   SOCIETY
+   SOCIETY / MASCOT
 ========================================= */
 
 .society-section {
@@ -714,15 +627,48 @@ main,
     padding: 105px var(--side-padding);
 
     overflow: hidden;
+    isolation: isolate;
+
+    background: var(--frosting-pink);
+}
+
+.society-background {
+    position: absolute;
+    inset: -35px;
+    z-index: -3;
+
+    background-image:
+        url("images/hero/TPJNieceDessertRoom.png");
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+
+    filter:
+        blur(22px)
+        saturate(0.85);
+
+    transform: scale(1.08);
+}
+
+.society-background-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
 
     background:
-        rgba(247, 182, 210, 0.96);
-
-    box-shadow:
-        0 25px 60px rgba(90, 42, 30, 0.12);
+        linear-gradient(
+            90deg,
+            rgba(247, 182, 210, 0.91) 0%,
+            rgba(247, 182, 210, 0.86) 48%,
+            rgba(252, 210, 240, 0.92) 100%
+        );
 }
 
 .society-inner {
+    position: relative;
+    z-index: 2;
+
     width: min(100%, 1270px);
     margin: 0 auto;
 
@@ -751,7 +697,7 @@ main,
 
     filter:
         drop-shadow(
-            0 24px 22px rgba(90, 42, 30, 0.17)
+            0 24px 22px rgba(90, 42, 30, 0.2)
         );
 
     animation: gentleFloat 5s ease-in-out infinite;
@@ -761,25 +707,25 @@ main,
     position: absolute;
     z-index: 1;
 
-    width: 235px;
+    width: 220px;
     height: auto;
 
     object-fit: contain;
 
-    opacity: 0.3;
+    opacity: 0.24;
 
     pointer-events: none;
 }
 
 .society-sprinkles-left {
     top: 9%;
-    left: -5%;
+    left: -4%;
 
     transform: rotate(-15deg);
 }
 
 .society-sprinkles-right {
-    right: -5%;
+    right: -4%;
     bottom: 8%;
 
     transform: rotate(17deg);
@@ -803,7 +749,7 @@ main,
     font-weight: 800;
     letter-spacing: 0.04em;
 
-    box-shadow: 7px 8px 0 var(--headline-pink);
+    box-shadow: 7px 8px 0 var(--signature-pink);
 }
 
 .society-note-one {
@@ -820,35 +766,123 @@ main,
     transform: rotate(4deg);
 }
 
-.society-copy h2 {
-    margin: 0;
-
-    font-family: 'Lilita One', cursive;
-    font-size: clamp(66px, 7vw, 103px);
-    font-weight: 400;
-    line-height: 0.86;
-    letter-spacing: -0.025em;
-}
-
 .society-statement {
-    max-width: 570px;
-    margin: 30px 0 31px;
+    max-width: 590px;
+    margin: 0 0 31px;
 }
 
 .society-statement p {
-    margin: 0 0 15px;
+    margin: 0 0 19px;
 
     color: var(--buttercream-brown);
 
-    font-size: 16px;
-    line-height: 1.72;
+    font-size: 17px;
+    line-height: 1.78;
 }
 
 .society-statement p:first-child {
     color: var(--chocolate);
 
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
+}
+
+
+/* =========================================
+   HANDWRITTEN BRAND QUOTE
+========================================= */
+
+.brand-quote-section {
+    position: relative;
+
+    padding: 95px var(--side-padding);
+
+    overflow: hidden;
+
+    background: var(--cream);
+}
+
+.brand-quote-section::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    opacity: 0.2;
+
+    background-image:
+        url("images/animations/TPJSprinklesFlat.png");
+
+    background-repeat: repeat;
+    background-size: 330px auto;
+
+    pointer-events: none;
+}
+
+.brand-quote-inner {
+    position: relative;
+    z-index: 2;
+
+    width: min(100%, 1050px);
+    margin: 0 auto;
+    padding: 55px 90px;
+
+    text-align: center;
+}
+
+.brand-quote-inner blockquote {
+    margin: 0;
+
+    color: var(--chocolate);
+
+    font-family: 'Caveat', cursive;
+    font-size: clamp(41px, 5vw, 68px);
+    font-weight: 500;
+    line-height: 1.05;
+}
+
+.brand-quote-inner blockquote strong {
+    display: block;
+
+    margin-top: 10px;
+
+    color: var(--deep-berry);
+
+    font-weight: 700;
+}
+
+.quote-mark {
+    position: absolute;
+
+    color: var(--headline-pink);
+
+    font-family: 'Lilita One', cursive;
+    font-size: 125px;
+    line-height: 1;
+
+    opacity: 0.9;
+}
+
+.quote-mark-left {
+    top: 4px;
+    left: 12px;
+}
+
+.quote-mark-right {
+    right: 12px;
+    bottom: -30px;
+}
+
+.quote-signature {
+    margin: 30px 0 0;
+
+    color: var(--signature-pink);
+
+    text-transform: uppercase;
+
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.17em;
 }
 
 
@@ -863,11 +897,7 @@ main,
 
     overflow: hidden;
 
-    background:
-        rgba(255, 248, 242, 0.97);
-
-    box-shadow:
-        0 25px 60px rgba(90, 42, 30, 0.1);
+    background: var(--cream);
 }
 
 .cake-feature-inner {
@@ -928,8 +958,8 @@ main,
 }
 
 .cake-feature-image {
-    width: min(93%, 680px);
-    max-height: 590px;
+    width: min(95%, 705px);
+    max-height: 610px;
 
     object-fit: contain;
 
@@ -954,12 +984,14 @@ main,
     overflow: hidden;
 
     background:
-        rgba(66, 26, 18, 0.98);
+        linear-gradient(
+            120deg,
+            var(--deep-chocolate) 0%,
+            #682C28 48%,
+            var(--deep-berry) 100%
+        );
 
     color: var(--cream);
-
-    box-shadow:
-        0 25px 60px rgba(45, 15, 10, 0.25);
 }
 
 .loaded-treats-inner {
@@ -980,9 +1012,9 @@ main,
 }
 
 .loaded-main-image {
-    width: 112%;
-    max-width: 850px;
-    max-height: 790px;
+    width: 118%;
+    max-width: 890px;
+    max-height: 820px;
 
     object-fit: contain;
 
@@ -1065,11 +1097,7 @@ main,
 
     overflow: hidden;
 
-    background:
-        rgba(252, 231, 241, 0.97);
-
-    box-shadow:
-        0 25px 60px rgba(90, 42, 30, 0.1);
+    background: var(--blush-pink);
 }
 
 .section-heading {
@@ -1174,19 +1202,15 @@ main,
 .reviews-section {
     position: relative;
 
-    padding: 110px var(--side-padding);
+    padding: 78px var(--side-padding);
 
-    background:
-        rgba(247, 182, 210, 0.96);
-
-    box-shadow:
-        0 25px 60px rgba(90, 42, 30, 0.1);
+    background: var(--frosting-pink);
 }
 
 .reviews-card {
-    max-width: 880px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 60px 44px;
+    padding: 45px 38px;
 
     border: 3px solid var(--chocolate);
     border-radius: 32px;
@@ -1195,21 +1219,21 @@ main,
 
     text-align: center;
 
-    box-shadow: 12px 12px 0 var(--headline-pink);
+    box-shadow: 11px 11px 0 var(--headline-pink);
 }
 
 .reviews-card h2 {
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: clamp(55px, 6.5vw, 88px);
+    font-size: clamp(48px, 5.6vw, 74px);
     font-weight: 400;
-    line-height: 0.88;
+    line-height: 0.9;
 }
 
 .reviews-card > p:not(.section-eyebrow) {
-    max-width: 580px;
-    margin: 23px auto 0;
+    max-width: 550px;
+    margin: 21px auto 0;
 
     color: var(--buttercream-brown);
 
@@ -1226,8 +1250,7 @@ main,
 
     padding: 115px var(--side-padding);
 
-    background:
-        rgba(252, 231, 241, 0.98);
+    background: var(--blush-pink);
 }
 
 .newsletter-card {
@@ -1365,8 +1388,8 @@ main,
 }
 
 .footer-logo {
-    width: 315px;
-    max-height: 175px;
+    width: 335px;
+    max-height: 185px;
 
     object-fit: contain;
     object-position: left center;
@@ -1379,6 +1402,14 @@ main,
     color: rgba(255, 248, 242, 0.72);
 
     line-height: 1.72;
+}
+
+.footer-brand .footer-love-line {
+    color: var(--headline-pink);
+
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .footer-column {
@@ -1418,6 +1449,26 @@ main,
     font-size: 13px;
 }
 
+.footer-notice {
+    width: min(100%, var(--page-width));
+    margin: 0 auto;
+    padding: 20px var(--side-padding);
+
+    border-top: 1px solid rgba(255, 248, 242, 0.12);
+
+    text-align: center;
+}
+
+.footer-notice p {
+    max-width: 950px;
+    margin: 0 auto;
+
+    color: rgba(255, 248, 242, 0.54);
+
+    font-size: 11px;
+    line-height: 1.65;
+}
+
 .footer-bottom {
     padding: 23px var(--side-padding);
 
@@ -1438,6 +1489,11 @@ main,
 
 .footer-bottom a {
     text-decoration: none;
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 22px;
 }
 
 
@@ -1538,7 +1594,7 @@ main,
     }
 
     .header-inner {
-        grid-template-columns: minmax(530px, 650px) 1fr auto;
+        grid-template-columns: minmax(550px, 680px) 1fr auto;
         gap: 14px;
     }
 
@@ -1547,12 +1603,12 @@ main,
     }
 
     .header-logo {
-        width: 690px;
-        height: 98px;
+        width: 735px;
+        height: 100px;
 
         transform:
-            translateX(-25px)
-            scale(1.22);
+            translateX(-38px)
+            scale(1.26);
     }
 
     .main-navigation {
@@ -1613,13 +1669,13 @@ main,
     }
 
     .header-logo {
-        width: 490px;
+        width: 510px;
         max-width: 100%;
-        height: 62px;
+        height: 64px;
 
         object-position: center;
 
-        transform: scale(1.13);
+        transform: scale(1.15);
         transform-origin: center;
     }
 
@@ -1670,10 +1726,7 @@ main,
         display: none;
     }
 
-    .editorial-hero {
-        min-height: 700px;
-    }
-
+    .editorial-hero,
     .editorial-hero-inner {
         min-height: 700px;
     }
@@ -1684,14 +1737,6 @@ main,
 
     .hero-headline {
         font-size: clamp(63px, 9vw, 91px);
-    }
-
-    .hero-frosting-divider {
-        height: 72px;
-    }
-
-    .dessert-room-window {
-        height: 55px;
     }
 
     .society-inner {
@@ -1708,7 +1753,7 @@ main,
     }
 
     .society-sprinkles {
-        width: 180px;
+        width: 170px;
     }
 
     .cake-feature-inner {
@@ -1729,8 +1774,8 @@ main,
     }
 
     .loaded-main-image {
-        width: min(110%, 800px);
-        max-height: 740px;
+        width: min(115%, 830px);
+        max-height: 770px;
     }
 
     .loaded-treats-copy {
@@ -1773,12 +1818,6 @@ main,
         --side-padding: 18px;
     }
 
-    .site-background {
-        opacity: 0.18;
-
-        background-position: center top;
-    }
-
     .site-header {
         border-top-width: 4px;
     }
@@ -1792,11 +1831,11 @@ main,
     }
 
     .header-logo {
-        width: 350px;
+        width: 365px;
         max-width: 100%;
-        height: 50px;
+        height: 52px;
 
-        transform: scale(1.08);
+        transform: scale(1.1);
     }
 
     .search-button {
@@ -1871,18 +1910,14 @@ main,
         width: 100%;
     }
 
-    .hero-frosting-divider {
-        height: 58px;
-
-        background-size: auto 760px;
-    }
-
-    .dessert-room-window {
-        height: 38px;
-    }
-
     .society-section {
         padding: 75px var(--side-padding) 90px;
+    }
+
+    .society-background {
+        filter:
+            blur(17px)
+            saturate(0.8);
     }
 
     .society-inner {
@@ -1900,7 +1935,7 @@ main,
 
     .society-sprinkles {
         width: 125px;
-        opacity: 0.25;
+        opacity: 0.2;
     }
 
     .society-note {
@@ -1913,8 +1948,33 @@ main,
         text-align: center;
     }
 
-    .society-copy h2 {
-        font-size: clamp(61px, 17vw, 83px);
+    .society-statement {
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .brand-quote-section {
+        padding: 75px var(--side-padding);
+    }
+
+    .brand-quote-inner {
+        padding: 42px 28px;
+    }
+
+    .brand-quote-inner blockquote {
+        font-size: clamp(36px, 11vw, 53px);
+    }
+
+    .quote-mark {
+        font-size: 78px;
+    }
+
+    .quote-mark-left {
+        left: -5px;
+    }
+
+    .quote-mark-right {
+        right: -5px;
     }
 
     .cake-feature-section {
@@ -1953,7 +2013,7 @@ main,
 
     .cake-feature-image {
         width: 100%;
-        max-height: 440px;
+        max-height: 460px;
     }
 
     .loaded-treats-section {
@@ -1961,12 +2021,12 @@ main,
     }
 
     .loaded-treats-visual {
-        min-height: 570px;
+        min-height: 590px;
     }
 
     .loaded-main-image {
-        width: 112%;
-        max-height: 610px;
+        width: 118%;
+        max-height: 630px;
     }
 
     .loaded-treats-copy h2 {
@@ -1992,9 +2052,23 @@ main,
     }
 
     .process-filmstrip {
-        padding-left: var(--side-padding);
+        position: relative;
+
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+
+        padding:
+            5px
+            var(--side-padding)
+            30px;
 
         grid-template-columns: repeat(5, 260px);
+
+        scrollbar-width: thin;
+    }
+
+    .process-card {
+        scroll-snap-align: center;
     }
 
     .process-card img {
@@ -2002,11 +2076,11 @@ main,
     }
 
     .reviews-section {
-        padding: 90px var(--side-padding);
+        padding: 75px var(--side-padding);
     }
 
     .reviews-card {
-        padding: 44px 23px;
+        padding: 40px 23px;
     }
 
     .newsletter-section {
@@ -2046,6 +2120,11 @@ main,
         object-position: center;
     }
 
+    .footer-brand p {
+        margin-right: auto;
+        margin-left: auto;
+    }
+
     .footer-column {
         align-items: center;
     }
@@ -2067,13 +2146,10 @@ main,
 @media (max-width: 430px) {
 
     .header-logo {
-        width: 285px;
+        width: 295px;
     }
 
-    .editorial-hero {
-        min-height: 760px;
-    }
-
+    .editorial-hero,
     .editorial-hero-inner {
         min-height: 760px;
     }
@@ -2095,12 +2171,12 @@ main,
     }
 
     .loaded-treats-visual {
-        min-height: 500px;
+        min-height: 515px;
     }
 
     .loaded-main-image {
-        width: 116%;
-        max-height: 540px;
+        width: 120%;
+        max-height: 555px;
     }
 
 }
