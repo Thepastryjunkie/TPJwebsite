@@ -90,7 +90,19 @@ a {
 
     border: 0;
 }
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
 
+.site-header,
+main,
+.site-footer {
+    width: 100%;
+    max-width: 100%;
+}
 
 /* =========================================
    BUTTONS
@@ -1687,25 +1699,38 @@ a {
     .site-header {
         border-top-width: 4px;
     }
+.header-inner {
+    width: 100%;
+    max-width: 100%;
 
-    .header-inner {
-        grid-template-columns: 42px 1fr auto;
-    }
+    padding: 4px 12px;
 
-    .header-logo-link {
-        height: 52px;
-    }
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    gap: 8px;
+}
+
+.header-logo-link {
+    width: 100%;
+    min-width: 0;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
 
 .header-logo {
-    width: 375px;
-    max-width: none;
-    height: 56px;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    max-height: 52px;
 
     object-fit: contain;
     object-position: center;
 
-    transform: scale(1.1);
-    transform-origin: center;
+    transform: none;
 }
 
     .search-button {
@@ -1784,7 +1809,7 @@ a {
     }
 
     .society-mascot {
-        width: 108%;
+        width: 100%;
         max-height: 465px;
     }
 
@@ -1853,7 +1878,7 @@ a {
     }
 
     .cake-feature-image {
-        width: 112%;
+        width: 100%;
         max-height: 490px;
 
         transform: none;
@@ -1868,7 +1893,7 @@ a {
     }
 
     .loaded-main-image {
-        width: 118%;
+        width: 100%;
         max-height: 630px;
     }
 
@@ -1976,18 +2001,26 @@ a {
     }
 }
 
+.society-mascot,
+.cake-feature-image,
+.loaded-main-image {
+    max-width: 100%;
+}
+
 /* =========================================
    SMALL MOBILE
 ========================================= */
 
 @media (max-width: 430px) {
 
- .header-logo {
-    width: 330px;
-    height: 52px;
+.header-logo {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    max-height: 48px;
 
-    transform: scale(1.08);
-} 
+    transform: none;
+}
 
     .hero-headline {
         font-size: clamp(43px, 13.8vw, 58px);
@@ -2014,7 +2047,7 @@ a {
     }
 
     .loaded-main-image {
-        width: 120%;
+        width: 100%;
         max-height: 555px;
     }
 
