@@ -2022,7 +2022,6 @@ a {
 /* =========================================
    REDUCED MOTION
 ========================================= */
-
 @media (prefers-reduced-motion: reduce) {
 
     html {
@@ -2043,8 +2042,9 @@ a {
 
     .reveal {
         opacity: 1;
-
         transform: none;
     }
 
-}
+}   /* closes prefers-reduced-motion */
+
+}   /* <-- ADD THIS ONE */
