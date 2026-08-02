@@ -652,27 +652,27 @@ a {
 
     animation: gentleFloat 5s ease-in-out infinite;
 }
-
 .society-edge-sprinkles {
     position: absolute;
-    z-index: 2;
+    z-index: 1;
 
-    width: 420px;
+    width: 360px;
 
-    opacity: 0.3;
+    opacity: 0.40;
 
     pointer-events: none;
 }
+
 .society-edge-sprinkles-left {
-    top: -20px;
-    left: -55px;
+    top: -50px;
+    left: -115px;
 
     transform: rotate(-12deg);
 }
 
 .society-edge-sprinkles-right {
-    right: -60px;
-    bottom: -25px;
+    right: -125px;
+    bottom: -65px;
 
     transform: rotate(17deg);
 }
