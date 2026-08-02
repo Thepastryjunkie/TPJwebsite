@@ -23,7 +23,7 @@
 
     --page-width: 1560px;
     --side-padding: clamp(24px, 4.5vw, 76px);
-    --header-height: 132px;
+    --header-height: 142px;
 }
 
 
@@ -244,10 +244,10 @@ a {
     height: 100%;
 
     margin: 0 auto;
-    padding: 5px var(--side-padding);
+    padding: 10px var(--side-padding);
 
     display: grid;
- grid-template-columns: minmax(680px, 780px) 1fr auto;  
+ grid-template-columns: minmax(650px, 745px) 1fr auto;  
     align-items: center;
     gap: 14px;
 }
@@ -295,7 +295,7 @@ a {
     text-transform: uppercase;
     white-space: nowrap;
 
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.045em;
 }
@@ -1043,7 +1043,6 @@ a {
 
     box-shadow: 10px 12px 0 var(--signature-pink);
 }
-
 .process-card img {
     width: 100%;
     height: 370px;
@@ -1051,6 +1050,12 @@ a {
     object-fit: cover;
 
     background: var(--dark-chocolate);
+
+    transition: transform 350ms ease;
+}
+.process-card:hover img,
+.process-card:focus-within img {
+    transform: scale(1.035);
 }
 
 .process-card figcaption {
@@ -1424,27 +1429,27 @@ a {
 @media (max-width: 1360px) {
 
     :root {
-        --header-height: 116px;
+        --header-height: 122px;
     }
 
 .header-inner {
-    grid-template-columns: minmax(540px, 640px) 1fr auto;
+    grid-template-columns: minmax(520px, 610px) 1fr auto;
     gap: 12px;
 }
 
     .header-logo-link {
-        height: 102px;
+        height: 108px;
     }
 .header-logo {
-    width: 620px;
+    width: 590px;
     max-width: none;
     height: auto;
-    max-height: 98px;
+    max-height: 94px;
 
     object-fit: contain;
     object-position: left center;
 
-    transform: translateX(-15px);
+    transform: translateX(-8px);
 }
     .main-navigation {
         gap: 11px;
@@ -1969,6 +1974,7 @@ a {
 
         text-align: center;
     }
+}
 
 /* =========================================
    SMALL MOBILE
@@ -2047,4 +2053,3 @@ a {
 
 }   /* closes prefers-reduced-motion */
 
-}   /* <-- ADD THIS ONE */
