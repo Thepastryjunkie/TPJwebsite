@@ -71,11 +71,25 @@ const cakeProducts = {
         shape: "heart",
         size: '5"',
         standardLayers: 1,
-        tallLayers: 2,
+        tallLayers: 1,
         standardPrice: 165,
-        tallPrice: 185,
+        tallPrice: 165,
         standardServings: "2–4",
-        tallServings: "4–6"
+        tallServings: "2–4",
+        allowExtraLayer: false
+    },
+
+    "heart-5-tall": {
+        name: '5" Tall Heart Cake',
+        shape: "heart",
+        size: '5"',
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 155,
+        tallPrice: 155,
+        standardServings: "4–6",
+        tallServings: "4–6",
+        allowExtraLayer: false
     },
 
     "heart-6": {
@@ -525,6 +539,11 @@ function getExtraLayerPrice() {
     return product.tallPrice - product.standardPrice;
 }
 
+function cakeAllowsExtraLayer() {
+    const product = getSelectedCakeProduct();
+    return product.allowExtraLayer !== false;
+}
+
 
 /* =========================================
    ESTIMATE CALCULATIONS
@@ -636,41 +655,16 @@ function updateVisibleCakeShape() {
 function updateRendererSize() {
     const product = getSelectedCakeProduct();
 
-    let scale = 1;
+    const widthScaleMap = {
+        '4"': 0.68,
+        '5"': 0.76,
+        '6"': 0.84,
+        '8"': 1,
+        '9"': 1.08,
+        '10"': 1.16
+    };
 
-    switch (product.size) {
-        case '4"':
-            scale = 0.77;
-            break;
-
-        case '5"':
-            scale = 0.85;
-            break;
-
-        case '6"':
-            scale = 0.94;
-            break;
-
-        case '8"':
-            scale = 1;
-            break;
-
-        case '9"':
-            scale = 1.05;
-            break;
-
-        case '10"':
-            scale = 1.1;
-            break;
-
-        default:
-            scale = 1;
-    }
-
-    cakeRenderer.style.setProperty(
-        "--cake-size-scale",
-        String(scale)
-    );
+    const widthScale = widthScaleMap[product.size] || 1;
 
     [
         roundCakeShape,
@@ -681,8 +675,11 @@ function updateRendererSize() {
             return;
         }
 
-        shapeElement.style.scale = scale;
+        shapeElement.style.transformOrigin = "center bottom";
+        shapeElement.style.setProperty("--cake-width-scale", widthScale);
     });
+
+    cakeRenderer.dataset.cakeSize = product.size.replace('"', "");
 }
 
 
@@ -691,6 +688,16 @@ function updateRendererSize() {
 ========================================= */
 
 function updateCakeHeight() {
+    if (!cakeAllowsExtraLayer()) {
+        builderState.isTall = false;
+        if (extraLayerToggle) {
+            extraLayerToggle.checked = false;
+            extraLayerToggle.disabled = true;
+        }
+    } else if (extraLayerToggle) {
+        extraLayerToggle.disabled = false;
+    }
+
     cakeRenderer.classList.toggle(
         "is-tall",
         builderState.isTall
@@ -718,10 +725,29 @@ function updateCakeHeight() {
     }
 
     if (bentoLayerNotice) {
+        const isFixedFiveInchHeart =
+            builderState.cakeProductId === "heart-5-bento" ||
+            builderState.cakeProductId === "heart-5-tall";
+
         bentoLayerNotice.classList.toggle(
             "is-hidden",
-            builderState.cakeProductId !==
-                "heart-5-bento"
+            !isFixedFiveInchHeart
+        );
+
+        if (builderState.cakeProductId === "heart-5-bento") {
+            bentoLayerNotice.textContent =
+                'The 5" Sweetheart Bento Box is a one-layer heart cake packaged with cupcakes.';
+        } else if (builderState.cakeProductId === "heart-5-tall") {
+            bentoLayerNotice.textContent =
+                'The 5" Tall Heart Cake is a separate two-layer cake and does not include cupcakes.';
+        }
+    }
+
+    const layerToggleLabel = extraLayerToggle?.closest(".extra-layer-toggle");
+    if (layerToggleLabel) {
+        layerToggleLabel.classList.toggle(
+            "is-hidden",
+            !cakeAllowsExtraLayer()
         );
     }
 }
@@ -903,12 +929,40 @@ function updateSelectedCardStates() {
    FULL PREVIEW RENDER
 ========================================= */
 
+function updateFinishPreview() {
+    const finishClasses = [
+        "finish-smooth",
+        "finish-texture",
+        "finish-vintage",
+        "finish-watercolor",
+        "finish-palette",
+        "finish-edible"
+    ];
+
+    cakeRenderer.classList.remove(...finishClasses);
+
+    const finishClassMap = {
+        "Smooth Finish": "finish-smooth",
+        "Simple Texture": "finish-texture",
+        "Vintage Piping": "finish-vintage",
+        "Watercolor Finish": "finish-watercolor",
+        "Palette Knife Finish": "finish-palette",
+        "Edible Image Design": "finish-edible"
+    };
+
+    const finishClass = finishClassMap[builderState.cakeFinish];
+    if (finishClass) {
+        cakeRenderer.classList.add(finishClass);
+    }
+}
+
 function renderCakePreview() {
     updateVisibleCakeShape();
     updateRendererSize();
     updateCakeHeight();
     updateCakeRendererColors();
     updateDecorationVisibility();
+    updateFinishPreview();
     updatePreviewSummary();
     updateSelectedCardStates();
 }
@@ -2962,6 +3016,7 @@ getElements(
             input.value;
 
         updateSelectedCardStates();
+        renderCakePreview();
     });
 });
 
@@ -3350,3 +3405,4 @@ function initializeBuilder() {
 
 
 initializeBuilder();
+
