@@ -2,7 +2,7 @@
 
 
 /* =========================================
-   VARIABLES
+   BRAND VARIABLES
 ========================================= */
 
 :root {
@@ -21,24 +21,23 @@
     --blush-pink: #FCE7F1;
     --deep-berry: #7B294F;
 
-    --gold: #D7A62B;
-    --soft-gold: #F5D778;
+    --gold: #D4A934;
+    --soft-gold: #F4D66E;
 
     --success: #37795B;
     --warning: #9A4B17;
     --error: #A72C49;
 
     --page-width: 1580px;
-    --side-padding: clamp(18px, 4vw, 70px);
+    --side-padding: clamp(18px, 4vw, 72px);
 
-    --builder-header-height: 80px;
-    --progress-height: 74px;
+    --builder-header-height: 92px;
+    --builder-progress-height: 72px;
 
     --cake-color: #F7B6D2;
-    --cake-highlight: #FFDCEA;
-    --cake-shadow-color: #D982A8;
+    --cake-highlight: #FFE1ED;
+    --cake-shadow-color: #D382A5;
     --accent-color: #FF4FA3;
-    --drip-color: #5A2A1E;
 }
 
 
@@ -75,6 +74,10 @@ svg {
     max-width: 100%;
 }
 
+a {
+    color: inherit;
+}
+
 button,
 input,
 textarea,
@@ -100,10 +103,6 @@ select {
 
 textarea {
     resize: vertical;
-}
-
-a {
-    color: inherit;
 }
 
 fieldset {
@@ -136,27 +135,27 @@ fieldset {
 
 
 /* =========================================
-   APPLICATION
+   APP BACKGROUND
 ========================================= */
 
-.builder-app {
+.cake-builder-app {
     min-height: 100vh;
 
     background:
         radial-gradient(
-            circle at 7% 12%,
-            rgba(255, 79, 163, 0.11),
+            circle at 8% 10%,
+            rgba(255, 79, 163, 0.1),
             transparent 24%
         ),
         radial-gradient(
-            circle at 94% 38%,
+            circle at 93% 36%,
             rgba(123, 41, 79, 0.08),
             transparent 30%
         ),
         linear-gradient(
             135deg,
             var(--cream) 0%,
-            #FFF1F7 55%,
+            #FFF2F7 56%,
             var(--blush-pink) 100%
         );
 }
@@ -176,10 +175,10 @@ fieldset {
     border-top: 5px solid var(--signature-pink);
     border-bottom: 1px solid rgba(255, 248, 242, 0.12);
 
-    background: rgba(66, 26, 18, 0.98);
+    background: rgba(45, 15, 10, 0.98);
     color: var(--cream);
 
-    box-shadow: 0 10px 30px rgba(45, 15, 10, 0.2);
+    box-shadow: 0 10px 30px rgba(45, 15, 10, 0.22);
 
     backdrop-filter: blur(12px);
 }
@@ -189,10 +188,10 @@ fieldset {
     min-height: calc(var(--builder-header-height) - 5px);
 
     margin: 0 auto;
-    padding: 12px var(--side-padding);
+    padding: 10px var(--side-padding);
 
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(110px, 1fr) minmax(320px, 620px) minmax(110px, 1fr);
     align-items: center;
     gap: 24px;
 }
@@ -209,7 +208,7 @@ fieldset {
     text-decoration: none;
     text-transform: uppercase;
 
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.06em;
 
@@ -219,7 +218,7 @@ fieldset {
 }
 
 .builder-back-link span {
-    font-size: 20px;
+    font-size: 19px;
 }
 
 .builder-back-link:hover,
@@ -228,15 +227,12 @@ fieldset {
 
     transform: translateX(-4px);
 }
-/* =========================================
-   BUILDER HEADER BRAND
-========================================= */
 
 .builder-logo-link {
     justify-self: center;
 
-    width: min(100%, 560px);
-    height: 58px;
+    width: min(100%, 590px);
+    height: 68px;
 
     display: flex;
     align-items: center;
@@ -250,14 +246,14 @@ fieldset {
 .builder-header-logo {
     display: block;
 
-    width: 540px;
+    width: 575px;
     max-width: none;
-    height: 58px;
+    height: 68px;
 
     object-fit: contain;
     object-position: center;
 
-    transform: scale(1.12);
+    transform: scale(1.08);
     transform-origin: center;
 
     transition: transform 180ms ease;
@@ -265,28 +261,42 @@ fieldset {
 
 .builder-logo-link:hover .builder-header-logo,
 .builder-logo-link:focus-visible .builder-header-logo {
-    transform: scale(1.15);
+    transform: scale(1.11);
 }
 
 .header-summary-button {
     justify-self: end;
 
-    min-width: 108px;
-    min-height: 46px;
-    padding: 8px 14px;
+    min-width: 118px;
+    min-height: 48px;
+    padding: 8px 15px;
 
-    display: none;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 9px;
 
-    border: 2px solid rgba(255, 248, 242, 0.35);
+    border: 2px solid rgba(255, 248, 242, 0.32);
     border-radius: 999px;
 
-    background: rgba(255, 248, 242, 0.08);
+    background: rgba(255, 248, 242, 0.07);
     color: var(--cream);
 
     cursor: pointer;
+
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        transform 180ms ease;
+}
+
+.header-summary-button:hover,
+.header-summary-button:focus-visible {
+    border-color: var(--headline-pink);
+
+    background: rgba(252, 210, 240, 0.1);
+
+    transform: translateY(-2px);
 }
 
 .header-summary-button span,
@@ -295,9 +305,10 @@ fieldset {
 }
 
 .header-summary-button span {
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 9px;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .header-summary-button strong {
@@ -310,7 +321,7 @@ fieldset {
 
 
 /* =========================================
-   PROGRESS NAVIGATION
+   PROGRESS
 ========================================= */
 
 .builder-progress {
@@ -318,9 +329,9 @@ fieldset {
     top: var(--builder-header-height);
     z-index: 1100;
 
-    height: var(--progress-height);
+    min-height: var(--builder-progress-height);
 
-    border-bottom: 1px solid rgba(90, 42, 30, 0.13);
+    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
 
     background: rgba(255, 248, 242, 0.96);
 
@@ -331,36 +342,34 @@ fieldset {
 
 .builder-progress-inner {
     width: min(100%, var(--page-width));
-    height: 100%;
+    min-height: var(--builder-progress-height);
 
     margin: 0 auto;
     padding: 10px var(--side-padding);
 
     display: grid;
-    grid-template-columns: repeat(8, minmax(84px, 1fr));
-    gap: 7px;
+    grid-template-columns: repeat(8, minmax(92px, 1fr));
+    gap: 8px;
 
     overflow-x: auto;
     scrollbar-width: thin;
 }
 
 .progress-step {
-    position: relative;
-
-    min-width: 86px;
-    min-height: 48px;
+    min-width: 92px;
+    min-height: 50px;
     padding: 7px 8px;
 
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 8px;
 
     border: 0;
-    border-radius: 14px;
+    border-radius: 13px;
 
     background: transparent;
-    color: rgba(90, 42, 30, 0.54);
+    color: rgba(90, 42, 30, 0.53);
 
     text-transform: uppercase;
     white-space: nowrap;
@@ -378,18 +387,18 @@ fieldset {
 }
 
 .progress-step span {
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
 
     display: grid;
     place-items: center;
 
     flex: 0 0 auto;
 
-    border: 2px solid rgba(90, 42, 30, 0.26);
+    border: 2px solid rgba(90, 42, 30, 0.23);
     border-radius: 50%;
 
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .progress-step:hover,
@@ -430,7 +439,7 @@ fieldset {
 ========================================= */
 
 .builder-main {
-    padding: 42px 0 92px;
+    padding: 38px 0 92px;
 }
 
 .builder-main-inner {
@@ -440,29 +449,48 @@ fieldset {
     padding: 0 var(--side-padding);
 
     display: grid;
-    grid-template-columns: minmax(450px, 0.9fr) minmax(520px, 1.1fr);
+    grid-template-columns: minmax(430px, 0.92fr) minmax(540px, 1.08fr);
     align-items: start;
-    gap: clamp(34px, 4.5vw, 76px);
+    gap: clamp(34px, 4.6vw, 78px);
+}
+
+.cake-preview-column,
+.builder-form-column {
+    min-width: 0;
 }
 
 
 /* =========================================
-   PREVIEW PANEL
+   PREVIEW
 ========================================= */
 
-.cake-preview-panel {
+.cake-preview-sticky {
     position: sticky;
     top: calc(
         var(--builder-header-height) +
-        var(--progress-height) +
-        24px
+        var(--builder-progress-height) +
+        20px
     );
 
-    min-height: 760px;
-    padding: clamp(26px, 3vw, 46px);
+    height: calc(
+        100vh -
+        var(--builder-header-height) -
+        var(--builder-progress-height) -
+        38px
+    );
+
+    min-height: 570px;
+    max-height: 830px;
+
+    padding: clamp(22px, 2.5vw, 39px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
 
     border: 3px solid var(--chocolate);
-    border-radius: 38px;
+    border-radius: 34px;
 
     background:
         linear-gradient(
@@ -473,11 +501,11 @@ fieldset {
         );
 
     box-shadow:
-        14px 15px 0 rgba(255, 79, 163, 0.24),
-        0 30px 55px rgba(90, 42, 30, 0.13);
+        13px 14px 0 rgba(255, 79, 163, 0.22),
+        0 28px 50px rgba(90, 42, 30, 0.12);
 }
 
-.preview-panel-header {
+.preview-heading-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -491,33 +519,33 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.15em;
 }
 
-.preview-panel-header h1 {
-    max-width: 520px;
+.preview-heading-row h1 {
+    max-width: 500px;
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: clamp(38px, 4.6vw, 68px);
+    font-size: clamp(37px, 4.4vw, 64px);
     font-weight: 400;
-    line-height: 0.93;
+    line-height: 0.92;
 }
 
-.preview-panel-header > div > p:last-child {
-    margin: 13px 0 0;
+.preview-heading-row > div > p:last-child {
+    margin: 12px 0 0;
 
     color: var(--deep-berry);
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .reset-cake-button {
-    min-height: 40px;
-    padding: 8px 15px;
+    min-height: 39px;
+    padding: 8px 14px;
 
     border: 2px solid var(--chocolate);
     border-radius: 999px;
@@ -527,7 +555,7 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
@@ -549,73 +577,38 @@ fieldset {
 
 
 /* =========================================
-   CAKE RENDERER
+   RENDERER STAGE
 ========================================= */
 
 .cake-renderer-stage {
-    min-height: 540px;
+    min-height: 0;
+
+    flex: 1 1 auto;
 
     display: grid;
     place-items: center;
 }
 
 .cake-renderer {
-    width: min(100%, 680px);
+    width: min(100%, 700px);
     height: auto;
 
     overflow: visible;
-
-    filter:
-        drop-shadow(
-            0 22px 22px rgba(90, 42, 30, 0.12)
-        );
 }
 
-.renderer-shadow {
-    fill: rgba(45, 15, 10, 0.19);
+.cake-floor-shadow {
+    fill: rgba(45, 15, 10, 0.17);
+
+    filter: blur(10px);
 }
 
-.renderer-board-bottom {
-    fill: #D1A6BA;
+.cake-board-bottom {
+    fill: #D0A4B9;
 }
 
-.renderer-board-top {
+.cake-board-top {
     stroke: var(--chocolate);
     stroke-width: 5;
-}
-
-.cake-body-shape,
-.cake-top-shape,
-.cake-bottom-shadow,
-.cake-side-highlight,
-.cake-decoration-group,
-.piped-border {
-    transition:
-        fill 320ms ease,
-        stroke 320ms ease,
-        opacity 260ms ease,
-        transform 420ms ease;
-}
-
-.cake-body-shape,
-.cake-top-shape {
-    stroke: var(--chocolate);
-    stroke-width: 5;
-    stroke-linejoin: round;
-}
-
-.cake-side-highlight {
-    fill: rgba(255, 255, 255, 0.22);
-
-    pointer-events: none;
-}
-
-.cake-bottom-shadow {
-    fill: var(--cake-shadow-color);
-
-    opacity: 0.38;
-
-    pointer-events: none;
 }
 
 .cake-shape-group {
@@ -628,73 +621,299 @@ fieldset {
 }
 
 .cake-shape-group:not(.is-hidden) {
-    animation: shapeEntrance 420ms ease both;
+    animation: shapeEntrance 360ms ease both;
 }
 
-.cake-decoration-group:not(.is-hidden) {
-    animation: decorationPop 320ms ease both;
+.cake-body-shape,
+.cake-top-shape {
+    stroke: var(--chocolate);
+    stroke-width: 5;
+    stroke-linejoin: round;
+
+    transition:
+        fill 300ms ease,
+        transform 420ms ease;
 }
 
-.layer-divider-shadow {
+.cake-body-highlight {
+    fill: rgba(255, 255, 255, 0.22);
+
+    pointer-events: none;
+}
+
+.cake-lower-shade {
+    fill: var(--cake-shadow-color);
+
+    opacity: 0.38;
+
+    pointer-events: none;
+}
+
+.cake-decoration-group,
+.cake-finish-group {
+    transition:
+        opacity 250ms ease,
+        transform 360ms ease;
+}
+
+.cake-decoration-group:not(.is-hidden),
+.cake-finish-group:not(.is-hidden) {
+    animation: decorationEntrance 300ms ease both;
+}
+
+
+/* =========================================
+   SIZE STATES
+========================================= */
+
+.cake-renderer[data-size="4"] .cake-shape-group {
+    transform: scaleX(0.7);
+}
+
+.cake-renderer[data-size="5"] .cake-shape-group {
+    transform: scaleX(0.78);
+}
+
+.cake-renderer[data-size="6"] .cake-shape-group {
+    transform: scaleX(0.86);
+}
+
+.cake-renderer[data-size="8"] .cake-shape-group {
+    transform: scaleX(1);
+}
+
+.cake-renderer[data-size="9"] .cake-shape-group {
+    transform: scaleX(1.08);
+}
+
+.cake-renderer[data-size="10"] .cake-shape-group {
+    transform: scaleX(1.16);
+}
+
+
+/* =========================================
+   TALL STATES
+========================================= */
+
+.cake-renderer.is-tall #roundCakeShape {
+    transform:
+        translateY(-46px)
+        scaleY(1.15);
+}
+
+.cake-renderer.is-tall #heartCakeShape {
+    transform:
+        translateY(-34px)
+        scaleY(1.12);
+}
+
+.cake-renderer.is-tall #starCakeShape {
+    transform:
+        translateY(-30px)
+        scaleY(1.1);
+}
+
+.cake-renderer.is-tall[data-size="4"] #roundCakeShape {
+    transform:
+        translateY(-46px)
+        scaleX(0.7)
+        scaleY(1.15);
+}
+
+.cake-renderer.is-tall[data-size="5"] .cake-shape-group {
+    transform:
+        translateY(-36px)
+        scaleX(0.78)
+        scaleY(1.12);
+}
+
+.cake-renderer.is-tall[data-size="6"] .cake-shape-group {
+    transform:
+        translateY(-42px)
+        scaleX(0.86)
+        scaleY(1.13);
+}
+
+.cake-renderer.is-tall[data-size="8"] .cake-shape-group {
+    transform:
+        translateY(-42px)
+        scaleX(1)
+        scaleY(1.13);
+}
+
+.cake-renderer.is-tall[data-size="9"] .cake-shape-group {
+    transform:
+        translateY(-42px)
+        scaleX(1.08)
+        scaleY(1.13);
+}
+
+.cake-renderer.is-tall[data-size="10"] .cake-shape-group {
+    transform:
+        translateY(-42px)
+        scaleX(1.16)
+        scaleY(1.13);
+}
+
+.cake-renderer.is-tall #chocolateDripDecoration,
+.cake-renderer.is-tall #cherriesDecoration,
+.cake-renderer.is-tall #topperDecoration,
+.cake-renderer.is-tall #vintagePipingDecoration {
+    transform: translateY(-42px);
+}
+
+.cake-renderer.is-tall #pearlsDecoration,
+.cake-renderer.is-tall #sprinklesDecoration,
+.cake-renderer.is-tall #goldAccentDecoration,
+.cake-renderer.is-tall #butterfliesDecoration,
+.cake-renderer.is-tall #flowersDecoration,
+.cake-renderer.is-tall #textureFinishDecoration,
+.cake-renderer.is-tall #watercolorFinishDecoration,
+.cake-renderer.is-tall #paletteFinishDecoration,
+.cake-renderer.is-tall #edibleImageFinishDecoration {
+    transform: translateY(-18px);
+}
+
+
+/* =========================================
+   EXTRA LAYER
+========================================= */
+
+.cake-layer-seam-shadow {
     fill: none;
-    stroke: rgba(90, 42, 30, 0.25);
+    stroke: rgba(90, 42, 30, 0.23);
     stroke-width: 8;
     stroke-linecap: round;
 }
 
-.layer-divider-highlight {
+.cake-layer-seam-highlight {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.4);
+    stroke: rgba(255, 255, 255, 0.38);
     stroke-width: 4;
     stroke-linecap: round;
 }
 
-.chocolate-drip {
-    fill: var(--drip-color);
-    stroke: var(--chocolate);
-    stroke-width: 3;
+
+/* =========================================
+   FINISHES
+========================================= */
+
+.texture-stroke {
+    fill: none;
+
+    stroke: rgba(90, 42, 30, 0.18);
+    stroke-width: 8;
+    stroke-linecap: round;
 }
 
-.ribbon-band,
-.ribbon-bow,
-.ribbon-knot {
+.watercolor-shape {
+    opacity: 0.25;
+
+    mix-blend-mode: multiply;
+}
+
+.watercolor-one {
     fill: var(--accent-color);
+}
+
+.watercolor-two {
+    fill: var(--deep-berry);
+}
+
+.watercolor-three {
+    fill: var(--cake-highlight);
+}
+
+.palette-stroke {
+    opacity: 0.86;
+
+    stroke: rgba(90, 42, 30, 0.24);
+    stroke-width: 2;
+}
+
+.palette-stroke-one {
+    fill: var(--accent-color);
+}
+
+.palette-stroke-two {
+    fill: var(--soft-gold);
+}
+
+.palette-stroke-three {
+    fill: var(--deep-berry);
+}
+
+.edible-image-frame {
+    fill: var(--cream);
+
     stroke: var(--chocolate);
+    stroke-width: 4;
+}
+
+.edible-image-person {
+    fill: var(--accent-color);
+}
+
+.edible-image-text {
+    fill: var(--chocolate);
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+
+/* =========================================
+   DECORATIONS
+========================================= */
+
+.chocolate-drip {
+    fill: var(--chocolate);
+
+    stroke: var(--dark-chocolate);
     stroke-width: 3;
 }
 
 .cake-pearl {
     fill: #FFFDF8;
-    stroke: #C7A7B7;
+
+    stroke: #C7A8B7;
     stroke-width: 2;
 }
 
 .cake-sprinkle {
     fill: none;
+
     stroke-width: 8;
     stroke-linecap: round;
 }
 
-.sprinkle-pink {
+.sprinkle-one {
     stroke: var(--signature-pink);
 }
 
-.sprinkle-cream {
+.sprinkle-two {
     stroke: #FFF1DC;
 }
 
-.sprinkle-purple {
+.sprinkle-three {
     stroke: #A873CE;
 }
 
-.gold-flake {
-    fill: var(--gold);
-    stroke: #AD7A13;
-    stroke-width: 1;
+.ribbon-band,
+.ribbon-bow-loop,
+.ribbon-bow-knot,
+.ribbon-tail {
+    fill: var(--accent-color);
+
+    stroke: var(--chocolate);
+    stroke-width: 3;
+    stroke-linejoin: round;
 }
 
 .butterfly-wing {
     fill: var(--accent-color);
+
     stroke: var(--chocolate);
     stroke-width: 2;
 }
@@ -703,8 +922,30 @@ fieldset {
     fill: var(--chocolate);
 }
 
+.gold-flake {
+    fill: var(--gold);
+
+    stroke: #A87914;
+    stroke-width: 1;
+}
+
+.flower-petal {
+    fill: var(--accent-color);
+
+    stroke: var(--chocolate);
+    stroke-width: 2;
+}
+
+.flower-center {
+    fill: var(--soft-gold);
+
+    stroke: var(--chocolate);
+    stroke-width: 2;
+}
+
 .cherry-stem {
     fill: none;
+
     stroke: #427444;
     stroke-width: 5;
     stroke-linecap: round;
@@ -712,31 +953,22 @@ fieldset {
 
 .cake-cherry {
     fill: #B92D40;
+
     stroke: #7D1728;
     stroke-width: 3;
 }
 
-.flower-petal {
-    fill: var(--accent-color);
-    stroke: var(--chocolate);
-    stroke-width: 2;
-}
-
-.flower-center {
-    fill: var(--soft-gold);
-    stroke: var(--chocolate);
-    stroke-width: 2;
-}
-
 .topper-stick {
     fill: none;
+
     stroke: var(--gold);
     stroke-width: 8;
     stroke-linecap: round;
 }
 
-.topper-sign {
+.topper-plaque {
     fill: var(--cream);
+
     stroke: var(--gold);
     stroke-width: 5;
 }
@@ -748,51 +980,30 @@ fieldset {
     font-size: 24px;
 }
 
-.piped-border {
+.vintage-top-shells,
+.vintage-bottom-shells,
+.vintage-swag {
     fill: none;
 
     stroke: var(--cake-highlight);
-    stroke-width: 26;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-
-/* =========================================
-   TALL CAKE STATES
-========================================= */
-
-.cake-renderer.is-tall #roundCakeShape {
-    transform:
-        translateY(-54px)
-        scaleY(1.15);
+.vintage-top-shells,
+.vintage-bottom-shells {
+    stroke-width: 25;
 }
 
-.cake-renderer.is-tall #heartCakeShape {
-    transform:
-        translateY(-42px)
-        scaleY(1.12);
+.vintage-swag {
+    stroke-width: 14;
 }
 
-.cake-renderer.is-tall #starCakeShape {
-    transform:
-        translateY(-38px)
-        scaleY(1.11);
-}
+.vintage-rosette {
+    fill: var(--cake-highlight);
 
-.cake-renderer.is-tall #chocolateDripDecoration,
-.cake-renderer.is-tall #cherriesDecoration,
-.cake-renderer.is-tall #topperDecoration,
-.cake-renderer.is-tall .top-piped-border {
-    transform: translateY(-58px);
-}
-
-.cake-renderer.is-tall #pearlsDecoration,
-.cake-renderer.is-tall #sprinklesDecoration,
-.cake-renderer.is-tall #goldAccentDecoration,
-.cake-renderer.is-tall #butterfliesDecoration,
-.cake-renderer.is-tall #flowersDecoration {
-    transform: translateY(-24px);
+    stroke: rgba(90, 42, 30, 0.15);
+    stroke-width: 2;
 }
 
 
@@ -800,69 +1011,69 @@ fieldset {
    PREVIEW SUMMARY
 ========================================= */
 
-.preview-quick-summary {
-    padding: 19px 22px;
+.preview-summary {
+    padding: 17px 20px;
 
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 16px;
 
     border: 2px solid var(--chocolate);
-    border-radius: 24px;
+    border-radius: 22px;
 
-    background: rgba(255, 248, 242, 0.91);
+    background: rgba(255, 248, 242, 0.92);
 }
 
-.preview-quick-summary > div {
+.preview-summary > div {
     text-align: center;
 }
 
-.preview-quick-summary span,
-.preview-quick-summary strong {
+.preview-summary span,
+.preview-summary strong {
     display: block;
 }
 
-.preview-quick-summary span {
+.preview-summary span {
     margin-bottom: 4px;
 
     color: var(--deep-berry);
 
     text-transform: uppercase;
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.07em;
 }
 
-.preview-quick-summary strong {
+.preview-summary strong {
     font-family: 'Lilita One', cursive;
-    font-size: 31px;
+    font-size: 29px;
     font-weight: 400;
 }
 
-.preview-price-note {
+.preview-note {
     max-width: 520px;
-    margin: 15px auto 0;
+    margin: 12px auto 0;
 
     color: var(--deep-berry);
 
     text-align: center;
 
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.5;
 }
 
 
 /* =========================================
-   BUILDER STEPS PANEL
+   FORM COLUMN
 ========================================= */
 
-.builder-steps-panel {
-    min-width: 0;
+.builder-form-column {
+    padding-top: 5px;
 }
 
 .builder-step {
-    animation: stepEntrance 420ms ease both;
+    animation: stepEntrance 360ms ease both;
 }
 
 .step-heading {
@@ -870,35 +1081,35 @@ fieldset {
 }
 
 .step-number {
-    margin: 0 0 12px;
+    margin: 0 0 11px;
 
     color: var(--deep-berry);
 
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.16em;
 }
 
 .step-heading h2 {
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: clamp(55px, 6vw, 91px);
+    font-size: clamp(56px, 6vw, 93px);
     font-weight: 400;
-    line-height: 0.88;
+    line-height: 0.87;
     letter-spacing: -0.025em;
 }
 
 .step-heading > p:last-child {
-    max-width: 680px;
+    max-width: 690px;
     margin: 18px 0 0;
 
     color: var(--buttercream-brown);
 
-    font-size: 16px;
-    line-height: 1.7;
+    font-size: 15px;
+    line-height: 1.68;
 }
 
 
@@ -917,8 +1128,6 @@ fieldset {
     width: 100%;
     margin-bottom: 17px;
 
-    color: var(--chocolate);
-
     font-family: 'Lilita One', cursive;
     font-size: 31px;
     font-weight: 400;
@@ -930,37 +1139,37 @@ fieldset {
 
     color: var(--buttercream-brown);
 
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.55;
 }
 
-.small-field-note {
+.field-note {
     margin: 13px 0 0;
 
     color: var(--buttercream-brown);
 
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.55;
 }
 
 
 /* =========================================
-   SHARED OPTION CARDS
+   SHARED CARD STATES
 ========================================= */
 
-.visual-option-card,
+.occasion-card,
 .shape-choice-card,
 .cake-size-card,
-.text-option-card,
-.description-option-card,
-.style-choice-card,
+.text-choice-card,
+.description-choice-card,
 .upgrade-card,
+.style-choice-card,
 .decoration-choice-card,
 .extra-product-card,
 .color-choice {
     position: relative;
 
-    border: 2px solid rgba(90, 42, 30, 0.22);
+    border: 2px solid rgba(90, 42, 30, 0.2);
 
     background: var(--white);
 
@@ -973,30 +1182,30 @@ fieldset {
         transform 180ms ease;
 }
 
-.visual-option-card:hover,
+.occasion-card:hover,
 .shape-choice-card:hover,
 .cake-size-card:hover,
-.text-option-card:hover,
-.description-option-card:hover,
-.style-choice-card:hover,
+.text-choice-card:hover,
+.description-choice-card:hover,
 .upgrade-card:hover,
+.style-choice-card:hover,
 .decoration-choice-card:hover,
 .extra-product-card:hover,
 .color-choice:hover {
     border-color: var(--signature-pink);
 
-    box-shadow: 0 12px 25px rgba(90, 42, 30, 0.1);
+    box-shadow: 0 12px 25px rgba(90, 42, 30, 0.09);
 
     transform: translateY(-4px);
 }
 
-.visual-option-card.is-selected,
+.occasion-card.is-selected,
 .shape-choice-card.is-selected,
 .cake-size-card.is-selected,
-.text-option-card.is-selected,
-.description-option-card.is-selected,
-.style-choice-card.is-selected,
+.text-choice-card.is-selected,
+.description-choice-card.is-selected,
 .upgrade-card.is-selected,
+.style-choice-card.is-selected,
 .decoration-choice-card.is-selected,
 .extra-product-card.is-selected,
 .color-choice.is-selected {
@@ -1005,17 +1214,17 @@ fieldset {
     background: var(--headline-pink);
 
     box-shadow:
-        0 0 0 3px rgba(255, 79, 163, 0.12),
-        0 12px 25px rgba(90, 42, 30, 0.1);
+        0 0 0 3px rgba(255, 79, 163, 0.1),
+        0 12px 25px rgba(90, 42, 30, 0.09);
 }
 
-.visual-option-card input,
+.occasion-card input,
 .shape-choice-card input,
 .cake-size-card input,
-.text-option-card input,
-.description-option-card input,
-.style-choice-card input,
+.text-choice-card input,
+.description-choice-card input,
 .upgrade-card input,
+.style-choice-card input,
 .decoration-choice-card input,
 .extra-product-card input,
 .color-choice input {
@@ -1024,130 +1233,183 @@ fieldset {
     opacity: 0;
     pointer-events: none;
 }
+
+
 /* =========================================
-   OCCASION CARDS
+   OCCASIONS
 ========================================= */
 
-.occasion-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-
-    gap:22px;
-
-    margin-top:32px;
-
+.occasion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
 }
 
-.visual-option-card{
+.occasion-card {
+    min-height: 205px;
+    padding: 27px;
 
-    position:relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
 
-    padding:30px;
+    border-radius: 0;
 
-    border:2px solid rgba(90,42,30,.12);
+    text-align: left;
+}
 
-    border-radius:28px;
+.occasion-number {
+    display: block;
 
-    background:#fff;
+    margin-bottom: auto;
 
-    cursor:pointer;
+    color: var(--headline-pink);
 
-    overflow:hidden;
+    font-family: 'Lilita One', cursive;
+    font-size: 53px;
+    line-height: 1;
+
+    transition: color 180ms ease;
+}
+
+.occasion-card strong {
+    display: block;
+
+    margin-bottom: 9px;
+
+    font-family: 'Lilita One', cursive;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.occasion-card small {
+    display: block;
+
+    color: var(--buttercream-brown);
+
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.occasion-card.is-selected .occasion-number {
+    color: var(--signature-pink);
+}
+
+
+/* =========================================
+   FORMS
+========================================= */
+
+.two-column-fields {
+    margin-bottom: 23px;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.full-width-field {
+    grid-column: 1 / -1;
+}
+
+.form-field {
+    margin-bottom: 23px;
+
+    display: block;
+}
+
+.form-field > span,
+.conditional-field > label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select,
+.conditional-field input {
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 17px;
+
+    border: 2px solid rgba(90, 42, 30, 0.23);
+    border-radius: 16px;
+
+    background: var(--white);
+    color: var(--chocolate);
+
+    outline: none;
 
     transition:
-        transform .22s ease,
-        box-shadow .22s ease,
-        border-color .22s ease;
-
+        border-color 180ms ease,
+        box-shadow 180ms ease;
 }
 
-.visual-option-card:hover{
-
-    transform:translateY(-6px);
-
-    border-color:var(--signature-pink);
-
-    box-shadow:
-        0 18px 45px rgba(90,42,30,.10);
-
+.form-field textarea {
+    min-height: 125px;
 }
 
-.visual-option-card input{
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus,
+.conditional-field input:focus {
+    border-color: var(--signature-pink);
 
-    position:absolute;
-
-    opacity:0;
-
+    box-shadow: 0 0 0 4px rgba(255, 79, 163, 0.11);
 }
 
-.occasion-card-number{
-
-    display:block;
-
-    margin-bottom:18px;
-
-    color:var(--headline-pink);
-
-    font-family:'Lilita One',cursive;
-
-    font-size:54px;
-
-    line-height:1;
-
+.form-field input::placeholder,
+.form-field textarea::placeholder,
+.conditional-field input::placeholder {
+    color: rgba(90, 42, 30, 0.41);
 }
 
-.visual-option-card strong{
+.date-field-shell {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 17px;
 
-    display:block;
+    border: 2px solid rgba(90, 42, 30, 0.23);
+    border-radius: 16px;
 
-    margin-bottom:10px;
-
-    color:var(--chocolate);
-
-    font-family:'Lilita One',cursive;
-
-    font-size:32px;
-
-    font-weight:400;
-
-    line-height:1;
-
+    background: var(--white);
 }
 
-.visual-option-card small{
+.date-field-shell:focus-within {
+    border-color: var(--signature-pink);
 
-    display:block;
-
-    color:var(--buttercream-brown);
-
-    font-size:15px;
-
-    line-height:1.6;
-
+    box-shadow: 0 0 0 4px rgba(255, 79, 163, 0.11);
 }
 
-.visual-option-card:has(input:checked){
+.date-field-shell input {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
 
-    border-color:var(--signature-pink);
+    border: 0;
 
-    background:linear-gradient(
-        180deg,
-        #FFF 0%,
-        #FFF8FC 100%
-    );
+    background: transparent;
 
-    box-shadow:
-        0 22px 48px rgba(255,79,163,.16);
-
+    outline: none;
 }
 
-.visual-option-card:has(input:checked) .occasion-card-number{
+.conditional-field,
+.conditional-section {
+    margin-bottom: 28px;
+    padding: 22px;
 
-    color:var(--signature-pink);
+    border: 2px dashed rgba(90, 42, 30, 0.23);
+    border-radius: 21px;
 
+    background: rgba(255, 255, 255, 0.63);
 }
+
 
 /* =========================================
    CALLOUTS
@@ -1157,26 +1419,26 @@ fieldset {
 .builder-warning,
 .form-error-message,
 .submission-message {
-    margin: 18px 0 25px;
-    padding: 16px 18px;
+    margin: 18px 0 24px;
+    padding: 15px 17px;
 
-    border-radius: 17px;
+    border-radius: 16px;
 
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.55;
 }
 
 .builder-callout {
-    border: 2px solid rgba(55, 121, 91, 0.3);
+    border: 2px solid rgba(55, 121, 91, 0.28);
 
-    background: rgba(55, 121, 91, 0.1);
+    background: rgba(55, 121, 91, 0.09);
     color: #24573F;
 }
 
 .builder-warning {
-    border: 2px solid rgba(154, 75, 23, 0.32);
+    border: 2px solid rgba(154, 75, 23, 0.3);
 
-    background: rgba(213, 130, 67, 0.12);
+    background: rgba(213, 130, 67, 0.11);
     color: #7A3710;
 }
 
@@ -1186,7 +1448,7 @@ fieldset {
 }
 
 .builder-warning p {
-    margin: 5px 0 0;
+    margin: 4px 0 0;
 }
 
 .form-error-message {
@@ -1207,16 +1469,16 @@ fieldset {
 }
 
 .submission-message.is-error {
-    border: 2px solid rgba(167, 44, 73, 0.3);
+    border: 2px solid rgba(167, 44, 73, 0.28);
 
-    background: rgba(167, 44, 73, 0.1);
+    background: rgba(167, 44, 73, 0.09);
     color: var(--error);
 }
 
 .submission-message.is-success {
-    border: 2px solid rgba(55, 121, 91, 0.3);
+    border: 2px solid rgba(55, 121, 91, 0.28);
 
-    background: rgba(55, 121, 91, 0.1);
+    background: rgba(55, 121, 91, 0.09);
     color: var(--success);
 }
 
@@ -1232,7 +1494,7 @@ fieldset {
 }
 
 .shape-choice-card {
-    min-height: 170px;
+    min-height: 165px;
     padding: 21px 15px;
 
     display: flex;
@@ -1241,43 +1503,71 @@ fieldset {
     justify-content: center;
     gap: 8px;
 
-    border-radius: 25px;
+    border-radius: 23px;
 
     text-align: center;
 }
 
-.shape-card-icon {
+.shape-drawing {
+    position: relative;
+
     width: 64px;
     height: 64px;
+
+    display: block;
+
+    margin-bottom: 4px;
+}
+
+.shape-round {
+    border: 5px solid var(--signature-pink);
+    border-radius: 50%;
+}
+
+.shape-heart::before {
+    content: "♥";
+
+    position: absolute;
+    inset: 0;
 
     display: grid;
     place-items: center;
 
     color: var(--signature-pink);
 
-    font-size: 57px;
+    font-size: 68px;
     line-height: 1;
 }
 
-.round-shape-icon {
-    border: 6px solid var(--signature-pink);
-    border-radius: 50%;
+.shape-star::before {
+    content: "★";
+
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--signature-pink);
+
+    font-size: 67px;
+    line-height: 1;
 }
 
 .shape-choice-card strong {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .shape-choice-card small {
     color: var(--deep-berry);
 
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.35;
 }
 
 
 /* =========================================
-   CAKE SIZES
+   SIZE CARDS
 ========================================= */
 
 .cake-size-grid {
@@ -1286,145 +1576,45 @@ fieldset {
     gap: 14px;
 }
 
-.single-size-grid {
-    grid-template-columns: minmax(220px, 330px);
-}
-
 .cake-size-card {
-    min-height: 215px;
+    min-height: 190px;
     padding: 21px 15px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 6px;
 
-    border-radius: 25px;
+    border-radius: 23px;
 
     text-align: center;
 }
 
-.cake-size-visual {
-    position: relative;
+.size-label {
+    display: block;
 
-    width: var(--cake-card-width, 82px);
-    height: 60px;
-
-    display: grid;
-    place-items: center;
-
-    margin-bottom: 6px;
-
-    border: 4px solid var(--chocolate);
-    border-radius: 50% 50% 18px 18px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #E69AB9,
-            #F7B6D2,
-            #D77D9F
-        );
-}
-
-.cake-size-visual::before {
-    content: "";
-
-    position: absolute;
-    top: -13px;
-    left: 50%;
-
-    width: 100%;
-    height: 24px;
-
-    border: 4px solid var(--chocolate);
-    border-radius: 50%;
-
-    background: #FFD9E8;
-
-    transform: translateX(-50%);
-}
-
-.size-4 {
-    --cake-card-width: 58px;
-}
-
-.size-6 {
-    --cake-card-width: 76px;
-}
-
-.size-8 {
-    --cake-card-width: 93px;
-}
-
-.size-9 {
-    --cake-card-width: 103px;
-}
-
-.size-10 {
-    --cake-card-width: 113px;
-}
-
-.heart-size-5,
-.heart-size-6,
-.heart-size-9,
-.star-size-8 {
-    height: auto;
-
-    border: 0;
-    border-radius: 0;
-
-    background: none;
     color: var(--signature-pink);
 
-    font-size: 64px;
-}
-
-.heart-size-5::before,
-.heart-size-6::before,
-.heart-size-9::before,
-.star-size-8::before {
-    display: none;
-}
-
-.heart-size-5 {
-    font-size: 50px;
-}
-
-.heart-size-6 {
-    font-size: 63px;
-}
-
-.heart-size-9 {
-    font-size: 78px;
-}
-
-.star-size-8 {
-    font-size: 76px;
-}
-
-.cake-size-card strong,
-.cake-size-card span,
-.cake-size-card b {
-    display: block;
+    font-family: 'Lilita One', cursive;
+    font-size: 47px;
+    line-height: 1;
 }
 
 .cake-size-card strong {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.3;
 }
 
-.cake-size-card > span:not(.cake-size-visual) {
+.cake-size-card small {
     color: var(--deep-berry);
 
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.4;
 }
 
 .cake-size-card b {
-    margin-top: 4px;
-
-    color: var(--chocolate);
+    margin-top: 5px;
 
     font-family: 'Lilita One', cursive;
     font-size: 25px;
@@ -1436,15 +1626,15 @@ fieldset {
    EXTRA LAYER
 ========================================= */
 
-.extra-layer-toggle {
+.extra-layer-control {
     padding: 20px;
 
     display: flex;
     align-items: center;
     gap: 18px;
 
-    border: 2px solid rgba(90, 42, 30, 0.24);
-    border-radius: 22px;
+    border: 2px solid rgba(90, 42, 30, 0.22);
+    border-radius: 21px;
 
     background: var(--white);
 
@@ -1452,23 +1642,22 @@ fieldset {
 
     transition:
         border-color 180ms ease,
-        background-color 180ms ease,
         transform 180ms ease;
 }
 
-.extra-layer-toggle:hover {
+.extra-layer-control:hover {
     border-color: var(--signature-pink);
 
     transform: translateY(-3px);
 }
 
-.extra-layer-toggle input {
+.extra-layer-control input {
     position: absolute;
 
     opacity: 0;
 }
 
-.toggle-switch {
+.toggle-track {
     position: relative;
 
     width: 64px;
@@ -1484,7 +1673,7 @@ fieldset {
     transition: background-color 180ms ease;
 }
 
-.toggle-switch::after {
+.toggle-track::after {
     content: "";
 
     position: absolute;
@@ -1503,98 +1692,96 @@ fieldset {
         transform 180ms ease;
 }
 
-.extra-layer-toggle input:checked + .toggle-switch {
+.extra-layer-control input:checked + .toggle-track {
     background: var(--signature-pink);
 }
 
-.extra-layer-toggle input:checked + .toggle-switch::after {
+.extra-layer-control input:checked + .toggle-track::after {
     background: var(--white);
 
     transform: translateX(29px);
 }
 
-.toggle-label strong,
-.toggle-label small {
+.toggle-copy strong,
+.toggle-copy small {
     display: block;
 }
 
-.toggle-label strong {
-    font-size: 16px;
+.toggle-copy strong {
+    font-size: 15px;
 }
 
-.toggle-label small {
+.toggle-copy small {
     margin-top: 3px;
 
     color: var(--deep-berry);
 
-    font-size: 11px;
+    font-size: 10px;
 }
 
 
 /* =========================================
-   FLAVORS AND TEXT OPTIONS
+   TEXT CHOICES
 ========================================= */
 
-.flavor-grid,
-.budget-grid {
+.text-choice-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
 }
 
-.text-option-card {
+.text-choice-card {
     min-height: 72px;
     padding: 15px;
 
     display: grid;
     place-items: center;
 
-    border-radius: 18px;
+    border-radius: 17px;
 
     text-align: center;
 }
 
-.text-option-card strong {
-    font-size: 12px;
+.text-choice-card strong {
+    font-size: 11px;
 }
 
 
 /* =========================================
-   DESCRIPTION OPTIONS
+   DESCRIPTION CHOICES
 ========================================= */
 
-.buttercream-grid,
-.description-option-grid {
+.description-choice-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
-.description-option-card {
-    min-height: 145px;
+.description-choice-card {
+    min-height: 140px;
     padding: 20px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
 
-    border-radius: 22px;
+    border-radius: 21px;
 }
 
-.description-option-card strong,
-.description-option-card span {
+.description-choice-card strong,
+.description-choice-card span {
     display: block;
 }
 
-.description-option-card strong {
-    font-size: 15px;
+.description-choice-card strong {
+    font-size: 14px;
 }
 
-.description-option-card span {
+.description-choice-card span {
     color: var(--buttercream-brown);
 
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.5;
 }
 
@@ -1610,31 +1797,26 @@ fieldset {
 }
 
 .upgrade-card {
-    min-height: 100px;
-    padding: 17px;
+    min-height: 95px;
+    padding: 16px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 5px;
 
-    border-radius: 20px;
-}
-
-.upgrade-card strong,
-.upgrade-card span {
-    display: block;
+    border-radius: 18px;
 }
 
 .upgrade-card strong {
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.35;
 }
 
 .upgrade-card span {
     color: var(--deep-berry);
 
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
 }
 
@@ -1646,25 +1828,25 @@ fieldset {
 .color-choice-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    gap: 11px;
 }
 
 .color-choice {
-    padding: 12px 7px;
+    padding: 11px 6px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
 
-    border-radius: 18px;
+    border-radius: 17px;
 
     text-align: center;
 }
 
 .color-swatch {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
 
     border: 4px solid var(--white);
     border-radius: 50%;
@@ -1672,40 +1854,40 @@ fieldset {
     background: var(--swatch-color);
 
     box-shadow:
-        0 0 0 2px rgba(90, 42, 30, 0.25),
-        0 5px 10px rgba(90, 42, 30, 0.11);
+        0 0 0 2px rgba(90, 42, 30, 0.23),
+        0 5px 10px rgba(90, 42, 30, 0.1);
 }
 
 .color-choice small {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
 }
 
-.custom-color-control {
-    margin-top: 16px;
-    padding: 14px 17px;
+.custom-color-field {
+    margin-top: 15px;
+    padding: 14px 16px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
 
-    border: 2px solid rgba(90, 42, 30, 0.22);
-    border-radius: 18px;
+    border: 2px solid rgba(90, 42, 30, 0.2);
+    border-radius: 17px;
 
     background: var(--white);
 
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
-.custom-color-control input {
-    width: 64px;
-    height: 42px;
+.custom-color-field input {
+    width: 62px;
+    height: 41px;
     padding: 2px;
 
     border: 0;
-    border-radius: 12px;
+    border-radius: 11px;
 
     background: transparent;
 
@@ -1714,138 +1896,89 @@ fieldset {
 
 
 /* =========================================
-   STYLE CHOICES
+   STYLE CARDS
 ========================================= */
 
 .style-choice-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
 }
 
 .style-choice-card {
-    min-height: 190px;
-    padding: 16px;
+    min-height: 320px;
+    padding: 12px 12px 19px;
 
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    gap: 6px;
-
-    border-radius: 23px;
-}
-
-.style-preview {
-    width: 100%;
-    height: 92px;
-
-    margin-bottom: 9px;
-
-    display: block;
+    gap: 7px;
 
     overflow: hidden;
 
-    border: 2px solid rgba(90, 42, 30, 0.18);
-    border-radius: 16px;
-
-    background-color: var(--frosting-pink);
+    border-radius: 21px;
 }
 
-.smooth-style-preview {
-    background:
-        linear-gradient(
-            100deg,
-            #E792B4,
-            #F7B6D2 48%,
-            #D7789C
-        );
-}
+.style-photo-placeholder {
+    width: 100%;
+    height: 220px;
+    padding: 20px;
 
-.texture-style-preview {
-    background:
-        repeating-linear-gradient(
-            176deg,
-            #F7B6D2 0 7px,
-            #EFA3C1 8px 11px,
-            #F9C7DB 12px 17px
-        );
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-.vintage-style-preview {
-    background:
-        radial-gradient(
-            circle at 20% 18%,
-            #FFF8F2 0 8%,
-            transparent 9%
-        ) 0 0 / 34px 34px,
-        linear-gradient(
-            #F7B6D2,
-            #E38BAF
-        );
-}
+    margin-bottom: 9px;
 
-.watercolor-style-preview {
-    background:
-        radial-gradient(
-            circle at 24% 30%,
-            rgba(255, 79, 163, 0.75),
-            transparent 31%
-        ),
-        radial-gradient(
-            circle at 68% 58%,
-            rgba(123, 41, 79, 0.42),
-            transparent 33%
-        ),
-        linear-gradient(
-            120deg,
-            #FFF1DC,
-            #F7B6D2
-        );
-}
+    border: 2px dashed rgba(90, 42, 30, 0.22);
+    border-radius: 14px;
 
-.palette-style-preview {
     background:
         linear-gradient(
             145deg,
-            transparent 0 20%,
-            #D4A26A 21% 30%,
-            transparent 31% 45%,
-            #FF4FA3 46% 56%,
-            transparent 57% 70%,
-            #7B294F 71% 80%,
-            transparent 81%
-        ),
-        #FFF1DC;
-}
-
-.image-style-preview {
-    background:
-        linear-gradient(
-            rgba(255, 255, 255, 0.28),
-            rgba(255, 255, 255, 0.28)
-        ),
-        linear-gradient(
-            135deg,
-            #7B294F 0 33%,
-            #F7B6D2 34% 66%,
-            #84563C 67% 100%
+            var(--blush-pink),
+            var(--cream)
         );
+
+    text-align: center;
 }
 
-.style-choice-card strong {
-    font-size: 14px;
+.style-photo-placeholder span,
+.style-photo-placeholder small {
+    display: block;
 }
 
-.style-choice-card small {
+.style-photo-placeholder span {
+    font-family: 'Lilita One', cursive;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.style-photo-placeholder small {
+    margin-top: 8px;
+
+    color: var(--deep-berry);
+
+    font-size: 9px;
+}
+
+.style-choice-card > strong {
+    font-family: 'Lilita One', cursive;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.style-choice-card > small {
     color: var(--deep-berry);
 
     font-size: 10px;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 
 /* =========================================
-   DECORATIONS
+   DECORATION CARDS
 ========================================= */
 
 .decoration-choice-grid {
@@ -1855,19 +1988,21 @@ fieldset {
 }
 
 .decoration-choice-card {
-    min-height: 155px;
+    min-height: 145px;
     padding: 16px;
 
     display: grid;
     grid-template-columns: 54px 1fr;
     grid-template-rows: auto auto;
     align-items: center;
-    gap: 4px 13px;
+    gap: 4px 12px;
 
-    border-radius: 22px;
+    border-radius: 20px;
 }
 
-.decoration-mini-preview {
+.decoration-line-art {
+    position: relative;
+
     grid-row: 1 / 3;
 
     width: 52px;
@@ -1878,65 +2013,95 @@ fieldset {
 
     overflow: hidden;
 
-    border: 2px solid rgba(90, 42, 30, 0.17);
-    border-radius: 15px;
+    border: 2px solid rgba(90, 42, 30, 0.15);
+    border-radius: 14px;
 
     background: var(--cream);
 
-    font-size: 27px;
+    font-size: 11px;
+    font-weight: 800;
 }
 
-.drip-mini-preview {
+.detail-drip::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
     background:
         radial-gradient(
-            circle at 20% 23%,
+            circle at 22% 26%,
             var(--chocolate) 0 17%,
             transparent 19%
         ),
         radial-gradient(
-            circle at 57% 29%,
-            var(--chocolate) 0 15%,
-            transparent 17%
+            circle at 58% 33%,
+            var(--chocolate) 0 14%,
+            transparent 16%
         ),
         linear-gradient(
             var(--chocolate) 0 42%,
             transparent 43%
-        ),
-        var(--cream);
+        );
 }
 
-.pearls-mini-preview {
+.detail-pearls {
     background:
         radial-gradient(
             circle,
-            #FFFFFF 0 16%,
+            white 0 16%,
             transparent 18%
-        ) 0 0 / 18px 18px,
+        ) 0 0 / 17px 17px,
         var(--frosting-pink);
 }
 
-.sprinkles-mini-preview {
+.detail-sprinkles {
     background:
         repeating-linear-gradient(
             45deg,
             transparent 0 7px,
-            var(--signature-pink) 8px 11px,
-            transparent 12px 18px
+            var(--signature-pink) 8px 10px,
+            transparent 11px 17px
         ),
         var(--cream);
 }
 
-.ribbon-mini-preview {
-    background:
-        linear-gradient(
-            transparent 38%,
-            var(--signature-pink) 39% 61%,
-            transparent 62%
-        ),
-        var(--cream);
+.detail-ribbon::before {
+    content: "";
+
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 21px;
+
+    height: 10px;
+
+    background: var(--signature-pink);
 }
 
-.gold-mini-preview {
+.detail-ribbon::after {
+    content: "◆";
+
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--signature-pink);
+
+    font-size: 25px;
+}
+
+.detail-butterflies::before {
+    content: "◖◗";
+
+    color: var(--signature-pink);
+
+    font-size: 22px;
+}
+
+.detail-gold {
     background:
         linear-gradient(
             135deg,
@@ -1949,17 +2114,44 @@ fieldset {
         var(--cream);
 }
 
-.topper-mini-preview {
+.detail-flowers::before {
+    content: "✿";
+
+    color: var(--signature-pink);
+
+    font-size: 31px;
+}
+
+.detail-cherries::before {
+    content: "● ●";
+
+    color: #B92D40;
+
+    font-size: 21px;
+}
+
+.detail-cherries::after {
+    content: "⌁";
+
+    position: absolute;
+    top: 3px;
+
+    color: #427444;
+
+    font-size: 22px;
+}
+
+.detail-topper {
     color: var(--gold);
 
     font-family: 'Lilita One', cursive;
-    font-size: 25px;
+    font-size: 15px;
 }
 
 .decoration-choice-card strong {
     align-self: end;
 
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.3;
 }
 
@@ -1968,7 +2160,7 @@ fieldset {
 
     color: var(--deep-berry);
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
 }
 
@@ -1984,8 +2176,8 @@ fieldset {
 }
 
 .extra-product-card {
-    min-height: 150px;
-    padding: 17px;
+    min-height: 145px;
+    padding: 16px;
 
     display: flex;
     flex-direction: column;
@@ -1993,22 +2185,27 @@ fieldset {
     justify-content: center;
     gap: 7px;
 
-    border-radius: 22px;
+    border-radius: 21px;
 
     text-align: center;
 }
 
-.extra-product-symbol {
-    font-size: 37px;
+.extra-count {
+    color: var(--signature-pink);
+
+    font-family: 'Lilita One', cursive;
+    font-size: 44px;
+    line-height: 1;
 }
 
 .extra-product-card strong {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .extra-product-card small {
     color: var(--deep-berry);
 
+    font-size: 10px;
     font-weight: 800;
 }
 
@@ -2018,16 +2215,16 @@ fieldset {
 }
 
 .quantity-product {
-    min-height: 88px;
-    padding: 16px 18px;
+    min-height: 84px;
+    padding: 15px 17px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
 
-    border: 2px solid rgba(90, 42, 30, 0.21);
-    border-radius: 20px;
+    border: 2px solid rgba(90, 42, 30, 0.2);
+    border-radius: 18px;
 
     background: var(--white);
 }
@@ -2038,7 +2235,7 @@ fieldset {
 }
 
 .quantity-product > div:first-child strong {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .quantity-product > div:first-child span {
@@ -2046,7 +2243,7 @@ fieldset {
 
     color: var(--deep-berry);
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
 }
 
@@ -2070,10 +2267,14 @@ fieldset {
     background: var(--cream);
     color: var(--chocolate);
 
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
 
     cursor: pointer;
+
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
 }
 
 .quantity-control button:hover,
@@ -2092,7 +2293,7 @@ fieldset {
 
     text-align: center;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
 
     outline: none;
@@ -2106,25 +2307,25 @@ fieldset {
 
 
 /* =========================================
-   UPLOAD AREA
+   UPLOAD
 ========================================= */
 
 .inspiration-upload-zone {
     position: relative;
 
-    min-height: 310px;
+    min-height: 300px;
     padding: 30px;
 
     display: grid;
     place-items: center;
 
-    border: 3px dashed rgba(90, 42, 30, 0.35);
-    border-radius: 30px;
+    border: 3px dashed rgba(90, 42, 30, 0.32);
+    border-radius: 28px;
 
     background:
         linear-gradient(
             145deg,
-            rgba(247, 182, 210, 0.36),
+            rgba(247, 182, 210, 0.3),
             rgba(252, 231, 241, 0.7)
         );
 
@@ -2158,12 +2359,16 @@ fieldset {
     text-align: center;
 }
 
-.upload-symbol {
+.upload-number {
     display: block;
 
-    margin-bottom: 12px;
+    margin-bottom: 11px;
 
-    font-size: 51px;
+    color: var(--headline-pink);
+
+    font-family: 'Lilita One', cursive;
+    font-size: 61px;
+    line-height: 1;
 }
 
 .upload-zone-content strong,
@@ -2174,30 +2379,30 @@ fieldset {
 
 .upload-zone-content strong {
     font-family: 'Lilita One', cursive;
-    font-size: 32px;
+    font-size: 31px;
     font-weight: 400;
 }
 
 .upload-zone-content p {
-    margin: 9px 0 18px;
+    margin: 8px 0 17px;
 
     color: var(--buttercream-brown);
 
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .upload-zone-content small {
-    margin-top: 12px;
+    margin-top: 11px;
 
     color: var(--deep-berry);
 
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
 }
 
 .upload-select-button {
-    min-height: 48px;
-    padding: 12px 22px;
+    min-height: 47px;
+    padding: 12px 21px;
 
     border: 2px solid var(--signature-pink);
     border-radius: 999px;
@@ -2207,11 +2412,15 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
     cursor: pointer;
+
+    transition:
+        background-color 180ms ease,
+        transform 180ms ease;
 }
 
 .upload-select-button:hover,
@@ -2222,11 +2431,11 @@ fieldset {
 }
 
 .inspiration-preview-grid {
-    margin-top: 25px;
+    margin-top: 24px;
 
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 15px;
 }
 
 .inspiration-preview-card {
@@ -2234,29 +2443,29 @@ fieldset {
 
     padding: 12px;
 
-    border: 2px solid rgba(90, 42, 30, 0.21);
-    border-radius: 22px;
+    border: 2px solid rgba(90, 42, 30, 0.2);
+    border-radius: 20px;
 
     background: var(--white);
 }
 
 .inspiration-preview-card img {
     width: 100%;
-    height: 220px;
+    height: 215px;
 
     object-fit: cover;
 
-    border-radius: 15px;
+    border-radius: 14px;
 }
 
 .inspiration-preview-card textarea {
     width: 100%;
-    min-height: 86px;
-    margin-top: 11px;
+    min-height: 84px;
+    margin-top: 10px;
     padding: 12px;
 
-    border: 2px solid rgba(90, 42, 30, 0.21);
-    border-radius: 14px;
+    border: 2px solid rgba(90, 42, 30, 0.2);
+    border-radius: 13px;
 
     outline: none;
 }
@@ -2269,11 +2478,11 @@ fieldset {
 
 .remove-upload-button {
     position: absolute;
-    top: 19px;
-    right: 19px;
+    top: 18px;
+    right: 18px;
 
-    width: 34px;
-    height: 34px;
+    width: 33px;
+    height: 33px;
     padding: 0;
 
     display: grid;
@@ -2285,35 +2494,33 @@ fieldset {
     background: var(--dark-chocolate);
     color: var(--white);
 
-    font-size: 20px;
+    font-size: 19px;
 
     cursor: pointer;
 }
 
 
 /* =========================================
-   CHECKBOX ACKNOWLEDGMENTS
+   POLICY CHECKS
 ========================================= */
 
-.form-check {
+.policy-check {
+    margin: 16px 0;
+    padding: 15px 16px;
+
     display: flex;
     align-items: flex-start;
     gap: 12px;
-}
 
-.policy-check {
-    margin: 17px 0;
-    padding: 15px 17px;
-
-    border: 2px solid rgba(90, 42, 30, 0.18);
-    border-radius: 17px;
+    border: 2px solid rgba(90, 42, 30, 0.17);
+    border-radius: 16px;
 
     background: rgba(255, 255, 255, 0.7);
 }
 
-.form-check-input {
-    width: 20px;
-    height: 20px;
+.policy-check input {
+    width: 19px;
+    height: 19px;
     margin: 1px 0 0;
 
     flex: 0 0 auto;
@@ -2321,8 +2528,8 @@ fieldset {
     accent-color: var(--signature-pink);
 }
 
-.form-check-label {
-    font-size: 11px;
+.policy-check span {
+    font-size: 10px;
     line-height: 1.55;
 }
 
@@ -2331,38 +2538,38 @@ fieldset {
    REVIEW
 ========================================= */
 
-.review-layout {
+.review-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
 }
 
 .review-section {
-    padding: 21px;
+    padding: 20px;
 
-    border: 2px solid rgba(90, 42, 30, 0.2);
-    border-radius: 23px;
+    border: 2px solid rgba(90, 42, 30, 0.19);
+    border-radius: 21px;
 
     background: var(--white);
 }
 
 .review-section-heading {
-    margin-bottom: 17px;
+    margin-bottom: 16px;
+    padding-bottom: 11px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
 
-    border-bottom: 1px solid rgba(90, 42, 30, 0.13);
-    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
 }
 
 .review-section-heading h3 {
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 400;
 }
 
@@ -2376,14 +2583,15 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
     cursor: pointer;
 }
 
-.review-section-heading button:hover {
+.review-section-heading button:hover,
+.review-section-heading button:focus-visible {
     color: var(--signature-pink);
 }
 
@@ -2395,7 +2603,7 @@ fieldset {
     padding: 8px 0;
 
     display: grid;
-    grid-template-columns: 125px minmax(0, 1fr);
+    grid-template-columns: 120px minmax(0, 1fr);
     gap: 13px;
 }
 
@@ -2407,13 +2615,13 @@ fieldset {
 .review-list dt {
     color: var(--deep-berry);
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     text-transform: uppercase;
 }
 
 .review-list dd {
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.5;
 }
 
@@ -2422,7 +2630,7 @@ fieldset {
 
     color: var(--buttercream-brown);
 
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.6;
 }
 
@@ -2434,11 +2642,11 @@ fieldset {
 
 .review-upload-previews img {
     width: 100%;
-    height: 95px;
+    height: 92px;
 
     object-fit: cover;
 
-    border-radius: 11px;
+    border-radius: 10px;
 }
 
 .review-upload-previews p {
@@ -2448,15 +2656,15 @@ fieldset {
 
     color: var(--buttercream-brown);
 
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .review-price-card {
-    margin-top: 24px;
-    padding: 22px;
+    margin-top: 23px;
+    padding: 21px;
 
     border: 3px solid var(--chocolate);
-    border-radius: 25px;
+    border-radius: 23px;
 
     background: var(--cream);
 
@@ -2471,7 +2679,7 @@ fieldset {
     justify-content: space-between;
     gap: 20px;
 
-    border-bottom: 1px solid rgba(90, 42, 30, 0.13);
+    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
 }
 
 .review-price-card > div:last-child {
@@ -2479,19 +2687,19 @@ fieldset {
 }
 
 .review-price-card span {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
 }
 
 .review-price-card strong {
     font-family: 'Lilita One', cursive;
-    font-size: 23px;
+    font-size: 22px;
     font-weight: 400;
 }
 
 .review-total-row {
     margin-top: 5px;
-    padding-top: 18px !important;
+    padding-top: 17px !important;
 }
 
 .review-total-row span {
@@ -2499,36 +2707,36 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
 }
 
 .review-total-row strong {
     color: var(--signature-pink);
 
-    font-size: 35px;
+    font-size: 34px;
 }
 
-.review-estimate-disclaimer {
+.review-disclaimer {
     max-width: 720px;
-    margin: 19px auto 29px;
+    margin: 18px auto 28px;
 
     color: var(--buttercream-brown);
 
     text-align: center;
 
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.6;
 }
 
 .review-acknowledgments {
-    margin-top: 24px;
+    margin-top: 22px;
 }
 
 .submit-cake-vision-button {
     width: 100%;
-    min-height: 64px;
-    padding: 16px 25px;
+    min-height: 62px;
+    padding: 16px 24px;
 
     border: 3px solid var(--signature-pink);
     border-radius: 999px;
@@ -2538,11 +2746,11 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
-    box-shadow: 0 14px 28px rgba(255, 79, 163, 0.22);
+    box-shadow: 0 14px 28px rgba(255, 79, 163, 0.21);
 
     cursor: pointer;
 
@@ -2556,7 +2764,7 @@ fieldset {
 .submit-cake-vision-button:focus-visible {
     background: #E73891;
 
-    box-shadow: 0 19px 34px rgba(255, 79, 163, 0.3);
+    box-shadow: 0 18px 32px rgba(255, 79, 163, 0.28);
 
     transform: translateY(-4px);
 }
@@ -2567,7 +2775,7 @@ fieldset {
 ========================================= */
 
 .builder-step-navigation {
-    margin-top: 43px;
+    margin-top: 42px;
 
     display: flex;
     align-items: center;
@@ -2576,16 +2784,16 @@ fieldset {
 }
 
 .step-navigation-button {
-    min-width: 150px;
-    min-height: 55px;
-    padding: 13px 25px;
+    min-width: 148px;
+    min-height: 54px;
+    padding: 13px 24px;
 
     border: 3px solid var(--chocolate);
     border-radius: 999px;
 
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
@@ -2604,23 +2812,23 @@ fieldset {
 }
 
 .step-navigation-button:disabled {
-    opacity: 0.35;
+    opacity: 0.34;
 
     cursor: not-allowed;
 }
 
-.secondary-step-button {
+.previous-button {
     background: var(--cream);
     color: var(--chocolate);
 }
 
-.secondary-step-button:hover:not(:disabled),
-.secondary-step-button:focus-visible:not(:disabled) {
+.previous-button:hover:not(:disabled),
+.previous-button:focus-visible:not(:disabled) {
     background: var(--chocolate);
     color: var(--cream);
 }
 
-.primary-step-button {
+.continue-button {
     margin-left: auto;
 
     border-color: var(--signature-pink);
@@ -2629,14 +2837,14 @@ fieldset {
     color: var(--white);
 }
 
-.primary-step-button:hover,
-.primary-step-button:focus-visible {
+.continue-button:hover,
+.continue-button:focus-visible {
     background: #E73891;
 }
 
 
 /* =========================================
-   MOBILE SUMMARY DRAWER
+   MOBILE SUMMARY
 ========================================= */
 
 .mobile-summary-drawer {
@@ -2679,15 +2887,15 @@ fieldset {
     bottom: 0;
 
     max-height: 82vh;
-    padding: 27px 22px 36px;
+    padding: 27px 22px 35px;
 
     overflow-y: auto;
 
-    border-radius: 30px 30px 0 0;
+    border-radius: 29px 29px 0 0;
 
     background: var(--cream);
 
-    box-shadow: 0 -20px 50px rgba(45, 15, 10, 0.24);
+    box-shadow: 0 -20px 50px rgba(45, 15, 10, 0.23);
 
     transform: translateY(105%);
 
@@ -2712,7 +2920,7 @@ fieldset {
 
     text-transform: uppercase;
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.12em;
 }
@@ -2721,14 +2929,14 @@ fieldset {
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: 37px;
+    font-size: 36px;
     font-weight: 400;
     line-height: 0.95;
 }
 
 .mobile-summary-header button {
-    width: 42px;
-    height: 42px;
+    width: 41px;
+    height: 41px;
     padding: 0;
 
     border: 2px solid var(--chocolate);
@@ -2736,24 +2944,24 @@ fieldset {
 
     background: transparent;
 
-    font-size: 26px;
+    font-size: 25px;
 
     cursor: pointer;
 }
 
 .mobile-summary-list {
-    margin: 26px 0 0;
+    margin: 25px 0 0;
 }
 
 .mobile-summary-list > div {
-    padding: 14px 0;
+    padding: 13px 0;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
 
-    border-bottom: 1px solid rgba(90, 42, 30, 0.13);
+    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
 }
 
 .mobile-summary-list dt,
@@ -2764,13 +2972,13 @@ fieldset {
 .mobile-summary-list dt {
     color: var(--deep-berry);
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
 }
 
 .mobile-summary-list dd {
     font-family: 'Lilita One', cursive;
-    font-size: 21px;
+    font-size: 20px;
 }
 
 
@@ -2791,7 +2999,7 @@ fieldset {
     background:
         radial-gradient(
             circle at center,
-            rgba(255, 79, 163, 0.25),
+            rgba(255, 79, 163, 0.24),
             transparent 40%
         ),
         rgba(45, 15, 10, 0.88);
@@ -2801,36 +3009,28 @@ fieldset {
 
 .success-card {
     width: min(100%, 670px);
-    padding: 55px 38px;
+    padding: 54px 37px;
 
     border: 3px solid var(--chocolate);
-    border-radius: 36px;
+    border-radius: 34px;
 
     background: var(--cream);
 
     text-align: center;
 
-    box-shadow: 15px 16px 0 var(--signature-pink);
+    box-shadow: 14px 15px 0 var(--signature-pink);
 
-    animation: successEntrance 480ms ease both;
-}
-
-.success-symbol {
-    display: block;
-
-    margin-bottom: 18px;
-
-    font-size: 66px;
+    animation: successEntrance 450ms ease both;
 }
 
 .success-eyebrow {
-    margin: 0 0 11px;
+    margin: 0 0 10px;
 
     color: var(--deep-berry);
 
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.14em;
 }
@@ -2839,24 +3039,24 @@ fieldset {
     margin: 0;
 
     font-family: 'Lilita One', cursive;
-    font-size: clamp(53px, 7vw, 84px);
+    font-size: clamp(52px, 7vw, 82px);
     font-weight: 400;
     line-height: 0.87;
 }
 
 .success-card > p:not(.success-eyebrow) {
     max-width: 520px;
-    margin: 22px auto 28px;
+    margin: 21px auto 27px;
 
     color: var(--buttercream-brown);
 
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.7;
 }
 
 .success-home-link {
-    min-height: 52px;
-    padding: 14px 25px;
+    min-height: 51px;
+    padding: 14px 24px;
 
     display: inline-flex;
     align-items: center;
@@ -2871,7 +3071,7 @@ fieldset {
     text-decoration: none;
     text-transform: uppercase;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.05em;
 }
@@ -2885,7 +3085,7 @@ fieldset {
     from {
         opacity: 0;
 
-        transform: translateY(18px);
+        transform: translateY(17px);
     }
 
     to {
@@ -2900,8 +3100,8 @@ fieldset {
         opacity: 0;
 
         transform:
-            translateY(14px)
-            scale(0.95);
+            translateY(12px)
+            scale(0.96);
     }
 
     to {
@@ -2913,13 +3113,13 @@ fieldset {
     }
 }
 
-@keyframes decorationPop {
+@keyframes decorationEntrance {
     from {
         opacity: 0;
 
         transform:
-            translateY(-9px)
-            scale(0.93);
+            translateY(-7px)
+            scale(0.95);
     }
 
     to {
@@ -2936,8 +3136,8 @@ fieldset {
         opacity: 0;
 
         transform:
-            translateY(25px)
-            scale(0.95);
+            translateY(24px)
+            scale(0.96);
     }
 
     to {
@@ -2960,28 +3160,31 @@ fieldset {
         --side-padding: clamp(18px, 3vw, 42px);
     }
 
+    .builder-header-inner {
+        grid-template-columns: minmax(100px, 1fr) minmax(300px, 530px) minmax(100px, 1fr);
+    }
+
+    .builder-header-logo {
+        width: 510px;
+    }
+
     .builder-main-inner {
-        grid-template-columns: minmax(390px, 0.86fr) minmax(470px, 1.14fr);
+        grid-template-columns: minmax(390px, 0.87fr) minmax(480px, 1.13fr);
         gap: 38px;
     }
 
-    .cake-preview-panel {
-        padding: 29px;
-    }
-
-    .cake-renderer-stage {
-        min-height: 480px;
+    .cake-preview-sticky {
+        padding: 28px;
     }
 
     .occasion-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cake-size-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .style-choice-grid,
     .decoration-choice-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -2996,15 +3199,15 @@ fieldset {
 @media (max-width: 980px) {
 
     :root {
-        --builder-header-height: 74px;
-        --progress-height: 68px;
+        --builder-header-height: 78px;
+        --builder-progress-height: 67px;
     }
 
     .builder-header-inner {
         grid-template-columns: 1fr auto;
     }
 
-    .builder-brand {
+    .builder-logo-link {
         display: none;
     }
 
@@ -3017,40 +3220,34 @@ fieldset {
     }
 
     .builder-main {
-        padding-top: 24px;
+        padding-top: 23px;
     }
 
     .builder-main-inner {
         grid-template-columns: 1fr;
     }
 
-    .cake-preview-panel {
+    .cake-preview-sticky {
         position: relative;
         top: auto;
 
+        height: auto;
         min-height: auto;
+        max-height: none;
+
+        overflow: visible;
     }
 
-    .builder-steps-panel {
+    .builder-form-column {
         width: 100%;
     }
 
-    .review-layout {
+    .review-grid {
         grid-template-columns: 1fr;
     }
 
 }
-.builder-logo-link {
-    width: min(100%, 430px);
-    height: 52px;
-}
 
-.builder-header-logo {
-    width: 430px;
-    height: 52px;
-
-    transform: scale(1.08);
-}
 
 /* =========================================
    MOBILE
@@ -3060,7 +3257,7 @@ fieldset {
 
     :root {
         --builder-header-height: 68px;
-        --progress-height: 62px;
+        --builder-progress-height: 61px;
         --side-padding: 14px;
     }
 
@@ -3069,19 +3266,19 @@ fieldset {
     }
 
     .builder-header-inner {
-        padding: 10px 14px;
+        padding: 9px 14px;
     }
 
     .builder-back-link {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .builder-back-link span {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .header-summary-button {
-        min-width: 104px;
+        min-width: 105px;
         min-height: 42px;
         padding: 6px 11px;
     }
@@ -3093,10 +3290,10 @@ fieldset {
     }
 
     .progress-step {
-        min-width: 85px;
-        min-height: 44px;
+        min-width: 84px;
+        min-height: 43px;
 
-        font-size: 8px;
+        font-size: 7px;
     }
 
     .progress-step span {
@@ -3105,92 +3302,88 @@ fieldset {
     }
 
     .builder-main {
-        padding: 16px 0 60px;
+        padding: 15px 0 58px;
     }
 
     .builder-main-inner {
         padding: 0 12px;
     }
 
-    .cake-preview-panel {
+    .cake-preview-sticky {
         padding: 21px 13px;
 
-        border-radius: 25px;
+        border-radius: 24px;
 
         box-shadow:
-            7px 8px 0 rgba(255, 79, 163, 0.22),
-            0 20px 40px rgba(90, 42, 30, 0.1);
+            7px 8px 0 rgba(255, 79, 163, 0.21),
+            0 20px 40px rgba(90, 42, 30, 0.09);
     }
 
-    .preview-panel-header {
+    .preview-heading-row {
         padding: 0 5px;
     }
 
-    .preview-panel-header h1 {
-        font-size: 40px;
+    .preview-heading-row h1 {
+        font-size: 39px;
     }
 
-    .preview-panel-header > div > p:last-child {
-        font-size: 11px;
+    .preview-heading-row > div > p:last-child {
+        font-size: 10px;
     }
 
     .reset-cake-button {
-        min-height: 36px;
-        padding: 7px 12px;
+        min-height: 35px;
+        padding: 7px 11px;
     }
 
     .cake-renderer-stage {
         min-height: 385px;
     }
 
-    .preview-quick-summary {
-        padding: 15px 8px;
+    .preview-summary {
+        padding: 14px 8px;
     }
 
-    .preview-quick-summary strong {
-        font-size: 25px;
+    .preview-summary strong {
+        font-size: 24px;
     }
 
-    .preview-price-note {
-        font-size: 9px;
+    .preview-note {
+        font-size: 8px;
     }
 
     .step-heading {
-        margin-top: 13px;
-        margin-bottom: 27px;
+        margin-top: 12px;
+        margin-bottom: 26px;
     }
 
     .step-heading h2 {
-        font-size: clamp(49px, 14vw, 69px);
+        font-size: clamp(48px, 14vw, 68px);
     }
 
     .step-heading > p:last-child {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .builder-fieldset {
-        margin-bottom: 31px;
+        margin-bottom: 30px;
     }
 
     .builder-fieldset > legend {
-        font-size: 28px;
+        font-size: 27px;
     }
 
     .occasion-grid,
     .shape-choice-grid,
     .cake-size-grid,
-    .single-size-grid,
-    .flavor-grid,
-    .budget-grid,
-    .buttercream-grid,
-    .description-option-grid,
+    .text-choice-grid,
+    .description-choice-grid,
     .upgrade-grid,
     .style-choice-grid,
     .decoration-choice-grid,
     .extra-product-grid,
     .inspiration-preview-grid,
-    .date-field-grid,
-    .two-column-field-grid {
+    .two-column-fields {
         grid-template-columns: 1fr;
     }
 
@@ -3198,31 +3391,38 @@ fieldset {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .visual-option-card {
-        min-height: 120px;
+    .occasion-card {
+        min-height: 170px;
+        padding: 20px;
     }
 
-    .occasion-symbol {
-        font-size: 31px;
+    .occasion-number {
+        font-size: 44px;
+    }
+
+    .occasion-card strong {
+        font-size: 25px;
+    }
+
+    .occasion-card small {
+        font-size: 9px;
     }
 
     .shape-choice-card {
-        min-height: 115px;
+        min-height: 112px;
 
         display: grid;
-        grid-template-columns: 68px 1fr;
+        grid-template-columns: 67px 1fr;
         grid-template-rows: auto auto;
 
         text-align: left;
     }
 
-    .shape-card-icon {
+    .shape-drawing {
         grid-row: 1 / 3;
 
-        width: 55px;
-        height: 55px;
-
-        font-size: 49px;
+        width: 54px;
+        height: 54px;
     }
 
     .shape-choice-card strong {
@@ -3234,33 +3434,23 @@ fieldset {
     }
 
     .cake-size-card {
-        min-height: 155px;
+        min-height: 142px;
 
         display: grid;
-        grid-template-columns: 115px 1fr;
+        grid-template-columns: 95px 1fr;
         grid-template-rows: auto auto auto;
         justify-items: start;
 
         text-align: left;
     }
 
-    .cake-size-visual {
+    .size-label {
         grid-row: 1 / 4;
 
         align-self: center;
         justify-self: center;
-    }
 
-    .cake-size-card strong {
-        align-self: end;
-    }
-
-    .cake-size-card > span:not(.cake-size-visual) {
-        align-self: center;
-    }
-
-    .cake-size-card b {
-        align-self: start;
+        font-size: 46px;
     }
 
     .color-choice-grid {
@@ -3268,11 +3458,11 @@ fieldset {
     }
 
     .style-choice-card {
-        min-height: 175px;
+        min-height: 300px;
     }
 
     .decoration-choice-card {
-        min-height: 115px;
+        min-height: 112px;
     }
 
     .quantity-product {
@@ -3286,16 +3476,16 @@ fieldset {
     }
 
     .inspiration-upload-zone {
-        min-height: 260px;
-        padding: 23px 17px;
+        min-height: 255px;
+        padding: 22px 16px;
     }
 
     .inspiration-preview-card img {
-        height: 245px;
+        height: 240px;
     }
 
     .review-list > div {
-        grid-template-columns: 105px minmax(0, 1fr);
+        grid-template-columns: 100px minmax(0, 1fr);
     }
 
     .builder-step-navigation {
@@ -3305,9 +3495,9 @@ fieldset {
 
         margin-right: -12px;
         margin-left: -12px;
-        padding: 13px 12px;
+        padding: 12px;
 
-        border-top: 1px solid rgba(90, 42, 30, 0.13);
+        border-top: 1px solid rgba(90, 42, 30, 0.12);
 
         background: rgba(255, 248, 242, 0.96);
 
@@ -3316,31 +3506,21 @@ fieldset {
 
     .step-navigation-button {
         min-width: 0;
-        min-height: 51px;
+        min-height: 50px;
 
         flex: 1;
     }
 
     .success-card {
-        padding: 45px 22px;
+        padding: 44px 21px;
 
-        border-radius: 28px;
+        border-radius: 27px;
 
         box-shadow: 8px 9px 0 var(--signature-pink);
     }
 
 }
-.builder-logo-link {
-    width: min(100%, 300px);
-    height: 44px;
-}
 
-.builder-header-logo {
-    width: 300px;
-    height: 44px;
-
-    transform: scale(1.04);
-}
 
 /* =========================================
    SMALL MOBILE
@@ -3349,7 +3529,7 @@ fieldset {
 @media (max-width: 430px) {
 
     .builder-back-link {
-        max-width: 90px;
+        max-width: 88px;
     }
 
     .header-summary-button {
@@ -3357,17 +3537,11 @@ fieldset {
     }
 
     .occasion-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr;
     }
 
-    .visual-option-card {
-        min-height: 112px;
-        padding: 15px 8px;
-    }
-
-    .visual-option-card strong {
-        font-size: 11px;
+    .occasion-card {
+        min-height: 155px;
     }
 
     .color-choice-grid {
@@ -3375,12 +3549,8 @@ fieldset {
     }
 
     .cake-size-card {
-        grid-template-columns: 94px 1fr;
-        padding: 16px 13px;
-    }
-
-    .cake-size-visual {
-        transform: scale(0.83);
+        grid-template-columns: 82px 1fr;
+        padding: 15px 12px;
     }
 
     .review-list > div {
@@ -3389,7 +3559,7 @@ fieldset {
     }
 
     .review-list dd {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .review-upload-previews {
@@ -3418,26 +3588,3 @@ fieldset {
     }
 
 }
-.style-photo{
-
-    width:100%;
-    height:185px;
-
-    object-fit:cover;
-
-    border-radius:18px;
-
-    border:2px solid rgba(90,42,30,.15);
-
-    background:#f5f5f5;
-
-    margin-bottom:14px;
-
-}
-
-.style-choice-card{
-
-    overflow:hidden;
-
-}
-

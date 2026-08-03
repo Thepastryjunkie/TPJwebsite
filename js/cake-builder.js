@@ -15,7 +15,8 @@ const cakeProducts = {
         standardPrice: 125,
         tallPrice: 145,
         standardServings: "4–6",
-        tallServings: "6–8"
+        tallServings: "6–8",
+        allowsExtraLayer: true
     },
 
     "round-6": {
@@ -27,7 +28,8 @@ const cakeProducts = {
         standardPrice: 185,
         tallPrice: 215,
         standardServings: "8–12",
-        tallServings: "12–18"
+        tallServings: "12–18",
+        allowsExtraLayer: true
     },
 
     "round-8": {
@@ -39,7 +41,8 @@ const cakeProducts = {
         standardPrice: 245,
         tallPrice: 275,
         standardServings: "16–20",
-        tallServings: "20–28"
+        tallServings: "20–28",
+        allowsExtraLayer: true
     },
 
     "round-9": {
@@ -51,7 +54,8 @@ const cakeProducts = {
         standardPrice: 310,
         tallPrice: 350,
         standardServings: "24–30",
-        tallServings: "30–38"
+        tallServings: "30–38",
+        allowsExtraLayer: true
     },
 
     "round-10": {
@@ -63,7 +67,8 @@ const cakeProducts = {
         standardPrice: 385,
         tallPrice: 425,
         standardServings: "32–40",
-        tallServings: "40–50"
+        tallServings: "40–50",
+        allowsExtraLayer: true
     },
 
     "heart-5-bento": {
@@ -76,7 +81,7 @@ const cakeProducts = {
         tallPrice: 165,
         standardServings: "2–4",
         tallServings: "2–4",
-        allowExtraLayer: false
+        allowsExtraLayer: false
     },
 
     "heart-5-tall": {
@@ -89,7 +94,7 @@ const cakeProducts = {
         tallPrice: 155,
         standardServings: "4–6",
         tallServings: "4–6",
-        allowExtraLayer: false
+        allowsExtraLayer: false
     },
 
     "heart-6": {
@@ -101,7 +106,8 @@ const cakeProducts = {
         standardPrice: 200,
         tallPrice: 230,
         standardServings: "8–12",
-        tallServings: "12–18"
+        tallServings: "12–18",
+        allowsExtraLayer: true
     },
 
     "heart-9": {
@@ -113,7 +119,8 @@ const cakeProducts = {
         standardPrice: 335,
         tallPrice: 375,
         standardServings: "20–26",
-        tallServings: "26–34"
+        tallServings: "26–34",
+        allowsExtraLayer: true
     },
 
     "star-8": {
@@ -125,7 +132,8 @@ const cakeProducts = {
         standardPrice: 265,
         tallPrice: 305,
         standardServings: "16–20",
-        tallServings: "20–28"
+        tallServings: "20–28",
+        allowsExtraLayer: true
     }
 };
 
@@ -164,6 +172,7 @@ const builderState = {
 
     decorations: [],
     flowerSource: "",
+
     topperType: "",
     topperPrice: 0,
     topperWording: "",
@@ -201,7 +210,7 @@ const builderState = {
 
 
 /* =========================================
-   ELEMENT HELPERS
+   DOM HELPERS
 ========================================= */
 
 function getElement(selector) {
@@ -210,29 +219,43 @@ function getElement(selector) {
 
 
 function getElements(selector) {
-    return Array.from(document.querySelectorAll(selector));
+    return Array.from(
+        document.querySelectorAll(selector)
+    );
 }
 
 
 function getCheckedValue(name) {
-    const checkedInput = document.querySelector(
+    const selected = document.querySelector(
         `input[name="${name}"]:checked`
     );
 
-    return checkedInput ? checkedInput.value : "";
+    return selected ? selected.value : "";
+}
+
+
+function setText(selector, value) {
+    const element = getElement(selector);
+
+    if (element) {
+        element.textContent = value;
+    }
 }
 
 
 function formatCurrency(amount) {
+    const numericAmount = Number(amount) || 0;
+
     return new Intl.NumberFormat(
         "en-US",
         {
             style: "currency",
             currency: "USD",
-            minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+            minimumFractionDigits:
+                Number.isInteger(numericAmount) ? 0 : 2,
             maximumFractionDigits: 2
         }
-    ).format(amount);
+    ).format(numericAmount);
 }
 
 
@@ -241,7 +264,9 @@ function formatDate(dateString) {
         return "Not selected";
     }
 
-    const date = new Date(`${dateString}T12:00:00`);
+    const date = new Date(
+        `${dateString}T12:00:00`
+    );
 
     if (Number.isNaN(date.getTime())) {
         return dateString;
@@ -267,7 +292,7 @@ function clampNumber(value, minimum, maximum) {
 
 
 /* =========================================
-   IMPORTANT DOM ELEMENTS
+   IMPORTANT ELEMENTS
 ========================================= */
 
 const cakeRenderer = getElement("#cakeRenderer");
@@ -287,23 +312,25 @@ const previewPrice = getElement("#previewPrice");
 
 const headerCakePrice = getElement("#headerCakePrice");
 
-const extraLayerToggle = getElement("#extraLayerToggle");
+const extraLayerToggle = getElement(
+    "#extraLayerToggle"
+);
 const extraLayerDescription = getElement(
     "#extraLayerDescription"
 );
-const bentoLayerNotice = getElement("#bentoLayerNotice");
+const bentoLayerNotice = getElement(
+    "#bentoLayerNotice"
+);
 
 const previousStepButton = getElement(
     "#previousStepButton"
 );
-const nextStepButton = getElement("#nextStepButton");
+const nextStepButton = getElement(
+    "#nextStepButton"
+);
 
 const stepValidationMessage = getElement(
     "#stepValidationMessage"
-);
-
-const resetCakeBuilderButton = getElement(
-    "#resetCakeBuilder"
 );
 
 
@@ -324,21 +351,23 @@ function normalizeHexColor(hexColor) {
 
 
 function hexToRgb(hexColor) {
-    const normalizedColor = normalizeHexColor(hexColor);
+    const normalized = normalizeHexColor(
+        hexColor
+    );
 
     return {
         red: Number.parseInt(
-            normalizedColor.slice(1, 3),
+            normalized.slice(1, 3),
             16
         ),
 
         green: Number.parseInt(
-            normalizedColor.slice(3, 5),
+            normalized.slice(3, 5),
             16
         ),
 
         blue: Number.parseInt(
-            normalizedColor.slice(5, 7),
+            normalized.slice(5, 7),
             16
         )
     };
@@ -346,27 +375,37 @@ function hexToRgb(hexColor) {
 
 
 function rgbToHex(red, green, blue) {
-    const channels = [red, green, blue].map((channel) => {
-        const safeChannel = clampNumber(
-            Math.round(channel),
-            0,
-            255
-        );
+    const channels = [red, green, blue].map(
+        (channel) => {
+            const safeChannel = clampNumber(
+                Math.round(channel),
+                0,
+                255
+            );
 
-        return safeChannel
-            .toString(16)
-            .padStart(2, "0");
-    });
+            return safeChannel
+                .toString(16)
+                .padStart(2, "0");
+        }
+    );
 
     return `#${channels.join("")}`.toUpperCase();
 }
 
 
-function mixHexColor(hexColor, targetColor, amount) {
-    const source = hexToRgb(hexColor);
+function mixHexColor(
+    sourceColor,
+    targetColor,
+    amount
+) {
+    const source = hexToRgb(sourceColor);
     const target = hexToRgb(targetColor);
 
-    const safeAmount = clampNumber(amount, 0, 1);
+    const safeAmount = clampNumber(
+        amount,
+        0,
+        1
+    );
 
     return rgbToHex(
         source.red +
@@ -384,124 +423,22 @@ function mixHexColor(hexColor, targetColor, amount) {
 }
 
 
-function updateCakeRendererColors() {
-    const mainColor = normalizeHexColor(
-        builderState.mainCakeColor
-    );
-
-    const accentColor = normalizeHexColor(
-        builderState.accentColor
-    );
-
-    const cakeHighlight = mixHexColor(
-        mainColor,
-        "#FFFFFF",
-        0.28
-    );
-
-    const cakeShadow = mixHexColor(
-        mainColor,
-        "#5A2A1E",
-        0.2
-    );
-
-    const gradientStart = mixHexColor(
-        mainColor,
-        "#5A2A1E",
-        0.11
-    );
-
-    const gradientEnd = mixHexColor(
-        mainColor,
-        "#5A2A1E",
-        0.18
-    );
-
-    document.documentElement.style.setProperty(
-        "--cake-color",
-        mainColor
-    );
-
-    document.documentElement.style.setProperty(
-        "--cake-highlight",
-        cakeHighlight
-    );
-
-    document.documentElement.style.setProperty(
-        "--cake-shadow-color",
-        cakeShadow
-    );
-
-    document.documentElement.style.setProperty(
-        "--accent-color",
-        accentColor
-    );
-
-    const gradientStartStop = getElement(
-        "#cakeBodyGradientStart"
-    );
-
-    const gradientMiddleStop = getElement(
-        "#cakeBodyGradientMiddle"
-    );
-
-    const gradientEndStop = getElement(
-        "#cakeBodyGradientEnd"
-    );
-
-    const topGradientStart = getElement(
-        "#cakeTopGradientStart"
-    );
-
-    const topGradientEnd = getElement(
-        "#cakeTopGradientEnd"
-    );
-
-    if (gradientStartStop) {
-        gradientStartStop.setAttribute(
-            "stop-color",
-            gradientStart
-        );
-    }
-
-    if (gradientMiddleStop) {
-        gradientMiddleStop.setAttribute(
-            "stop-color",
-            mainColor
-        );
-    }
-
-    if (gradientEndStop) {
-        gradientEndStop.setAttribute(
-            "stop-color",
-            gradientEnd
-        );
-    }
-
-    if (topGradientStart) {
-        topGradientStart.setAttribute(
-            "stop-color",
-            cakeHighlight
-        );
-    }
-
-    if (topGradientEnd) {
-        topGradientEnd.setAttribute(
-            "stop-color",
-            mainColor
-        );
-    }
-}
-
-
 /* =========================================
-   CAKE PRODUCT HELPERS
+   PRODUCT HELPERS
 ========================================= */
 
 function getSelectedCakeProduct() {
     return (
         cakeProducts[builderState.cakeProductId] ||
         cakeProducts["round-6"]
+    );
+}
+
+
+function cakeAllowsExtraLayer() {
+    return (
+        getSelectedCakeProduct()
+            .allowsExtraLayer !== false
     );
 }
 
@@ -536,24 +473,21 @@ function getCakeLayerCount() {
 function getExtraLayerPrice() {
     const product = getSelectedCakeProduct();
 
-    return product.tallPrice - product.standardPrice;
-}
-
-function cakeAllowsExtraLayer() {
-    const product = getSelectedCakeProduct();
-    return product.allowExtraLayer !== false;
+    return (
+        product.tallPrice -
+        product.standardPrice
+    );
 }
 
 
 /* =========================================
-   ESTIMATE CALCULATIONS
+   PRICE CALCULATIONS
 ========================================= */
 
 function calculatePremiumFillingTotal() {
     return builderState.premiumFillings.reduce(
-        (total, filling) => {
-            return total + filling.price;
-        },
+        (total, filling) =>
+            total + filling.price,
         0
     );
 }
@@ -561,9 +495,8 @@ function calculatePremiumFillingTotal() {
 
 function calculateDecorationTotal() {
     return builderState.decorations.reduce(
-        (total, decoration) => {
-            return total + decoration.price;
-        },
+        (total, decoration) =>
+            total + decoration.price,
         0
     );
 }
@@ -576,9 +509,8 @@ function calculateTopperTotal() {
 
 function calculateCheckboxExtraTotal() {
     return builderState.extras.reduce(
-        (total, extra) => {
-            return total + extra.price;
-        },
+        (total, extra) =>
+            total + extra.price,
         0
     );
 }
@@ -586,9 +518,8 @@ function calculateCheckboxExtraTotal() {
 
 function calculateQuantityExtraTotal() {
     return builderState.quantityExtras.reduce(
-        (total, extra) => {
-            return total + extra.total;
-        },
+        (total, extra) =>
+            total + extra.total,
         0
     );
 }
@@ -623,17 +554,115 @@ function calculateEstimatedTotal() {
 
 
 /* =========================================
-   RENDER CAKE SHAPE
+   RENDERER COLOR
+========================================= */
+
+function updateRendererColors() {
+    if (!cakeRenderer) {
+        return;
+    }
+
+    const mainColor = normalizeHexColor(
+        builderState.mainCakeColor
+    );
+
+    const accentColor = normalizeHexColor(
+        builderState.accentColor
+    );
+
+    const highlightColor = mixHexColor(
+        mainColor,
+        "#FFFFFF",
+        0.3
+    );
+
+    const shadowColor = mixHexColor(
+        mainColor,
+        "#5A2A1E",
+        0.2
+    );
+
+    const bodyStart = mixHexColor(
+        mainColor,
+        "#5A2A1E",
+        0.12
+    );
+
+    const bodyEnd = mixHexColor(
+        mainColor,
+        "#5A2A1E",
+        0.2
+    );
+
+    document.documentElement.style.setProperty(
+        "--cake-color",
+        mainColor
+    );
+
+    document.documentElement.style.setProperty(
+        "--cake-highlight",
+        highlightColor
+    );
+
+    document.documentElement.style.setProperty(
+        "--cake-shadow-color",
+        shadowColor
+    );
+
+    document.documentElement.style.setProperty(
+        "--accent-color",
+        accentColor
+    );
+
+    getElement(
+        "#cakeBodyGradientStart"
+    )?.setAttribute(
+        "stop-color",
+        bodyStart
+    );
+
+    getElement(
+        "#cakeBodyGradientMiddle"
+    )?.setAttribute(
+        "stop-color",
+        mainColor
+    );
+
+    getElement(
+        "#cakeBodyGradientEnd"
+    )?.setAttribute(
+        "stop-color",
+        bodyEnd
+    );
+
+    getElement(
+        "#cakeTopGradientStart"
+    )?.setAttribute(
+        "stop-color",
+        highlightColor
+    );
+
+    getElement(
+        "#cakeTopGradientEnd"
+    )?.setAttribute(
+        "stop-color",
+        mainColor
+    );
+}
+
+
+/* =========================================
+   RENDERER SHAPE
 ========================================= */
 
 function updateVisibleCakeShape() {
-    const shapeGroups = {
+    const shapes = {
         round: roundCakeShape,
         heart: heartCakeShape,
         star: starCakeShape
     };
 
-    Object.entries(shapeGroups).forEach(
+    Object.entries(shapes).forEach(
         ([shapeName, shapeElement]) => {
             if (!shapeElement) {
                 return;
@@ -641,7 +670,8 @@ function updateVisibleCakeShape() {
 
             shapeElement.classList.toggle(
                 "is-hidden",
-                shapeName !== builderState.cakeShape
+                shapeName !==
+                    builderState.cakeShape
             );
         }
     );
@@ -649,47 +679,35 @@ function updateVisibleCakeShape() {
 
 
 /* =========================================
-   RENDER CAKE SIZE
+   RENDERER SIZE
 ========================================= */
 
 function updateRendererSize() {
+    if (!cakeRenderer) {
+        return;
+    }
+
     const product = getSelectedCakeProduct();
 
-    const widthScaleMap = {
-        '4"': 0.68,
-        '5"': 0.76,
-        '6"': 0.84,
-        '8"': 1,
-        '9"': 1.08,
-        '10"': 1.16
-    };
+    const numericSize = product.size.replace(
+        '"',
+        ""
+    );
 
-    const widthScale = widthScaleMap[product.size] || 1;
-
-    [
-        roundCakeShape,
-        heartCakeShape,
-        starCakeShape
-    ].forEach((shapeElement) => {
-        if (!shapeElement) {
-            return;
-        }
-
-        shapeElement.style.transformOrigin = "center bottom";
-        shapeElement.style.setProperty("--cake-width-scale", widthScale);
-    });
-
-    cakeRenderer.dataset.cakeSize = product.size.replace('"', "");
+    cakeRenderer.dataset.size = numericSize;
 }
 
 
 /* =========================================
-   RENDER CAKE HEIGHT
+   RENDERER HEIGHT
 ========================================= */
 
 function updateCakeHeight() {
+    const product = getSelectedCakeProduct();
+
     if (!cakeAllowsExtraLayer()) {
         builderState.isTall = false;
+
         if (extraLayerToggle) {
             extraLayerToggle.checked = false;
             extraLayerToggle.disabled = true;
@@ -698,91 +716,139 @@ function updateCakeHeight() {
         extraLayerToggle.disabled = false;
     }
 
-    cakeRenderer.classList.toggle(
+    cakeRenderer?.classList.toggle(
         "is-tall",
         builderState.isTall
     );
 
-    const extraLayerDecoration = getElement(
+    getElement(
         "#extraLayerDecoration"
+    )?.classList.toggle(
+        "is-hidden",
+        !builderState.isTall
     );
 
-    if (extraLayerDecoration) {
-        extraLayerDecoration.classList.toggle(
-            "is-hidden",
-            !builderState.isTall
+    const layerControl =
+        extraLayerToggle?.closest(
+            ".extra-layer-control"
         );
-    }
 
-    const product = getSelectedCakeProduct();
-    const extraLayerPrice = getExtraLayerPrice();
+    layerControl?.classList.toggle(
+        "is-hidden",
+        !cakeAllowsExtraLayer()
+    );
 
     if (extraLayerDescription) {
-        extraLayerDescription.textContent =
-            builderState.isTall
-                ? `Tall version selected · ${product.tallLayers} layers · ${formatCurrency(product.tallPrice)} base`
-                : `Makes your cake tall · Adds ${formatCurrency(extraLayerPrice)}`;
-    }
-
-    if (bentoLayerNotice) {
-        const isFixedFiveInchHeart =
-            builderState.cakeProductId === "heart-5-bento" ||
-            builderState.cakeProductId === "heart-5-tall";
-
-        bentoLayerNotice.classList.toggle(
-            "is-hidden",
-            !isFixedFiveInchHeart
-        );
-
-        if (builderState.cakeProductId === "heart-5-bento") {
-            bentoLayerNotice.textContent =
-                'The 5" Sweetheart Bento Box is a one-layer heart cake packaged with cupcakes.';
-        } else if (builderState.cakeProductId === "heart-5-tall") {
-            bentoLayerNotice.textContent =
-                'The 5" Tall Heart Cake is a separate two-layer cake and does not include cupcakes.';
+        if (builderState.isTall) {
+            extraLayerDescription.textContent =
+                `${product.tallLayers} layers · ${formatCurrency(product.tallPrice)} base`;
+        } else {
+            extraLayerDescription.textContent =
+                `Makes your cake tall · Adds ${formatCurrency(getExtraLayerPrice())}`;
         }
     }
 
-    const layerToggleLabel = extraLayerToggle?.closest(".extra-layer-toggle");
-    if (layerToggleLabel) {
-        layerToggleLabel.classList.toggle(
+    if (bentoLayerNotice) {
+        const isBento =
+            builderState.cakeProductId ===
+            "heart-5-bento";
+
+        const isTallFive =
+            builderState.cakeProductId ===
+            "heart-5-tall";
+
+        bentoLayerNotice.classList.toggle(
             "is-hidden",
-            !cakeAllowsExtraLayer()
+            !isBento && !isTallFive
         );
+
+        if (isBento) {
+            bentoLayerNotice.textContent =
+                'The 5" Sweetheart Bento Box includes a one-layer heart cake and cupcakes.';
+        }
+
+        if (isTallFive) {
+            bentoLayerNotice.textContent =
+                'The 5" Tall Heart Cake is a separate two-layer cake and does not include cupcakes.';
+        }
     }
 }
 
 
 /* =========================================
-   RENDER DECORATIONS
+   RENDERER FINISHES
+========================================= */
+
+function updateFinishVisibility() {
+    const finishGroups = getElements(
+        ".cake-finish-group"
+    );
+
+    finishGroups.forEach((group) => {
+        group.classList.add("is-hidden");
+    });
+
+    const finishElementMap = {
+        "Simple Texture":
+            "#textureFinishDecoration",
+
+        "Vintage Piping":
+            "#vintagePipingDecoration",
+
+        "Watercolor Finish":
+            "#watercolorFinishDecoration",
+
+        "Palette Knife Finish":
+            "#paletteFinishDecoration",
+
+        "Edible Image Design":
+            "#edibleImageFinishDecoration"
+    };
+
+    const selectedFinishElement =
+        finishElementMap[
+            builderState.cakeFinish
+        ];
+
+    if (selectedFinishElement) {
+        getElement(
+            selectedFinishElement
+        )?.classList.remove("is-hidden");
+    }
+}
+
+
+/* =========================================
+   RENDERER DECORATIONS
 ========================================= */
 
 function updateDecorationVisibility() {
-    const decorationElements = getElements(
+    getElements(
         ".cake-decoration-group"
-    );
-
-    decorationElements.forEach((element) => {
-        const alwaysVisible =
+    ).forEach((element) => {
+        const isExtraLayer =
             element.id ===
-            "pipedBorderDecoration";
+            "extraLayerDecoration";
+
+        if (isExtraLayer) {
+            return;
+        }
 
         const isSelected =
             builderState.decorations.some(
                 (decoration) =>
-                    decoration.id === element.id
+                    decoration.id ===
+                    element.id
             );
 
         const isTopper =
             element.id ===
                 "topperDecoration" &&
-            builderState.topperType;
+            Boolean(builderState.topperType);
 
         element.classList.toggle(
             "is-hidden",
-            !alwaysVisible &&
-                !isSelected &&
-                !isTopper
+            !isSelected && !isTopper
         );
     });
 
@@ -791,106 +857,32 @@ function updateDecorationVisibility() {
     );
 
     if (topperTextPreview) {
-        const previewText =
+        const wording =
             builderState.topperWording.trim() ||
             "Celebrate";
 
         topperTextPreview.textContent =
-            previewText.length > 14
-                ? `${previewText.slice(0, 14)}…`
-                : previewText;
+            wording.length > 15
+                ? `${wording.slice(0, 15)}…`
+                : wording;
     }
 }
 
 
 /* =========================================
-   RENDER MAIN PREVIEW SUMMARY
-========================================= */
-
-function updatePreviewSummary() {
-    const product = getSelectedCakeProduct();
-    const heightLabel = builderState.isTall
-        ? "Tall"
-        : "Standard";
-
-    const layerCount = getCakeLayerCount();
-    const servings = getCakeServings();
-    const total = calculateEstimatedTotal();
-
-    previewCakeName.textContent = product.name;
-
-    previewCakeDescription.textContent =
-        `${product.shape[0].toUpperCase()}${product.shape.slice(1)} · ` +
-        `${heightLabel} · ` +
-        `${layerCount} ${layerCount === 1 ? "layer" : "layers"}`;
-
-    previewServingCount.textContent = servings;
-    previewPrice.textContent = formatCurrency(total);
-
-    headerCakePrice.textContent =
-        formatCurrency(total);
-
-    const mobileSummaryTitle = getElement(
-        "#mobileSummaryTitle"
-    );
-
-    const mobileSummaryShape = getElement(
-        "#mobileSummaryShape"
-    );
-
-    const mobileSummaryHeight = getElement(
-        "#mobileSummaryHeight"
-    );
-
-    const mobileSummaryServings = getElement(
-        "#mobileSummaryServings"
-    );
-
-    const mobileSummaryPrice = getElement(
-        "#mobileSummaryPrice"
-    );
-
-    if (mobileSummaryTitle) {
-        mobileSummaryTitle.textContent = product.name;
-    }
-
-    if (mobileSummaryShape) {
-        mobileSummaryShape.textContent =
-            product.shape[0].toUpperCase() +
-            product.shape.slice(1);
-    }
-
-    if (mobileSummaryHeight) {
-        mobileSummaryHeight.textContent =
-            heightLabel;
-    }
-
-    if (mobileSummaryServings) {
-        mobileSummaryServings.textContent =
-            servings;
-    }
-
-    if (mobileSummaryPrice) {
-        mobileSummaryPrice.textContent =
-            formatCurrency(total);
-    }
-}
-
-
-/* =========================================
-   RENDER SELECTED CARD STATES
+   SELECTED CARD STATES
 ========================================= */
 
 function updateSelectedCardStates() {
     const selectableInputs = getElements(
         [
-            ".visual-option-card input",
+            ".occasion-card input",
             ".shape-choice-card input",
             ".cake-size-card input",
-            ".text-option-card input",
-            ".description-option-card input",
-            ".style-choice-card input",
+            ".text-choice-card input",
+            ".description-choice-card input",
             ".upgrade-card input",
+            ".style-choice-card input",
             ".decoration-choice-card input",
             ".extra-product-card input",
             ".color-choice input"
@@ -900,24 +892,20 @@ function updateSelectedCardStates() {
     selectableInputs.forEach((input) => {
         const card = input.closest(
             [
-                ".visual-option-card",
+                ".occasion-card",
                 ".shape-choice-card",
                 ".cake-size-card",
-                ".text-option-card",
-                ".description-option-card",
-                ".style-choice-card",
+                ".text-choice-card",
+                ".description-choice-card",
                 ".upgrade-card",
+                ".style-choice-card",
                 ".decoration-choice-card",
                 ".extra-product-card",
                 ".color-choice"
             ].join(",")
         );
 
-        if (!card) {
-            return;
-        }
-
-        card.classList.toggle(
+        card?.classList.toggle(
             "is-selected",
             input.checked
         );
@@ -926,45 +914,97 @@ function updateSelectedCardStates() {
 
 
 /* =========================================
-   FULL PREVIEW RENDER
+   PREVIEW SUMMARY
 ========================================= */
 
-function updateFinishPreview() {
-    const finishClasses = [
-        "finish-smooth",
-        "finish-texture",
-        "finish-vintage",
-        "finish-watercolor",
-        "finish-palette",
-        "finish-edible"
-    ];
+function updatePreviewSummary() {
+    const product = getSelectedCakeProduct();
 
-    cakeRenderer.classList.remove(...finishClasses);
+    const heightLabel =
+        builderState.isTall
+            ? "Tall"
+            : "Standard";
 
-    const finishClassMap = {
-        "Smooth Finish": "finish-smooth",
-        "Simple Texture": "finish-texture",
-        "Vintage Piping": "finish-vintage",
-        "Watercolor Finish": "finish-watercolor",
-        "Palette Knife Finish": "finish-palette",
-        "Edible Image Design": "finish-edible"
-    };
+    const layerCount = getCakeLayerCount();
 
-    const finishClass = finishClassMap[builderState.cakeFinish];
-    if (finishClass) {
-        cakeRenderer.classList.add(finishClass);
+    const shapeName =
+        product.shape.charAt(0).toUpperCase() +
+        product.shape.slice(1);
+
+    const total = calculateEstimatedTotal();
+
+    if (previewCakeName) {
+        previewCakeName.textContent =
+            product.name;
     }
+
+    if (previewCakeDescription) {
+        previewCakeDescription.textContent =
+            `${shapeName} · ${heightLabel} · ${layerCount} ${layerCount === 1 ? "layer" : "layers"}`;
+    }
+
+    if (previewServingCount) {
+        previewServingCount.textContent =
+            getCakeServings();
+    }
+
+    if (previewPrice) {
+        previewPrice.textContent =
+            formatCurrency(total);
+    }
+
+    if (headerCakePrice) {
+        headerCakePrice.textContent =
+            formatCurrency(total);
+    }
+
+    setText(
+        "#mobileSummaryTitle",
+        product.name
+    );
+
+    setText(
+        "#mobileSummaryShape",
+        shapeName
+    );
+
+    setText(
+        "#mobileSummaryHeight",
+        heightLabel
+    );
+
+    setText(
+        "#mobileSummaryServings",
+        getCakeServings()
+    );
+
+    setText(
+        "#mobileSummaryPrice",
+        formatCurrency(total)
+    );
 }
+
+
+/* =========================================
+   COMPLETE PREVIEW RENDER
+========================================= */
 
 function renderCakePreview() {
     updateVisibleCakeShape();
     updateRendererSize();
     updateCakeHeight();
-    updateCakeRendererColors();
+    updateRendererColors();
+    updateFinishVisibility();
     updateDecorationVisibility();
-    updateFinishPreview();
-    updatePreviewSummary();
     updateSelectedCardStates();
+    updatePreviewSummary();
+    updateBudgetNotice();
+
+    if (
+        builderState.currentStep === 8
+    ) {
+        populateReview();
+    }
 }
 
 
@@ -991,6 +1031,7 @@ function showStep(stepNumber) {
                 elementStep === safeStep;
 
             stepElement.hidden = !isActive;
+
             stepElement.classList.toggle(
                 "is-active",
                 isActive
@@ -1030,18 +1071,24 @@ function showStep(stepNumber) {
         }
     );
 
-    previousStepButton.disabled =
-        safeStep === 1;
+    if (previousStepButton) {
+        previousStepButton.disabled =
+            safeStep === 1;
+    }
 
-    nextStepButton.hidden =
-        safeStep === 8;
+    if (nextStepButton) {
+        nextStepButton.hidden =
+            safeStep === 8;
 
-    nextStepButton.textContent =
-        safeStep === 7
-            ? "Review My Cake"
-            : "Continue";
+        nextStepButton.textContent =
+            safeStep === 7
+                ? "Review My Cake"
+                : "Continue";
+    }
 
-    stepValidationMessage.textContent = "";
+    if (stepValidationMessage) {
+        stepValidationMessage.textContent = "";
+    }
 
     if (safeStep === 8) {
         populateReview();
@@ -1065,12 +1112,16 @@ function goToNextStep() {
             builderState.currentStep + 1
         );
 
-    showStep(builderState.currentStep + 1);
+    showStep(
+        builderState.currentStep + 1
+    );
 }
 
 
 function goToPreviousStep() {
-    showStep(builderState.currentStep - 1);
+    showStep(
+        builderState.currentStep - 1
+    );
 }
 
 
@@ -1078,14 +1129,17 @@ function goToPreviousStep() {
    VALIDATION
 ========================================= */
 
-function setStepValidationMessage(message) {
-    stepValidationMessage.textContent = message;
+function showValidationMessage(message) {
+    if (stepValidationMessage) {
+        stepValidationMessage.textContent =
+            message;
+    }
 }
 
 
 function validateStepOne() {
     if (!builderState.occasion) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose an occasion before continuing."
         );
 
@@ -1096,15 +1150,15 @@ function validateStepOne() {
         builderState.occasion === "Other" &&
         !builderState.otherOccasion.trim()
     ) {
-        setStepValidationMessage(
-            "Tell us what you are celebrating."
+        showValidationMessage(
+            "Tell me what you are celebrating."
         );
 
         return false;
     }
 
     if (!builderState.eventDate) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose the event date."
         );
 
@@ -1112,7 +1166,7 @@ function validateStepOne() {
     }
 
     if (!builderState.fulfillmentDate) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose the preferred pickup or delivery date."
         );
 
@@ -1123,7 +1177,7 @@ function validateStepOne() {
         !builderState.guestCount ||
         builderState.guestCount < 1
     ) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Enter the approximate guest count."
         );
 
@@ -1136,7 +1190,7 @@ function validateStepOne() {
 
 function validateStepTwo() {
     if (!builderState.cakeProductId) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose a cake size before continuing."
         );
 
@@ -1149,7 +1203,7 @@ function validateStepTwo() {
 
 function validateStepThree() {
     if (!builderState.cakeFlavor) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose a cake flavor."
         );
 
@@ -1161,23 +1215,23 @@ function validateStepThree() {
             "Custom Flavor" &&
         !builderState.customCakeFlavor.trim()
     ) {
-        setStepValidationMessage(
-            "Tell us the custom cake flavor you want."
+        showValidationMessage(
+            "Describe the custom flavor you want."
         );
 
         return false;
     }
 
     if (!builderState.buttercreamStyle) {
-        setStepValidationMessage(
-            "Choose a buttercream style."
+        showValidationMessage(
+            "Choose a buttercream."
         );
 
         return false;
     }
 
     if (!builderState.cakeFilling) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose a filling."
         );
 
@@ -1189,8 +1243,8 @@ function validateStepThree() {
             "Custom Filling" &&
         !builderState.customFilling.trim()
     ) {
-        setStepValidationMessage(
-            "Tell us the custom filling you want."
+        showValidationMessage(
+            "Describe the custom filling you want."
         );
 
         return false;
@@ -1202,14 +1256,14 @@ function validateStepThree() {
 
 function validateStepFour() {
     if (!builderState.cakeFinish) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose a buttercream finish."
         );
 
         return false;
     }
 
-    const flowerDecorationSelected =
+    const flowersSelected =
         builderState.decorations.some(
             (decoration) =>
                 decoration.id ===
@@ -1217,10 +1271,10 @@ function validateStepFour() {
         );
 
     if (
-        flowerDecorationSelected &&
+        flowersSelected &&
         !builderState.flowerSource
     ) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose who will supply the fresh flowers."
         );
 
@@ -1228,15 +1282,17 @@ function validateStepFour() {
     }
 
     const topperSelected =
-        getElement(
-            "#topperDecorationOption"
-        )?.checked;
+        Boolean(
+            getElement(
+                "#topperDecorationOption"
+            )?.checked
+        );
 
     if (
         topperSelected &&
         !builderState.topperType
     ) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose the topper type."
         );
 
@@ -1253,11 +1309,12 @@ function validateStepSix() {
     );
 
     if (
-        builderState.inspirationFiles.length > 0 &&
+        builderState.inspirationFiles.length >
+            0 &&
         acknowledgment &&
         !acknowledgment.checked
     ) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Acknowledge the inspiration-photo policy before continuing."
         );
 
@@ -1270,7 +1327,7 @@ function validateStepSix() {
 
 function validateStepSeven() {
     if (!builderState.customerName.trim()) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Enter your first and last name."
         );
 
@@ -1278,7 +1335,7 @@ function validateStepSeven() {
     }
 
     if (!builderState.customerPhone.trim()) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Enter your phone number."
         );
 
@@ -1286,20 +1343,20 @@ function validateStepSeven() {
     }
 
     if (!builderState.customerEmail.trim()) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Enter your email address."
         );
 
         return false;
     }
 
-    const emailIsValid =
+    const validEmail =
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
             builderState.customerEmail
         );
 
-    if (!emailIsValid) {
-        setStepValidationMessage(
+    if (!validEmail) {
+        showValidationMessage(
             "Enter a valid email address."
         );
 
@@ -1307,7 +1364,7 @@ function validateStepSeven() {
     }
 
     if (!builderState.preferredContactMethod) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose a preferred contact method."
         );
 
@@ -1315,7 +1372,7 @@ function validateStepSeven() {
     }
 
     if (!builderState.fulfillmentMethod) {
-        setStepValidationMessage(
+        showValidationMessage(
             "Choose pickup or delivery."
         );
 
@@ -1331,7 +1388,7 @@ function validateStepSeven() {
             !builderState.deliveryCity.trim() ||
             !builderState.deliveryZip.trim()
         ) {
-            setStepValidationMessage(
+            showValidationMessage(
                 "Complete the delivery address."
             );
 
@@ -1342,7 +1399,7 @@ function validateStepSeven() {
             !builderState.deliveryMiles ||
             builderState.deliveryMiles <= 0
         ) {
-            setStepValidationMessage(
+            showValidationMessage(
                 "Enter the estimated delivery mileage."
             );
 
@@ -1351,8 +1408,8 @@ function validateStepSeven() {
     }
 
     if (!builderState.customerBudget) {
-        setStepValidationMessage(
-            "Choose the amount you are comfortable spending."
+        showValidationMessage(
+            "Choose a comfortable spending range."
         );
 
         return false;
@@ -1363,7 +1420,7 @@ function validateStepSeven() {
 
 
 function validateCurrentStep() {
-    setStepValidationMessage("");
+    showValidationMessage("");
 
     switch (builderState.currentStep) {
         case 1:
@@ -1394,24 +1451,22 @@ function validateCurrentStep() {
 
 
 /* =========================================
-   OCCASION AND DATE LOGIC
+   OCCASION LOGIC
 ========================================= */
 
 function updateOtherOccasionVisibility() {
-    const field = getElement(
+    getElement(
         "#otherOccasionField"
-    );
-
-    if (!field) {
-        return;
-    }
-
-    field.classList.toggle(
+    )?.classList.toggle(
         "is-hidden",
         builderState.occasion !== "Other"
     );
 }
 
+
+/* =========================================
+   GUEST RECOMMENDATION
+========================================= */
 
 function updateGuestRecommendation() {
     const recommendation = getElement(
@@ -1436,36 +1491,35 @@ function updateGuestRecommendation() {
         return;
     }
 
-    let recommendationText = "";
+    let message = "";
 
     if (guests <= 6) {
-        recommendationText =
+        message =
             'A 4" Mini Indulgence Cake may fit this guest count.';
     } else if (guests <= 12) {
-        recommendationText =
+        message =
             'A standard 6" cake may fit this guest count.';
     } else if (guests <= 18) {
-        recommendationText =
+        message =
             'A tall 6" cake may fit this guest count.';
     } else if (guests <= 20) {
-        recommendationText =
+        message =
             'A standard 8" cake may fit this guest count.';
     } else if (guests <= 28) {
-        recommendationText =
+        message =
             'A tall 8" cake may fit this guest count.';
     } else if (guests <= 38) {
-        recommendationText =
+        message =
             'A 9" cake may fit this guest count.';
     } else if (guests <= 50) {
-        recommendationText =
+        message =
             'A 10" cake may fit this guest count.';
     } else {
-        recommendationText =
-            "This guest count may require a tiered cake or an additional dessert option.";
+        message =
+            "This guest count may require multiple cakes, a tiered design, or extra desserts.";
     }
 
-    recommendation.textContent =
-        recommendationText;
+    recommendation.textContent = message;
 
     recommendation.classList.remove(
         "is-hidden"
@@ -1473,26 +1527,36 @@ function updateGuestRecommendation() {
 }
 
 
+/* =========================================
+   RUSH LOGIC
+========================================= */
+
 function calculateDaysUntilFulfillment() {
     if (!builderState.fulfillmentDate) {
         return null;
     }
 
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
     const fulfillmentDate = new Date(
         `${builderState.fulfillmentDate}T00:00:00`
     );
 
-    if (Number.isNaN(fulfillmentDate.getTime())) {
+    if (
+        Number.isNaN(
+            fulfillmentDate.getTime()
+        )
+    ) {
         return null;
     }
 
     return Math.ceil(
-        (fulfillmentDate.getTime() -
-            today.getTime()) /
-            86400000
+        (
+            fulfillmentDate.getTime() -
+            today.getTime()
+        ) / 86400000
     );
 }
 
@@ -1501,47 +1565,47 @@ function updateRushFee() {
     const daysUntilFulfillment =
         calculateDaysUntilFulfillment();
 
-    const rushNotice = getElement(
-        "#rushOrderNotice"
-    );
-
-    const isRushRequest =
+    const isRush =
         daysUntilFulfillment !== null &&
         daysUntilFulfillment >= 0 &&
         daysUntilFulfillment < 5;
 
     builderState.rushFee =
-        isRushRequest ? 75 : 0;
+        isRush ? 75 : 0;
 
-    if (rushNotice) {
-        rushNotice.classList.toggle(
-            "is-hidden",
-            !isRushRequest
-        );
-    }
+    getElement(
+        "#rushOrderNotice"
+    )?.classList.toggle(
+        "is-hidden",
+        !isRush
+    );
 
     renderCakePreview();
 }
 
 
 /* =========================================
-   CAKE SHAPE AND SIZE LOGIC
+   CAKE SHAPE AND SIZE
 ========================================= */
 
 function showCakeSizeGroup(shape) {
-    const sizeGroups = {
-        round: getElement("#roundSizeOptions"),
-        heart: getElement("#heartSizeOptions"),
-        star: getElement("#starSizeOptions")
+    const groups = {
+        round: getElement(
+            "#roundSizeOptions"
+        ),
+
+        heart: getElement(
+            "#heartSizeOptions"
+        ),
+
+        star: getElement(
+            "#starSizeOptions"
+        )
     };
 
-    Object.entries(sizeGroups).forEach(
-        ([groupShape, groupElement]) => {
-            if (!groupElement) {
-                return;
-            }
-
-            groupElement.classList.toggle(
+    Object.entries(groups).forEach(
+        ([groupShape, element]) => {
+            element?.classList.toggle(
                 "is-hidden",
                 groupShape !== shape
             );
@@ -1551,20 +1615,27 @@ function showCakeSizeGroup(shape) {
 
 
 function chooseDefaultCakeForShape(shape) {
-    const defaults = {
+    const defaultProducts = {
         round: "round-6",
         heart: "heart-6",
         star: "star-8"
     };
 
-    const nextProductId =
-        defaults[shape] || "round-6";
+    const productId =
+        defaultProducts[shape] ||
+        "round-6";
 
     builderState.cakeProductId =
-        nextProductId;
+        productId;
+
+    builderState.isTall = false;
+
+    if (extraLayerToggle) {
+        extraLayerToggle.checked = false;
+    }
 
     const sizeInput = getElement(
-        `input[name="cakeSize"][value="${nextProductId}"]`
+        `input[name="cakeSize"][value="${productId}"]`
     );
 
     if (sizeInput) {
@@ -1573,33 +1644,38 @@ function chooseDefaultCakeForShape(shape) {
 }
 
 
-function updateCakeSelectionFromInput(input) {
-    if (!cakeProducts[input.value]) {
+function updateCakeSelection(input) {
+    const product =
+        cakeProducts[input.value];
+
+    if (!product) {
         return;
     }
 
-    builderState.cakeProductId = input.value;
+    builderState.cakeProductId =
+        input.value;
+
     builderState.cakeShape =
-        cakeProducts[input.value].shape;
+        product.shape;
+
+    builderState.isTall = false;
+
+    if (extraLayerToggle) {
+        extraLayerToggle.checked = false;
+    }
 
     renderCakePreview();
 }
 
 
 /* =========================================
-   CONDITIONAL FLAVOR FIELDS
+   CUSTOM FLAVOR FIELDS
 ========================================= */
 
 function updateCustomCakeFlavorVisibility() {
-    const field = getElement(
+    getElement(
         "#customCakeFlavorField"
-    );
-
-    if (!field) {
-        return;
-    }
-
-    field.classList.toggle(
+    )?.classList.toggle(
         "is-hidden",
         builderState.cakeFlavor !==
             "Custom Flavor"
@@ -1608,15 +1684,9 @@ function updateCustomCakeFlavorVisibility() {
 
 
 function updateCustomFillingVisibility() {
-    const field = getElement(
+    getElement(
         "#customFillingField"
-    );
-
-    if (!field) {
-        return;
-    }
-
-    field.classList.toggle(
+    )?.classList.toggle(
         "is-hidden",
         builderState.cakeFilling !==
             "Custom Filling"
@@ -1625,7 +1695,7 @@ function updateCustomFillingVisibility() {
 
 
 /* =========================================
-   FLOWER AND TOPPER CONDITIONALS
+   FLOWER AND TOPPER OPTIONS
 ========================================= */
 
 function updateFlowerSourceVisibility() {
@@ -1636,16 +1706,12 @@ function updateFlowerSourceVisibility() {
                 "flowersDecoration"
         );
 
-    const flowerSourceOptions = getElement(
+    getElement(
         "#flowerSourceOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !flowersSelected
     );
-
-    if (flowerSourceOptions) {
-        flowerSourceOptions.classList.toggle(
-            "is-hidden",
-            !flowersSelected
-        );
-    }
 
     if (!flowersSelected) {
         builderState.flowerSource = "";
@@ -1660,23 +1726,19 @@ function updateFlowerSourceVisibility() {
 
 
 function updateTopperOptionsVisibility() {
-    const topperOption = getElement(
+    const topperCheckbox = getElement(
         "#topperDecorationOption"
     );
 
-    const topperTypeOptions = getElement(
-        "#topperTypeOptions"
-    );
-
     const topperSelected =
-        Boolean(topperOption?.checked);
+        Boolean(topperCheckbox?.checked);
 
-    if (topperTypeOptions) {
-        topperTypeOptions.classList.toggle(
-            "is-hidden",
-            !topperSelected
-        );
-    }
+    getElement(
+        "#topperTypeOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !topperSelected
+    );
 
     if (!topperSelected) {
         builderState.topperType = "";
@@ -1703,7 +1765,7 @@ function updateTopperOptionsVisibility() {
 
 
 /* =========================================
-   EXTRA PRODUCT LOGIC
+   EXTRAS
 ========================================= */
 
 function updateCheckboxExtras() {
@@ -1711,14 +1773,12 @@ function updateCheckboxExtras() {
         "[data-extra-name]"
     )
         .filter((input) => input.checked)
-        .map((input) => {
-            return {
-                name: input.dataset.extraName,
-                price:
-                    Number(input.dataset.price) ||
-                    0
-            };
-        });
+        .map((input) => ({
+            name: input.dataset.extraName,
+            price:
+                Number(input.dataset.price) ||
+                0
+        }));
 
     renderCakePreview();
 }
@@ -1728,7 +1788,7 @@ function updateQuantityExtras() {
     builderState.quantityExtras =
         getElements(".quantity-product")
             .map((productRow) => {
-                const input =
+                const quantityInput =
                     productRow.querySelector(
                         'input[type="number"]'
                     );
@@ -1736,28 +1796,32 @@ function updateQuantityExtras() {
                 const quantity = Math.max(
                     0,
                     Number.parseInt(
-                        input?.value || "0",
+                        quantityInput?.value || "0",
                         10
                     ) || 0
                 );
 
                 const unitPrice =
                     Number(
-                        productRow.dataset.unitPrice
+                        productRow.dataset
+                            .unitPrice
                     ) || 0;
 
                 return {
                     name:
-                        productRow.dataset.productName ||
+                        productRow.dataset
+                            .productName ||
                         "Extra",
 
                     quantity,
                     unitPrice,
-                    total: quantity * unitPrice
+                    total:
+                        quantity * unitPrice
                 };
             })
             .filter(
-                (extra) => extra.quantity > 0
+                (extra) =>
+                    extra.quantity > 0
             );
 
     renderCakePreview();
@@ -1765,7 +1829,7 @@ function updateQuantityExtras() {
 
 
 /* =========================================
-   DELIVERY CALCULATION
+   DELIVERY
 ========================================= */
 
 function calculateDeliveryFee(miles) {
@@ -1803,24 +1867,20 @@ function calculateDeliveryFee(miles) {
 
 
 function updateDeliveryFieldsVisibility() {
-    const deliveryFields = getElement(
-        "#deliveryAddressFields"
-    );
-
     const isDelivery =
         builderState.fulfillmentMethod ===
         "Delivery";
 
-    if (deliveryFields) {
-        deliveryFields.classList.toggle(
-            "is-hidden",
-            !isDelivery
-        );
-    }
+    getElement(
+        "#deliveryAddressFields"
+    )?.classList.toggle(
+        "is-hidden",
+        !isDelivery
+    );
 
     if (!isDelivery) {
-        builderState.deliveryFee = 0;
         builderState.deliveryMiles = 0;
+        builderState.deliveryFee = 0;
     }
 
     updateDeliveryEstimate();
@@ -1828,7 +1888,7 @@ function updateDeliveryFieldsVisibility() {
 
 
 function updateDeliveryEstimate() {
-    const deliveryNotice = getElement(
+    const notice = getElement(
         "#deliveryEstimateNotice"
     );
 
@@ -1838,12 +1898,12 @@ function updateDeliveryEstimate() {
     ) {
         builderState.deliveryFee = 0;
 
-        if (deliveryNotice) {
-            deliveryNotice.classList.add(
+        if (notice) {
+            notice.textContent = "";
+
+            notice.classList.add(
                 "is-hidden"
             );
-
-            deliveryNotice.textContent = "";
         }
 
         renderCakePreview();
@@ -1856,20 +1916,20 @@ function updateDeliveryEstimate() {
             builderState.deliveryMiles
         );
 
-    if (deliveryNotice) {
+    if (notice) {
         if (builderState.deliveryMiles > 0) {
-            deliveryNotice.textContent =
+            notice.textContent =
                 `Estimated local delivery fee: ${formatCurrency(builderState.deliveryFee)}. Final distance will be confirmed after review.`;
 
-            deliveryNotice.classList.remove(
+            notice.classList.remove(
                 "is-hidden"
             );
         } else {
-            deliveryNotice.classList.add(
+            notice.textContent = "";
+
+            notice.classList.add(
                 "is-hidden"
             );
-
-            deliveryNotice.textContent = "";
         }
     }
 
@@ -1881,8 +1941,8 @@ function updateDeliveryEstimate() {
    BUDGET NOTICE
 ========================================= */
 
-function getBudgetUpperLimit(budgetValue) {
-    switch (budgetValue) {
+function getBudgetUpperLimit(value) {
+    switch (value) {
         case "Under $250":
             return 249;
 
@@ -1902,47 +1962,45 @@ function getBudgetUpperLimit(budgetValue) {
 
 
 function updateBudgetNotice() {
-    const budgetNotice = getElement(
+    const notice = getElement(
         "#budgetNotice"
     );
 
-    if (!budgetNotice) {
+    if (!notice) {
         return;
     }
 
-    const upperLimit = getBudgetUpperLimit(
-        builderState.customerBudget
-    );
+    const upperLimit =
+        getBudgetUpperLimit(
+            builderState.customerBudget
+        );
 
     if (
         upperLimit === null ||
         builderState.customerBudget ===
             "Not Sure"
     ) {
-        budgetNotice.classList.add(
-            "is-hidden"
-        );
+        notice.textContent = "";
 
-        budgetNotice.textContent = "";
+        notice.classList.add("is-hidden");
 
         return;
     }
 
-    const estimate = calculateEstimatedTotal();
+    const estimate =
+        calculateEstimatedTotal();
 
     if (estimate > upperLimit) {
-        budgetNotice.textContent =
-            `Your current starting estimate is ${formatCurrency(estimate)}, which is above the selected budget range. You may revise the cake size or details before submitting.`;
+        notice.textContent =
+            `Your current starting estimate is ${formatCurrency(estimate)}, which is above the selected spending range. You can revise the cake size or selected details before submitting.`;
 
-        budgetNotice.classList.remove(
+        notice.classList.remove(
             "is-hidden"
         );
     } else {
-        budgetNotice.classList.add(
-            "is-hidden"
-        );
+        notice.textContent = "";
 
-        budgetNotice.textContent = "";
+        notice.classList.add("is-hidden");
     }
 }
 
@@ -1952,46 +2010,47 @@ function updateBudgetNotice() {
 ========================================= */
 
 const maximumUploadCount = 5;
-const maximumFileSize = 8 * 1024 * 1024;
+const maximumFileSize =
+    8 * 1024 * 1024;
 
-function fileIsAllowed(file) {
-    const allowedTypes = [
+
+function fileTypeIsAllowed(file) {
+    return [
         "image/jpeg",
         "image/png",
         "image/webp"
-    ];
-
-    return allowedTypes.includes(file.type);
+    ].includes(file.type);
 }
 
 
 function addInspirationFiles(fileList) {
-    const uploadErrorMessage = getElement(
+    const errorMessage = getElement(
         "#uploadErrorMessage"
     );
 
-    if (uploadErrorMessage) {
-        uploadErrorMessage.textContent = "";
+    if (errorMessage) {
+        errorMessage.textContent = "";
     }
 
-    const incomingFiles = Array.from(fileList);
+    const incomingFiles =
+        Array.from(fileList);
 
     for (const file of incomingFiles) {
         if (
-            builderState.inspirationFiles.length >=
-            maximumUploadCount
+            builderState.inspirationFiles
+                .length >= maximumUploadCount
         ) {
-            if (uploadErrorMessage) {
-                uploadErrorMessage.textContent =
+            if (errorMessage) {
+                errorMessage.textContent =
                     "You can upload up to five inspiration images.";
             }
 
             break;
         }
 
-        if (!fileIsAllowed(file)) {
-            if (uploadErrorMessage) {
-                uploadErrorMessage.textContent =
+        if (!fileTypeIsAllowed(file)) {
+            if (errorMessage) {
+                errorMessage.textContent =
                     "Only JPG, PNG, and WebP images are accepted.";
             }
 
@@ -1999,8 +2058,8 @@ function addInspirationFiles(fileList) {
         }
 
         if (file.size > maximumFileSize) {
-            if (uploadErrorMessage) {
-                uploadErrorMessage.textContent =
+            if (errorMessage) {
+                errorMessage.textContent =
                     `${file.name} is larger than 8 MB.`;
             }
 
@@ -2010,8 +2069,10 @@ function addInspirationFiles(fileList) {
         const duplicateExists =
             builderState.inspirationFiles.some(
                 (upload) =>
-                    upload.file.name === file.name &&
-                    upload.file.size === file.size
+                    upload.file.name ===
+                        file.name &&
+                    upload.file.size ===
+                        file.size
             );
 
         if (duplicateExists) {
@@ -2023,6 +2084,7 @@ function addInspirationFiles(fileList) {
                 `${Date.now()}-${Math.random().toString(16).slice(2)}`,
 
             file,
+
             previewUrl:
                 URL.createObjectURL(file),
 
@@ -2035,23 +2097,24 @@ function addInspirationFiles(fileList) {
 
 
 function removeInspirationFile(uploadId) {
-    const uploadIndex =
+    const index =
         builderState.inspirationFiles.findIndex(
-            (upload) => upload.id === uploadId
+            (upload) =>
+                upload.id === uploadId
         );
 
-    if (uploadIndex === -1) {
+    if (index === -1) {
         return;
     }
 
     URL.revokeObjectURL(
         builderState.inspirationFiles[
-            uploadIndex
+            index
         ].previewUrl
     );
 
     builderState.inspirationFiles.splice(
-        uploadIndex,
+        index,
         1
     );
 
@@ -2073,7 +2136,9 @@ function renderInspirationPreviews() {
     builderState.inspirationFiles.forEach(
         (upload) => {
             const card =
-                document.createElement("article");
+                document.createElement(
+                    "article"
+                );
 
             card.className =
                 "inspiration-preview-card";
@@ -2086,7 +2151,9 @@ function renderInspirationPreviews() {
                 "Uploaded cake inspiration";
 
             const removeButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
             removeButton.type = "button";
             removeButton.className =
@@ -2108,26 +2175,27 @@ function renderInspirationPreviews() {
                 }
             );
 
-            const noteField =
-                document.createElement("textarea");
+            const note =
+                document.createElement(
+                    "textarea"
+                );
 
-            noteField.placeholder =
-                "What do you love about this photo?";
+            note.placeholder =
+                "What do you like about this photo?";
 
-            noteField.value = upload.note;
+            note.value = upload.note;
 
-            noteField.addEventListener(
+            note.addEventListener(
                 "input",
                 () => {
-                    upload.note =
-                        noteField.value;
+                    upload.note = note.value;
                 }
             );
 
             card.append(
                 image,
                 removeButton,
-                noteField
+                note
             );
 
             previewGrid.appendChild(card);
@@ -2137,19 +2205,23 @@ function renderInspirationPreviews() {
 
 
 /* =========================================
-   REVIEW SCREEN
+   REVIEW HELPERS
 ========================================= */
 
 function getDisplayOccasion() {
-    if (builderState.occasion === "Other") {
+    if (
+        builderState.occasion === "Other"
+    ) {
         return (
             builderState.otherOccasion.trim() ||
             "Other"
         );
     }
 
-    return builderState.occasion ||
-        "Not selected";
+    return (
+        builderState.occasion ||
+        "Not selected"
+    );
 }
 
 
@@ -2164,8 +2236,10 @@ function getDisplayCakeFlavor() {
         );
     }
 
-    return builderState.cakeFlavor ||
-        "Not selected";
+    return (
+        builderState.cakeFlavor ||
+        "Not selected"
+    );
 }
 
 
@@ -2180,47 +2254,35 @@ function getDisplayFilling() {
         );
     }
 
-    return builderState.cakeFilling ||
-        "Not selected";
-}
-
-
-function getDecorationNames() {
-    return builderState.decorations.map(
-        (decoration) => decoration.name
+    return (
+        builderState.cakeFilling ||
+        "Not selected"
     );
 }
 
 
-function getExtrasSummaryText() {
-    const lines = [];
+function getExtrasSummary() {
+    const extras = [];
 
-    builderState.extras.forEach((extra) => {
-        lines.push(
-            `${extra.name} (${formatCurrency(extra.price)})`
-        );
-    });
+    builderState.extras.forEach(
+        (extra) => {
+            extras.push(
+                `${extra.name} (${formatCurrency(extra.price)})`
+            );
+        }
+    );
 
     builderState.quantityExtras.forEach(
         (extra) => {
-            lines.push(
+            extras.push(
                 `${extra.quantity} × ${extra.name} (${formatCurrency(extra.total)})`
             );
         }
     );
 
-    return lines.length
-        ? lines.join(", ")
+    return extras.length
+        ? extras.join(", ")
         : "No extras selected.";
-}
-
-
-function setTextContent(selector, value) {
-    const element = getElement(selector);
-
-    if (element) {
-        element.textContent = value;
-    }
 }
 
 
@@ -2236,16 +2298,16 @@ function populateReviewUploads() {
     container.innerHTML = "";
 
     if (
-        builderState.inspirationFiles.length ===
-        0
+        builderState.inspirationFiles
+            .length === 0
     ) {
-        const emptyMessage =
+        const message =
             document.createElement("p");
 
-        emptyMessage.textContent =
+        message.textContent =
             "No inspiration photos uploaded.";
 
-        container.appendChild(emptyMessage);
+        container.appendChild(message);
 
         return;
     }
@@ -2256,6 +2318,7 @@ function populateReviewUploads() {
                 document.createElement("img");
 
             image.src = upload.previewUrl;
+
             image.alt =
                 "Uploaded inspiration preview";
 
@@ -2265,54 +2328,66 @@ function populateReviewUploads() {
 }
 
 
+/* =========================================
+   POPULATE REVIEW
+========================================= */
+
 function populateReview() {
     const product = getSelectedCakeProduct();
 
-    setTextContent(
+    const shapeName =
+        product.shape.charAt(0).toUpperCase() +
+        product.shape.slice(1);
+
+    const layerCount = getCakeLayerCount();
+
+    setText(
         "#reviewOccasion",
         getDisplayOccasion()
     );
 
-    setTextContent(
+    setText(
         "#reviewEventDate",
-        formatDate(builderState.eventDate)
+        formatDate(
+            builderState.eventDate
+        )
     );
 
-    setTextContent(
+    setText(
         "#reviewFulfillmentDate",
         formatDate(
             builderState.fulfillmentDate
         )
     );
 
-    setTextContent(
+    setText(
         "#reviewGuestCount",
         builderState.guestCount
             ? String(builderState.guestCount)
             : "Not entered"
     );
 
-    setTextContent(
+    setText(
         "#reviewCakeSelection",
         product.name
     );
 
-    setTextContent(
+    setText(
         "#reviewCakeShape",
-        `${product.shape[0].toUpperCase()}${product.shape.slice(1)} · ${builderState.isTall ? "Tall" : "Standard"} · ${getCakeLayerCount()} ${getCakeLayerCount() === 1 ? "layer" : "layers"}`
+        `${shapeName} · ${builderState.isTall ? "Tall" : "Standard"} · ${layerCount} ${layerCount === 1 ? "layer" : "layers"}`
     );
 
-    setTextContent(
+    setText(
         "#reviewServings",
         getCakeServings()
     );
 
-    setTextContent(
+    setText(
         "#reviewCakeFlavor",
         getDisplayCakeFlavor()
     );
 
-    const buttercreamText = [
+    const buttercreamSummary = [
         builderState.buttercreamStyle ||
             "Not selected",
 
@@ -2321,17 +2396,17 @@ function populateReview() {
         .filter(Boolean)
         .join(" · ");
 
-    setTextContent(
+    setText(
         "#reviewButtercream",
-        buttercreamText
+        buttercreamSummary
     );
 
-    setTextContent(
+    setText(
         "#reviewFilling",
         getDisplayFilling()
     );
 
-    setTextContent(
+    setText(
         "#reviewPremiumFilling",
         builderState.premiumFillings.length
             ? builderState.premiumFillings
@@ -2343,21 +2418,26 @@ function populateReview() {
             : "None"
     );
 
-    setTextContent(
+    setText(
         "#reviewColors",
         `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
     );
 
-    setTextContent(
+    setText(
         "#reviewFinish",
         builderState.cakeFinish ||
             "Not selected"
     );
 
-    setTextContent(
+    setText(
         "#reviewDecorations",
-        getDecorationNames().length
-            ? getDecorationNames().join(", ")
+        builderState.decorations.length
+            ? builderState.decorations
+                  .map(
+                      (decoration) =>
+                          decoration.name
+                  )
+                  .join(", ")
             : "None selected"
     );
 
@@ -2366,29 +2446,29 @@ function populateReview() {
             ? `${builderState.topperType}${builderState.topperWording.trim() ? ` · “${builderState.topperWording.trim()}”` : ""}`
             : "None";
 
-    setTextContent(
+    setText(
         "#reviewTopper",
         topperSummary
     );
 
-    setTextContent(
+    setText(
         "#reviewExtras",
-        getExtrasSummaryText()
+        getExtrasSummary()
     );
 
-    setTextContent(
+    setText(
         "#reviewTheme",
         builderState.cakeTheme.trim() ||
             "Not entered"
     );
 
-    setTextContent(
+    setText(
         "#reviewCakeWording",
         builderState.cakeWording.trim() ||
             "Not entered"
     );
 
-    setTextContent(
+    setText(
         "#reviewCustomerName",
         builderState.customerName.trim() ||
             "Not entered"
@@ -2401,44 +2481,46 @@ function populateReview() {
             : builderState.fulfillmentMethod ||
               "Not selected";
 
-    setTextContent(
+    setText(
         "#reviewFulfillmentMethod",
         fulfillmentSummary
     );
 
-    setTextContent(
+    setText(
         "#reviewBudget",
         builderState.customerBudget ||
             "Not selected"
     );
 
-    setTextContent(
+    setText(
         "#reviewCakeSubtotal",
         formatCurrency(
             calculateCakeSubtotal()
         )
     );
 
-    setTextContent(
+    setText(
         "#reviewExtrasSubtotal",
         formatCurrency(
             calculateExtrasTotal()
         )
     );
 
-    setTextContent(
+    setText(
         "#reviewRushFee",
-        formatCurrency(builderState.rushFee)
+        formatCurrency(
+            builderState.rushFee
+        )
     );
 
-    setTextContent(
+    setText(
         "#reviewDeliveryFee",
         formatCurrency(
             builderState.deliveryFee
         )
     );
 
-    setTextContent(
+    setText(
         "#reviewEstimatedTotal",
         formatCurrency(
             calculateEstimatedTotal()
@@ -2450,7 +2532,7 @@ function populateReview() {
 
 
 /* =========================================
-   MOBILE SUMMARY DRAWER
+   MOBILE SUMMARY
 ========================================= */
 
 function openMobileSummary() {
@@ -2458,21 +2540,20 @@ function openMobileSummary() {
         "#mobileCakeSummary"
     );
 
-    const openButton = getElement(
-        "#openCakeSummary"
-    );
-
     if (!drawer) {
         return;
     }
 
     drawer.classList.add("is-open");
+
     drawer.setAttribute(
         "aria-hidden",
         "false"
     );
 
-    openButton?.setAttribute(
+    getElement(
+        "#openCakeSummary"
+    )?.setAttribute(
         "aria-expanded",
         "true"
     );
@@ -2488,21 +2569,20 @@ function closeMobileSummary() {
         "#mobileCakeSummary"
     );
 
-    const openButton = getElement(
-        "#openCakeSummary"
-    );
-
     if (!drawer) {
         return;
     }
 
     drawer.classList.remove("is-open");
+
     drawer.setAttribute(
         "aria-hidden",
         "true"
     );
 
-    openButton?.setAttribute(
+    getElement(
+        "#openCakeSummary"
+    )?.setAttribute(
         "aria-expanded",
         "false"
     );
@@ -2517,15 +2597,13 @@ function closeMobileSummary() {
    SUBMISSION PLACEHOLDER
 ========================================= */
 
-function validateFinalAcknowledgments() {
-    const requiredAcknowledgments = [
+function finalAcknowledgmentsAreChecked() {
+    return [
         "#inquiryAcknowledgment",
         "#priceAcknowledgment",
         "#depositAcknowledgment",
         "#termsAcknowledgment"
-    ];
-
-    return requiredAcknowledgments.every(
+    ].every(
         (selector) =>
             Boolean(
                 getElement(selector)?.checked
@@ -2535,53 +2613,64 @@ function validateFinalAcknowledgments() {
 
 
 function submitCakeVision() {
-    const submissionMessage = getElement(
+    const message = getElement(
         "#submissionMessage"
     );
 
-    if (!validateFinalAcknowledgments()) {
-        if (submissionMessage) {
-            submissionMessage.className =
+    if (!finalAcknowledgmentsAreChecked()) {
+        if (message) {
+            message.className =
                 "submission-message is-error";
 
-            submissionMessage.textContent =
+            message.textContent =
                 "Please acknowledge all four statements before submitting.";
         }
 
         return;
     }
 
-    if (submissionMessage) {
-        submissionMessage.className =
+    if (message) {
+        message.className =
             "submission-message is-success";
 
-        submissionMessage.textContent =
-            "The visual builder is working. The final email and file-upload service still needs to be connected before this form can send real inquiries.";
+        message.textContent =
+            "The builder is working. The email and image-upload service still needs to be connected before this sends a real inquiry.";
     }
 
     /*
-       IMPORTANT:
+        The live form connection will later submit:
 
-       This prototype does not send data anywhere yet.
-
-       Later, this function will package:
-       - builderState
-       - inspiration image files
-       - inspiration notes
-       - estimated total
-       - customer contact details
-
-       and submit them to the form/upload service
-       selected for the live website.
+        - builderState
+        - inspiration image files
+        - inspiration notes
+        - customer contact information
+        - estimated pricing
+        - selected cake details
     */
 }
 
 
 /* =========================================
-   RESET BUILDER
+   RESET
 ========================================= */
 
 function resetBuilder() {
+    const confirmed = window.confirm(
+        "Reset the entire cake builder?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    builderState.inspirationFiles.forEach(
+        (upload) => {
+            URL.revokeObjectURL(
+                upload.previewUrl
+            );
+        }
+    );
+
     builderState.currentStep = 1;
     builderState.highestUnlockedStep = 1;
 
@@ -2611,21 +2700,13 @@ function resetBuilder() {
 
     builderState.decorations = [];
     builderState.flowerSource = "";
+
     builderState.topperType = "";
     builderState.topperPrice = 0;
     builderState.topperWording = "";
 
     builderState.extras = [];
     builderState.quantityExtras = [];
-
-    builderState.inspirationFiles.forEach(
-        (upload) => {
-            URL.revokeObjectURL(
-                upload.previewUrl
-            );
-        }
-    );
-
     builderState.inspirationFiles = [];
 
     builderState.cakeNameText = "";
@@ -2649,7 +2730,6 @@ function resetBuilder() {
     builderState.deliveryMiles = 0;
 
     builderState.customerBudget = "";
-
     builderState.rushFee = 0;
     builderState.deliveryFee = 0;
 
@@ -2662,19 +2742,12 @@ function resetBuilder() {
     getElements(
         'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea, select'
     ).forEach((field) => {
-        if (
-            field.id === "deliveryState"
-        ) {
+        if (field.id === "deliveryState") {
             field.value = "Texas";
         } else if (
-            field.type === "number"
+            field.closest(".quantity-product")
         ) {
-            field.value =
-                field.closest(
-                    ".quantity-product"
-                )
-                    ? "0"
-                    : "";
+            field.value = "0";
         } else {
             field.value = "";
         }
@@ -2688,7 +2761,7 @@ function resetBuilder() {
         'input[name="cakeSize"][value="round-6"]'
     );
 
-    const defaultMainColor = getElement(
+    const pinkInput = getElement(
         'input[name="mainCakeColor"][value="#F7B6D2"]'
     );
 
@@ -2700,8 +2773,8 @@ function resetBuilder() {
         roundSixInput.checked = true;
     }
 
-    if (defaultMainColor) {
-        defaultMainColor.checked = true;
+    if (pinkInput) {
+        pinkInput.checked = true;
     }
 
     if (extraLayerToggle) {
@@ -2712,19 +2785,20 @@ function resetBuilder() {
         "#customMainColor"
     );
 
-    const accentColor = getElement(
-        "#accentColor"
-    );
-
     if (customMainColor) {
         customMainColor.value = "#FF4FA3";
     }
+
+    const accentColor = getElement(
+        "#accentColor"
+    );
 
     if (accentColor) {
         accentColor.value = "#FF4FA3";
     }
 
     showCakeSizeGroup("round");
+
     updateOtherOccasionVisibility();
     updateCustomCakeFlavorVisibility();
     updateCustomFillingVisibility();
@@ -2738,15 +2812,15 @@ function resetBuilder() {
 
 
 /* =========================================
-   EVENT BINDINGS: STEP NAVIGATION
+   NAVIGATION EVENTS
 ========================================= */
 
-nextStepButton.addEventListener(
+nextStepButton?.addEventListener(
     "click",
     goToNextStep
 );
 
-previousStepButton.addEventListener(
+previousStepButton?.addEventListener(
     "click",
     goToPreviousStep
 );
@@ -2762,7 +2836,8 @@ getElements(".progress-step").forEach(
 
                 if (
                     targetStep <=
-                    builderState.highestUnlockedStep
+                    builderState
+                        .highestUnlockedStep
                 ) {
                     showStep(targetStep);
                 }
@@ -2776,11 +2851,11 @@ getElements("[data-edit-step]").forEach(
         button.addEventListener(
             "click",
             () => {
-                const targetStep = Number(
-                    button.dataset.editStep
+                showStep(
+                    Number(
+                        button.dataset.editStep
+                    )
                 );
-
-                showStep(targetStep);
             }
         );
     }
@@ -2788,21 +2863,27 @@ getElements("[data-edit-step]").forEach(
 
 
 /* =========================================
-   EVENT BINDINGS: OCCASION
+   OCCASION EVENTS
 ========================================= */
 
 getElements(
     'input[name="occasion"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.occasion = input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.occasion =
+                input.value;
 
-        updateOtherOccasionVisibility();
-        updateSelectedCardStates();
-    });
+            updateOtherOccasionVisibility();
+            updateSelectedCardStates();
+        }
+    );
 });
 
-getElement("#otherOccasionText")?.addEventListener(
+getElement(
+    "#otherOccasionText"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.otherOccasion =
@@ -2818,7 +2899,9 @@ getElement("#eventDate")?.addEventListener(
     }
 );
 
-getElement("#fulfillmentDate")?.addEventListener(
+getElement(
+    "#fulfillmentDate"
+)?.addEventListener(
     "change",
     (event) => {
         builderState.fulfillmentDate =
@@ -2840,32 +2923,56 @@ getElement("#guestCount")?.addEventListener(
 
 
 /* =========================================
-   EVENT BINDINGS: CAKE SHAPE AND SIZE
+   CAKE EVENTS
 ========================================= */
 
 getElements(
     'input[name="cakeShape"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.cakeShape = input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeShape =
+                input.value;
 
-        showCakeSizeGroup(input.value);
-        chooseDefaultCakeForShape(input.value);
-        renderCakePreview();
-    });
+            showCakeSizeGroup(
+                input.value
+            );
+
+            chooseDefaultCakeForShape(
+                input.value
+            );
+
+            renderCakePreview();
+        }
+    );
 });
 
 getElements(
     'input[name="cakeSize"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        updateCakeSelectionFromInput(input);
-    });
+    input.addEventListener(
+        "change",
+        () => {
+            updateCakeSelection(input);
+        }
+    );
 });
 
 extraLayerToggle?.addEventListener(
     "change",
     () => {
+        if (!cakeAllowsExtraLayer()) {
+            extraLayerToggle.checked =
+                false;
+
+            builderState.isTall = false;
+
+            renderCakePreview();
+
+            return;
+        }
+
         builderState.isTall =
             extraLayerToggle.checked;
 
@@ -2875,21 +2982,27 @@ extraLayerToggle?.addEventListener(
 
 
 /* =========================================
-   EVENT BINDINGS: FLAVORS
+   FLAVOR EVENTS
 ========================================= */
 
 getElements(
     'input[name="cakeFlavor"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.cakeFlavor = input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeFlavor =
+                input.value;
 
-        updateCustomCakeFlavorVisibility();
-        updateSelectedCardStates();
-    });
+            updateCustomCakeFlavorVisibility();
+            updateSelectedCardStates();
+        }
+    );
 });
 
-getElement("#customCakeFlavor")?.addEventListener(
+getElement(
+    "#customCakeFlavor"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.customCakeFlavor =
@@ -2900,15 +3013,20 @@ getElement("#customCakeFlavor")?.addEventListener(
 getElements(
     'input[name="buttercreamStyle"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.buttercreamStyle =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.buttercreamStyle =
+                input.value;
 
-        updateSelectedCardStates();
-    });
+            updateSelectedCardStates();
+        }
+    );
 });
 
-getElement("#buttercreamFlavor")?.addEventListener(
+getElement(
+    "#buttercreamFlavor"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.buttercreamFlavor =
@@ -2919,16 +3037,21 @@ getElement("#buttercreamFlavor")?.addEventListener(
 getElements(
     'input[name="cakeFilling"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.cakeFilling =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeFilling =
+                input.value;
 
-        updateCustomFillingVisibility();
-        updateSelectedCardStates();
-    });
+            updateCustomFillingVisibility();
+            updateSelectedCardStates();
+        }
+    );
 });
 
-getElement("#customFilling")?.addEventListener(
+getElement(
+    "#customFilling"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.customFilling =
@@ -2939,50 +3062,60 @@ getElement("#customFilling")?.addEventListener(
 getElements(
     "[data-premium-filling]"
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.premiumFillings =
-            getElements(
-                "[data-premium-filling]"
-            )
-                .filter(
-                    (premiumInput) =>
-                        premiumInput.checked
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.premiumFillings =
+                getElements(
+                    "[data-premium-filling]"
                 )
-                .map((premiumInput) => {
-                    return {
-                        name:
-                            premiumInput.dataset
-                                .premiumFilling,
+                    .filter(
+                        (premiumInput) =>
+                            premiumInput.checked
+                    )
+                    .map(
+                        (premiumInput) => ({
+                            name:
+                                premiumInput
+                                    .dataset
+                                    .premiumFilling,
 
-                        price:
-                            Number(
-                                premiumInput.dataset
-                                    .price
-                            ) || 0
-                    };
-                });
+                            price:
+                                Number(
+                                    premiumInput
+                                        .dataset
+                                        .price
+                                ) || 0
+                        })
+                    );
 
-        renderCakePreview();
-    });
+            renderCakePreview();
+        }
+    );
 });
 
 
 /* =========================================
-   EVENT BINDINGS: COLORS AND STYLE
+   COLOR AND FINISH EVENTS
 ========================================= */
 
 getElements(
     'input[name="mainCakeColor"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.mainCakeColor =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.mainCakeColor =
+                input.value;
 
-        renderCakePreview();
-    });
+            renderCakePreview();
+        }
+    );
 });
 
-getElement("#customMainColor")?.addEventListener(
+getElement(
+    "#customMainColor"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.mainCakeColor =
@@ -3011,90 +3144,107 @@ getElement("#accentColor")?.addEventListener(
 getElements(
     'input[name="cakeFinish"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.cakeFinish =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeFinish =
+                input.value;
 
-        updateSelectedCardStates();
-        renderCakePreview();
-    });
+            renderCakePreview();
+        }
+    );
 });
 
 
 /* =========================================
-   EVENT BINDINGS: DECORATIONS
+   DECORATION EVENTS
 ========================================= */
 
 getElements(
     "[data-decoration-id]"
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.decorations =
-            getElements(
-                "[data-decoration-id]"
-            )
-                .filter(
-                    (decorationInput) =>
-                        decorationInput.checked
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.decorations =
+                getElements(
+                    "[data-decoration-id]"
                 )
-                .filter(
-                    (decorationInput) =>
-                        decorationInput.dataset
-                            .decorationId !==
-                        "topperDecoration"
-                )
-                .map((decorationInput) => {
-                    return {
-                        id:
-                            decorationInput.dataset
-                                .decorationId,
+                    .filter(
+                        (decorationInput) =>
+                            decorationInput.checked
+                    )
+                    .filter(
+                        (decorationInput) =>
+                            decorationInput
+                                .dataset
+                                .decorationId !==
+                            "topperDecoration"
+                    )
+                    .map(
+                        (decorationInput) => ({
+                            id:
+                                decorationInput
+                                    .dataset
+                                    .decorationId,
 
-                        name:
-                            decorationInput.dataset
-                                .decorationName,
+                            name:
+                                decorationInput
+                                    .dataset
+                                    .decorationName,
 
-                        price:
-                            Number(
-                                decorationInput.dataset
-                                    .price
-                            ) || 0
-                    };
-                });
+                            price:
+                                Number(
+                                    decorationInput
+                                        .dataset
+                                        .price
+                                ) || 0
+                        })
+                    );
 
-        updateFlowerSourceVisibility();
-        updateTopperOptionsVisibility();
-        renderCakePreview();
-    });
+            updateFlowerSourceVisibility();
+            updateTopperOptionsVisibility();
+            renderCakePreview();
+        }
+    );
 });
 
 getElements(
     'input[name="flowerSource"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.flowerSource =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.flowerSource =
+                input.value;
 
-        updateSelectedCardStates();
-    });
+            updateSelectedCardStates();
+        }
+    );
 });
 
 getElements(
     'input[name="topperType"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.topperType =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.topperType =
+                input.value;
 
-        builderState.topperPrice =
-            Number(input.dataset.price) ||
-            0;
+            builderState.topperPrice =
+                Number(
+                    input.dataset.price
+                ) || 0;
 
-        updateSelectedCardStates();
-        renderCakePreview();
-    });
+            renderCakePreview();
+        }
+    );
 });
 
-getElement("#topperWording")?.addEventListener(
+getElement(
+    "#topperWording"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.topperWording =
@@ -3106,32 +3256,31 @@ getElement("#topperWording")?.addEventListener(
 
 
 /* =========================================
-   EVENT BINDINGS: EXTRAS
+   EXTRA EVENTS
 ========================================= */
 
-getElements("[data-extra-name]").forEach(
-    (input) => {
-        input.addEventListener(
-            "change",
-            updateCheckboxExtras
-        );
-    }
-);
+getElements(
+    "[data-extra-name]"
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        updateCheckboxExtras
+    );
+});
 
 getElements(".quantity-product").forEach(
-    (productRow) => {
-        const quantityInput =
-            productRow.querySelector(
-                'input[type="number"]'
-            );
+    (row) => {
+        const input = row.querySelector(
+            'input[type="number"]'
+        );
 
         const decreaseButton =
-            productRow.querySelector(
+            row.querySelector(
                 '[data-quantity-action="decrease"]'
             );
 
         const increaseButton =
-            productRow.querySelector(
+            row.querySelector(
                 '[data-quantity-action="increase"]'
             );
 
@@ -3140,11 +3289,10 @@ getElements(".quantity-product").forEach(
             () => {
                 const nextValue = Math.max(
                     0,
-                    Number(quantityInput.value) -
-                        1
+                    Number(input.value) - 1
                 );
 
-                quantityInput.value =
+                input.value =
                     String(nextValue);
 
                 updateQuantityExtras();
@@ -3157,28 +3305,28 @@ getElements(".quantity-product").forEach(
                 const nextValue =
                     Math.max(
                         0,
-                        Number(quantityInput.value)
+                        Number(input.value)
                     ) + 1;
 
-                quantityInput.value =
+                input.value =
                     String(nextValue);
 
                 updateQuantityExtras();
             }
         );
 
-        quantityInput?.addEventListener(
+        input?.addEventListener(
             "input",
             () => {
                 const safeValue = Math.max(
                     0,
                     Number.parseInt(
-                        quantityInput.value || "0",
+                        input.value || "0",
                         10
                     ) || 0
                 );
 
-                quantityInput.value =
+                input.value =
                     String(safeValue);
 
                 updateQuantityExtras();
@@ -3189,22 +3337,20 @@ getElements(".quantity-product").forEach(
 
 
 /* =========================================
-   EVENT BINDINGS: UPLOADS
+   UPLOAD EVENTS
 ========================================= */
 
 const inspirationFileInput = getElement(
     "#inspirationFiles"
 );
 
-const chooseInspirationFiles = getElement(
-    "#chooseInspirationFiles"
-);
-
 const inspirationUploadZone = getElement(
     "#inspirationUploadZone"
 );
 
-chooseInspirationFiles?.addEventListener(
+getElement(
+    "#chooseInspirationFiles"
+)?.addEventListener(
     "click",
     () => {
         inspirationFileInput?.click();
@@ -3265,7 +3411,7 @@ inspirationUploadZone?.addEventListener(
 
 
 /* =========================================
-   EVENT BINDINGS: DETAILS
+   DETAIL FIELD EVENTS
 ========================================= */
 
 const simpleFieldBindings = {
@@ -3287,9 +3433,13 @@ const simpleFieldBindings = {
     deliveryZip: "deliveryZip"
 };
 
-Object.entries(simpleFieldBindings).forEach(
+Object.entries(
+    simpleFieldBindings
+).forEach(
     ([elementId, stateKey]) => {
-        getElement(`#${elementId}`)?.addEventListener(
+        getElement(
+            `#${elementId}`
+        )?.addEventListener(
             "input",
             (event) => {
                 builderState[stateKey] =
@@ -3312,16 +3462,21 @@ getElement(
 getElements(
     'input[name="fulfillmentMethod"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.fulfillmentMethod =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.fulfillmentMethod =
+                input.value;
 
-        updateDeliveryFieldsVisibility();
-        updateSelectedCardStates();
-    });
+            updateDeliveryFieldsVisibility();
+            updateSelectedCardStates();
+        }
+    );
 });
 
-getElement("#deliveryMiles")?.addEventListener(
+getElement(
+    "#deliveryMiles"
+)?.addEventListener(
     "input",
     (event) => {
         builderState.deliveryMiles =
@@ -3334,26 +3489,33 @@ getElement("#deliveryMiles")?.addEventListener(
 getElements(
     'input[name="customerBudget"]'
 ).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.customerBudget =
-            input.value;
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.customerBudget =
+                input.value;
 
-        updateBudgetNotice();
-        updateSelectedCardStates();
-    });
+            updateBudgetNotice();
+            updateSelectedCardStates();
+        }
+    );
 });
 
 
 /* =========================================
-   EVENT BINDINGS: SUMMARY AND RESET
+   SUMMARY, RESET, SUBMIT
 ========================================= */
 
-getElement("#openCakeSummary")?.addEventListener(
+getElement(
+    "#openCakeSummary"
+)?.addEventListener(
     "click",
     openMobileSummary
 );
 
-getElement("#closeCakeSummary")?.addEventListener(
+getElement(
+    "#closeCakeSummary"
+)?.addEventListener(
     "click",
     closeMobileSummary
 );
@@ -3365,20 +3527,16 @@ getElement(
     closeMobileSummary
 );
 
-resetCakeBuilderButton?.addEventListener(
+getElement(
+    "#resetCakeBuilder"
+)?.addEventListener(
     "click",
-    () => {
-        const confirmed = window.confirm(
-            "Reset the entire cake builder?"
-        );
-
-        if (confirmed) {
-            resetBuilder();
-        }
-    }
+    resetBuilder
 );
 
-getElement("#submitCakeVision")?.addEventListener(
+getElement(
+    "#submitCakeVision"
+)?.addEventListener(
     "click",
     submitCakeVision
 );
@@ -3405,4 +3563,3 @@ function initializeBuilder() {
 
 
 initializeBuilder();
-
