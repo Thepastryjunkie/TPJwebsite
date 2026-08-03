@@ -1,0 +1,5287 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Build and submit your custom cake vision to The Pastry Junkie."
+    >
+
+    <title>
+        Build Your Cake | The Pastry Junkie
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../cake-builder.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="builder-app">
+
+
+        <!-- =========================================
+             HEADER
+        ========================================== -->
+
+        <header class="builder-header">
+
+            <div class="builder-header-inner">
+
+                <a
+                    class="builder-back-link"
+                    href="../index.html"
+                    aria-label="Return to The Pastry Junkie homepage"
+                >
+                    <span aria-hidden="true">←</span>
+                    Back Home
+                </a>
+
+
+                <div class="builder-brand">
+
+                    <p>
+                        The Pastry Junkie
+                    </p>
+
+                    <span>
+                        Custom Cake Builder
+                    </span>
+
+                </div>
+
+
+                <button
+                    id="openCakeSummary"
+                    class="header-summary-button"
+                    type="button"
+                    aria-controls="mobileCakeSummary"
+                    aria-expanded="false"
+                >
+                    <span>
+                        Your Cake
+                    </span>
+
+                    <strong id="headerCakePrice">
+                        $185
+                    </strong>
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =========================================
+             PROGRESS NAVIGATION
+        ========================================== -->
+
+        <nav
+            class="builder-progress"
+            aria-label="Cake builder progress"
+        >
+
+            <div class="builder-progress-inner">
+
+                <button
+                    class="progress-step is-active"
+                    type="button"
+                    data-step-target="1"
+                    aria-current="step"
+                >
+                    <span>1</span>
+                    Occasion
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="2"
+                >
+                    <span>2</span>
+                    Cake
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="3"
+                >
+                    <span>3</span>
+                    Flavor
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="4"
+                >
+                    <span>4</span>
+                    Style
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="5"
+                >
+                    <span>5</span>
+                    Extras
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="6"
+                >
+                    <span>6</span>
+                    Inspiration
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="7"
+                >
+                    <span>7</span>
+                    Details
+                </button>
+
+
+                <button
+                    class="progress-step"
+                    type="button"
+                    data-step-target="8"
+                >
+                    <span>8</span>
+                    Review
+                </button>
+
+            </div>
+
+        </nav>
+
+
+
+        <!-- =========================================
+             MAIN BUILDER LAYOUT
+        ========================================== -->
+
+        <main class="builder-main">
+
+            <div class="builder-main-inner">
+
+
+                <!-- =================================
+                     LIVE PREVIEW
+                ================================== -->
+
+                <aside class="cake-preview-panel">
+
+                    <div class="preview-panel-header">
+
+                        <div>
+
+                            <p class="preview-eyebrow">
+                                Your Cake So Far
+                            </p>
+
+                            <h1 id="previewCakeName">
+                                6" Sweet Tooth Cake
+                            </h1>
+
+                            <p id="previewCakeDescription">
+                                Round · Standard · 2 layers
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            id="resetCakeBuilder"
+                            class="reset-cake-button"
+                            type="button"
+                        >
+                            Reset
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =============================
+                         SVG CAKE RENDERER
+                    ============================== -->
+
+                    <div class="cake-renderer-stage">
+
+                        <svg
+                            id="cakeRenderer"
+                            class="cake-renderer"
+                            viewBox="0 0 700 720"
+                            role="img"
+                            aria-labelledby="cakeRendererTitle cakeRendererDescription"
+                        >
+
+                            <title id="cakeRendererTitle">
+                                Custom cake preview
+                            </title>
+
+                            <desc id="cakeRendererDescription">
+                                A customizable illustrated cake preview that changes
+                                according to the selected size, shape, height, color,
+                                and decorations.
+                            </desc>
+
+
+
+                            <!-- =====================
+                                 DEFINITIONS
+                            ====================== -->
+
+                            <defs>
+
+                                <linearGradient
+                                    id="cakeBodyGradient"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="100%"
+                                    y2="0%"
+                                >
+
+                                    <stop
+                                        id="cakeBodyGradientStart"
+                                        offset="0%"
+                                        stop-color="#E49DBB"
+                                    />
+
+                                    <stop
+                                        id="cakeBodyGradientMiddle"
+                                        offset="42%"
+                                        stop-color="#F7B6D2"
+                                    />
+
+                                    <stop
+                                        id="cakeBodyGradientEnd"
+                                        offset="100%"
+                                        stop-color="#D982A8"
+                                    />
+
+                                </linearGradient>
+
+
+                                <linearGradient
+                                    id="cakeTopGradient"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="0%"
+                                    y2="100%"
+                                >
+
+                                    <stop
+                                        id="cakeTopGradientStart"
+                                        offset="0%"
+                                        stop-color="#FFDCEA"
+                                    />
+
+                                    <stop
+                                        id="cakeTopGradientEnd"
+                                        offset="100%"
+                                        stop-color="#F7B6D2"
+                                    />
+
+                                </linearGradient>
+
+
+                                <linearGradient
+                                    id="boardGradient"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="0%"
+                                    y2="100%"
+                                >
+
+                                    <stop
+                                        offset="0%"
+                                        stop-color="#FFFDFB"
+                                    />
+
+                                    <stop
+                                        offset="100%"
+                                        stop-color="#EEDDE5"
+                                    />
+
+                                </linearGradient>
+
+
+                                <filter
+                                    id="cakeShadowFilter"
+                                    x="-30%"
+                                    y="-30%"
+                                    width="160%"
+                                    height="160%"
+                                >
+
+                                    <feGaussianBlur stdDeviation="12"/>
+
+                                </filter>
+
+
+                                <filter
+                                    id="softDecorationShadow"
+                                    x="-30%"
+                                    y="-30%"
+                                    width="160%"
+                                    height="160%"
+                                >
+
+                                    <feDropShadow
+                                        dx="0"
+                                        dy="5"
+                                        stdDeviation="4"
+                                        flood-color="#421A12"
+                                        flood-opacity="0.22"
+                                    />
+
+                                </filter>
+
+
+                                <filter
+                                    id="pearlShadow"
+                                    x="-40%"
+                                    y="-40%"
+                                    width="180%"
+                                    height="180%"
+                                >
+
+                                    <feDropShadow
+                                        dx="1"
+                                        dy="2"
+                                        stdDeviation="1.5"
+                                        flood-color="#5A2A1E"
+                                        flood-opacity="0.32"
+                                    />
+
+                                </filter>
+
+                            </defs>
+
+
+
+                            <!-- =====================
+                                 SHADOW
+                            ====================== -->
+
+                            <ellipse
+                                class="renderer-shadow"
+                                cx="350"
+                                cy="650"
+                                rx="230"
+                                ry="38"
+                                filter="url(#cakeShadowFilter)"
+                            />
+
+
+
+                            <!-- =====================
+                                 CAKE BOARD
+                            ====================== -->
+
+                            <ellipse
+                                class="renderer-board-bottom"
+                                cx="350"
+                                cy="617"
+                                rx="255"
+                                ry="54"
+                            />
+
+                            <ellipse
+                                class="renderer-board-top"
+                                cx="350"
+                                cy="602"
+                                rx="255"
+                                ry="54"
+                                fill="url(#boardGradient)"
+                            />
+
+
+
+                            <!-- =====================
+                                 ROUND CAKE
+                            ====================== -->
+
+                            <g
+                                id="roundCakeShape"
+                                class="cake-shape-group"
+                            >
+
+                                <path
+                                    id="roundCakeBody"
+                                    class="cake-body-shape"
+                                    d="
+                                        M165 282
+                                        C165 248 248 224 350 224
+                                        C452 224 535 248 535 282
+                                        L535 543
+                                        C535 579 452 605 350 605
+                                        C248 605 165 579 165 543
+                                        Z
+                                    "
+                                    fill="url(#cakeBodyGradient)"
+                                />
+
+
+                                <ellipse
+                                    id="roundCakeTop"
+                                    class="cake-top-shape"
+                                    cx="350"
+                                    cy="282"
+                                    rx="185"
+                                    ry="58"
+                                    fill="url(#cakeTopGradient)"
+                                />
+
+
+                                <path
+                                    class="cake-side-highlight"
+                                    d="
+                                        M208 306
+                                        C232 287 261 281 286 289
+                                        L286 530
+                                        C257 536 229 528 208 511
+                                        Z
+                                    "
+                                />
+
+
+                                <path
+                                    class="cake-bottom-shadow"
+                                    d="
+                                        M166 518
+                                        C198 558 270 579 350 579
+                                        C430 579 502 558 534 518
+                                        L534 548
+                                        C518 580 440 605 350 605
+                                        C260 605 182 580 166 548
+                                        Z
+                                    "
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 HEART CAKE
+                            ====================== -->
+
+                            <g
+                                id="heartCakeShape"
+                                class="cake-shape-group is-hidden"
+                            >
+
+                                <path
+                                    id="heartCakeBody"
+                                    class="cake-body-shape"
+                                    d="
+                                        M350 590
+
+                                        C308 557 206 486 167 395
+
+                                        C138 329 158 272 217 251
+
+                                        C262 235 317 254 350 298
+
+                                        C383 254 438 235 483 251
+
+                                        C542 272 562 329 533 395
+
+                                        C494 486 392 557 350 590
+
+                                        Z
+                                    "
+                                    fill="url(#cakeBodyGradient)"
+                                />
+
+
+                                <path
+                                    id="heartCakeTop"
+                                    class="cake-top-shape"
+                                    d="
+                                        M350 373
+
+                                        C316 338 240 289 240 232
+
+                                        C240 188 277 160 318 169
+
+                                        C334 172 346 184 350 197
+
+                                        C354 184 366 172 382 169
+
+                                        C423 160 460 188 460 232
+
+                                        C460 289 384 338 350 373
+
+                                        Z
+                                    "
+                                    fill="url(#cakeTopGradient)"
+                                />
+
+
+                                <path
+                                    class="cake-side-highlight"
+                                    d="
+                                        M216 294
+                                        C246 264 293 262 322 286
+                                        C296 350 271 433 292 511
+                                        C253 481 222 446 197 405
+                                        C170 361 180 323 216 294
+                                        Z
+                                    "
+                                />
+
+
+                                <path
+                                    class="cake-bottom-shadow"
+                                    d="
+                                        M171 394
+                                        C213 479 308 548 350 579
+                                        C392 548 487 479 529 394
+
+                                        L529 422
+
+                                        C482 504 391 568 350 600
+                                        C309 568 218 504 171 422
+
+                                        Z
+                                    "
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 STAR CAKE
+                            ====================== -->
+
+                            <g
+                                id="starCakeShape"
+                                class="cake-shape-group is-hidden"
+                            >
+
+                                <polygon
+                                    id="starCakeBody"
+                                    class="cake-body-shape"
+                                    points="
+                                        350,186
+                                        396,290
+                                        508,302
+                                        423,380
+                                        446,493
+                                        350,436
+                                        254,493
+                                        277,380
+                                        192,302
+                                        304,290
+                                    "
+                                    fill="url(#cakeBodyGradient)"
+                                />
+
+
+                                <polygon
+                                    id="starCakeTop"
+                                    class="cake-top-shape"
+                                    points="
+                                        350,158
+                                        390,246
+                                        486,256
+                                        413,322
+                                        433,419
+                                        350,370
+                                        267,419
+                                        287,322
+                                        214,256
+                                        310,246
+                                    "
+                                    fill="url(#cakeTopGradient)"
+                                />
+
+
+                                <path
+                                    class="cake-side-highlight"
+                                    d="
+                                        M304 290
+                                        L225 309
+                                        L286 366
+                                        L268 450
+                                        L326 416
+                                        Z
+                                    "
+                                />
+
+
+                                <path
+                                    class="cake-bottom-shadow"
+                                    d="
+                                        M254 465
+                                        L350 408
+                                        L446 465
+                                        L438 500
+                                        L350 447
+                                        L262 500
+                                        Z
+                                    "
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 EXTRA LAYER DETAIL
+                            ====================== -->
+
+                            <g
+                                id="extraLayerDecoration"
+                                class="cake-decoration-group is-hidden"
+                            >
+
+                                <path
+                                    class="layer-divider-shadow"
+                                    d="
+                                        M185 405
+                                        C252 433 448 433 515 405
+                                    "
+                                />
+
+
+                                <path
+                                    class="layer-divider-highlight"
+                                    d="
+                                        M195 392
+                                        C260 417 440 417 505 392
+                                    "
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 CHOCOLATE DRIP
+                            ====================== -->
+
+                            <g
+                                id="chocolateDripDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <path
+                                    class="chocolate-drip"
+                                    d="
+                                        M174 292
+
+                                        C216 314 255 300 293 299
+
+                                        C335 298 377 316 420 299
+
+                                        C454 286 492 293 526 283
+
+                                        L526 330
+
+                                        C506 340 491 321 480 316
+
+                                        C464 307 460 348 450 368
+
+                                        C437 394 416 378 416 349
+
+                                        C416 324 397 323 385 334
+
+                                        C366 352 362 398 340 398
+
+                                        C317 398 322 348 306 334
+
+                                        C290 320 270 328 266 357
+
+                                        C261 387 239 379 232 352
+
+                                        C226 322 203 331 174 343
+
+                                        Z
+                                    "
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 RIBBON
+                            ====================== -->
+
+                            <g
+                                id="ribbonDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <rect
+                                    class="ribbon-band"
+                                    x="166"
+                                    y="458"
+                                    width="368"
+                                    height="34"
+                                    rx="8"
+                                />
+
+
+                                <path
+                                    class="ribbon-bow"
+                                    d="
+                                        M350 475
+
+                                        C309 434 261 436 273 479
+
+                                        C282 516 321 500 350 484
+
+                                        C379 500 418 516 427 479
+
+                                        C439 436 391 434 350 475
+
+                                        Z
+                                    "
+                                />
+
+
+                                <circle
+                                    class="ribbon-knot"
+                                    cx="350"
+                                    cy="478"
+                                    r="17"
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 PEARLS
+                            ====================== -->
+
+                            <g
+                                id="pearlsDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#pearlShadow)"
+                            >
+
+                                <circle class="cake-pearl pearl-large" cx="220" cy="341" r="9"/>
+                                <circle class="cake-pearl pearl-small" cx="259" cy="384" r="6"/>
+                                <circle class="cake-pearl pearl-medium" cx="313" cy="325" r="7.5"/>
+                                <circle class="cake-pearl pearl-large" cx="374" cy="377" r="9"/>
+                                <circle class="cake-pearl pearl-small" cx="445" cy="331" r="6"/>
+                                <circle class="cake-pearl pearl-large" cx="480" cy="423" r="9"/>
+                                <circle class="cake-pearl pearl-small" cx="415" cy="523" r="6"/>
+                                <circle class="cake-pearl pearl-large" cx="302" cy="515" r="9"/>
+                                <circle class="cake-pearl pearl-small" cx="214" cy="463" r="6"/>
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 SPRINKLES
+                            ====================== -->
+
+                            <g
+                                id="sprinklesDecoration"
+                                class="cake-decoration-group is-hidden"
+                            >
+
+                                <line class="cake-sprinkle sprinkle-pink" x1="219" y1="354" x2="237" y2="369"/>
+                                <line class="cake-sprinkle sprinkle-cream" x1="267" y1="323" x2="285" y2="313"/>
+                                <line class="cake-sprinkle sprinkle-purple" x1="318" y1="367" x2="330" y2="384"/>
+                                <line class="cake-sprinkle sprinkle-pink" x1="377" y1="326" x2="398" y2="334"/>
+                                <line class="cake-sprinkle sprinkle-cream" x1="438" y1="371" x2="455" y2="356"/>
+                                <line class="cake-sprinkle sprinkle-purple" x1="477" y1="439" x2="493" y2="453"/>
+                                <line class="cake-sprinkle sprinkle-pink" x1="418" y1="505" x2="436" y2="490"/>
+                                <line class="cake-sprinkle sprinkle-cream" x1="350" y1="536" x2="368" y2="548"/>
+                                <line class="cake-sprinkle sprinkle-purple" x1="286" y1="503" x2="301" y2="519"/>
+                                <line class="cake-sprinkle sprinkle-pink" x1="211" y1="443" x2="229" y2="434"/>
+                                <line class="cake-sprinkle sprinkle-cream" x1="251" y1="422" x2="266" y2="437"/>
+                                <line class="cake-sprinkle sprinkle-purple" x1="394" y1="444" x2="412" y2="430"/>
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 GOLD ACCENTS
+                            ====================== -->
+
+                            <g
+                                id="goldAccentDecoration"
+                                class="cake-decoration-group is-hidden"
+                            >
+
+                                <path
+                                    class="gold-flake"
+                                    d="M238 350 L251 341 L260 355 L245 364 Z"
+                                />
+
+                                <path
+                                    class="gold-flake"
+                                    d="M422 390 L435 378 L446 391 L432 405 Z"
+                                />
+
+                                <path
+                                    class="gold-flake"
+                                    d="M286 475 L302 466 L309 483 L293 491 Z"
+                                />
+
+                                <path
+                                    class="gold-flake"
+                                    d="M465 483 L476 471 L489 481 L477 495 Z"
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 BUTTERFLIES
+                            ====================== -->
+
+                            <g
+                                id="butterfliesDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <g
+                                    class="butterfly"
+                                    transform="translate(232 333) rotate(-15)"
+                                >
+
+                                    <ellipse
+                                        class="butterfly-wing"
+                                        cx="-10"
+                                        cy="-5"
+                                        rx="13"
+                                        ry="18"
+                                    />
+
+                                    <ellipse
+                                        class="butterfly-wing"
+                                        cx="10"
+                                        cy="-5"
+                                        rx="13"
+                                        ry="18"
+                                    />
+
+                                    <rect
+                                        class="butterfly-body"
+                                        x="-2"
+                                        y="-13"
+                                        width="4"
+                                        height="27"
+                                        rx="2"
+                                    />
+
+                                </g>
+
+
+                                <g
+                                    class="butterfly"
+                                    transform="translate(452 420) rotate(18)"
+                                >
+
+                                    <ellipse
+                                        class="butterfly-wing"
+                                        cx="-10"
+                                        cy="-5"
+                                        rx="13"
+                                        ry="18"
+                                    />
+
+                                    <ellipse
+                                        class="butterfly-wing"
+                                        cx="10"
+                                        cy="-5"
+                                        rx="13"
+                                        ry="18"
+                                    />
+
+                                    <rect
+                                        class="butterfly-body"
+                                        x="-2"
+                                        y="-13"
+                                        width="4"
+                                        height="27"
+                                        rx="2"
+                                    />
+
+                                </g>
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 CHERRIES
+                            ====================== -->
+
+                            <g
+                                id="cherriesDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <path
+                                    class="cherry-stem"
+                                    d="
+                                        M299 248
+                                        C310 221 333 215 350 217
+                                    "
+                                />
+
+
+                                <circle
+                                    class="cake-cherry"
+                                    cx="292"
+                                    cy="261"
+                                    r="20"
+                                />
+
+
+                                <path
+                                    class="cherry-stem"
+                                    d="
+                                        M391 251
+                                        C381 222 360 215 350 217
+                                    "
+                                />
+
+
+                                <circle
+                                    class="cake-cherry"
+                                    cx="399"
+                                    cy="263"
+                                    r="20"
+                                />
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 FLOWERS
+                            ====================== -->
+
+                            <g
+                                id="flowersDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <g
+                                    class="cake-flower"
+                                    transform="translate(240 292)"
+                                >
+
+                                    <circle class="flower-petal" cx="0" cy="-18" r="16"/>
+                                    <circle class="flower-petal" cx="17" cy="-5" r="16"/>
+                                    <circle class="flower-petal" cx="11" cy="15" r="16"/>
+                                    <circle class="flower-petal" cx="-11" cy="15" r="16"/>
+                                    <circle class="flower-petal" cx="-17" cy="-5" r="16"/>
+                                    <circle class="flower-center" cx="0" cy="0" r="10"/>
+
+                                </g>
+
+
+                                <g
+                                    class="cake-flower"
+                                    transform="translate(451 314) scale(0.85)"
+                                >
+
+                                    <circle class="flower-petal" cx="0" cy="-18" r="16"/>
+                                    <circle class="flower-petal" cx="17" cy="-5" r="16"/>
+                                    <circle class="flower-petal" cx="11" cy="15" r="16"/>
+                                    <circle class="flower-petal" cx="-11" cy="15" r="16"/>
+                                    <circle class="flower-petal" cx="-17" cy="-5" r="16"/>
+                                    <circle class="flower-center" cx="0" cy="0" r="10"/>
+
+                                </g>
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 TOPPER
+                            ====================== -->
+
+                            <g
+                                id="topperDecoration"
+                                class="cake-decoration-group is-hidden"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <path
+                                    class="topper-stick"
+                                    d="
+                                        M350 250
+                                        L350 171
+                                    "
+                                />
+
+
+                                <rect
+                                    class="topper-sign"
+                                    x="279"
+                                    y="119"
+                                    width="142"
+                                    height="60"
+                                    rx="12"
+                                />
+
+
+                                <text
+                                    id="topperTextPreview"
+                                    class="topper-text"
+                                    x="350"
+                                    y="157"
+                                    text-anchor="middle"
+                                >
+                                    Celebrate
+                                </text>
+
+                            </g>
+
+
+
+                            <!-- =====================
+                                 PIPED BUTTERCREAM
+                            ====================== -->
+
+                            <g
+                                id="pipedBorderDecoration"
+                                class="cake-decoration-group"
+                                filter="url(#softDecorationShadow)"
+                            >
+
+                                <path
+                                    class="piped-border top-piped-border"
+                                    d="
+                                        M181 285
+
+                                        C199 257 220 313 241 285
+
+                                        C262 257 283 313 304 285
+
+                                        C325 257 346 313 367 285
+
+                                        C388 257 409 313 430 285
+
+                                        C451 257 472 313 493 285
+
+                                        C509 264 520 298 525 285
+                                    "
+                                />
+
+
+                                <path
+                                    class="piped-border bottom-piped-border"
+                                    d="
+                                        M181 547
+
+                                        C199 519 220 575 241 547
+
+                                        C262 519 283 575 304 547
+
+                                        C325 519 346 575 367 547
+
+                                        C388 519 409 575 430 547
+
+                                        C451 519 472 575 493 547
+
+                                        C509 526 520 560 525 547
+                                    "
+                                />
+
+                            </g>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- =============================
+                         QUICK SUMMARY
+                    ============================== -->
+
+                    <div class="preview-quick-summary">
+
+                        <div>
+
+                            <span>
+                                Serves
+                            </span>
+
+                            <strong id="previewServingCount">
+                                8–12
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Starting Estimate
+                            </span>
+
+                            <strong id="previewPrice">
+                                $185
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="preview-price-note">
+                        Your final quote is confirmed after The Pastry Junkie
+                        reviews your complete design.
+                    </p>
+
+                </aside>
+
+
+
+                <!-- =================================
+                     BUILDER STEPS
+                ================================== -->
+
+                <section class="builder-steps-panel">
+
+
+                    <!-- =============================
+                         STEP 1: OCCASION
+                    ============================== -->
+
+                    <section
+                        id="builderStep1"
+                        class="builder-step is-active"
+                        data-step="1"
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step One
+                            </p>
+
+                            <h2>
+                                What Are We Celebrating?
+                            </h2>
+
+                            <p>
+                                Tell us what brought you here so we can begin
+                                shaping the right cake experience.
+                            </p>
+
+                        </div>
+
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend class="visually-hidden">
+                                Choose an occasion
+                            </legend>
+
+
+                            <div class="occasion-grid">
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Birthday"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        🎂
+                                    </span>
+
+                                    <strong>
+                                        Birthday
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Baby Shower"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        🍼
+                                    </span>
+
+                                    <strong>
+                                        Baby Shower
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Graduation"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        🎓
+                                    </span>
+
+                                    <strong>
+                                        Graduation
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Wedding or Engagement"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        💍
+                                    </span>
+
+                                    <strong>
+                                        Wedding or Engagement
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Anniversary"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        ❤️
+                                    </span>
+
+                                    <strong>
+                                        Anniversary
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Holiday"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        ✨
+                                    </span>
+
+                                    <strong>
+                                        Holiday
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="occasion"
+                                        value="Just Because"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        🍰
+                                    </span>
+
+                                    <strong>
+                                        Just Because
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="visual-option-card">
+
+                                    <input
+                                        id="otherOccasionOption"
+                                        type="radio"
+                                        name="occasion"
+                                        value="Other"
+                                    >
+
+                                    <span
+                                        class="occasion-symbol"
+                                        aria-hidden="true"
+                                    >
+                                        🎉
+                                    </span>
+
+                                    <strong>
+                                        Something Else
+                                    </strong>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <div
+                            id="otherOccasionField"
+                            class="conditional-field is-hidden"
+                        >
+
+                            <label for="otherOccasionText">
+                                Tell us the occasion
+                            </label>
+
+                            <input
+                                id="otherOccasionText"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Enter the celebration"
+                            >
+
+                        </div>
+
+
+                        <div class="date-field-grid">
+
+                            <label class="form-field">
+
+                                <span>
+                                    Event Date
+                                </span>
+
+                                <div class="date-input-wrapper">
+
+                                    <input
+                                        id="eventDate"
+                                        type="date"
+                                        required
+                                    >
+
+                                </div>
+
+                            </label>
+
+
+                            <label class="form-field">
+
+                                <span>
+                                    Preferred Pickup or Delivery Date
+                                </span>
+
+                                <div class="date-input-wrapper">
+
+                                    <input
+                                        id="fulfillmentDate"
+                                        type="date"
+                                        required
+                                    >
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Approximately how many people are you serving?
+                            </span>
+
+                            <input
+                                id="guestCount"
+                                type="number"
+                                min="1"
+                                max="500"
+                                inputmode="numeric"
+                                placeholder="Enter guest count"
+                            >
+
+                        </label>
+
+
+                        <div
+                            id="guestRecommendation"
+                            class="builder-callout is-hidden"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <div
+                            id="rushOrderNotice"
+                            class="builder-warning is-hidden"
+                            aria-live="polite"
+                        >
+
+                            <strong>
+                                Rush Request
+                            </strong>
+
+                            <p>
+                                Requests made fewer than five days before
+                                fulfillment may include a $75 rush fee and
+                                remain subject to availability.
+                            </p>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 2: PICK YOUR CAKE
+                    ============================== -->
+
+                    <section
+                        id="builderStep2"
+                        class="builder-step"
+                        data-step="2"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Two
+                            </p>
+
+                            <h2>
+                                Pick Your Cake
+                            </h2>
+
+                            <p>
+                                Choose your shape and size. Add another layer
+                                if you want a taller statement cake.
+                            </p>
+
+                        </div>
+
+
+                        <!-- SHAPE -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Choose a shape
+                            </legend>
+
+
+                            <div class="shape-choice-grid">
+
+                                <label class="shape-choice-card is-selected">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="round"
+                                        checked
+                                    >
+
+                                    <span class="shape-card-icon round-shape-icon"></span>
+
+                                    <strong>
+                                        Round
+                                    </strong>
+
+                                    <small>
+                                        Signature celebration cakes
+                                    </small>
+
+                                </label>
+
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="heart"
+                                    >
+
+                                    <span class="shape-card-icon heart-shape-icon">
+                                        ♥
+                                    </span>
+
+                                    <strong>
+                                        Heart
+                                    </strong>
+
+                                    <small>
+                                        Love at first bite
+                                    </small>
+
+                                </label>
+
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="star"
+                                    >
+
+                                    <span class="shape-card-icon star-shape-icon">
+                                        ★
+                                    </span>
+
+                                    <strong>
+                                        Star
+                                    </strong>
+
+                                    <small>
+                                        Superstar celebration cake
+                                    </small>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- ROUND SIZES -->
+
+                        <fieldset
+                            id="roundSizeOptions"
+                            class="builder-fieldset cake-size-group"
+                        >
+
+                            <legend>
+                                Choose your round cake size
+                            </legend>
+
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="round-4"
+                                    >
+
+                                    <span class="cake-size-visual size-4"></span>
+
+                                    <strong>
+                                        4" Mini Indulgence
+                                    </strong>
+
+                                    <span>
+                                        Serves 4–6
+                                    </span>
+
+                                    <b>
+                                        $125
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card is-selected">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="round-6"
+                                        checked
+                                    >
+
+                                    <span class="cake-size-visual size-6"></span>
+
+                                    <strong>
+                                        6" Sweet Tooth Cake
+                                    </strong>
+
+                                    <span>
+                                        Serves 8–12
+                                    </span>
+
+                                    <b>
+                                        $185
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="round-8"
+                                    >
+
+                                    <span class="cake-size-visual size-8"></span>
+
+                                    <strong>
+                                        8" Party Starter Cake
+                                    </strong>
+
+                                    <span>
+                                        Serves 16–20
+                                    </span>
+
+                                    <b>
+                                        $245
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="round-9"
+                                    >
+
+                                    <span class="cake-size-visual size-9"></span>
+
+                                    <strong>
+                                        9" Main Event Cake
+                                    </strong>
+
+                                    <span>
+                                        Serves 24–30
+                                    </span>
+
+                                    <b>
+                                        $310
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="round-10"
+                                    >
+
+                                    <span class="cake-size-visual size-10"></span>
+
+                                    <strong>
+                                        10" Celebration Crowd Cake
+                                    </strong>
+
+                                    <span>
+                                        Serves 32–40
+                                    </span>
+
+                                    <b>
+                                        $385
+                                    </b>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- HEART SIZES -->
+
+                        <fieldset
+                            id="heartSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Choose your heart cake size
+                            </legend>
+
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="heart-5-bento"
+                                    >
+
+                                    <span class="cake-size-visual heart-size-5">
+                                        ♥
+                                    </span>
+
+                                    <strong>
+                                        5" Sweetheart Bento Box
+                                    </strong>
+
+                                    <span>
+                                        1 layer · Serves 2–4
+                                    </span>
+
+                                    <b>
+                                        $165
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="heart-6"
+                                    >
+
+                                    <span class="cake-size-visual heart-size-6">
+                                        ♥
+                                    </span>
+
+                                    <strong>
+                                        6" Love at First Bite
+                                    </strong>
+
+                                    <span>
+                                        Serves 8–12
+                                    </span>
+
+                                    <b>
+                                        $200
+                                    </b>
+
+                                </label>
+
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="heart-9"
+                                    >
+
+                                    <span class="cake-size-visual heart-size-9">
+                                        ♥
+                                    </span>
+
+                                    <strong>
+                                        9" Whole Lotta Love
+                                    </strong>
+
+                                    <span>
+                                        Serves 20–26
+                                    </span>
+
+                                    <b>
+                                        $335
+                                    </b>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- STAR SIZE -->
+
+                        <fieldset
+                            id="starSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Choose your star cake
+                            </legend>
+
+
+                            <div class="cake-size-grid single-size-grid">
+
+                                <label class="cake-size-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeSize"
+                                        value="star-8"
+                                    >
+
+                                    <span class="cake-size-visual star-size-8">
+                                        ★
+                                    </span>
+
+                                    <strong>
+                                        8" Superstar Cake
+                                    </strong>
+
+                                    <span>
+                                        Serves 16–20
+                                    </span>
+
+                                    <b>
+                                        $265
+                                    </b>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- EXTRA LAYER -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Cake height
+                            </legend>
+
+
+                            <label class="extra-layer-toggle">
+
+                                <input
+                                    id="extraLayerToggle"
+                                    type="checkbox"
+                                >
+
+                                <span class="toggle-switch"></span>
+
+
+                                <span class="toggle-label">
+
+                                    <strong>
+                                        Add Another Layer
+                                    </strong>
+
+                                    <small id="extraLayerDescription">
+                                        Makes your cake tall · Adds $30
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+
+                            <p
+                                id="bentoLayerNotice"
+                                class="small-field-note is-hidden"
+                            >
+                                The 5" Sweetheart Bento Box includes one cake
+                                layer. Adding another layer creates the tall
+                                two-layer version.
+                            </p>
+
+                        </fieldset>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 3: FLAVOR
+                    ============================== -->
+
+                    <section
+                        id="builderStep3"
+                        class="builder-step"
+                        data-step="3"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Three
+                            </p>
+
+                            <h2>
+                                Flavor Your Cake
+                            </h2>
+
+                            <p>
+                                Choose a favorite or tell us exactly what
+                                you are craving.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- CAKE FLAVOR -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Cake flavor
+                            </legend>
+
+
+                            <div class="flavor-grid">
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Vanilla"
+                                    >
+
+                                    <strong>
+                                        Vanilla
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Chocolate"
+                                    >
+
+                                    <strong>
+                                        Chocolate
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Strawberry"
+                                    >
+
+                                    <strong>
+                                        Strawberry
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Red Velvet"
+                                    >
+
+                                    <strong>
+                                        Red Velvet
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Lemon"
+                                    >
+
+                                    <strong>
+                                        Lemon
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Birthday Cake"
+                                    >
+
+                                    <strong>
+                                        Birthday Cake
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Cookies and Cream"
+                                    >
+
+                                    <strong>
+                                        Cookies & Cream
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Cookie Butter"
+                                    >
+
+                                    <strong>
+                                        Cookie Butter
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        id="customCakeFlavorOption"
+                                        type="radio"
+                                        name="cakeFlavor"
+                                        value="Custom Flavor"
+                                    >
+
+                                    <strong>
+                                        Something Else
+                                    </strong>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <div
+                            id="customCakeFlavorField"
+                            class="conditional-field is-hidden"
+                        >
+
+                            <label for="customCakeFlavor">
+                                What flavor are you craving?
+                            </label>
+
+                            <input
+                                id="customCakeFlavor"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Describe your cake flavor"
+                            >
+
+                        </div>
+
+
+
+                        <!-- BUTTERCREAM -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Buttercream style
+                            </legend>
+
+
+                            <div class="buttercream-grid">
+
+                                <label class="description-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="buttercreamStyle"
+                                        value="American Buttercream"
+                                    >
+
+                                    <strong>
+                                        American Buttercream
+                                    </strong>
+
+                                    <span>
+                                        Can be flavored to complement your cake.
+                                    </span>
+
+                                </label>
+
+
+                                <label class="description-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="buttercreamStyle"
+                                        value="Cream Cheese Buttercream"
+                                    >
+
+                                    <strong>
+                                        Cream Cheese Buttercream
+                                    </strong>
+
+                                    <span>
+                                        Tangy, smooth, and rich.
+                                    </span>
+
+                                </label>
+
+
+                                <label class="description-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="buttercreamStyle"
+                                        value="Chocolate Buttercream"
+                                    >
+
+                                    <strong>
+                                        Chocolate Buttercream
+                                    </strong>
+
+                                    <span>
+                                        Deep chocolate flavor.
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- BUTTERCREAM FLAVOR -->
+
+                        <label class="form-field">
+
+                            <span>
+                                Would you like your buttercream flavored?
+                            </span>
+
+                            <input
+                                id="buttercreamFlavor"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Examples: vanilla, lemon, strawberry, chocolate"
+                            >
+
+                        </label>
+
+
+
+                        <!-- STANDARD FILLING -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Filling
+                            </legend>
+
+
+                            <p class="fieldset-description">
+                                Standard fillings are included in the base price.
+                            </p>
+
+
+                            <div class="flavor-grid">
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Vanilla"
+                                    >
+
+                                    <strong>
+                                        Vanilla
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Chocolate"
+                                    >
+
+                                    <strong>
+                                        Chocolate
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Strawberry"
+                                    >
+
+                                    <strong>
+                                        Strawberry
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Raspberry"
+                                    >
+
+                                    <strong>
+                                        Raspberry
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Blueberry"
+                                    >
+
+                                    <strong>
+                                        Blueberry
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Lemon"
+                                    >
+
+                                    <strong>
+                                        Lemon
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Cookie Butter"
+                                    >
+
+                                    <strong>
+                                        Cookie Butter
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        id="customFillingOption"
+                                        type="radio"
+                                        name="cakeFilling"
+                                        value="Custom Filling"
+                                    >
+
+                                    <strong>
+                                        Something Else
+                                    </strong>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <div
+                            id="customFillingField"
+                            class="conditional-field is-hidden"
+                        >
+
+                            <label for="customFilling">
+                                Tell us the filling you want
+                            </label>
+
+                            <input
+                                id="customFilling"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Describe your filling"
+                            >
+
+                        </div>
+
+
+
+                        <!-- PREMIUM FILLINGS -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Premium filling upgrades
+                            </legend>
+
+
+                            <div class="upgrade-grid">
+
+                                <label class="upgrade-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-premium-filling="Brownie Layer"
+                                        data-price="8"
+                                    >
+
+                                    <strong>
+                                        Brownie Layer
+                                    </strong>
+
+                                    <span>
+                                        +$8
+                                    </span>
+
+                                </label>
+
+
+                                <label class="upgrade-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-premium-filling="Cheesecake Layer"
+                                        data-price="12"
+                                    >
+
+                                    <strong>
+                                        Cheesecake Layer
+                                    </strong>
+
+                                    <span>
+                                        +$12
+                                    </span>
+
+                                </label>
+
+
+                                <label class="upgrade-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-premium-filling="Ganache"
+                                        data-price="12"
+                                    >
+
+                                    <strong>
+                                        Ganache
+                                    </strong>
+
+                                    <span>
+                                        +$12
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 4: STYLE
+                    ============================== -->
+
+                    <section
+                        id="builderStep4"
+                        class="builder-step"
+                        data-step="4"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Four
+                            </p>
+
+                            <h2>
+                                Style Your Cake
+                            </h2>
+
+                            <p>
+                                Choose your colors, finish, and favorite
+                                cake details.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- MAIN COLOR -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Main buttercream color
+                            </legend>
+
+
+                            <div class="color-choice-grid">
+
+                                <label
+                                    class="color-choice is-selected"
+                                    title="Soft pink"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#F7B6D2"
+                                        checked
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#F7B6D2;"
+                                    ></span>
+
+                                    <small>
+                                        Soft Pink
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Hot pink"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#FF4FA3"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#FF4FA3;"
+                                    ></span>
+
+                                    <small>
+                                        Hot Pink
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Chocolate"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#84563C"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#84563C;"
+                                    ></span>
+
+                                    <small>
+                                        Chocolate
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Cream"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#FFF1DC"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#FFF1DC;"
+                                    ></span>
+
+                                    <small>
+                                        Cream
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="White"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#FFFFFF"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#FFFFFF;"
+                                    ></span>
+
+                                    <small>
+                                        White
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Black"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#171313"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#171313;"
+                                    ></span>
+
+                                    <small>
+                                        Black
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Lavender"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#D9C2F0"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#D9C2F0;"
+                                    ></span>
+
+                                    <small>
+                                        Lavender
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Baby blue"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#BFDDF5"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#BFDDF5;"
+                                    ></span>
+
+                                    <small>
+                                        Baby Blue
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Sage"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#B8C9AF"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#B8C9AF;"
+                                    ></span>
+
+                                    <small>
+                                        Sage
+                                    </small>
+
+                                </label>
+
+
+                                <label
+                                    class="color-choice"
+                                    title="Yellow"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="mainCakeColor"
+                                        value="#F7D978"
+                                    >
+
+                                    <span
+                                        class="color-swatch"
+                                        style="--swatch-color:#F7D978;"
+                                    ></span>
+
+                                    <small>
+                                        Yellow
+                                    </small>
+
+                                </label>
+
+                            </div>
+
+
+                            <label class="custom-color-control">
+
+                                <span>
+                                    Choose another color
+                                </span>
+
+                                <input
+                                    id="customMainColor"
+                                    type="color"
+                                    value="#FF4FA3"
+                                >
+
+                            </label>
+
+                        </fieldset>
+
+
+
+                        <!-- SECONDARY COLOR -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Accent color
+                            </legend>
+
+
+                            <label class="custom-color-control">
+
+                                <span>
+                                    Choose your accent color
+                                </span>
+
+                                <input
+                                    id="accentColor"
+                                    type="color"
+                                    value="#FF4FA3"
+                                >
+
+                            </label>
+
+                        </fieldset>
+
+
+
+                        <!-- FINISH -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Buttercream finish
+                            </legend>
+
+
+                            <div class="style-choice-grid">
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Smooth Finish"
+                                    >
+
+                                    <span class="style-preview smooth-style-preview"></span>
+
+                                    <strong>
+                                        Smooth
+                                    </strong>
+
+                                    <small>
+                                        Clean and polished
+                                    </small>
+
+                                </label>
+
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Simple Texture"
+                                    >
+
+                                    <span class="style-preview texture-style-preview"></span>
+
+                                    <strong>
+                                        Simple Texture
+                                    </strong>
+
+                                    <small>
+                                        Soft buttercream movement
+                                    </small>
+
+                                </label>
+
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Vintage Piping"
+                                    >
+
+                                    <span class="style-preview vintage-style-preview"></span>
+
+                                    <strong>
+                                        Vintage Piping
+                                    </strong>
+
+                                    <small>
+                                        Piped borders and details
+                                    </small>
+
+                                </label>
+
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Watercolor Finish"
+                                    >
+
+                                    <span class="style-preview watercolor-style-preview"></span>
+
+                                    <strong>
+                                        Watercolor
+                                    </strong>
+
+                                    <small>
+                                        Blended buttercream color
+                                    </small>
+
+                                </label>
+
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Palette Knife Finish"
+                                    >
+
+                                    <span class="style-preview palette-style-preview"></span>
+
+                                    <strong>
+                                        Palette Knife
+                                    </strong>
+
+                                    <small>
+                                        Artistic painted texture
+                                    </small>
+
+                                </label>
+
+
+                                <label class="style-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeFinish"
+                                        value="Edible Image Design"
+                                    >
+
+                                    <span class="style-preview image-style-preview"></span>
+
+                                    <strong>
+                                        Edible Image
+                                    </strong>
+
+                                    <small>
+                                        Photo or collage design
+                                    </small>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- DECORATIONS -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Cake details
+                            </legend>
+
+
+                            <p class="fieldset-description">
+                                Select every detail you want considered in
+                                your design.
+                            </p>
+
+
+                            <div class="decoration-choice-grid">
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="chocolateDripDecoration"
+                                        data-decoration-name="Chocolate Drip"
+                                        data-price="10"
+                                    >
+
+                                    <span class="decoration-mini-preview drip-mini-preview"></span>
+
+                                    <strong>
+                                        Chocolate Drip
+                                    </strong>
+
+                                    <small>
+                                        +$10
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="pearlsDecoration"
+                                        data-decoration-name="Edible Pearls"
+                                        data-price="10"
+                                    >
+
+                                    <span class="decoration-mini-preview pearls-mini-preview"></span>
+
+                                    <strong>
+                                        Edible Pearls
+                                    </strong>
+
+                                    <small>
+                                        +$10
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="sprinklesDecoration"
+                                        data-decoration-name="Themed Sprinkles"
+                                        data-price="6"
+                                    >
+
+                                    <span class="decoration-mini-preview sprinkles-mini-preview"></span>
+
+                                    <strong>
+                                        Themed Sprinkles
+                                    </strong>
+
+                                    <small>
+                                        +$6
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="ribbonDecoration"
+                                        data-decoration-name="Ribbon"
+                                        data-price="8"
+                                    >
+
+                                    <span class="decoration-mini-preview ribbon-mini-preview"></span>
+
+                                    <strong>
+                                        Ribbon
+                                    </strong>
+
+                                    <small>
+                                        +$8
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="butterfliesDecoration"
+                                        data-decoration-name="Butterflies"
+                                        data-price="10"
+                                    >
+
+                                    <span class="decoration-mini-preview butterflies-mini-preview">
+                                        🦋
+                                    </span>
+
+                                    <strong>
+                                        Butterflies
+                                    </strong>
+
+                                    <small>
+                                        +$10
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="goldAccentDecoration"
+                                        data-decoration-name="Gold or Silver Accents"
+                                        data-price="15"
+                                    >
+
+                                    <span class="decoration-mini-preview gold-mini-preview"></span>
+
+                                    <strong>
+                                        Gold or Silver
+                                    </strong>
+
+                                    <small>
+                                        +$15
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="flowersDecoration"
+                                        data-decoration-name="Fresh Flowers Supplied by The Pastry Junkie"
+                                        data-price="25"
+                                    >
+
+                                    <span class="decoration-mini-preview flowers-mini-preview">
+                                        🌸
+                                    </span>
+
+                                    <strong>
+                                        Fresh Flowers
+                                    </strong>
+
+                                    <small>
+                                        +$25
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-decoration-id="cherriesDecoration"
+                                        data-decoration-name="Cherries"
+                                        data-price="6"
+                                    >
+
+                                    <span class="decoration-mini-preview cherries-mini-preview">
+                                        🍒
+                                    </span>
+
+                                    <strong>
+                                        Cherries
+                                    </strong>
+
+                                    <small>
+                                        +$6
+                                    </small>
+
+                                </label>
+
+
+                                <label class="decoration-choice-card">
+
+                                    <input
+                                        id="topperDecorationOption"
+                                        type="checkbox"
+                                        data-decoration-id="topperDecoration"
+                                        data-decoration-name="Cake Topper"
+                                        data-price="0"
+                                    >
+
+                                    <span class="decoration-mini-preview topper-mini-preview">
+                                        30
+                                    </span>
+
+                                    <strong>
+                                        Cake Topper
+                                    </strong>
+
+                                    <small>
+                                        Choose below
+                                    </small>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- FLOWER SOURCE -->
+
+                        <div
+                            id="flowerSourceOptions"
+                            class="conditional-section is-hidden"
+                        >
+
+                            <fieldset class="builder-fieldset">
+
+                                <legend>
+                                    Fresh flower source
+                                </legend>
+
+
+                                <div class="description-option-grid">
+
+                                    <label class="description-option-card">
+
+                                        <input
+                                            type="radio"
+                                            name="flowerSource"
+                                            value="Supplied by The Pastry Junkie"
+                                        >
+
+                                        <strong>
+                                            Supplied by The Pastry Junkie
+                                        </strong>
+
+                                        <span>
+                                            Sourcing and preparation included.
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="description-option-card">
+
+                                        <input
+                                            type="radio"
+                                            name="flowerSource"
+                                            value="Customer Supplied"
+                                        >
+
+                                        <strong>
+                                            I Will Supply the Flowers
+                                        </strong>
+
+                                        <span>
+                                            Flowers must be safe, non-toxic,
+                                            and appropriate for use near food.
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </fieldset>
+
+                        </div>
+
+
+
+                        <!-- TOPPER TYPE -->
+
+                        <div
+                            id="topperTypeOptions"
+                            class="conditional-section is-hidden"
+                        >
+
+                            <fieldset class="builder-fieldset">
+
+                                <legend>
+                                    Choose a topper
+                                </legend>
+
+
+                                <div class="upgrade-grid">
+
+                                    <label class="upgrade-card">
+
+                                        <input
+                                            type="radio"
+                                            name="topperType"
+                                            value="Cardstock Topper"
+                                            data-price="12"
+                                        >
+
+                                        <strong>
+                                            Cardstock Topper
+                                        </strong>
+
+                                        <span>
+                                            +$12
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="upgrade-card">
+
+                                        <input
+                                            type="radio"
+                                            name="topperType"
+                                            value="Chocolate Topper"
+                                            data-price="15"
+                                        >
+
+                                        <strong>
+                                            Chocolate Topper
+                                        </strong>
+
+                                        <span>
+                                            +$15
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="upgrade-card">
+
+                                        <input
+                                            type="radio"
+                                            name="topperType"
+                                            value="Premade Acrylic Topper"
+                                            data-price="15"
+                                        >
+
+                                        <strong>
+                                            Premade Acrylic
+                                        </strong>
+
+                                        <span>
+                                            +$15
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="upgrade-card">
+
+                                        <input
+                                            type="radio"
+                                            name="topperType"
+                                            value="Fondant Topper"
+                                            data-price="20"
+                                        >
+
+                                        <strong>
+                                            Fondant Topper
+                                        </strong>
+
+                                        <span>
+                                            +$20
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="upgrade-card">
+
+                                        <input
+                                            type="radio"
+                                            name="topperType"
+                                            value="Custom Acrylic Topper"
+                                            data-price="35"
+                                        >
+
+                                        <strong>
+                                            Custom Acrylic
+                                        </strong>
+
+                                        <span>
+                                            From $35
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <p class="small-field-note">
+                                    Custom acrylic pricing includes sourcing,
+                                    handling, and coordination.
+                                </p>
+
+                            </fieldset>
+
+
+                            <label class="form-field">
+
+                                <span>
+                                    Topper wording
+                                </span>
+
+                                <input
+                                    id="topperWording"
+                                    type="text"
+                                    maxlength="40"
+                                    autocomplete="off"
+                                    placeholder="Example: Happy 30th Birthday"
+                                >
+
+                            </label>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 5: EXTRAS
+                    ============================== -->
+
+                    <section
+                        id="builderStep5"
+                        class="builder-step"
+                        data-step="5"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Five
+                            </p>
+
+                            <h2>
+                                Complete the Celebration
+                            </h2>
+
+                            <p>
+                                Add matching treats for your guests or dessert table.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- CUPCAKES -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Gourmet cupcakes
+                            </legend>
+
+
+                            <div class="extra-product-grid">
+
+                                <label class="extra-product-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-extra-name="4 Gourmet Cupcakes"
+                                        data-price="16"
+                                    >
+
+                                    <span class="extra-product-symbol">
+                                        🧁
+                                    </span>
+
+                                    <strong>
+                                        4 Count
+                                    </strong>
+
+                                    <small>
+                                        +$16
+                                    </small>
+
+                                </label>
+
+
+                                <label class="extra-product-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-extra-name="8 Gourmet Cupcakes"
+                                        data-price="28"
+                                    >
+
+                                    <span class="extra-product-symbol">
+                                        🧁
+                                    </span>
+
+                                    <strong>
+                                        8 Count
+                                    </strong>
+
+                                    <small>
+                                        +$28
+                                    </small>
+
+                                </label>
+
+
+                                <label class="extra-product-card">
+
+                                    <input
+                                        type="checkbox"
+                                        data-extra-name="12 Gourmet Cupcakes"
+                                        data-price="48"
+                                    >
+
+                                    <span class="extra-product-symbol">
+                                        🧁
+                                    </span>
+
+                                    <strong>
+                                        12 Count
+                                    </strong>
+
+                                    <small>
+                                        +$48
+                                    </small>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- CHOCOLATE COVERED TREATS -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Chocolate-covered treats
+                            </legend>
+
+
+                            <div class="quantity-product-list">
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Cakesicles"
+                                    data-unit-price="5"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Cakesicles
+                                        </strong>
+
+                                        <span>
+                                            $5 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease cakesicle quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Cakesicle quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase cakesicle quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Chocolate Covered Oreos"
+                                    data-unit-price="3"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Chocolate-Covered Oreos
+                                        </strong>
+
+                                        <span>
+                                            $3 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease chocolate covered Oreo quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Chocolate covered Oreo quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase chocolate covered Oreo quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Chocolate Covered Pretzels"
+                                    data-unit-price="2.5"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Chocolate-Covered Pretzels
+                                        </strong>
+
+                                        <span>
+                                            $2.50 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease chocolate covered pretzel quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Chocolate covered pretzel quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase chocolate covered pretzel quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Chocolate Covered Rice Crispy Treats"
+                                    data-unit-price="4"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Chocolate-Covered Rice Crispy Treats
+                                        </strong>
+
+                                        <span>
+                                            $4 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease chocolate covered rice crispy treat quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Chocolate covered rice crispy treat quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase chocolate covered rice crispy treat quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Chocolate Covered Strawberries"
+                                    data-unit-price="3"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Chocolate-Covered Strawberries
+                                        </strong>
+
+                                        <span>
+                                            $3 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease chocolate covered strawberry quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Chocolate covered strawberry quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase chocolate covered strawberry quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Chocolate Heart Cupcake Toppers"
+                                    data-unit-price="2"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Chocolate Heart Cupcake Toppers
+                                        </strong>
+
+                                        <span>
+                                            $2 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease chocolate heart cupcake topper quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Chocolate heart cupcake topper quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase chocolate heart cupcake topper quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- JARS -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Dessert jars
+                            </legend>
+
+
+                            <div class="quantity-product-list">
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Banana Pudding Jars"
+                                    data-unit-price="10"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Banana Pudding Jars
+                                        </strong>
+
+                                        <span>
+                                            $10 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease banana pudding jar quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Banana pudding jar quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase banana pudding jar quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Cheesecake Jars"
+                                    data-unit-price="10"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Cheesecake Jars
+                                        </strong>
+
+                                        <span>
+                                            $10 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease cheesecake jar quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Cheesecake jar quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase cheesecake jar quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Strawberry Shortcake Jars"
+                                    data-unit-price="10"
+                                >
+
+                                    <div>
+
+                                        <strong>
+                                            Strawberry Shortcake Jars
+                                        </strong>
+
+                                        <span>
+                                            $10 each
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                            aria-label="Decrease strawberry shortcake jar quantity"
+                                        >
+                                            −
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                            aria-label="Strawberry shortcake jar quantity"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                            aria-label="Increase strawberry shortcake jar quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </fieldset>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 6: INSPIRATION
+                    ============================== -->
+
+                    <section
+                        id="builderStep6"
+                        class="builder-step"
+                        data-step="6"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Six
+                            </p>
+
+                            <h2>
+                                Show Me What You’re Loving
+                            </h2>
+
+                            <p>
+                                Upload up to five inspiration photos and tell
+                                us what you like about each one.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            id="inspirationUploadZone"
+                            class="inspiration-upload-zone"
+                        >
+
+                            <input
+                                id="inspirationFiles"
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                multiple
+                            >
+
+
+                            <div class="upload-zone-content">
+
+                                <span
+                                    class="upload-symbol"
+                                    aria-hidden="true"
+                                >
+                                    📸
+                                </span>
+
+                                <strong>
+                                    Drop Your Inspiration Here
+                                </strong>
+
+                                <p>
+                                    Drag and drop or choose up to five images.
+                                </p>
+
+                                <button
+                                    id="chooseInspirationFiles"
+                                    type="button"
+                                    class="upload-select-button"
+                                >
+                                    Choose Photos
+                                </button>
+
+                                <small>
+                                    JPG, PNG, or WebP
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="uploadErrorMessage"
+                            class="form-error-message"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <div
+                            id="inspirationPreviewGrid"
+                            class="inspiration-preview-grid"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <label class="form-check policy-check">
+
+                            <input
+                                id="inspirationPolicyAcknowledgment"
+                                class="form-check-input"
+                                type="checkbox"
+                            >
+
+                            <span class="form-check-label">
+                                I understand inspiration photos are used for
+                                direction and will not be copied exactly.
+                            </span>
+
+                        </label>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 7: DETAILS
+                    ============================== -->
+
+                    <section
+                        id="builderStep7"
+                        class="builder-step"
+                        data-step="7"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Seven
+                            </p>
+
+                            <h2>
+                                Tell Me About Your Vision
+                            </h2>
+
+                            <p>
+                                Add the personal details needed to understand
+                                your cake and celebration.
+                            </p>
+
+                        </div>
+
+
+                        <div class="two-column-field-grid">
+
+                            <label class="form-field">
+
+                                <span>
+                                    Name for the cake
+                                </span>
+
+                                <input
+                                    id="cakeNameText"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="Example: Maya"
+                                >
+
+                            </label>
+
+
+                            <label class="form-field">
+
+                                <span>
+                                    Age or milestone
+                                </span>
+
+                                <input
+                                    id="cakeAgeText"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="Example: 30"
+                                >
+
+                            </label>
+
+                        </div>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Exact cake wording
+                            </span>
+
+                            <input
+                                id="cakeWording"
+                                type="text"
+                                maxlength="80"
+                                autocomplete="off"
+                                placeholder="Enter the exact message for the cake"
+                            >
+
+                        </label>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Theme
+                            </span>
+
+                            <input
+                                id="cakeTheme"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Example: Barbie, disco, floral, graduation"
+                            >
+
+                        </label>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Tell me about your vision
+                            </span>
+
+                            <textarea
+                                id="cakeVision"
+                                rows="6"
+                                placeholder="Describe the look, feeling, colors, theme, and anything else you want included."
+                            ></textarea>
+
+                        </label>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Must-have details
+                            </span>
+
+                            <textarea
+                                id="mustHaveDetails"
+                                rows="4"
+                                placeholder="What absolutely needs to be included?"
+                            ></textarea>
+
+                        </label>
+
+
+                        <label class="form-field">
+
+                            <span>
+                                Please do not include
+                            </span>
+
+                            <textarea
+                                id="doNotInclude"
+                                rows="4"
+                                placeholder="Anything you definitely do not want?"
+                            ></textarea>
+
+                        </label>
+
+
+
+                        <!-- CONTACT -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Your contact information
+                            </legend>
+
+
+                            <div class="two-column-field-grid">
+
+                                <label class="form-field">
+
+                                    <span>
+                                        First and last name
+                                    </span>
+
+                                    <input
+                                        id="customerName"
+                                        type="text"
+                                        autocomplete="name"
+                                        required
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        Phone number
+                                    </span>
+
+                                    <input
+                                        id="customerPhone"
+                                        type="tel"
+                                        autocomplete="tel"
+                                        required
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        Email address
+                                    </span>
+
+                                    <input
+                                        id="customerEmail"
+                                        type="email"
+                                        autocomplete="email"
+                                        required
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        Preferred contact method
+                                    </span>
+
+                                    <select id="preferredContactMethod">
+
+                                        <option value="">
+                                            Choose one
+                                        </option>
+
+                                        <option value="Text">
+                                            Text
+                                        </option>
+
+                                        <option value="Email">
+                                            Email
+                                        </option>
+
+                                        <option value="Phone Call">
+                                            Phone Call
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <!-- FULFILLMENT -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                Pickup or delivery
+                            </legend>
+
+
+                            <div class="description-option-grid">
+
+                                <label class="description-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="fulfillmentMethod"
+                                        value="Pickup"
+                                    >
+
+                                    <strong>
+                                        Pickup
+                                    </strong>
+
+                                    <span>
+                                        Pickup details are shared after the
+                                        order is confirmed.
+                                    </span>
+
+                                </label>
+
+
+                                <label class="description-option-card">
+
+                                    <input
+                                        id="deliveryOption"
+                                        type="radio"
+                                        name="fulfillmentMethod"
+                                        value="Delivery"
+                                    >
+
+                                    <strong>
+                                        Local Delivery
+                                    </strong>
+
+                                    <span>
+                                        Delivery is calculated using the
+                                        approved delivery distance.
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <div
+                            id="deliveryAddressFields"
+                            class="conditional-section is-hidden"
+                        >
+
+                            <div class="two-column-field-grid">
+
+                                <label class="form-field full-width-field">
+
+                                    <span>
+                                        Delivery street address
+                                    </span>
+
+                                    <input
+                                        id="deliveryStreet"
+                                        type="text"
+                                        autocomplete="street-address"
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        City
+                                    </span>
+
+                                    <input
+                                        id="deliveryCity"
+                                        type="text"
+                                        autocomplete="address-level2"
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        State
+                                    </span>
+
+                                    <input
+                                        id="deliveryState"
+                                        type="text"
+                                        value="Texas"
+                                        autocomplete="address-level1"
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        ZIP code
+                                    </span>
+
+                                    <input
+                                        id="deliveryZip"
+                                        type="text"
+                                        inputmode="numeric"
+                                        autocomplete="postal-code"
+                                    >
+
+                                </label>
+
+
+                                <label class="form-field">
+
+                                    <span>
+                                        Estimated delivery miles
+                                    </span>
+
+                                    <input
+                                        id="deliveryMiles"
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        inputmode="decimal"
+                                        placeholder="Calculated distance"
+                                    >
+
+                                </label>
+
+                            </div>
+
+
+                            <p class="small-field-note">
+                                The current prototype will calculate delivery
+                                from the entered mileage. Automatic address
+                                distance lookup will be connected later.
+                            </p>
+
+
+                            <div
+                                id="deliveryEstimateNotice"
+                                class="builder-callout is-hidden"
+                                aria-live="polite"
+                            ></div>
+
+                        </div>
+
+
+
+                        <!-- BUDGET -->
+
+                        <fieldset class="builder-fieldset">
+
+                            <legend>
+                                What amount are you comfortable spending?
+                            </legend>
+
+
+                            <div class="budget-grid">
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="customerBudget"
+                                        value="Under $250"
+                                    >
+
+                                    <strong>
+                                        Under $250
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="customerBudget"
+                                        value="$250–$349"
+                                    >
+
+                                    <strong>
+                                        $250–$349
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="customerBudget"
+                                        value="$350–$499"
+                                    >
+
+                                    <strong>
+                                        $350–$499
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="customerBudget"
+                                        value="$500+"
+                                    >
+
+                                    <strong>
+                                        $500+
+                                    </strong>
+
+                                </label>
+
+
+                                <label class="text-option-card">
+
+                                    <input
+                                        type="radio"
+                                        name="customerBudget"
+                                        value="Not Sure"
+                                    >
+
+                                    <strong>
+                                        I’m Not Sure Yet
+                                    </strong>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <div
+                            id="budgetNotice"
+                            class="builder-warning is-hidden"
+                            aria-live="polite"
+                        ></div>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP 8: REVIEW
+                    ============================== -->
+
+                    <section
+                        id="builderStep8"
+                        class="builder-step"
+                        data-step="8"
+                        hidden
+                    >
+
+                        <div class="step-heading">
+
+                            <p class="step-number">
+                                Step Eight
+                            </p>
+
+                            <h2>
+                                Your Cake Vision
+                            </h2>
+
+                            <p>
+                                Review your selections before sending your
+                                inquiry to The Pastry Junkie.
+                            </p>
+
+                        </div>
+
+
+                        <div class="review-layout">
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Celebration
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="1"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <dl class="review-list">
+
+                                    <div>
+                                        <dt>Occasion</dt>
+                                        <dd id="reviewOccasion">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Event Date</dt>
+                                        <dd id="reviewEventDate">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Fulfillment Date</dt>
+                                        <dd id="reviewFulfillmentDate">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Guest Count</dt>
+                                        <dd id="reviewGuestCount">Not entered</dd>
+                                    </div>
+
+                                </dl>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Cake
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="2"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <dl class="review-list">
+
+                                    <div>
+                                        <dt>Selection</dt>
+                                        <dd id="reviewCakeSelection">
+                                            6" Sweet Tooth Cake
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Shape and Height</dt>
+                                        <dd id="reviewCakeShape">
+                                            Round · Standard
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Servings</dt>
+                                        <dd id="reviewServings">
+                                            8–12
+                                        </dd>
+                                    </div>
+
+                                </dl>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Flavor
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="3"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <dl class="review-list">
+
+                                    <div>
+                                        <dt>Cake Flavor</dt>
+                                        <dd id="reviewCakeFlavor">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Buttercream</dt>
+                                        <dd id="reviewButtercream">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Filling</dt>
+                                        <dd id="reviewFilling">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Premium Filling</dt>
+                                        <dd id="reviewPremiumFilling">None</dd>
+                                    </div>
+
+                                </dl>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Style
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="4"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <dl class="review-list">
+
+                                    <div>
+                                        <dt>Colors</dt>
+                                        <dd id="reviewColors">
+                                            Soft pink
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Finish</dt>
+                                        <dd id="reviewFinish">
+                                            Not selected
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Decorations</dt>
+                                        <dd id="reviewDecorations">
+                                            None selected
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Topper</dt>
+                                        <dd id="reviewTopper">
+                                            None
+                                        </dd>
+                                    </div>
+
+                                </dl>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Celebration Extras
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="5"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <p id="reviewExtras">
+                                    No extras selected.
+                                </p>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Inspiration
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="6"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <div
+                                    id="reviewUploadPreviews"
+                                    class="review-upload-previews"
+                                >
+
+                                    <p>
+                                        No inspiration photos uploaded.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="review-section">
+
+                                <div class="review-section-heading">
+
+                                    <h3>
+                                        Vision and Contact
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        data-edit-step="7"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </div>
+
+
+                                <dl class="review-list">
+
+                                    <div>
+                                        <dt>Theme</dt>
+                                        <dd id="reviewTheme">Not entered</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Cake Wording</dt>
+                                        <dd id="reviewCakeWording">Not entered</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Customer</dt>
+                                        <dd id="reviewCustomerName">Not entered</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Fulfillment</dt>
+                                        <dd id="reviewFulfillmentMethod">Not selected</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt>Budget</dt>
+                                        <dd id="reviewBudget">Not selected</dd>
+                                    </div>
+
+                                </dl>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- PRICE SUMMARY -->
+
+                        <div class="review-price-card">
+
+                            <div>
+
+                                <span>
+                                    Cake and Selected Details
+                                </span>
+
+                                <strong id="reviewCakeSubtotal">
+                                    $185
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Celebration Extras
+                                </span>
+
+                                <strong id="reviewExtrasSubtotal">
+                                    $0
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Rush Fee
+                                </span>
+
+                                <strong id="reviewRushFee">
+                                    $0
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Delivery
+                                </span>
+
+                                <strong id="reviewDeliveryFee">
+                                    $0
+                                </strong>
+
+                            </div>
+
+
+                            <div class="review-total-row">
+
+                                <span>
+                                    Estimated Starting Total
+                                </span>
+
+                                <strong id="reviewEstimatedTotal">
+                                    $185
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="review-estimate-disclaimer">
+                            This is a starting estimate and not a guaranteed
+                            final quote. Final pricing, availability, taxes,
+                            delivery, and complex design adjustments are
+                            confirmed after review.
+                        </p>
+
+
+
+                        <!-- TERMS -->
+
+                        <div class="review-acknowledgments">
+
+                            <label class="form-check policy-check">
+
+                                <input
+                                    id="inquiryAcknowledgment"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    required
+                                >
+
+                                <span class="form-check-label">
+                                    I understand this is an inquiry and does
+                                    not confirm my order or reserve my date.
+                                </span>
+
+                            </label>
+
+
+                            <label class="form-check policy-check">
+
+                                <input
+                                    id="priceAcknowledgment"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    required
+                                >
+
+                                <span class="form-check-label">
+                                    I understand the displayed total is a
+                                    starting estimate and may change after
+                                    the design is reviewed.
+                                </span>
+
+                            </label>
+
+
+                            <label class="form-check policy-check">
+
+                                <input
+                                    id="depositAcknowledgment"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    required
+                                >
+
+                                <span class="form-check-label">
+                                    I understand my date is not reserved until
+                                    the required deposit has been paid.
+                                </span>
+
+                            </label>
+
+
+                            <label class="form-check policy-check">
+
+                                <input
+                                    id="termsAcknowledgment"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    required
+                                >
+
+                                <span class="form-check-label">
+                                    I have reviewed and agree to The Pastry
+                                    Junkie’s ordering terms and policies.
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+
+                        <!-- SUBMISSION -->
+
+                        <div
+                            id="submissionMessage"
+                            class="submission-message"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <button
+                            id="submitCakeVision"
+                            class="submit-cake-vision-button"
+                            type="button"
+                        >
+                            Send My Cake Vision
+                        </button>
+
+                    </section>
+
+
+
+                    <!-- =============================
+                         STEP NAVIGATION
+                    ============================== -->
+
+                    <div class="builder-step-navigation">
+
+                        <button
+                            id="previousStepButton"
+                            class="step-navigation-button secondary-step-button"
+                            type="button"
+                            disabled
+                        >
+                            Previous
+                        </button>
+
+
+                        <button
+                            id="nextStepButton"
+                            class="step-navigation-button primary-step-button"
+                            type="button"
+                        >
+                            Continue
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="stepValidationMessage"
+                        class="form-error-message"
+                        aria-live="polite"
+                    ></div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+
+
+        <!-- =========================================
+             MOBILE SUMMARY DRAWER
+        ========================================== -->
+
+        <div
+            id="mobileCakeSummary"
+            class="mobile-summary-drawer"
+            aria-hidden="true"
+        >
+
+            <button
+                id="closeCakeSummary"
+                class="mobile-summary-overlay"
+                type="button"
+                aria-label="Close cake summary"
+            ></button>
+
+
+            <section
+                class="mobile-summary-content"
+                aria-labelledby="mobileSummaryTitle"
+            >
+
+                <div class="mobile-summary-header">
+
+                    <div>
+
+                        <p>
+                            Your Cake So Far
+                        </p>
+
+                        <h2 id="mobileSummaryTitle">
+                            6" Sweet Tooth Cake
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        id="closeCakeSummaryButton"
+                        type="button"
+                        aria-label="Close cake summary"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <dl class="mobile-summary-list">
+
+                    <div>
+                        <dt>Shape</dt>
+                        <dd id="mobileSummaryShape">Round</dd>
+                    </div>
+
+                    <div>
+                        <dt>Height</dt>
+                        <dd id="mobileSummaryHeight">Standard</dd>
+                    </div>
+
+                    <div>
+                        <dt>Servings</dt>
+                        <dd id="mobileSummaryServings">8–12</dd>
+                    </div>
+
+                    <div>
+                        <dt>Estimate</dt>
+                        <dd id="mobileSummaryPrice">$185</dd>
+                    </div>
+
+                </dl>
+
+            </section>
+
+        </div>
+
+
+
+        <!-- =========================================
+             SUCCESS SCREEN
+        ========================================== -->
+
+        <section
+            id="submissionSuccessScreen"
+            class="submission-success-screen"
+            hidden
+        >
+
+            <div class="success-card">
+
+                <span
+                    class="success-symbol"
+                    aria-hidden="true"
+                >
+                    🎂
+                </span>
+
+                <p class="success-eyebrow">
+                    Cake Vision Received
+                </p>
+
+                <h2>
+                    Your Cake Vision Has Been Sent!
+                </h2>
+
+                <p>
+                    Thanks for trusting The Pastry Junkie with your
+                    celebration. Your inquiry will be reviewed before
+                    availability and final pricing are confirmed.
+                </p>
+
+                <a
+                    class="success-home-link"
+                    href="../index.html"
+                >
+                    Return Home
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script src="../js/cake-builder.js"></script>
+
+</body>
+
+</html>
