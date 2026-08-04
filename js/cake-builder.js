@@ -39,7 +39,7 @@ const cakeProducts = {
         standardLayers: 2,
         tallLayers: 3,
         standardPrice: 245,
-        tallPrice: 275,
+        tallPrice: 285,
         standardServings: "16–20",
         tallServings: "20–28",
         allowsExtraLayer: true
@@ -166,16 +166,16 @@ const builderState = {
     customFilling: "",
     premiumFillings: [],
 
-    mainCakeColor: "#F7B6D2",
-    accentColor: "#FF4FA3",
+    mainCakeColor: "original",
+    accentColor: "original",
     cakeFinish: "",
 
     cakeBoardStyle: "round",
-    cakeBoardColor: "#F4C3D7",
+    cakeBoardColor: "original",
     cupcakeLinerStyle: "paper",
-    cupcakeFrostingStyle: "classic-tall-swirl",
-    cupcakeLinerColor: "#F4C3D7",
-    cupcakeFrostingColor: "#F7B6D2",
+    cupcakeFrostingStyle: "",
+    cupcakeLinerColor: "original",
+    cupcakeFrostingColor: "original",
 
     decorations: [],
     flowerSource: "",
@@ -329,11 +329,6 @@ const bentoLayerNotice = getElement(
     "#bentoLayerNotice"
 );
 
-const realisticBoardImage = getElement("#realisticBoardImage");
-const realisticBoardTint = getElement("#realisticBoardTint");
-const realisticCakeImage = getElement("#realisticCakeImage");
-const realisticCakeTint = getElement("#realisticCakeTint");
-const realisticCakeRenderer = getElement("#realisticCakeRenderer");
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
@@ -596,87 +591,147 @@ function calculateEstimatedTotal() {
    RENDERER COLOR
 ========================================= */
 
-function setMaskedTint(element, maskUrl, color) {
-    if (!element) return;
-    element.style.setProperty("--realistic-mask", `url("${maskUrl}")`);
-    element.style.setProperty("--realistic-tint", color);
-}
-
 const realisticImageCache = new Map();
-let realisticRenderSequence = 0;
+let realisticRenderVersion = 0;
 
 function loadRealisticImage(url) {
     if (!realisticImageCache.has(url)) {
-        realisticImageCache.set(url, new Promise((resolve, reject) => {
-            const image = new Image();
-            image.onload = () => resolve(image);
-            image.onerror = reject;
-            image.src = url;
-        }));
+        realisticImageCache.set(
+            url,
+            new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error(`Unable to load ${url}`));
+                image.src = url;
+            })
+        );
     }
+
     return realisticImageCache.get(url);
 }
-
-function drawRecoloredAsset(context, image, mask, color, x = 0, y = 0, scale = 1) {
-    const width = realisticCakeCanvas.width;
-    const height = realisticCakeCanvas.height;
+function makeTintedLayer(image, mask, color) {
     const layer = document.createElement("canvas");
+
+    layer.width = realisticCakeCanvas.width;
+    layer.height = realisticCakeCanvas.height;
+
     const layerContext = layer.getContext("2d");
-    layer.width = width;
-    layer.height = height;
 
-    layerContext.drawImage(image, x, y, image.width * scale, image.height * scale);
+    /* Create the recolorable shape */
+    layerContext.drawImage(
+        mask,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
 
-    const colorLayer = document.createElement("canvas");
-    const colorContext = colorLayer.getContext("2d");
-    colorLayer.width = width;
-    colorLayer.height = height;
-    colorContext.drawImage(mask, x, y, mask.width * scale, mask.height * scale);
-    colorContext.globalCompositeOperation = "source-in";
-    colorContext.fillStyle = color;
-    colorContext.fillRect(0, 0, width, height);
+    /* Fill the masked area with the selected color */
+    layerContext.globalCompositeOperation = "source-in";
+    layerContext.fillStyle = color;
 
-    // Multiply turns the light neutral frosting/board into the selected color
-    // while retaining the photographed highlights, texture, and shadows.
+    layerContext.fillRect(
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    /* Restore shadows from the original artwork */
     layerContext.globalCompositeOperation = "multiply";
-    layerContext.drawImage(colorLayer, 0, 0);
+    layerContext.globalAlpha = 0.34;
+
+    layerContext.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    /* Preserve dimension without washing dark colors back to gray. */
+const selectedRgb = hexToRgb(color);
+
+const isVeryDark =
+    selectedRgb.red +
+    selectedRgb.green +
+    selectedRgb.blue < 90;
+
+layerContext.globalCompositeOperation = "screen";
+layerContext.globalAlpha =
+    isVeryDark ? 0.025 : 0.08;
+
+    layerContext.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    /* Remove anything drawn outside the recolor mask */
+    layerContext.globalCompositeOperation = "destination-in";
+    layerContext.globalAlpha = 1;
+
+    layerContext.drawImage(
+        mask,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
     layerContext.globalCompositeOperation = "source-over";
-    context.drawImage(layer, 0, 0);
+    layerContext.globalAlpha = 1;
+
+    return layer;
 }
+function drawRecoloredAsset(
+    context,
+    image,
+    mask,
+    color,
+    x,
+    y,
+    width,
+    height
+) {
+    if (!color || color === "original") {
+        context.drawImage(
+            image,
+            x,
+            y,
+            width,
+            height
+        );
 
-async function renderRealisticCanvas({ cakeUrl, boardUrl, boardMaskUrl, cakeColor, boardColor, placement, isBento }) {
-    if (!realisticCakeCanvas) return;
-    const renderSequence = ++realisticRenderSequence;
-    try {
-        const requestedImages = isBento
-            ? [loadRealisticImage(cakeUrl)]
-            : [loadRealisticImage(boardUrl), loadRealisticImage(boardMaskUrl), loadRealisticImage(cakeUrl)];
-        const images = await Promise.all(requestedImages);
-        if (renderSequence !== realisticRenderSequence) return;
-
-        const context = realisticCakeCanvas.getContext("2d");
-        context.clearRect(0, 0, realisticCakeCanvas.width, realisticCakeCanvas.height);
-
-        if (isBento) {
-            context.drawImage(images[0], 0, 0, realisticCakeCanvas.width, realisticCakeCanvas.height);
-        } else {
-            const [boardImage, boardMask, cakeImage] = images;
-            drawRecoloredAsset(context, boardImage, boardMask, boardColor);
-
-            const scale = placement[2];
-            // Every approved asset is centered from its visible artwork, not its
-            // transparent canvas. These x values preserve that exact centering.
-            drawRecoloredAsset(context, cakeImage, cakeImage, cakeColor, placement[0], placement[1], scale);
-        }
-
-        realisticCakeRenderer?.classList.add("is-canvas-ready");
-    } catch (error) {
-        realisticCakeRenderer?.classList.remove("is-canvas-ready");
+        return;
     }
+
+    const tintLayer = makeTintedLayer(
+        image,
+        mask,
+        color
+    );
+
+    context.save();
+    context.globalAlpha = 1;
+
+    context.drawImage(
+        tintLayer,
+        x,
+        y,
+        width,
+        height
+    );
+
+    context.restore();
 }
 
-function updateRealisticCakePreview() {
-    if (!realisticCakeImage || !realisticBoardImage) return;
+async function updateRealisticCakePreview() {
+    if (!realisticCakeCanvas) return;
+
+    const renderVersion = ++realisticRenderVersion;
 
     const boardKey = builderState.cakeBoardStyle;
     const boardAssets = boardAssetMap[boardKey] || boardAssetMap.round;
@@ -694,56 +749,140 @@ function updateRealisticCakePreview() {
 
     if (isBento) {
         cakeFile = "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png";
-        realisticBoardImage.hidden = true;
-        realisticBoardTint.hidden = true;
-        realisticCakeTint.hidden = true;
-        realisticCakeImage.style.transform = "none";
-        realisticCakeTint.style.transform = "none";
-    } else {
-        realisticBoardImage.hidden = false;
-        realisticBoardTint.hidden = false;
-        realisticCakeTint.hidden = false;
-        const placement = cakePlacements[placementKey]?.[boardKey] || cakePlacements[placementKey]?.round || [0,0,1];
-        const transform = `translate(${(placement[0] / 12.54).toFixed(3)}%, ${(placement[1] / 12.54).toFixed(3)}%) scale(${placement[2]})`;
-        realisticCakeImage.style.transformOrigin = "top left";
-        realisticCakeTint.style.transformOrigin = "top left";
-        realisticCakeImage.style.transform = transform;
-        realisticCakeTint.style.transform = transform;
     }
 
     const cakeUrl = `${finalAssetRoot}/cakes/${cakeFile}`;
     const boardUrl = `${finalAssetRoot}/boards/${boardAssets[0]}`;
     const boardMaskUrl = `${finalAssetRoot}/boards/${boardAssets[1]}`;
 
-    realisticCakeImage.src = cakeUrl;
-    realisticBoardImage.src = boardUrl;
-    setMaskedTint(realisticCakeTint, cakeUrl, builderState.mainCakeColor);
-    setMaskedTint(realisticBoardTint, boardMaskUrl, builderState.cakeBoardColor);
+    try {
+        const requestedImages = isBento
+            ? await Promise.all([loadRealisticImage(cakeUrl)])
+            : await Promise.all([
+                loadRealisticImage(boardUrl),
+                loadRealisticImage(boardMaskUrl),
+                loadRealisticImage(cakeUrl)
+            ]);
 
-    const canvasPlacement = isBento
-        ? [0, 0, 1]
-        : (cakePlacements[placementKey]?.[boardKey] || cakePlacements[placementKey]?.round || [0, 0, 1]);
-    renderRealisticCanvas({
-        cakeUrl,
-        boardUrl,
-        boardMaskUrl,
-        cakeColor: builderState.mainCakeColor,
-        boardColor: builderState.cakeBoardColor,
-        placement: canvasPlacement,
-        isBento
-    });
+        if (renderVersion !== realisticRenderVersion) return;
+
+        const context = realisticCakeCanvas.getContext("2d");
+        context.clearRect(
+            0,
+            0,
+            realisticCakeCanvas.width,
+            realisticCakeCanvas.height
+        );
+
+        if (isBento) {
+            context.drawImage(
+                requestedImages[0],
+                0,
+                0,
+                realisticCakeCanvas.width,
+                realisticCakeCanvas.height
+            );
+            return;
+        }
+
+             const [boardImage, boardMask, cakeImage] =
+            requestedImages;
+
+        const boardYOffset =
+            boardKey === "rectangleHorizontal"
+                ? 260
+                : 0;
+
+        drawRecoloredAsset(
+            context,
+            boardImage,
+            boardMask,
+            builderState.cakeBoardColor,
+            0,
+            boardYOffset,
+            realisticCakeCanvas.width,
+            realisticCakeCanvas.height
+        );
+
+        const placementBoardKey =
+            boardKey === "rectangleHorizontal"
+                ? "round"
+                : boardKey;
+
+        const placement =
+            cakePlacements[placementKey]?.[
+                placementBoardKey
+            ] ||
+            cakePlacements[placementKey]?.round ||
+            [0, 0, 1];
+
+        const [x, y, scale] = placement;
+
+        const cakeSize =
+            realisticCakeCanvas.width * scale;
+
+        drawRecoloredAsset(
+            context,
+            cakeImage,
+            cakeImage,
+            builderState.mainCakeColor,
+            x,
+            y,
+            cakeSize,
+            cakeSize
+        );
+
+    } catch (error) {
+        console.error(
+            "The realistic cake preview could not be rendered.",
+            error
+        );
+    }
 }
 
 const cupcakeFoundationMap = {
-    paper: ["TPJ-Asset-041-Standard-Pleated-Paper-Unfrosted-Cupcake.png", "TPJ-Asset-041-Standard-Pleated-Paper-Liner-Recolor-Mask.png"],
-    "metallic-pleated": ["TPJ-Asset-043-Metallic-Foil-Pleated-Unfrosted-Cupcake.png", "TPJ-Asset-043-Metallic-Foil-Pleated-Liner-Recolor-Mask.png"],
-    "rigid-cup": ["TPJ-Asset-042-Rigid-Foil-Cup-Unfrosted-Cupcake.png", "TPJ-Asset-042-Rigid-Foil-Baking-Cup-Recolor-Mask.png"]
+    paper: [
+        "TPJ-Asset-041-Standard-Pleated-Paper-Unfrosted-Cupcake.png",
+        "TPJ-Asset-041-Standard-Pleated-Paper-Liner-Recolor-Mask.png",
+        "paper-Frosting-Compatible-Foundation.png"
+    ],
+
+    "metallic-pleated": [
+        "TPJ-Asset-043-Metallic-Foil-Pleated-Unfrosted-Cupcake.png",
+        "TPJ-Asset-043-Metallic-Foil-Pleated-Liner-Recolor-Mask.png",
+        "metallic-pleated-Frosting-Compatible-Foundation.png"
+    ],
+
+    "rigid-cup": [
+        "TPJ-Asset-042-Rigid-Foil-Cup-Unfrosted-Cupcake.png",
+        "TPJ-Asset-042-Rigid-Foil-Baking-Cup-Recolor-Mask.png",
+        "rigid-cup-Frosting-Compatible-Foundation.png"
+    ]
 };
 
 function getCupcakeFrostingFiles(liner, style) {
-    if (style === "true-rosette") return ["TPJ-Asset-045-TrueRosette-Frosting.png", "TPJ-Asset-045-TrueRosette-Recolor-Mask.png"];
-    if (style === "classic-tall-swirl") return [`TPJ-Asset-044-ClassicTallSwirl-${liner}-Frosting.png`, `TPJ-Asset-044-ClassicTallSwirl-${liner}-Recolor-Mask.png`];
-    return [`TPJ-Asset-046-LowPipedEdibleImage-${liner}-Frosting.png`, `TPJ-Asset-046-LowPipedEdibleImage-${liner}-Recolor-Mask.png`];
+    if (style === "classic-tall-swirl") {
+        return [
+            `TPJ-Asset-044-ClassicTallSwirl-${liner}-Frosting.png`,
+            `TPJ-Asset-044-ClassicTallSwirl-${liner}-Recolor-Mask.png`
+        ];
+    }
+
+    if (style === "true-rosette") {
+        return [
+            "TPJ-Asset-045-TrueRosette-Frosting.png",
+            "TPJ-Asset-045-TrueRosette-Recolor-Mask.png"
+        ];
+    }
+
+    if (style === "low-piped-edible-image") {
+        return [
+            `TPJ-Asset-046-LowPipedEdibleImage-${liner}-Frosting.png`,
+            `TPJ-Asset-046-LowPipedEdibleImage-${liner}-Recolor-Mask.png`
+        ];
+    }
+
+    return null;
 }
 
 function updateCupcakePreview() {
@@ -751,23 +890,96 @@ function updateCupcakePreview() {
     const frosting = getElement("#cupcakeFrosting");
     const linerTint = getElement("#cupcakeLinerTint");
     const frostingTint = getElement("#cupcakeFrostingTint");
-    if (!foundation || !frosting || !linerTint || !frostingTint) return;
 
-    const liner = builderState.cupcakeLinerStyle;
-    const foundationFiles = cupcakeFoundationMap[liner] || cupcakeFoundationMap.paper;
-    const frostingFiles = getCupcakeFrostingFiles(liner, builderState.cupcakeFrostingStyle);
-    const linerRoot = `${finalAssetRoot}/cupcakes/liners`;
-    const frostingRoot = `${finalAssetRoot}/cupcakes/frosting`;
+    if (
+        !foundation ||
+        !frosting ||
+        !linerTint ||
+        !frostingTint
+    ) {
+        return;
+    }
 
-    foundation.src = `${linerRoot}/${foundationFiles[0]}`;
-    frosting.src = `${frostingRoot}/${frostingFiles[0]}`;
-    linerTint.style.setProperty("--cupcake-mask", `url("${linerRoot}/${foundationFiles[1]}")`);
-    linerTint.style.setProperty("--cupcake-tint", builderState.cupcakeLinerColor);
-    frostingTint.style.setProperty("--cupcake-mask", `url("${frostingRoot}/${frostingFiles[1]}")`);
-    frostingTint.style.setProperty("--cupcake-tint", builderState.cupcakeFrostingColor);
+    const liner =
+        builderState.cupcakeLinerStyle || "paper";
 
-    const selectedSet = builderState.extras.find((extra) => /^\d+ Gourmet Cupcakes$/.test(extra.name));
-    setText("#cupcakeSetCaption", selectedSet ? `${selectedSet.name} · preview applies to every cupcake` : "Select a 4-, 8-, or 12-count set above.");
+    const foundationFiles =
+        cupcakeFoundationMap[liner] ||
+        cupcakeFoundationMap.paper;
+
+    const frostingFiles =
+        getCupcakeFrostingFiles(
+            liner,
+            builderState.cupcakeFrostingStyle
+        );
+
+    const hasFrosting = Boolean(frostingFiles);
+
+    const linerRoot =
+        `${finalAssetRoot}/cupcakes/liners`;
+
+    const frostingRoot =
+        `${finalAssetRoot}/cupcakes/frosting`;
+
+    const linerMaskUrl =
+        `${linerRoot}/${foundationFiles[1]}`;
+
+    foundation.src = hasFrosting
+        ? `${frostingRoot}/${foundationFiles[2]}`
+        : `${linerRoot}/${foundationFiles[0]}`;
+
+    linerTint.style.backgroundColor =
+        builderState.cupcakeLinerColor === "original"
+            ? "transparent"
+            : builderState.cupcakeLinerColor;
+
+    linerTint.style.webkitMaskImage =
+        `url("${linerMaskUrl}")`;
+
+    linerTint.style.maskImage =
+        `url("${linerMaskUrl}")`;
+
+    if (hasFrosting) {
+        const frostingMaskUrl =
+            `${frostingRoot}/${frostingFiles[1]}`;
+
+        frosting.src =
+            `${frostingRoot}/${frostingFiles[0]}`;
+
+        frosting.style.display = "";
+        frostingTint.style.display = "";
+
+        frostingTint.style.backgroundColor =
+            builderState.cupcakeFrostingColor === "original"
+                ? "transparent"
+                : builderState.cupcakeFrostingColor;
+
+        frostingTint.style.webkitMaskImage =
+            `url("${frostingMaskUrl}")`;
+
+        frostingTint.style.maskImage =
+            `url("${frostingMaskUrl}")`;
+    } else {
+        frosting.removeAttribute("src");
+        frosting.style.display = "none";
+
+        frostingTint.style.display = "none";
+        frostingTint.style.backgroundColor = "transparent";
+        frostingTint.style.webkitMaskImage = "none";
+        frostingTint.style.maskImage = "none";
+    }
+
+    const selectedSet = builderState.extras.find(
+        (extra) =>
+            /^\d+ Gourmet Cupcakes$/.test(extra.name)
+    );
+
+    setText(
+        "#cupcakeSetCaption",
+        selectedSet
+            ? `${selectedSet.name} · preview applies to every cupcake`
+            : "Select a 4-, 8-, or 12-count set above."
+    );
 }
 
 function updateRendererColors() {
@@ -2877,7 +3089,7 @@ function resetBuilder() {
     if (!confirmed) {
         return;
     }
-
+closeMobileSummary();
     builderState.inspirationFiles.forEach(
         (upload) => {
             URL.revokeObjectURL(
@@ -2909,15 +3121,15 @@ function resetBuilder() {
     builderState.customFilling = "";
     builderState.premiumFillings = [];
 
-    builderState.mainCakeColor = "#F7B6D2";
-    builderState.accentColor = "#FF4FA3";
+    builderState.mainCakeColor = "original";
+    builderState.accentColor = "original";
     builderState.cakeFinish = "";
     builderState.cakeBoardStyle = "round";
-    builderState.cakeBoardColor = "#F4C3D7";
+    builderState.cakeBoardColor = "original";
     builderState.cupcakeLinerStyle = "paper";
-    builderState.cupcakeFrostingStyle = "classic-tall-swirl";
-    builderState.cupcakeLinerColor = "#F4C3D7";
-    builderState.cupcakeFrostingColor = "#F7B6D2";
+    builderState.cupcakeFrostingStyle = "";
+    builderState.cupcakeLinerColor = "original";
+    builderState.cupcakeFrostingColor = "original";
 
     builderState.decorations = [];
     builderState.flowerSource = "";
@@ -2982,20 +3194,12 @@ function resetBuilder() {
         'input[name="cakeSize"][value="round-6"]'
     );
 
-    const pinkInput = getElement(
-        'input[name="mainCakeColor"][value="#F7B6D2"]'
-    );
-
     if (roundShapeInput) {
         roundShapeInput.checked = true;
     }
 
     if (roundSixInput) {
         roundSixInput.checked = true;
-    }
-
-    if (pinkInput) {
-        pinkInput.checked = true;
     }
 
     if (extraLayerToggle) {
@@ -3017,16 +3221,14 @@ function resetBuilder() {
     if (accentColor) {
         accentColor.value = "#FF4FA3";
     }
-
-    const resetValues = {
-        cakeBoardStyle: "round",
-        cakeBoardColor: "#F4C3D7",
-        cupcakeLinerStyle: "paper",
-        cupcakeFrostingStyle: "classic-tall-swirl",
-        cupcakeLinerColor: "#F4C3D7",
-        cupcakeFrostingColor: "#F7B6D2"
-    };
-
+const resetValues = {
+    cakeBoardStyle: "round",
+    cakeBoardColor: "original",
+    cupcakeLinerStyle: "paper",
+    cupcakeFrostingStyle:"",
+    cupcakeLinerColor: "original",
+    cupcakeFrostingColor: "original"
+};
     Object.entries(resetValues).forEach(([id, value]) => {
         const control = getElement(`#${id}`);
         if (control) control.value = value;

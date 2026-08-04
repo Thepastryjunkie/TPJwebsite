@@ -180,10 +180,11 @@
 
                 <aside class="cake-preview-column">
 
-                    <div class="cake-preview-sticky">
+                  <div class="cake-preview-sticky">
 
-                        <div class="preview-heading-row">
+    <div class="preview-visual-card">
 
+        <div class="preview-heading-row">
                             <div>
 
                                 <p class="preview-eyebrow">
@@ -225,31 +226,11 @@
                             >
                                 <canvas
                                     id="realisticCakeCanvas"
-                                    class="realistic-canvas"
+                                    class="realistic-cake-canvas"
                                     width="1254"
                                     height="1254"
                                     aria-hidden="true"
                                 ></canvas>
-                                <img
-                                    id="realisticBoardImage"
-                                    class="realistic-layer realistic-board-layer"
-                                    alt=""
-                                >
-                                <span
-                                    id="realisticBoardTint"
-                                    class="realistic-layer realistic-tint-layer realistic-board-tint"
-                                    aria-hidden="true"
-                                ></span>
-                                <img
-                                    id="realisticCakeImage"
-                                    class="realistic-layer realistic-cake-layer"
-                                    alt=""
-                                >
-                                <span
-                                    id="realisticCakeTint"
-                                    class="realistic-layer realistic-tint-layer realistic-cake-tint"
-                                    aria-hidden="true"
-                                ></span>
                             </div>
 
                             <svg
@@ -1261,7 +1242,9 @@
 
                         </div>
 
-
+                        
+                       </div>
+                       
                         <!-- =========================
                              PREVIEW TOTALS
                         ========================== -->
@@ -2455,7 +2438,7 @@
                             <div class="color-choice-grid">
 
                                 <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#F7B6D2" checked>
+                                  <input type="radio" name="mainCakeColor" value="#F7B6D2"> 
                                     <span class="color-swatch" style="--swatch-color:#F7B6D2;"></span>
                                     <small>Soft Pink</small>
                                 </label>
@@ -3154,7 +3137,16 @@
                             <div class="cupcake-studio-layout">
                                 <div class="cupcake-control-grid">
                                     <label><span>Liner style</span><select id="cupcakeLinerStyle"><option value="paper">Standard pleated paper</option><option value="metallic-pleated">Metallic foil pleated</option><option value="rigid-cup">Rigid metallic foil cup</option></select></label>
-                                    <label><span>Frosting style</span><select id="cupcakeFrostingStyle"><option value="classic-tall-swirl">Classic tall swirl</option><option value="true-rosette">Rosette</option><option value="low-piped-edible-image">Flat edible-image icing</option></select></label>
+                                    <label>
+    <span>Frosting style</span>
+
+    <select id="cupcakeFrostingStyle">
+        <option value="" selected>Choose icing style</option>
+        <option value="classic-tall-swirl">Classic tall swirl</option>
+        <option value="true-rosette">Rosette</option>
+        <option value="low-piped-edible-image">Flat edible-image icing</option>
+    </select>
+</label>
                                     <label><span>Liner color</span><input id="cupcakeLinerColor" type="color" value="#F4C3D7"></label>
                                     <label><span>Frosting color</span><input id="cupcakeFrostingColor" type="color" value="#F7B6D2"></label>
                                 </div>
