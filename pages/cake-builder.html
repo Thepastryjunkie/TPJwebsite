@@ -217,6 +217,41 @@
 
                         <div class="cake-renderer-stage">
 
+                            <div
+                                id="realisticCakeRenderer"
+                                class="realistic-cake-renderer"
+                                role="img"
+                                aria-label="Realistic preview of the selected cake and cake board"
+                            >
+                                <canvas
+                                    id="realisticCakeCanvas"
+                                    class="realistic-canvas"
+                                    width="1254"
+                                    height="1254"
+                                    aria-hidden="true"
+                                ></canvas>
+                                <img
+                                    id="realisticBoardImage"
+                                    class="realistic-layer realistic-board-layer"
+                                    alt=""
+                                >
+                                <span
+                                    id="realisticBoardTint"
+                                    class="realistic-layer realistic-tint-layer realistic-board-tint"
+                                    aria-hidden="true"
+                                ></span>
+                                <img
+                                    id="realisticCakeImage"
+                                    class="realistic-layer realistic-cake-layer"
+                                    alt=""
+                                >
+                                <span
+                                    id="realisticCakeTint"
+                                    class="realistic-layer realistic-tint-layer realistic-cake-tint"
+                                    aria-hidden="true"
+                                ></span>
+                            </div>
+
                             <svg
                                 id="cakeRenderer"
                                 class="cake-renderer finish-smooth"
@@ -1681,6 +1716,15 @@
 
                         </fieldset>
 
+                        <fieldset class="builder-fieldset board-customizer">
+                            <legend>Cake Board</legend>
+                            <div class="compact-choice-row">
+                                <label><span>Board shape</span><select id="cakeBoardStyle"><option value="round">Round</option><option value="square">Square</option><option value="rectangleHorizontal">Rectangle</option></select></label>
+                                <label><span>Board color</span><input id="cakeBoardColor" type="color" value="#F4C3D7"></label>
+                            </div>
+                            <p id="cakeBoardNotice" class="field-note">Board choices update the realistic preview only and do not change pricing.</p>
+                        </fieldset>
+
 
                         <!-- ROUND SIZES -->
 
@@ -3102,6 +3146,26 @@
 
                             </div>
 
+                        </fieldset>
+
+                        <fieldset id="cupcakeStudio" class="builder-fieldset cupcake-studio">
+                            <legend>Cupcake Look</legend>
+                            <p class="field-note">These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above.</p>
+                            <div class="cupcake-studio-layout">
+                                <div class="cupcake-control-grid">
+                                    <label><span>Liner style</span><select id="cupcakeLinerStyle"><option value="paper">Standard pleated paper</option><option value="metallic-pleated">Metallic foil pleated</option><option value="rigid-cup">Rigid metallic foil cup</option></select></label>
+                                    <label><span>Frosting style</span><select id="cupcakeFrostingStyle"><option value="classic-tall-swirl">Classic tall swirl</option><option value="true-rosette">Rosette</option><option value="low-piped-edible-image">Flat edible-image icing</option></select></label>
+                                    <label><span>Liner color</span><input id="cupcakeLinerColor" type="color" value="#F4C3D7"></label>
+                                    <label><span>Frosting color</span><input id="cupcakeFrostingColor" type="color" value="#F7B6D2"></label>
+                                </div>
+                                <div class="cupcake-live-preview">
+                                    <div id="cupcakeComposite" class="cupcake-composite" aria-label="Cupcake preview">
+                                        <img id="cupcakeFoundation" alt=""><span id="cupcakeLinerTint" class="cupcake-tint" aria-hidden="true"></span>
+                                        <img id="cupcakeFrosting" alt=""><span id="cupcakeFrostingTint" class="cupcake-tint" aria-hidden="true"></span>
+                                    </div>
+                                    <p id="cupcakeSetCaption">Select a 4-, 8-, or 12-count set above.</p>
+                                </div>
+                            </div>
                         </fieldset>
 
                         <fieldset class="builder-fieldset">

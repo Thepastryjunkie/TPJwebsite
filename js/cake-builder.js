@@ -170,6 +170,13 @@ const builderState = {
     accentColor: "#FF4FA3",
     cakeFinish: "",
 
+    cakeBoardStyle: "round",
+    cakeBoardColor: "#F4C3D7",
+    cupcakeLinerStyle: "paper",
+    cupcakeFrostingStyle: "classic-tall-swirl",
+    cupcakeLinerColor: "#F4C3D7",
+    cupcakeFrostingColor: "#F7B6D2",
+
     decorations: [],
     flowerSource: "",
 
@@ -321,6 +328,38 @@ const extraLayerDescription = getElement(
 const bentoLayerNotice = getElement(
     "#bentoLayerNotice"
 );
+
+const realisticBoardImage = getElement("#realisticBoardImage");
+const realisticBoardTint = getElement("#realisticBoardTint");
+const realisticCakeImage = getElement("#realisticCakeImage");
+const realisticCakeTint = getElement("#realisticCakeTint");
+const realisticCakeRenderer = getElement("#realisticCakeRenderer");
+const realisticCakeCanvas = getElement("#realisticCakeCanvas");
+
+const finalAssetRoot = "../images/cake-builder/final";
+
+const cakeAssetMap = {
+    round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
+    heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
+    star: { standard: "TPJ-Asset-003-Blank-Star-Cake.png", tall: "TPJ-Asset-012-Blank-Tall-Star-3-Layer-Cake.png", key: "star", tallKey: "tallStar" }
+};
+
+const boardAssetMap = {
+    round: ["TPJ-Asset-033-Round-Cake-Board.png", "TPJ-Asset-033-Round-Cake-Board-Recolor-Mask.png"],
+    square: ["TPJ-Asset-034-Square-Cake-Board.png", "TPJ-Asset-034-Square-Cake-Board-Recolor-Mask.png"],
+    rectangleHorizontal: ["TPJ-Asset-037-Rectangle-Horizontal-Cake-Board.png", "TPJ-Asset-037-Rectangle-Horizontal-Cake-Board-Recolor-Mask.png"]
+};
+
+const cakePlacements = {
+    round: { round:[118.1462,153.004,.810277], square:[130.5573,169.1502,.790514], rectangleHorizontal:[118.1462,-106.996,.810277] },
+    heart: { round:[145.5955,166.2172,.76779], square:[157.3371,182.0412,.749064], rectangleHorizontal:[145.5955,-93.7828,.76779] },
+    star: { round:[161.04,221.6379,.746133], square:[172.4049,236.1101,.727934], rectangleHorizontal:[161.04,-38.3621,.746133] },
+    tallRound: { round:[55.9934,-65.7743,.90708], square:[55.9934,-70.7743,.90708], rectangleHorizontal:[55.9934,-325.7743,.90708] },
+    tallHeart: { round:[130.8091,93.2498,.790743], square:[142.9113,110.8534,.771456], rectangleHorizontal:[130.8091,-166.7502,.790743] },
+    tallStar: { round:[126.8638,96.3035,.797665], square:[139.0623,113.8327,.77821], rectangleHorizontal:[126.8638,-163.6965,.797665] },
+    heart5in: { round:[80.6229,131.3771,.868644], square:[93.9492,148.0508,.847458], rectangleHorizontal:[80.6229,-128.6229,.868644] },
+    tallHeart5in: { round:[92.6802,113.9979,.851506], square:[105.7124,131.0955,.830737], rectangleHorizontal:[92.6802,-146.0021,.851506] }
+};
 
 const previousStepButton = getElement(
     "#previousStepButton"
@@ -556,6 +595,180 @@ function calculateEstimatedTotal() {
 /* =========================================
    RENDERER COLOR
 ========================================= */
+
+function setMaskedTint(element, maskUrl, color) {
+    if (!element) return;
+    element.style.setProperty("--realistic-mask", `url("${maskUrl}")`);
+    element.style.setProperty("--realistic-tint", color);
+}
+
+const realisticImageCache = new Map();
+let realisticRenderSequence = 0;
+
+function loadRealisticImage(url) {
+    if (!realisticImageCache.has(url)) {
+        realisticImageCache.set(url, new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => resolve(image);
+            image.onerror = reject;
+            image.src = url;
+        }));
+    }
+    return realisticImageCache.get(url);
+}
+
+function drawRecoloredAsset(context, image, mask, color, x = 0, y = 0, scale = 1) {
+    const width = realisticCakeCanvas.width;
+    const height = realisticCakeCanvas.height;
+    const layer = document.createElement("canvas");
+    const layerContext = layer.getContext("2d");
+    layer.width = width;
+    layer.height = height;
+
+    layerContext.drawImage(image, x, y, image.width * scale, image.height * scale);
+
+    const colorLayer = document.createElement("canvas");
+    const colorContext = colorLayer.getContext("2d");
+    colorLayer.width = width;
+    colorLayer.height = height;
+    colorContext.drawImage(mask, x, y, mask.width * scale, mask.height * scale);
+    colorContext.globalCompositeOperation = "source-in";
+    colorContext.fillStyle = color;
+    colorContext.fillRect(0, 0, width, height);
+
+    // Multiply turns the light neutral frosting/board into the selected color
+    // while retaining the photographed highlights, texture, and shadows.
+    layerContext.globalCompositeOperation = "multiply";
+    layerContext.drawImage(colorLayer, 0, 0);
+    layerContext.globalCompositeOperation = "source-over";
+    context.drawImage(layer, 0, 0);
+}
+
+async function renderRealisticCanvas({ cakeUrl, boardUrl, boardMaskUrl, cakeColor, boardColor, placement, isBento }) {
+    if (!realisticCakeCanvas) return;
+    const renderSequence = ++realisticRenderSequence;
+    try {
+        const requestedImages = isBento
+            ? [loadRealisticImage(cakeUrl)]
+            : [loadRealisticImage(boardUrl), loadRealisticImage(boardMaskUrl), loadRealisticImage(cakeUrl)];
+        const images = await Promise.all(requestedImages);
+        if (renderSequence !== realisticRenderSequence) return;
+
+        const context = realisticCakeCanvas.getContext("2d");
+        context.clearRect(0, 0, realisticCakeCanvas.width, realisticCakeCanvas.height);
+
+        if (isBento) {
+            context.drawImage(images[0], 0, 0, realisticCakeCanvas.width, realisticCakeCanvas.height);
+        } else {
+            const [boardImage, boardMask, cakeImage] = images;
+            drawRecoloredAsset(context, boardImage, boardMask, boardColor);
+
+            const scale = placement[2];
+            // Every approved asset is centered from its visible artwork, not its
+            // transparent canvas. These x values preserve that exact centering.
+            drawRecoloredAsset(context, cakeImage, cakeImage, cakeColor, placement[0], placement[1], scale);
+        }
+
+        realisticCakeRenderer?.classList.add("is-canvas-ready");
+    } catch (error) {
+        realisticCakeRenderer?.classList.remove("is-canvas-ready");
+    }
+}
+
+function updateRealisticCakePreview() {
+    if (!realisticCakeImage || !realisticBoardImage) return;
+
+    const boardKey = builderState.cakeBoardStyle;
+    const boardAssets = boardAssetMap[boardKey] || boardAssetMap.round;
+    const isBento = builderState.cakeProductId === "heart-5-bento";
+    const isFiveInchHeart = builderState.cakeProductId === "heart-5-tall";
+    const shapeAssets = cakeAssetMap[builderState.cakeShape] || cakeAssetMap.round;
+
+    let cakeFile = builderState.isTall ? shapeAssets.tall : shapeAssets.standard;
+    let placementKey = builderState.isTall ? shapeAssets.tallKey : shapeAssets.key;
+
+    if (isFiveInchHeart) {
+        cakeFile = "TPJ-Asset-026-Blank-Tall-5in-Heart-Standalone-Cake.png";
+        placementKey = "tallHeart5in";
+    }
+
+    if (isBento) {
+        cakeFile = "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png";
+        realisticBoardImage.hidden = true;
+        realisticBoardTint.hidden = true;
+        realisticCakeTint.hidden = true;
+        realisticCakeImage.style.transform = "none";
+        realisticCakeTint.style.transform = "none";
+    } else {
+        realisticBoardImage.hidden = false;
+        realisticBoardTint.hidden = false;
+        realisticCakeTint.hidden = false;
+        const placement = cakePlacements[placementKey]?.[boardKey] || cakePlacements[placementKey]?.round || [0,0,1];
+        const transform = `translate(${(placement[0] / 12.54).toFixed(3)}%, ${(placement[1] / 12.54).toFixed(3)}%) scale(${placement[2]})`;
+        realisticCakeImage.style.transformOrigin = "top left";
+        realisticCakeTint.style.transformOrigin = "top left";
+        realisticCakeImage.style.transform = transform;
+        realisticCakeTint.style.transform = transform;
+    }
+
+    const cakeUrl = `${finalAssetRoot}/cakes/${cakeFile}`;
+    const boardUrl = `${finalAssetRoot}/boards/${boardAssets[0]}`;
+    const boardMaskUrl = `${finalAssetRoot}/boards/${boardAssets[1]}`;
+
+    realisticCakeImage.src = cakeUrl;
+    realisticBoardImage.src = boardUrl;
+    setMaskedTint(realisticCakeTint, cakeUrl, builderState.mainCakeColor);
+    setMaskedTint(realisticBoardTint, boardMaskUrl, builderState.cakeBoardColor);
+
+    const canvasPlacement = isBento
+        ? [0, 0, 1]
+        : (cakePlacements[placementKey]?.[boardKey] || cakePlacements[placementKey]?.round || [0, 0, 1]);
+    renderRealisticCanvas({
+        cakeUrl,
+        boardUrl,
+        boardMaskUrl,
+        cakeColor: builderState.mainCakeColor,
+        boardColor: builderState.cakeBoardColor,
+        placement: canvasPlacement,
+        isBento
+    });
+}
+
+const cupcakeFoundationMap = {
+    paper: ["TPJ-Asset-041-Standard-Pleated-Paper-Unfrosted-Cupcake.png", "TPJ-Asset-041-Standard-Pleated-Paper-Liner-Recolor-Mask.png"],
+    "metallic-pleated": ["TPJ-Asset-043-Metallic-Foil-Pleated-Unfrosted-Cupcake.png", "TPJ-Asset-043-Metallic-Foil-Pleated-Liner-Recolor-Mask.png"],
+    "rigid-cup": ["TPJ-Asset-042-Rigid-Foil-Cup-Unfrosted-Cupcake.png", "TPJ-Asset-042-Rigid-Foil-Baking-Cup-Recolor-Mask.png"]
+};
+
+function getCupcakeFrostingFiles(liner, style) {
+    if (style === "true-rosette") return ["TPJ-Asset-045-TrueRosette-Frosting.png", "TPJ-Asset-045-TrueRosette-Recolor-Mask.png"];
+    if (style === "classic-tall-swirl") return [`TPJ-Asset-044-ClassicTallSwirl-${liner}-Frosting.png`, `TPJ-Asset-044-ClassicTallSwirl-${liner}-Recolor-Mask.png`];
+    return [`TPJ-Asset-046-LowPipedEdibleImage-${liner}-Frosting.png`, `TPJ-Asset-046-LowPipedEdibleImage-${liner}-Recolor-Mask.png`];
+}
+
+function updateCupcakePreview() {
+    const foundation = getElement("#cupcakeFoundation");
+    const frosting = getElement("#cupcakeFrosting");
+    const linerTint = getElement("#cupcakeLinerTint");
+    const frostingTint = getElement("#cupcakeFrostingTint");
+    if (!foundation || !frosting || !linerTint || !frostingTint) return;
+
+    const liner = builderState.cupcakeLinerStyle;
+    const foundationFiles = cupcakeFoundationMap[liner] || cupcakeFoundationMap.paper;
+    const frostingFiles = getCupcakeFrostingFiles(liner, builderState.cupcakeFrostingStyle);
+    const linerRoot = `${finalAssetRoot}/cupcakes/liners`;
+    const frostingRoot = `${finalAssetRoot}/cupcakes/frosting`;
+
+    foundation.src = `${linerRoot}/${foundationFiles[0]}`;
+    frosting.src = `${frostingRoot}/${frostingFiles[0]}`;
+    linerTint.style.setProperty("--cupcake-mask", `url("${linerRoot}/${foundationFiles[1]}")`);
+    linerTint.style.setProperty("--cupcake-tint", builderState.cupcakeLinerColor);
+    frostingTint.style.setProperty("--cupcake-mask", `url("${frostingRoot}/${frostingFiles[1]}")`);
+    frostingTint.style.setProperty("--cupcake-tint", builderState.cupcakeFrostingColor);
+
+    const selectedSet = builderState.extras.find((extra) => /^\d+ Gourmet Cupcakes$/.test(extra.name));
+    setText("#cupcakeSetCaption", selectedSet ? `${selectedSet.name} · preview applies to every cupcake` : "Select a 4-, 8-, or 12-count set above.");
+}
 
 function updateRendererColors() {
     if (!cakeRenderer) {
@@ -990,6 +1203,8 @@ function updatePreviewSummary() {
 ========================================= */
 
 function renderCakePreview() {
+    updateRealisticCakePreview();
+    updateCupcakePreview();
     updateVisibleCakeShape();
     updateRendererSize();
     updateCakeHeight();
@@ -2697,6 +2912,12 @@ function resetBuilder() {
     builderState.mainCakeColor = "#F7B6D2";
     builderState.accentColor = "#FF4FA3";
     builderState.cakeFinish = "";
+    builderState.cakeBoardStyle = "round";
+    builderState.cakeBoardColor = "#F4C3D7";
+    builderState.cupcakeLinerStyle = "paper";
+    builderState.cupcakeFrostingStyle = "classic-tall-swirl";
+    builderState.cupcakeLinerColor = "#F4C3D7";
+    builderState.cupcakeFrostingColor = "#F7B6D2";
 
     builderState.decorations = [];
     builderState.flowerSource = "";
@@ -2796,6 +3017,20 @@ function resetBuilder() {
     if (accentColor) {
         accentColor.value = "#FF4FA3";
     }
+
+    const resetValues = {
+        cakeBoardStyle: "round",
+        cakeBoardColor: "#F4C3D7",
+        cupcakeLinerStyle: "paper",
+        cupcakeFrostingStyle: "classic-tall-swirl",
+        cupcakeLinerColor: "#F4C3D7",
+        cupcakeFrostingColor: "#F7B6D2"
+    };
+
+    Object.entries(resetValues).forEach(([id, value]) => {
+        const control = getElement(`#${id}`);
+        if (control) control.value = value;
+    });
 
     showCakeSizeGroup("round");
 
@@ -3259,12 +3494,35 @@ getElement(
    EXTRA EVENTS
 ========================================= */
 
+[
+    ["#cakeBoardStyle", "cakeBoardStyle"],
+    ["#cakeBoardColor", "cakeBoardColor"],
+    ["#cupcakeLinerStyle", "cupcakeLinerStyle"],
+    ["#cupcakeFrostingStyle", "cupcakeFrostingStyle"],
+    ["#cupcakeLinerColor", "cupcakeLinerColor"],
+    ["#cupcakeFrostingColor", "cupcakeFrostingColor"]
+].forEach(([selector, stateKey]) => {
+    getElement(selector)?.addEventListener("input", (event) => {
+        builderState[stateKey] = event.target.value;
+        renderCakePreview();
+    });
+});
+
 getElements(
     "[data-extra-name]"
 ).forEach((input) => {
     input.addEventListener(
         "change",
-        updateCheckboxExtras
+        () => {
+            if (input.checked && /^\d+ Gourmet Cupcakes$/.test(input.dataset.extraName || "")) {
+                getElements("[data-extra-name]").forEach((otherInput) => {
+                    if (otherInput !== input && /^\d+ Gourmet Cupcakes$/.test(otherInput.dataset.extraName || "")) {
+                        otherInput.checked = false;
+                    }
+                });
+            }
+            updateCheckboxExtras();
+        }
     );
 });
 

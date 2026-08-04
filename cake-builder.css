@@ -587,6 +587,9 @@ fieldset {
 
     display: grid;
     place-items: center;
+
+    position: relative;
+    isolation: isolate;
 }
 
 .cake-renderer {
@@ -594,6 +597,73 @@ fieldset {
     height: auto;
 
     overflow: visible;
+
+    grid-area: 1 / 1;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.realistic-cake-renderer {
+    width: min(100%, 700px);
+    aspect-ratio: 1;
+    grid-area: 1 / 1;
+    position: relative;
+    z-index: 1;
+}
+
+.realistic-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.realistic-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* The canvas renderer handles alignment and recoloring without relying on
+   external CSS masks, which browsers block when this site is opened locally. */
+.realistic-cake-renderer.is-canvas-ready .realistic-layer {
+    display: none;
+}
+
+.realistic-tint-layer {
+    background: var(--realistic-tint, transparent);
+    -webkit-mask-image: var(--realistic-mask);
+    mask-image: var(--realistic-mask);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    mix-blend-mode: color;
+    opacity: 0.82;
+}
+
+.realistic-board-layer,
+.realistic-board-tint {
+    z-index: 1;
+}
+
+.realistic-cake-layer,
+.realistic-cake-tint {
+    z-index: 2;
+}
+
+.cake-renderer .cake-floor-shadow,
+.cake-renderer .cake-board-bottom,
+.cake-renderer .cake-board-top,
+.cake-renderer .cake-shape-group,
+.cake-renderer #extraLayerDecoration {
+    display: none !important;
 }
 
 .cake-floor-shadow {
@@ -2303,6 +2373,112 @@ fieldset {
 .quantity-control input::-webkit-outer-spin-button {
     appearance: none;
     margin: 0;
+}
+
+.compact-choice-row,
+.cupcake-control-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.compact-choice-row label,
+.cupcake-control-grid label {
+    display: grid;
+    gap: 0.45rem;
+    color: var(--chocolate);
+    font-weight: 700;
+}
+
+.compact-choice-row select,
+.cupcake-control-grid select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.7rem 0.8rem;
+    border: 2px solid rgba(90, 42, 30, 0.25);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--chocolate);
+    font: inherit;
+}
+
+.compact-choice-row input[type="color"],
+.cupcake-control-grid input[type="color"] {
+    width: 100%;
+    height: 48px;
+    padding: 0.25rem;
+    border: 2px solid rgba(90, 42, 30, 0.25);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.field-note {
+    margin: 0.8rem 0 0;
+    color: rgba(90, 42, 30, 0.72);
+}
+
+.cupcake-studio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.72fr);
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.cupcake-live-preview {
+    display: grid;
+    justify-items: center;
+    padding: 0.75rem;
+    border-radius: 18px;
+    background: rgba(255, 248, 242, 0.9);
+}
+
+.cupcake-composite {
+    width: min(100%, 280px);
+    aspect-ratio: 1;
+    position: relative;
+}
+
+.cupcake-composite img,
+.cupcake-tint {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cupcake-tint {
+    background: var(--cupcake-tint, transparent);
+    -webkit-mask-image: var(--cupcake-mask);
+    mask-image: var(--cupcake-mask);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    mix-blend-mode: color;
+    opacity: 0.88;
+}
+
+#cupcakeFoundation,
+#cupcakeLinerTint { z-index: 1; }
+#cupcakeFrosting,
+#cupcakeFrostingTint { z-index: 2; }
+
+#cupcakeSetCaption {
+    margin: 0.25rem 0 0;
+    text-align: center;
+    color: var(--chocolate);
+    font-weight: 700;
+}
+
+@media (max-width: 720px) {
+    .compact-choice-row,
+    .cupcake-control-grid,
+    .cupcake-studio-layout {
+        grid-template-columns: 1fr;
+    }
 }
 
 
