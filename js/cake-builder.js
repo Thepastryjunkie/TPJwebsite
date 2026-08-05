@@ -1836,7 +1836,226 @@ function drawBentoEdibleImage(
 
     context.restore();
 }
+function drawRealisticCakeFinish(
+    context,
+    product,
+    x,
+    y,
+    width,
+    height
+) {
+    const finish = builderState.cakeFinish;
 
+    if (
+        finish !== "Watercolor Finish" &&
+        finish !== "Palette Knife Finish"
+    ) {
+        return;
+    }
+
+    /*
+        Keep the artwork approximately on the
+        visible front face of the cake.
+    */
+
+    const isTall =
+        builderState.isTall ||
+        builderState.cakeProductId === "heart-5-tall" ||
+        builderState.cakeProductId === "tier-4-6-tall";
+
+    const frontLeft =
+        x + width * 0.27;
+
+    const frontTop =
+        y + height * (isTall ? 0.31 : 0.38);
+
+    const frontWidth =
+        width * 0.46;
+
+    const frontHeight =
+        height * (isTall ? 0.42 : 0.31);
+
+    context.save();
+
+    /*
+        Clip the finish so it does not spill
+        far outside the center cake area.
+    */
+
+    context.beginPath();
+    context.roundRect(
+        frontLeft,
+        frontTop,
+        frontWidth,
+        frontHeight,
+        Math.min(frontWidth, frontHeight) * 0.12
+    );
+
+    context.clip();
+
+
+    if (finish === "Watercolor Finish") {
+        const accent =
+            builderState.accentColor !== "original"
+                ? builderState.accentColor
+                : "#FF4FA3";
+
+        const mainColor =
+            builderState.mainCakeColor !== "original"
+                ? builderState.mainCakeColor
+                : "#F7B6D2";
+
+        context.globalCompositeOperation = "multiply";
+        context.globalAlpha = 0.24;
+
+        const watercolorBlobs = [
+            {
+                x: frontLeft + frontWidth * 0.25,
+                y: frontTop + frontHeight * 0.27,
+                radiusX: frontWidth * 0.25,
+                radiusY: frontHeight * 0.22,
+                color: accent,
+                rotation: -0.18
+            },
+            {
+                x: frontLeft + frontWidth * 0.68,
+                y: frontTop + frontHeight * 0.47,
+                radiusX: frontWidth * 0.31,
+                radiusY: frontHeight * 0.25,
+                color: "#7B294F",
+                rotation: 0.15
+            },
+            {
+                x: frontLeft + frontWidth * 0.43,
+                y: frontTop + frontHeight * 0.77,
+                radiusX: frontWidth * 0.28,
+                radiusY: frontHeight * 0.2,
+                color: mainColor,
+                rotation: -0.08
+            }
+        ];
+
+        watercolorBlobs.forEach((blob) => {
+            context.save();
+
+            context.translate(
+                blob.x,
+                blob.y
+            );
+
+            context.rotate(
+                blob.rotation
+            );
+
+            context.fillStyle =
+                blob.color;
+
+            context.beginPath();
+
+            context.ellipse(
+                0,
+                0,
+                blob.radiusX,
+                blob.radiusY,
+                0,
+                0,
+                Math.PI * 2
+            );
+
+            context.fill();
+            context.restore();
+        });
+    }
+
+
+    if (finish === "Palette Knife Finish") {
+        const accent =
+            builderState.accentColor !== "original"
+                ? builderState.accentColor
+                : "#FF4FA3";
+
+        const strokes = [
+            {
+                x: frontLeft + frontWidth * 0.15,
+                y: frontTop + frontHeight * 0.27,
+                width: frontWidth * 0.34,
+                height: frontHeight * 0.15,
+                color: accent,
+                rotation: -0.18
+            },
+            {
+                x: frontLeft + frontWidth * 0.53,
+                y: frontTop + frontHeight * 0.18,
+                width: frontWidth * 0.3,
+                height: frontHeight * 0.14,
+                color: "#F4D66E",
+                rotation: 0.12
+            },
+            {
+                x: frontLeft + frontWidth * 0.37,
+                y: frontTop + frontHeight * 0.61,
+                width: frontWidth * 0.39,
+                height: frontHeight * 0.16,
+                color: "#7B294F",
+                rotation: -0.08
+            }
+        ];
+
+        context.globalCompositeOperation = "source-over";
+        context.globalAlpha = 0.88;
+
+        strokes.forEach((stroke) => {
+            context.save();
+
+            context.translate(
+                stroke.x,
+                stroke.y
+            );
+
+            context.rotate(
+                stroke.rotation
+            );
+
+            context.fillStyle =
+                stroke.color;
+
+            context.beginPath();
+
+            context.moveTo(
+                0,
+                stroke.height * 0.55
+            );
+
+            context.bezierCurveTo(
+                stroke.width * 0.12,
+                0,
+                stroke.width * 0.72,
+                -stroke.height * 0.1,
+                stroke.width,
+                stroke.height * 0.48
+            );
+
+            context.bezierCurveTo(
+                stroke.width * 0.76,
+                stroke.height,
+                stroke.width * 0.18,
+                stroke.height,
+                0,
+                stroke.height * 0.55
+            );
+
+            context.closePath();
+            context.fill();
+
+            context.restore();
+        });
+    }
+
+    context.restore();
+
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-over";
+}
 
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
@@ -2042,7 +2261,14 @@ async function updateRealisticCakePreview() {
                 );
             }
         });
-
+drawRealisticCakeFinish(
+    context,
+    product,
+    x,
+    y + boardYOffset,
+    size.width,
+    size.height
+);
         if (edibleImage) {
             previewEntries.forEach((entry, index) => {
                 const cakeImage = cakeImages[index];
