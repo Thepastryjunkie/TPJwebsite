@@ -1296,24 +1296,111 @@ function getBentoCakeMask(image) {
 
     return maskCanvas;
 }
+function drawBentoColorPreview(context, image, canvas) {
+    if (builderState.mainCakeColor !== "original") {
+        context.save();
+        context.beginPath();
 
-function drawBentoColorPreview(context, image, transform) {
-    if (builderState.mainCakeColor === "original") {
-        return;
+        context.moveTo(451, 521);
+
+        context.bezierCurveTo(
+            410, 500,
+            377, 481,
+            334, 483
+        );
+
+        context.bezierCurveTo(
+            268, 486,
+            219, 523,
+            218, 583
+        );
+
+        context.lineTo(218, 720);
+
+        context.bezierCurveTo(
+            218, 789,
+            289, 843,
+            392, 870
+        );
+
+        context.bezierCurveTo(
+            500, 844,
+            636, 791,
+            636, 715
+        );
+
+        context.lineTo(636, 587);
+
+        context.bezierCurveTo(
+            635, 525,
+            592, 503,
+            547, 505
+        );
+
+        context.bezierCurveTo(
+            507, 505,
+            482, 527,
+            451, 521
+        );
+
+        context.closePath();
+        context.clip();
+
+        drawRecoloredAsset(
+            context,
+            image,
+            image,
+            builderState.mainCakeColor,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        context.restore();
     }
 
-    drawRecoloredAsset(
-        context,
-        image,
-        getBentoCakeMask(image),
-        builderState.mainCakeColor,
-        transform.x,
-        transform.y,
-        transform.width,
-        transform.height
-    );
-}
+    if (
+        builderState.cupcakeFrostingColor !==
+        "original"
+    ) {
+        context.save();
+        context.beginPath();
 
+        [
+    [768, 621, 90, 70],
+    [987, 656, 86, 71],
+    [725, 799, 98, 84],
+    [952, 846, 96, 85]
+].forEach(([x, y, radiusX, radiusY]) => {
+    context.moveTo(x + radiusX, y);
+
+    context.ellipse(
+        x,
+        y,
+        radiusX,
+        radiusY,
+        0,
+        0,
+        Math.PI * 2
+    );
+});
+        context.clip();
+
+        drawRecoloredAsset(
+            context,
+            image,
+            image,
+            builderState.cupcakeFrostingColor,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        context.restore();
+    }
+}
 function drawTwoTierColors(
     context,
     image,
@@ -1322,15 +1409,32 @@ function drawTwoTierColors(
     width,
     height
 ) {
-    const isTallTier =
-        builderState.cakeProductId === "tier-4-6-tall";
+    const isTall =
+        builderState.cakeProductId ===
+        "tier-4-6-tall";
 
-    const topTierBounds = isTallTier
-        ? { x: 355, y: 55, width: 545, height: 645 }
-        : { x: 325, y: 150, width: 610, height: 540 };
+    const topTier = isTall
+        ? {
+            left: 0.287,
+            right: 0.714,
+            top: 0.051,
+            shoulder: 0.103,
+            sideBottom: 0.487,
+            bottom: 0.552
+        }
+        : {
+            left: 0.263,
+            right: 0.737,
+            top: 0.128,
+            shoulder: 0.205,
+            sideBottom: 0.452,
+            bottom: 0.544
+        };
 
-    /* The full asset is the bottom-tier mask. Drawing it first makes the
-       exposed top surface of the bottom tier use the bottom-tier color. */
+    /*
+        Color the complete cake with the
+        selected bottom-tier color first.
+    */
     drawRecoloredAsset(
         context,
         image,
@@ -1342,18 +1446,64 @@ function drawTwoTierColors(
         height
     );
 
-    /* The upper tier needs its own source-coordinate mask. The previous
-       percentage split cut through the tall tier and recolored part of the
-       lower tier's top surface. */
+    const left =
+        x + width * topTier.left;
+
+    const right =
+        x + width * topTier.right;
+
+    const centerX =
+        (left + right) / 2;
+
+    const radiusX =
+        (right - left) / 2;
+
+    const top =
+        y + height * topTier.top;
+
+    const shoulder =
+        y + height * topTier.shoulder;
+
+    const sideBottom =
+        y + height * topTier.sideBottom;
+
+    const bottom =
+        y + height * topTier.bottom;
+
+    /*
+        Clip the top color to the actual
+        cylindrical top tier.
+    */
     context.save();
     context.beginPath();
-    context.rect(
-        x + (topTierBounds.x / image.naturalWidth) * width,
-        y + (topTierBounds.y / image.naturalHeight) * height,
-        (topTierBounds.width / image.naturalWidth) * width,
-        (topTierBounds.height / image.naturalHeight) * height
+
+    context.moveTo(left, shoulder);
+
+    context.ellipse(
+        centerX,
+        shoulder,
+        radiusX,
+        shoulder - top,
+        0,
+        Math.PI,
+        Math.PI * 2
     );
+
+    context.lineTo(right, sideBottom);
+
+    context.ellipse(
+        centerX,
+        sideBottom,
+        radiusX,
+        bottom - sideBottom,
+        0,
+        0,
+        Math.PI
+    );
+
+    context.closePath();
     context.clip();
+
     drawRecoloredAsset(
         context,
         image,
@@ -1364,9 +1514,9 @@ function drawTwoTierColors(
         width,
         height
     );
+
     context.restore();
 }
-
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
 
@@ -4461,7 +4611,6 @@ function submitCakeVision() {
 /* =========================================
    RESET
 ========================================= */
-
 function resetBuilder() {
     const confirmed = window.confirm(
         "Reset the entire cake builder?"
@@ -4470,221 +4619,11 @@ function resetBuilder() {
     if (!confirmed) {
         return;
     }
-closeMobileSummary();
-    builderState.inspirationFiles.forEach(
-        (upload) => {
-            URL.revokeObjectURL(
-                upload.previewUrl
-            );
-        }
+
+    window.location.replace(
+        window.location.href.split(/[?#]/)[0]
     );
-
-    builderState.currentStep = 1;
-    builderState.highestUnlockedStep = 1;
-
-    builderState.occasion = "";
-    builderState.otherOccasion = "";
-    builderState.eventDate = "";
-    builderState.fulfillmentDate = "";
-    builderState.guestCount = 0;
-
-    builderState.cakeShape = "round";
-    builderState.cakeProductId = "round-6";
-    builderState.isTall = false;
-    builderState.numberLetterKind = "number";
-    builderState.numberCakeFirst = "0";
-    builderState.numberCakeSecond = "1";
-    builderState.letterCakeText = "A";
-    builderState.characterOneColor = "original";
-    builderState.characterTwoColor = "original";
-
-    builderState.cakeFlavor = "";
-    builderState.customCakeFlavor = "";
-
-    builderState.buttercreamStyle = "";
-    builderState.buttercreamFlavor = "";
-
-    builderState.cakeFilling = "";
-    builderState.customFilling = "";
-    builderState.premiumFillings = [];
-
-    builderState.mainCakeColor = "original";
-    builderState.accentColor = "original";
-    builderState.cakeFinish = "";
-    builderState.cakeCoverage = "full";
-    builderState.tierTopColor = "original";
-    builderState.tierBottomColor = "original";
-    builderState.cakeBoardStyle = "round";
-    builderState.cakeBoardColor = "original";
-    builderState.cupcakeLinerStyle = "paper";
-    builderState.cupcakeFrostingStyle = "";
-    builderState.cupcakeLinerColor = "original";
-    builderState.cupcakeFrostingColor = "original";
-
-    builderState.decorations = [];
-    builderState.flowerSource = "";
-
-    builderState.topperType = "";
-    builderState.topperPrice = 0;
-    builderState.topperWording = "";
-
-    builderState.extras = [];
-    builderState.quantityExtras = [];
-    builderState.inspirationFiles = [];
-
-    builderState.cakeNameText = "";
-    builderState.cakeAgeText = "";
-    builderState.cakeWording = "";
-    builderState.cakeTheme = "";
-    builderState.cakeVision = "";
-    builderState.mustHaveDetails = "";
-    builderState.doNotInclude = "";
-
-    builderState.customerName = "";
-    builderState.customerPhone = "";
-    builderState.customerEmail = "";
-    builderState.preferredContactMethod = "";
-
-    builderState.fulfillmentMethod = "";
-    builderState.deliveryStreet = "";
-    builderState.deliveryCity = "";
-    builderState.deliveryState = "Texas";
-    builderState.deliveryZip = "";
-    builderState.deliveryMiles = 0;
-
-    builderState.customerBudget = "";
-    builderState.rushFee = 0;
-    builderState.deliveryFee = 0;
-
-    getElements(
-        'input[type="radio"], input[type="checkbox"]'
-    ).forEach((input) => {
-        input.checked = false;
-    });
-
-    getElements(
-        'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea, select'
-    ).forEach((field) => {
-        if (field.id === "deliveryState") {
-            field.value = "Texas";
-        } else if (
-            field.closest(".quantity-product")
-        ) {
-            field.value = "0";
-        } else {
-            field.value = "";
-        }
-    });
-
-    const roundShapeInput = getElement(
-        'input[name="cakeShape"][value="round"]'
-    );
-
-    const roundSixInput = getElement(
-        'input[name="cakeSize"][value="round-6"]'
-    );
-
-    const fullCoverageInput = getElement(
-        'input[name="cakeCoverage"][value="full"]'
-    );
-
-    if (roundShapeInput) {
-        roundShapeInput.checked = true;
-    }
-
-    if (roundSixInput) {
-        roundSixInput.checked = true;
-    }
-
-    if (fullCoverageInput) {
-        fullCoverageInput.checked = true;
-    }
-
-    if (extraLayerToggle) {
-        extraLayerToggle.checked = false;
-    }
-
-    const customMainColor = getElement(
-        "#customMainColor"
-    );
-
-    if (customMainColor) {
-        customMainColor.value = "#FF4FA3";
-    }
-
-    const accentColor = getElement(
-        "#accentColor"
-    );
-
-    if (accentColor) {
-        accentColor.value = "#FF4FA3";
-    }
-const resetValues = {
-    cakeBoardStyle: "round",
-    cupcakeLinerStyle: "paper",
-    cupcakeFrostingStyle:"",
-    numberLetterKind: "number",
-    numberCakeFirst: "0",
-    numberCakeSecond: "1",
-    letterCakeText: "A"
-};
-    Object.entries(resetValues).forEach(([id, value]) => {
-        const control = getElement(`#${id}`);
-        if (control) control.value = value;
-    });
-
-    const resetColorValues = {
-        cakeBoardColor: "#F4C3D7",
-        cupcakeLinerColor: "#F4C3D7",
-        cupcakeFrostingColor: "#F7B6D2",
-        customMainColor: "#FF4FA3",
-        accentColor: "#FF4FA3",
-        tierTopColor: "#FFF1DC",
-        tierBottomColor: "#FFF1DC",
-        characterOneColor: "#FFF1DC",
-        characterTwoColor: "#FFF1DC"
-    };
-
-    Object.entries(resetColorValues).forEach(([id, value]) => {
-        const control = getElement(`#${id}`);
-        if (control) control.value = value;
-    });
-
-    /* Reset the Step 1 controls explicitly. This prevents a previously
-       validated date/count value or a stale disabled/read-only property from
-       surviving the visual reset. */
-    ["eventDate", "fulfillmentDate", "guestCount"].forEach((id) => {
-        const control = getElement(`#${id}`);
-
-        if (!control) {
-            return;
-        }
-
-        control.value = "";
-        control.disabled = false;
-        control.readOnly = false;
-        control.removeAttribute("aria-invalid");
-    });
-
-    showValidationMessage("");
-    updateGuestRecommendation();
-    updateRushFee();
-
-    showCakeSizeGroup("round");
-    updateCakeBoardControls();
-    updateNumberLetterControls();
-
-    updateOtherOccasionVisibility();
-    updateCustomCakeFlavorVisibility();
-    updateCustomFillingVisibility();
-    updateFlowerSourceVisibility();
-    updateTopperOptionsVisibility();
-    updateDeliveryFieldsVisibility();
-    renderInspirationPreviews();
-    renderCakePreview();
-    showStep(1);
 }
-
 
 /* =========================================
    NAVIGATION EVENTS
