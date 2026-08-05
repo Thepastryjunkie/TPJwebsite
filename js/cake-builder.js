@@ -340,6 +340,8 @@ const builderState = {
     numberCakeFirst: "0",
     numberCakeSecond: "1",
     letterCakeText: "A",
+    characterOneColor: "original",
+    characterTwoColor: "original",
 
     cakeFlavor: "",
     customCakeFlavor: "",
@@ -1199,69 +1201,117 @@ function getCakePreviewEntries(product) {
     return [{ file, key }];
 }
 
-function drawContainedCanvasImage(context, image, canvas) {
+function drawContainedCanvasImage(
+    context,
+    image,
+    canvas,
+    scaleMultiplier = 1,
+    offsetY = 0
+) {
     const scale = Math.min(
         canvas.width / image.naturalWidth,
         canvas.height / image.naturalHeight
-    );
+    ) * scaleMultiplier;
     const width = image.naturalWidth * scale;
     const height = image.naturalHeight * scale;
     const x = (canvas.width - width) / 2;
-    const y = (canvas.height - height) / 2;
+    const y = (canvas.height - height) / 2 + offsetY;
 
     context.drawImage(image, x, y, width, height);
+
+    return { x, y, width, height, scale };
 }
 
-function drawBentoColorPreview(context, image, canvas) {
-    if (builderState.mainCakeColor !== "original") {
-        context.save();
-        context.beginPath();
-        context.moveTo(180, 585);
-        context.bezierCurveTo(195, 490, 335, 465, 430, 535);
-        context.bezierCurveTo(520, 470, 650, 505, 665, 600);
-        context.lineTo(650, 805);
-        context.bezierCurveTo(615, 895, 475, 925, 405, 925);
-        context.bezierCurveTo(300, 900, 185, 845, 175, 755);
-        context.closePath();
-        context.clip();
-        drawRecoloredAsset(
-            context,
-            image,
-            image,
-            builderState.mainCakeColor,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-        context.restore();
+const bentoCakeMaskCache = new WeakMap();
+
+function getBentoCakeMask(image) {
+    if (bentoCakeMaskCache.has(image)) {
+        return bentoCakeMaskCache.get(image);
     }
 
-    if (builderState.cupcakeFrostingColor !== "original") {
-        context.save();
-        context.beginPath();
-        [
-            [792, 650],
-            [1038, 674],
-            [786, 850],
-            [1033, 875]
-        ].forEach(([x, y]) => {
-            context.moveTo(x + 115, y);
-            context.arc(x, y, 115, 0, Math.PI * 2);
-        });
-        context.clip();
-        drawRecoloredAsset(
-            context,
-            image,
-            image,
-            builderState.cupcakeFrostingColor,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-        context.restore();
+    const sourceCanvas = document.createElement("canvas");
+    sourceCanvas.width = image.naturalWidth;
+    sourceCanvas.height = image.naturalHeight;
+
+    const sourceContext = sourceCanvas.getContext("2d", {
+        willReadFrequently: true
+    });
+
+    sourceContext.drawImage(image, 0, 0);
+
+    const pixels = sourceContext.getImageData(
+        0,
+        0,
+        sourceCanvas.width,
+        sourceCanvas.height
+    );
+
+    const maskCanvas = document.createElement("canvas");
+    maskCanvas.width = sourceCanvas.width;
+    maskCanvas.height = sourceCanvas.height;
+
+    const maskContext = maskCanvas.getContext("2d");
+    const maskPixels = maskContext.createImageData(
+        maskCanvas.width,
+        maskCanvas.height
+    );
+
+    for (let y = 500; y < 875; y += 1) {
+        const leftEdge = y < 800
+            ? 220 + Math.max(0, y - 570) * 0.05
+            : 225 + (y - 800) * 1.15;
+        const rightEdge = y < 800
+            ? 625 - Math.max(0, y - 570) * 0.06
+            : 625 - (y - 800) * 0.5;
+
+        for (
+            let x = Math.floor(leftEdge);
+            x < Math.ceil(rightEdge);
+            x += 1
+        ) {
+            const offset = (y * sourceCanvas.width + x) * 4;
+            const red = pixels.data[offset];
+            const green = pixels.data[offset + 1];
+            const blue = pixels.data[offset + 2];
+            const alpha = pixels.data[offset + 3];
+
+            const isButtercream =
+                alpha > 20 &&
+                red > 175 &&
+                green > 135 &&
+                red - blue > 35 &&
+                green - blue > 20;
+
+            if (isButtercream) {
+                maskPixels.data[offset] = 255;
+                maskPixels.data[offset + 1] = 255;
+                maskPixels.data[offset + 2] = 255;
+                maskPixels.data[offset + 3] = alpha;
+            }
+        }
     }
+
+    maskContext.putImageData(maskPixels, 0, 0);
+    bentoCakeMaskCache.set(image, maskCanvas);
+
+    return maskCanvas;
+}
+
+function drawBentoColorPreview(context, image, transform) {
+    if (builderState.mainCakeColor === "original") {
+        return;
+    }
+
+    drawRecoloredAsset(
+        context,
+        image,
+        getBentoCakeMask(image),
+        builderState.mainCakeColor,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
 }
 
 function drawTwoTierColors(
@@ -1272,33 +1322,43 @@ function drawTwoTierColors(
     width,
     height
 ) {
-    const topTierBottom = y + height * 0.49;
+    const isTallTier =
+        builderState.cakeProductId === "tier-4-6-tall";
 
+    const topTierBounds = isTallTier
+        ? { x: 355, y: 55, width: 545, height: 645 }
+        : { x: 325, y: 150, width: 610, height: 540 };
+
+    /* The full asset is the bottom-tier mask. Drawing it first makes the
+       exposed top surface of the bottom tier use the bottom-tier color. */
+    drawRecoloredAsset(
+        context,
+        image,
+        image,
+        builderState.tierBottomColor,
+        x,
+        y,
+        width,
+        height
+    );
+
+    /* The upper tier needs its own source-coordinate mask. The previous
+       percentage split cut through the tall tier and recolored part of the
+       lower tier's top surface. */
     context.save();
     context.beginPath();
-    context.rect(x, y, width, topTierBottom - y);
+    context.rect(
+        x + (topTierBounds.x / image.naturalWidth) * width,
+        y + (topTierBounds.y / image.naturalHeight) * height,
+        (topTierBounds.width / image.naturalWidth) * width,
+        (topTierBounds.height / image.naturalHeight) * height
+    );
     context.clip();
     drawRecoloredAsset(
         context,
         image,
         image,
         builderState.tierTopColor,
-        x,
-        y,
-        width,
-        height
-    );
-    context.restore();
-
-    context.save();
-    context.beginPath();
-    context.rect(x, topTierBottom, width, y + height - topTierBottom);
-    context.clip();
-    drawRecoloredAsset(
-        context,
-        image,
-        image,
-        builderState.tierBottomColor,
         x,
         y,
         width,
@@ -1353,6 +1413,8 @@ async function updateRealisticCakePreview() {
                 cakeUrls[0]
             );
 
+            const cupcakeDesign = await renderCupcakeDesignCanvas();
+
             if (renderVersion !== realisticRenderVersion) return;
 
             const context = realisticCakeCanvas.getContext("2d");
@@ -1362,19 +1424,41 @@ async function updateRealisticCakePreview() {
                 realisticCakeCanvas.width,
                 realisticCakeCanvas.height
             );
-            drawContainedCanvasImage(
+            const standaloneScale = isBento
+                ? 0.96
+                : product.cupcakeCount === 4
+                ? 0.94
+                : 1.06;
+
+            const standaloneOffsetY = isBento
+                ? 12
+                : product.cupcakeCount === 4
+                ? 18
+                : 8;
+
+            const transform = drawContainedCanvasImage(
                 context,
                 standaloneImage,
-                realisticCakeCanvas
+                realisticCakeCanvas,
+                standaloneScale,
+                standaloneOffsetY
             );
 
             if (isBento) {
                 drawBentoColorPreview(
                     context,
                     standaloneImage,
-                    realisticCakeCanvas
+                    transform
                 );
             }
+
+            drawCupcakeSetPreview(
+                context,
+                cupcakeDesign,
+                isBento ? "bento" : builderState.cakeProductId,
+                transform,
+                standaloneImage
+            );
             return;
         }
 
@@ -1441,11 +1525,18 @@ async function updateRealisticCakePreview() {
                     size.height
                 );
             } else {
+                const selectedCakeColor =
+                    product.shape === "numberLetter"
+                        ? index === 0
+                            ? builderState.characterOneColor
+                            : builderState.characterTwoColor
+                        : builderState.mainCakeColor;
+
                 drawRecoloredAsset(
                     context,
                     cakeImage,
                     cakeImage,
-                    builderState.mainCakeColor,
+                    selectedCakeColor,
                     x,
                     y + boardYOffset,
                     size.width,
@@ -1504,6 +1595,293 @@ function getCupcakeFrostingFiles(liner, style) {
     }
 
     return null;
+}
+
+function drawCupcakeCanvasDecorations(context, width, height) {
+    const selected = new Set(
+        builderState.decorations.map((decoration) => decoration.id)
+    );
+
+    if (getElement("#topperDecorationOption")?.checked) {
+        selected.add("topperDecoration");
+    }
+
+    const centerX = width * 0.5;
+
+    if (selected.has("sprinklesDecoration")) {
+        const colors = [
+            "#FF4FA3",
+            "#70B7E6",
+            "#F2C94C",
+            "#8DCB84",
+            "#A97BDC",
+            "#84563C"
+        ];
+
+        const positions = [
+            [0.39, 0.23, -0.5], [0.45, 0.18, 0.7],
+            [0.52, 0.22, -0.3], [0.59, 0.19, 0.5],
+            [0.63, 0.27, -0.8], [0.56, 0.31, 0.4],
+            [0.47, 0.30, -0.6], [0.41, 0.34, 0.8],
+            [0.51, 0.37, 0.2], [0.61, 0.36, -0.4]
+        ];
+
+        positions.forEach(([x, y, rotation], index) => {
+            context.save();
+            context.translate(width * x, height * y);
+            context.rotate(rotation);
+            context.fillStyle = colors[index % colors.length];
+            context.fillRect(-9, -3, 18, 6);
+            context.restore();
+        });
+    }
+
+    if (selected.has("pearlsDecoration")) {
+        [[0.42, 0.24], [0.5, 0.18], [0.59, 0.25], [0.47, 0.34], [0.58, 0.35]]
+            .forEach(([x, y]) => {
+                context.beginPath();
+                context.arc(width * x, height * y, width * 0.012, 0, Math.PI * 2);
+                context.fillStyle = "#FFFDF8";
+                context.fill();
+                context.strokeStyle = "#D9C8B8";
+                context.lineWidth = width * 0.004;
+                context.stroke();
+            });
+    }
+
+    if (selected.has("chocolateDripDecoration")) {
+        context.save();
+        context.fillStyle = "#5A2A1E";
+        context.beginPath();
+        context.ellipse(centerX, height * 0.39, width * 0.2, height * 0.05, 0, 0, Math.PI * 2);
+        context.fill();
+        [0.42, 0.5, 0.58].forEach((x, index) => {
+            context.beginPath();
+            context.arc(width * x, height * (0.42 + index * 0.012), width * 0.025, 0, Math.PI * 2);
+            context.fill();
+        });
+        context.restore();
+    }
+
+    if (selected.has("goldAccentDecoration")) {
+        [[0.4, 0.2], [0.55, 0.18], [0.62, 0.3], [0.46, 0.35]].forEach(([x, y], index) => {
+            context.beginPath();
+            context.arc(width * x, height * y, width * (index % 2 ? 0.016 : 0.01), 0, Math.PI * 2);
+            context.fillStyle = index % 2 ? "#F2D47C" : "#D6A63A";
+            context.fill();
+        });
+    }
+
+    if (selected.has("cherriesDecoration")) {
+        context.fillStyle = "#B92D40";
+        [0.47, 0.54].forEach((x, index) => {
+            context.beginPath();
+            context.arc(width * x, height * (0.2 + index * 0.012), width * 0.035, 0, Math.PI * 2);
+            context.fill();
+        });
+    }
+
+    if (selected.has("flowersDecoration")) {
+        context.save();
+        context.translate(centerX, height * 0.23);
+        context.fillStyle = "#F486B6";
+        for (let index = 0; index < 6; index += 1) {
+            context.rotate(Math.PI / 3);
+            context.beginPath();
+            context.ellipse(width * 0.045, 0, width * 0.045, width * 0.024, 0, 0, Math.PI * 2);
+            context.fill();
+        }
+        context.beginPath();
+        context.arc(0, 0, width * 0.025, 0, Math.PI * 2);
+        context.fillStyle = "#F7D978";
+        context.fill();
+        context.restore();
+    }
+
+    if (selected.has("butterfliesDecoration")) {
+        context.save();
+        context.translate(centerX, height * 0.21);
+        context.rotate(-0.25);
+        context.fillStyle = "#C9A9EA";
+        [-1, 1].forEach((direction) => {
+            context.beginPath();
+            context.ellipse(direction * width * 0.03, 0, width * 0.035, width * 0.02, direction * 0.35, 0, Math.PI * 2);
+            context.fill();
+        });
+        context.restore();
+    }
+
+    if (selected.has("ribbonDecoration")) {
+        context.save();
+        context.translate(centerX, height * 0.56);
+        context.strokeStyle = normalizeHexColor(builderState.accentColor);
+        context.lineWidth = width * 0.018;
+        [-1, 1].forEach((direction) => {
+            context.beginPath();
+            context.ellipse(direction * width * 0.04, 0, width * 0.045, width * 0.027, direction * 0.3, 0, Math.PI * 2);
+            context.stroke();
+        });
+        context.restore();
+    }
+
+    if (selected.has("topperDecoration")) {
+        const wording = builderState.topperWording.trim().slice(0, 8) || "TOP";
+        context.save();
+        context.translate(centerX, height * 0.105);
+        context.fillStyle = "#D6A63A";
+        context.fillRect(-width * 0.105, -height * 0.028, width * 0.21, height * 0.056);
+        context.fillStyle = "#FFFFFF";
+        context.font = `900 ${Math.round(width * 0.034)}px Arial`;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(wording, 0, 0, width * 0.19);
+        context.fillStyle = "#84563C";
+        context.fillRect(-width * 0.006, height * 0.028, width * 0.012, height * 0.08);
+        context.restore();
+    }
+}
+
+async function renderCupcakeDesignCanvas() {
+    const liner = builderState.cupcakeLinerStyle || "paper";
+    const foundationFiles =
+        cupcakeFoundationMap[liner] || cupcakeFoundationMap.paper;
+    const frostingFiles = getCupcakeFrostingFiles(
+        liner,
+        builderState.cupcakeFrostingStyle
+    );
+
+    const linerRoot = `${finalAssetRoot}/cupcakes/liners`;
+    const frostingRoot = `${finalAssetRoot}/cupcakes/frosting`;
+    const foundationUrl = frostingFiles
+        ? `${frostingRoot}/${foundationFiles[2]}`
+        : `${linerRoot}/${foundationFiles[0]}`;
+
+    const [foundation, linerMask, frosting, frostingMask] =
+        await Promise.all([
+            loadRealisticImage(foundationUrl),
+            loadRealisticImage(`${linerRoot}/${foundationFiles[1]}`),
+            frostingFiles
+                ? loadRealisticImage(`${frostingRoot}/${frostingFiles[0]}`)
+                : Promise.resolve(null),
+            frostingFiles
+                ? loadRealisticImage(`${frostingRoot}/${frostingFiles[1]}`)
+                : Promise.resolve(null)
+        ]);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = foundation.naturalWidth;
+    canvas.height = foundation.naturalHeight;
+
+    const context = canvas.getContext("2d");
+    context.drawImage(foundation, 0, 0, canvas.width, canvas.height);
+
+    if (builderState.cupcakeLinerColor !== "original") {
+        const linerTint = makeTintedLayer(
+            foundation,
+            linerMask,
+            builderState.cupcakeLinerColor
+        );
+        context.drawImage(linerTint, 0, 0, canvas.width, canvas.height);
+    }
+
+    if (frosting && frostingMask) {
+        context.drawImage(frosting, 0, 0, canvas.width, canvas.height);
+
+        if (builderState.cupcakeFrostingColor !== "original") {
+            const frostingTint = makeTintedLayer(
+                frosting,
+                frostingMask,
+                builderState.cupcakeFrostingColor
+            );
+            context.drawImage(frostingTint, 0, 0, canvas.width, canvas.height);
+        }
+
+        drawCupcakeCanvasDecorations(context, canvas.width, canvas.height);
+    }
+
+    return canvas;
+}
+
+const cupcakeSetLayouts = {
+    bento: {
+        slots: [
+            [772, 670, 268, -0.03],
+            [986, 705, 262, 0.035],
+            [724, 855, 268, -0.02],
+            [949, 898, 260, 0.04]
+        ]
+    },
+    "cupcakes-4": {
+        slots: [
+            [459, 662, 430, -0.035],
+            [801, 723, 420, 0.035],
+            [384, 906, 425, -0.04],
+            [749, 971, 415, 0.04]
+        ]
+    },
+    "cupcakes-8": {
+        slots: [
+            [402, 510, 300, -0.025], [644, 535, 297, -0.01],
+            [887, 554, 293, 0.01], [1129, 576, 286, 0.025],
+            [351, 695, 300, -0.035], [604, 721, 297, -0.015],
+            [861, 743, 293, 0.01], [1124, 768, 286, 0.03]
+        ]
+    },
+    "cupcakes-12": {
+        slots: [
+            [406, 459, 250, -0.025], [622, 477, 247, -0.01],
+            [842, 495, 245, 0.01], [1063, 516, 240, 0.025],
+            [364, 606, 250, -0.035], [591, 625, 247, -0.015],
+            [818, 645, 245, 0.01], [1046, 666, 240, 0.03],
+            [320, 761, 250, -0.04], [556, 784, 247, -0.02],
+            [792, 803, 245, 0.01], [1029, 826, 240, 0.035]
+        ]
+    }
+};
+
+function drawCupcakeSetPreview(
+    context,
+    cupcakeDesign,
+    layoutKey,
+    transform,
+    sourceImage
+) {
+    const layout = cupcakeSetLayouts[layoutKey];
+
+    if (!layout || !cupcakeDesign) {
+        return;
+    }
+
+    context.save();
+    context.translate(transform.x, transform.y);
+    context.scale(
+        transform.width / sourceImage.naturalWidth,
+        transform.height / sourceImage.naturalHeight
+    );
+
+    layout.slots.forEach(([centerX, centerY, size, rotation]) => {
+        context.save();
+        context.translate(centerX, centerY);
+        context.rotate(rotation);
+
+        /* Crop away the transparent single-cupcake padding. The liner/body
+           remains underneath; frosting and decorations stay on top. */
+        context.drawImage(
+            cupcakeDesign,
+            60,
+            100,
+            cupcakeDesign.width - 120,
+            cupcakeDesign.height - 170,
+            -size / 2,
+            -size * 0.48,
+            size,
+            size * 0.92
+        );
+
+        context.restore();
+    });
+
+    context.restore();
 }
 
 function updateCupcakePreview() {
@@ -2050,9 +2428,21 @@ function updateProductModeUI() {
         !isTwoTier
     );
 
+    const isNumberLetter = product.shape === "numberLetter";
+
+    getElement("#characterColorCustomizer")?.classList.toggle(
+        "is-hidden",
+        !isNumberLetter
+    );
+
+    getElement("#secondCharacterColorField")?.classList.toggle(
+        "is-hidden",
+        !isNumberLetter || product.characterCount !== 2
+    );
+
     getElement("#singleCakeColorCustomizer")?.classList.toggle(
         "is-hidden",
-        isCupcakesOnly || isTwoTier
+        isCupcakesOnly || isTwoTier || isNumberLetter
     );
 
     const cupcakeStudio = getElement("#cupcakeStudio");
@@ -3831,6 +4221,10 @@ function populateReview() {
             ? `${builderState.cupcakeLinerColor} liner · ${builderState.cupcakeFrostingColor} icing`
             : product.shape === "tier"
             ? `${builderState.tierTopColor} top tier · ${builderState.tierBottomColor} bottom tier`
+            : product.shape === "numberLetter"
+            ? product.characterCount === 2
+                ? `${builderState.characterOneColor} first character · ${builderState.characterTwoColor} second character`
+                : `${builderState.characterOneColor} character color`
             : `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
     );
 
@@ -4101,6 +4495,8 @@ closeMobileSummary();
     builderState.numberCakeFirst = "0";
     builderState.numberCakeSecond = "1";
     builderState.letterCakeText = "A";
+    builderState.characterOneColor = "original";
+    builderState.characterTwoColor = "original";
 
     builderState.cakeFlavor = "";
     builderState.customCakeFlavor = "";
@@ -4244,13 +4640,35 @@ const resetValues = {
         customMainColor: "#FF4FA3",
         accentColor: "#FF4FA3",
         tierTopColor: "#FFF1DC",
-        tierBottomColor: "#FFF1DC"
+        tierBottomColor: "#FFF1DC",
+        characterOneColor: "#FFF1DC",
+        characterTwoColor: "#FFF1DC"
     };
 
     Object.entries(resetColorValues).forEach(([id, value]) => {
         const control = getElement(`#${id}`);
         if (control) control.value = value;
     });
+
+    /* Reset the Step 1 controls explicitly. This prevents a previously
+       validated date/count value or a stale disabled/read-only property from
+       surviving the visual reset. */
+    ["eventDate", "fulfillmentDate", "guestCount"].forEach((id) => {
+        const control = getElement(`#${id}`);
+
+        if (!control) {
+            return;
+        }
+
+        control.value = "";
+        control.disabled = false;
+        control.readOnly = false;
+        control.removeAttribute("aria-invalid");
+    });
+
+    showValidationMessage("");
+    updateGuestRecommendation();
+    updateRushFee();
 
     showCakeSizeGroup("round");
     updateCakeBoardControls();
@@ -4659,7 +5077,9 @@ getElements(
 
 [
     ["#tierTopColor", "tierTopColor"],
-    ["#tierBottomColor", "tierBottomColor"]
+    ["#tierBottomColor", "tierBottomColor"],
+    ["#characterOneColor", "characterOneColor"],
+    ["#characterTwoColor", "characterTwoColor"]
 ].forEach(([selector, stateKey]) => {
     getElement(selector)?.addEventListener("input", (event) => {
         builderState[stateKey] = event.target.value;
