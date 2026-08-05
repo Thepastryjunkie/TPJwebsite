@@ -3063,28 +3063,175 @@
 
                                 </label>
 
-                                <label class="style-choice-card">
+                            </div>
 
-                                    <input
-                                        type="radio"
-                                        name="cakeFinish"
-                                        value="Edible Image Design"
+                        </fieldset>
+
+                        <fieldset
+                            id="edibleImageCustomizer"
+                            class="builder-fieldset"
+                        >
+
+                            <legend>
+                                Edible Image
+                            </legend>
+
+                            <p class="fieldset-description">
+                                Add a photo, logo, or printed design without replacing your buttercream finish or other decorations.
+                            </p>
+
+                            <label class="edible-image-toggle-card">
+
+                                <input
+                                    id="edibleImageEnabled"
+                                    type="checkbox"
+                                >
+
+                                <span>
+                                    <strong>Add an edible image</strong>
+                                    <small>Upload one JPG, PNG, or WebP image.</small>
+                                </span>
+
+                            </label>
+
+                            <div
+                                id="edibleImageControls"
+                                class="edible-image-controls is-hidden"
+                            >
+
+                                <input
+                                    id="edibleImageFile"
+                                    class="visually-hidden-file-input"
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                >
+
+                                <div class="edible-image-upload-row">
+
+                                    <div
+                                        id="edibleImageThumbnail"
+                                        class="edible-image-thumbnail"
+                                        aria-live="polite"
                                     >
-
-                                    <div class="style-photo-placeholder">
-                                        <span>Edible Image</span>
-                                        <small>Your photo goes here</small>
+                                        <span>No image selected</span>
                                     </div>
 
-                                    <strong>
-                                        Edible Image
-                                    </strong>
+                                    <div class="edible-image-upload-actions">
 
-                                    <small>
-                                        Photo, logo, or printed collage design.
-                                    </small>
+                                        <button
+                                            id="chooseEdibleImage"
+                                            class="upload-select-button"
+                                            type="button"
+                                        >
+                                            Choose Image
+                                        </button>
 
-                                </label>
+                                        <button
+                                            id="removeEdibleImage"
+                                            class="edible-image-secondary-button"
+                                            type="button"
+                                            disabled
+                                        >
+                                            Remove Image
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <p
+                                    id="edibleImageError"
+                                    class="form-error-message"
+                                    aria-live="polite"
+                                ></p>
+
+                                <fieldset class="edible-image-option-group">
+
+                                    <legend>Image Shape</legend>
+
+                                    <div class="compact-choice-row edible-image-shape-row">
+
+                                        <label>
+                                            <input type="radio" name="edibleImageShape" value="original" checked>
+                                            <span>Original</span>
+                                        </label>
+
+                                        <label>
+                                            <input type="radio" name="edibleImageShape" value="rectangle">
+                                            <span>Rectangle</span>
+                                        </label>
+
+                                        <label>
+                                            <input type="radio" name="edibleImageShape" value="circle">
+                                            <span>Circle</span>
+                                        </label>
+
+                                    </div>
+
+                                </fieldset>
+
+                                <fieldset
+                                    id="edibleImageTierTarget"
+                                    class="edible-image-option-group is-hidden"
+                                >
+
+                                    <legend>Two-Tier Placement</legend>
+
+                                    <div class="compact-choice-row edible-image-shape-row">
+
+                                        <label>
+                                            <input type="radio" name="edibleImageTier" value="bottom" checked>
+                                            <span>Bottom Tier</span>
+                                        </label>
+
+                                        <label>
+                                            <input type="radio" name="edibleImageTier" value="top">
+                                            <span>Top Tier</span>
+                                        </label>
+
+                                    </div>
+
+                                </fieldset>
+
+                                <div class="edible-image-adjustments">
+
+                                    <label>
+                                        <span>Size <output id="edibleImageScaleValue">70%</output></span>
+                                        <input id="edibleImageScale" type="range" min="35" max="115" value="70">
+                                    </label>
+
+                                    <label>
+                                        <span>Move Left / Right <output id="edibleImageXValue">0</output></span>
+                                        <input id="edibleImageX" type="range" min="-40" max="40" value="0">
+                                    </label>
+
+                                    <label>
+                                        <span>Move Up / Down <output id="edibleImageYValue">0</output></span>
+                                        <input id="edibleImageY" type="range" min="-40" max="40" value="0">
+                                    </label>
+
+                                    <label>
+                                        <span>Rotate <output id="edibleImageRotationValue">0&deg;</output></span>
+                                        <input id="edibleImageRotation" type="range" min="-20" max="20" value="0">
+                                    </label>
+
+                                </div>
+
+                                <div class="edible-image-control-footer">
+
+                                    <p id="edibleImagePlacementNote">
+                                        The image will appear centered on the usable cake surface. Adjust it while watching the live preview.
+                                    </p>
+
+                                    <button
+                                        id="resetEdibleImagePosition"
+                                        class="edible-image-secondary-button"
+                                        type="button"
+                                    >
+                                        Reset Position
+                                    </button>
+
+                                </div>
 
                             </div>
 

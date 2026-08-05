@@ -360,6 +360,16 @@ const builderState = {
     tierTopColor: "original",
     tierBottomColor: "original",
 
+    edibleImageEnabled: false,
+    edibleImageFile: null,
+    edibleImageUrl: "",
+    edibleImageShape: "original",
+    edibleImageScale: 70,
+    edibleImageX: 0,
+    edibleImageY: 0,
+    edibleImageRotation: 0,
+    edibleImageTier: "bottom",
+
     cakeBoardStyle: "round",
     cakeBoardColor: "original",
     cupcakeLinerStyle: "paper",
@@ -998,9 +1008,14 @@ function makeTintedLayer(image, mask, color) {
     );
 
     /* Restore shadows from the original artwork */
-    layerContext.globalCompositeOperation = "multiply";
-    layerContext.globalAlpha = 0.34;
+  const isSimpleTextureAsset =
+    image.src.includes(
+        "Simple-Texture-Horizontal-Comb"
+    );
 
+layerContext.globalCompositeOperation = "multiply";
+layerContext.globalAlpha =
+    isSimpleTextureAsset ? 0.78 : 0.34;
     layerContext.drawImage(
         image,
         0,
@@ -1019,8 +1034,8 @@ const isVeryDark =
 
 layerContext.globalCompositeOperation = "screen";
 layerContext.globalAlpha =
-    isVeryDark ? 0.025 : 0.08;
-
+     isVeryDark?  (isSimpleTextureAsset ? 0.26 : 0.10)
+    : (isSimpleTextureAsset ? 0.04 : 0.08);
     layerContext.drawImage(
         image,
         0,
@@ -1169,19 +1184,71 @@ function getCakePreviewEntries(product) {
         cakeAssetMap[product.shape] ||
         cakeAssetMap.round;
 
-    let file = builderState.isTall
-        ? shapeAssets.tall
-        : shapeAssets.standard;
+ let file = builderState.isTall
+    ? shapeAssets.tall
+    : shapeAssets.standard;
 
-    let key = builderState.isTall
-        ? shapeAssets.tallKey
-        : shapeAssets.key;
+let key = builderState.isTall
+    ? shapeAssets.tallKey
+    : shapeAssets.key;
 
-    if (builderState.cakeProductId === "heart-5-tall") {
-        file = "TPJ-Asset-026-Blank-Tall-5in-Heart-Standalone-Cake.png";
-        key = "tallHeart5in";
+
+/*
+    SIMPLE TEXTURE ASSET SWAP
+*/
+
+const simpleTextureAssetMap = {
+    round: {
+        standard:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Round.png",
+
+        tall:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-Round.png"
+    },
+
+    heart: {
+        standard:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Heart.png",
+
+        tall:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-Heart.png"
+    },
+
+    star: {
+        standard:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Star.png",
+
+        tall:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-Star.png"
+    },
+
+    square: {
+        standard:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Square.png",
+
+        tall:
+            "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-Square.png"
     }
+};
 
+if (builderState.cakeFinish === "Simple Texture") {
+    const textureAssets =
+        simpleTextureAssetMap[product.shape];
+
+    if (textureAssets) {
+        file = builderState.isTall
+            ? textureAssets.tall
+            : textureAssets.standard;
+    }
+}
+if (builderState.cakeProductId === "heart-5-tall") {
+    file =
+        builderState.cakeFinish === "Simple Texture"
+            ? "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-5in-Heart.png"
+            : "TPJ-Asset-026-Blank-Tall-5in-Heart-Standalone-Cake.png";
+
+    key = "tallHeart5in";
+}
     if (
         product.shape === "round" &&
         builderState.cakeCoverage === "naked"
@@ -1517,6 +1584,260 @@ function drawTwoTierColors(
 
     context.restore();
 }
+
+
+/* =========================================
+   EDIBLE IMAGE CANVAS LAYER
+========================================= */
+
+function edibleImageIsReady() {
+    return Boolean(
+        builderState.edibleImageEnabled &&
+        builderState.edibleImageUrl
+    );
+}
+
+
+function addRoundedRectanglePath(
+    context,
+    x,
+    y,
+    width,
+    height,
+    radius
+) {
+    const safeRadius = Math.min(
+        Math.max(0, radius),
+        width / 2,
+        height / 2
+    );
+
+    context.beginPath();
+    context.moveTo(x + safeRadius, y);
+    context.lineTo(x + width - safeRadius, y);
+    context.quadraticCurveTo(
+        x + width,
+        y,
+        x + width,
+        y + safeRadius
+    );
+    context.lineTo(x + width, y + height - safeRadius);
+    context.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - safeRadius,
+        y + height
+    );
+    context.lineTo(x + safeRadius, y + height);
+    context.quadraticCurveTo(
+        x,
+        y + height,
+        x,
+        y + height - safeRadius
+    );
+    context.lineTo(x, y + safeRadius);
+    context.quadraticCurveTo(
+        x,
+        y,
+        x + safeRadius,
+        y
+    );
+    context.closePath();
+}
+
+
+function drawEdibleImageInArea(
+    context,
+    image,
+    area
+) {
+    if (!image || !edibleImageIsReady()) {
+        return;
+    }
+
+    const sizeScale = clampNumber(
+        Number(builderState.edibleImageScale) / 100,
+        0.35,
+        1.15
+    );
+
+    let width = area.width * sizeScale;
+    let height = area.height * sizeScale;
+    const imageAspect =
+        image.naturalWidth / image.naturalHeight || 1;
+
+    if (builderState.edibleImageShape === "circle") {
+        const diameter = Math.min(width, height);
+        width = diameter;
+        height = diameter;
+    } else if (builderState.edibleImageShape === "rectangle") {
+        height = Math.min(height, width / 1.35);
+    } else if (imageAspect >= 1) {
+        height = Math.min(height, width / imageAspect);
+    } else {
+        width = Math.min(width, height * imageAspect);
+    }
+
+    const centerX =
+        area.centerX +
+        area.width *
+            (clampNumber(Number(builderState.edibleImageX), -40, 40) / 100) *
+            0.48;
+
+    const centerY =
+        area.centerY +
+        area.height *
+            (clampNumber(Number(builderState.edibleImageY), -40, 40) / 100) *
+            0.48;
+
+    const left = -width / 2;
+    const top = -height / 2;
+
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(
+        clampNumber(
+            Number(builderState.edibleImageRotation),
+            -20,
+            20
+        ) * Math.PI / 180
+    );
+
+    if (builderState.edibleImageShape === "circle") {
+        context.beginPath();
+        context.arc(0, 0, width / 2, 0, Math.PI * 2);
+    } else {
+        addRoundedRectanglePath(
+            context,
+            left,
+            top,
+            width,
+            height,
+            Math.min(width, height) * 0.045
+        );
+    }
+
+    context.clip();
+
+    const targetAspect = width / height;
+    let sourceX = 0;
+    let sourceY = 0;
+    let sourceWidth = image.naturalWidth;
+    let sourceHeight = image.naturalHeight;
+
+    if (builderState.edibleImageShape !== "original") {
+        if (imageAspect > targetAspect) {
+            sourceWidth = image.naturalHeight * targetAspect;
+            sourceX = (image.naturalWidth - sourceWidth) / 2;
+        } else {
+            sourceHeight = image.naturalWidth / targetAspect;
+            sourceY = (image.naturalHeight - sourceHeight) / 2;
+        }
+    }
+
+    context.drawImage(
+        image,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        left,
+        top,
+        width,
+        height
+    );
+
+    context.restore();
+}
+
+
+function getEdibleImageArea(
+    product,
+    x,
+    y,
+    width,
+    height
+) {
+    if (product.shape === "tier") {
+        const useTopTier =
+            builderState.edibleImageTier === "top";
+
+        return useTopTier
+            ? {
+                centerX: x + width * 0.5,
+                centerY: y + height * 0.31,
+                width: width * 0.22,
+                height: height * 0.14
+            }
+            : {
+                centerX: x + width * 0.5,
+                centerY: y + height * 0.61,
+                width: width * 0.32,
+                height: height * 0.18
+            };
+    }
+
+    if (product.shape === "sheet") {
+        return {
+            centerX: x + width * 0.5,
+            centerY: y + height * 0.43,
+            width: width * 0.38,
+            height: height * 0.24
+        };
+    }
+
+    if (product.shape === "numberLetter") {
+        return {
+            centerX: x + width * 0.5,
+            centerY: y + height * 0.44,
+            width: width * 0.3,
+            height: height * 0.22
+        };
+    }
+
+    const isTallCake = builderState.isTall;
+
+    return {
+        centerX: x + width * 0.5,
+        centerY: y + height * (isTallCake ? 0.49 : 0.5),
+        width: width * (isTallCake ? 0.27 : 0.31),
+        height: height * (isTallCake ? 0.25 : 0.22)
+    };
+}
+
+
+function drawBentoEdibleImage(
+    context,
+    image,
+    transform,
+    sourceImage
+) {
+    if (!image || !edibleImageIsReady()) {
+        return;
+    }
+
+    context.save();
+    context.translate(transform.x, transform.y);
+    context.scale(
+        transform.width / sourceImage.naturalWidth,
+        transform.height / sourceImage.naturalHeight
+    );
+
+    drawEdibleImageInArea(
+        context,
+        image,
+        {
+            centerX: 430,
+            centerY: 548,
+            width: 260,
+            height: 145
+        }
+    );
+
+    context.restore();
+}
+
+
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
 
@@ -1559,11 +1880,19 @@ async function updateRealisticCakePreview() {
 
     try {
         if (isStandalonePreview) {
-            const standaloneImage = await loadRealisticImage(
-                cakeUrls[0]
-            );
-
-            const cupcakeDesign = await renderCupcakeDesignCanvas();
+            const [
+                standaloneImage,
+                cupcakeDesign,
+                edibleImage
+            ] = await Promise.all([
+                loadRealisticImage(cakeUrls[0]),
+                renderCupcakeDesignCanvas(),
+                edibleImageIsReady()
+                    ? loadRealisticImage(
+                        builderState.edibleImageUrl
+                    )
+                    : Promise.resolve(null)
+            ]);
 
             if (renderVersion !== realisticRenderVersion) return;
 
@@ -1600,6 +1929,13 @@ async function updateRealisticCakePreview() {
                     standaloneImage,
                     transform
                 );
+
+                drawBentoEdibleImage(
+                    context,
+                    edibleImage,
+                    transform,
+                    standaloneImage
+                );
             }
 
             drawCupcakeSetPreview(
@@ -1618,11 +1954,23 @@ async function updateRealisticCakePreview() {
         const boardMaskUrl =
             `${finalAssetRoot}/boards/${boardAssets[1]}`;
 
-        const [boardImage, boardMask, ...cakeImages] =
+        const [
+            boardImage,
+            boardMask,
+            cakeImages,
+            edibleImage
+        ] =
             await Promise.all([
                 loadRealisticImage(boardUrl),
                 loadRealisticImage(boardMaskUrl),
-                ...cakeUrls.map(loadRealisticImage)
+                Promise.all(
+                    cakeUrls.map(loadRealisticImage)
+                ),
+                edibleImageIsReady()
+                    ? loadRealisticImage(
+                        builderState.edibleImageUrl
+                    )
+                    : Promise.resolve(null)
             ]);
 
         if (renderVersion !== realisticRenderVersion) return;
@@ -1694,6 +2042,35 @@ async function updateRealisticCakePreview() {
                 );
             }
         });
+
+        if (edibleImage) {
+            previewEntries.forEach((entry, index) => {
+                const cakeImage = cakeImages[index];
+                const placement =
+                    entry.placement ||
+                    cakePlacements[entry.key]?.[boardKey] ||
+                    cakePlacements[entry.key]?.round ||
+                    [0, 0, 1];
+
+                const [x, y, scale] = placement;
+                const size = getContainedAssetSize(
+                    cakeImage,
+                    scale
+                );
+
+                drawEdibleImageInArea(
+                    context,
+                    edibleImage,
+                    getEdibleImageArea(
+                        product,
+                        x,
+                        y + boardYOffset,
+                        size.width,
+                        size.height
+                    )
+                );
+            });
+        }
     } catch (error) {
         console.error(
             "The realistic cake preview could not be rendered.",
@@ -1944,6 +2321,28 @@ async function renderCupcakeDesignCanvas() {
                 builderState.cupcakeFrostingColor
             );
             context.drawImage(frostingTint, 0, 0, canvas.width, canvas.height);
+        }
+
+        if (
+            getSelectedCakeProduct().shape === "cupcakes" &&
+            builderState.cupcakeFrostingStyle ===
+                "low-piped-edible-image" &&
+            edibleImageIsReady()
+        ) {
+            const edibleImage = await loadRealisticImage(
+                builderState.edibleImageUrl
+            );
+
+            drawEdibleImageInArea(
+                context,
+                edibleImage,
+                {
+                    centerX: canvas.width * 0.5,
+                    centerY: canvas.height * 0.255,
+                    width: canvas.width * 0.3,
+                    height: canvas.height * 0.22
+                }
+            );
         }
 
         drawCupcakeCanvasDecorations(context, canvas.width, canvas.height);
@@ -2400,9 +2799,7 @@ function updateFinishVisibility() {
     });
 
     const finishElementMap = {
-        "Simple Texture":
-            "#textureFinishDecoration",
-
+       
         "Vintage Piping":
             "#vintagePipingDecoration",
 
@@ -2410,10 +2807,7 @@ function updateFinishVisibility() {
             "#watercolorFinishDecoration",
 
         "Palette Knife Finish":
-            "#paletteFinishDecoration",
-
-        "Edible Image Design":
-            "#edibleImageFinishDecoration"
+            "#paletteFinishDecoration"
     };
 
     const selectedFinishElement =
@@ -2691,6 +3085,94 @@ function normalizeProductSpecificState(product) {
 }
 
 
+function updateEdibleImageControls() {
+    const controls = getElement(
+        "#edibleImageControls"
+    );
+    const enabledInput = getElement(
+        "#edibleImageEnabled"
+    );
+    const thumbnail = getElement(
+        "#edibleImageThumbnail"
+    );
+    const removeButton = getElement(
+        "#removeEdibleImage"
+    );
+    const tierTarget = getElement(
+        "#edibleImageTierTarget"
+    );
+    const placementNote = getElement(
+        "#edibleImagePlacementNote"
+    );
+    const product = getSelectedCakeProduct();
+
+    if (enabledInput) {
+        enabledInput.checked =
+            builderState.edibleImageEnabled;
+    }
+
+    controls?.classList.toggle(
+        "is-hidden",
+        !builderState.edibleImageEnabled
+    );
+
+    tierTarget?.classList.toggle(
+        "is-hidden",
+        product.shape !== "tier"
+    );
+
+    if (removeButton) {
+        removeButton.disabled =
+            !builderState.edibleImageUrl;
+    }
+
+    if (thumbnail) {
+        thumbnail.innerHTML = "";
+
+        if (builderState.edibleImageUrl) {
+            const image = document.createElement("img");
+            image.src = builderState.edibleImageUrl;
+            image.alt = "Selected edible image";
+            thumbnail.appendChild(image);
+        } else {
+            const emptyMessage =
+                document.createElement("span");
+            emptyMessage.textContent =
+                "No image selected";
+            thumbnail.appendChild(emptyMessage);
+        }
+    }
+
+    if (placementNote) {
+        if (product.shape === "tier") {
+            placementNote.textContent =
+                "Choose the top or bottom tier, then adjust the image while watching the live preview.";
+        } else if (product.shape === "sheet") {
+            placementNote.textContent =
+                "The image is placed flat on top of the sheet cake.";
+        } else if (product.shape === "numberLetter") {
+            placementNote.textContent =
+                "The image is placed on the exposed top. A double cake repeats the uploaded image on both characters.";
+        } else if (product.shape === "cupcakes") {
+            placementNote.textContent =
+                builderState.cupcakeFrostingStyle ===
+                    "low-piped-edible-image"
+                    ? "The image is centered on every cupcake in the selected set."
+                    : "Choose Low Piped / Edible Image icing so the image has a flat frosting surface.";
+        } else if (
+            builderState.cakeProductId ===
+            "heart-5-bento"
+        ) {
+            placementNote.textContent =
+                "The image is placed on the heart cake. The four cupcakes remain unchanged.";
+        } else {
+            placementNote.textContent =
+                "The image is centered on the visible cake face. Adjust it while watching the live preview.";
+        }
+    }
+}
+
+
 /* =========================================
    PREVIEW SUMMARY
 ========================================= */
@@ -2762,6 +3244,7 @@ function updatePreviewSummary() {
 
 function renderCakePreview() {
     updateProductModeUI();
+    updateEdibleImageControls();
     updateRealisticCakePreview();
     updateCupcakePreview();
     updateVisibleCakeShape();
@@ -3051,6 +3534,30 @@ function validateStepFour() {
     } else if (!builderState.cakeFinish) {
         showValidationMessage(
             "Choose a buttercream finish."
+        );
+
+        return false;
+    }
+
+    if (
+        builderState.edibleImageEnabled &&
+        !builderState.edibleImageUrl
+    ) {
+        showValidationMessage(
+            "Upload the edible image or turn the edible-image option off."
+        );
+
+        return false;
+    }
+
+    if (
+        isCupcakesOnlyProduct() &&
+        edibleImageIsReady() &&
+        builderState.cupcakeFrostingStyle !==
+            "low-piped-edible-image"
+    ) {
+        showValidationMessage(
+            "Choose Low Piped / Edible Image icing for cupcake edible images."
         );
 
         return false;
@@ -4387,15 +4894,22 @@ function populateReview() {
             : builderState.cakeFinish || "Not selected"
     );
 
+    const reviewDecorationNames =
+        builderState.decorations.map(
+            (decoration) =>
+                decoration.name
+        );
+
+    if (edibleImageIsReady()) {
+        reviewDecorationNames.push(
+            "Edible Image"
+        );
+    }
+
     setText(
         "#reviewDecorations",
-        builderState.decorations.length
-            ? builderState.decorations
-                  .map(
-                      (decoration) =>
-                          decoration.name
-                  )
-                  .join(", ")
+        reviewDecorationNames.length
+            ? reviewDecorationNames.join(", ")
             : "None selected"
     );
 
@@ -5248,6 +5762,195 @@ getElements(".quantity-product").forEach(
    UPLOAD EVENTS
 ========================================= */
 
+function updateEdibleImageRangeOutputs() {
+    setText(
+        "#edibleImageScaleValue",
+        `${builderState.edibleImageScale}%`
+    );
+    setText(
+        "#edibleImageXValue",
+        String(builderState.edibleImageX)
+    );
+    setText(
+        "#edibleImageYValue",
+        String(builderState.edibleImageY)
+    );
+    setText(
+        "#edibleImageRotationValue",
+        `${builderState.edibleImageRotation}°`
+    );
+}
+
+
+function clearEdibleImageFile() {
+    if (builderState.edibleImageUrl) {
+        URL.revokeObjectURL(
+            builderState.edibleImageUrl
+        );
+    }
+
+    builderState.edibleImageFile = null;
+    builderState.edibleImageUrl = "";
+
+    const fileInput = getElement(
+        "#edibleImageFile"
+    );
+
+    if (fileInput) {
+        fileInput.value = "";
+    }
+
+    setText("#edibleImageError", "");
+    renderCakePreview();
+}
+
+
+function setEdibleImageFile(file) {
+    const errorMessage = getElement(
+        "#edibleImageError"
+    );
+    const acceptedTypes = new Set([
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ]);
+
+    if (!file || !acceptedTypes.has(file.type)) {
+        if (errorMessage) {
+            errorMessage.textContent =
+                "Choose a JPG, PNG, or WebP image.";
+        }
+        return;
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+        if (errorMessage) {
+            errorMessage.textContent =
+                "The edible image must be 15 MB or smaller.";
+        }
+        return;
+    }
+
+    if (builderState.edibleImageUrl) {
+        URL.revokeObjectURL(
+            builderState.edibleImageUrl
+        );
+    }
+
+    builderState.edibleImageEnabled = true;
+    builderState.edibleImageFile = file;
+    builderState.edibleImageUrl =
+        URL.createObjectURL(file);
+
+    if (errorMessage) {
+        errorMessage.textContent = "";
+    }
+
+    renderCakePreview();
+}
+
+
+function resetEdibleImagePosition() {
+    builderState.edibleImageScale = 70;
+    builderState.edibleImageX = 0;
+    builderState.edibleImageY = 0;
+    builderState.edibleImageRotation = 0;
+
+    [
+        ["#edibleImageScale", 70],
+        ["#edibleImageX", 0],
+        ["#edibleImageY", 0],
+        ["#edibleImageRotation", 0]
+    ].forEach(([selector, value]) => {
+        const input = getElement(selector);
+        if (input) input.value = String(value);
+    });
+
+    updateEdibleImageRangeOutputs();
+    renderCakePreview();
+}
+
+
+const edibleImageFileInput = getElement(
+    "#edibleImageFile"
+);
+
+getElement(
+    "#edibleImageEnabled"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.edibleImageEnabled =
+            event.target.checked;
+        renderCakePreview();
+    }
+);
+
+getElement(
+    "#chooseEdibleImage"
+)?.addEventListener(
+    "click",
+    () => edibleImageFileInput?.click()
+);
+
+edibleImageFileInput?.addEventListener(
+    "change",
+    (event) => {
+        setEdibleImageFile(
+            event.target.files?.[0]
+        );
+    }
+);
+
+getElement(
+    "#removeEdibleImage"
+)?.addEventListener(
+    "click",
+    clearEdibleImageFile
+);
+
+getElement(
+    "#resetEdibleImagePosition"
+)?.addEventListener(
+    "click",
+    resetEdibleImagePosition
+);
+
+getElements(
+    'input[name="edibleImageShape"]'
+).forEach((input) => {
+    input.addEventListener("change", () => {
+        builderState.edibleImageShape = input.value;
+        renderCakePreview();
+    });
+});
+
+getElements(
+    'input[name="edibleImageTier"]'
+).forEach((input) => {
+    input.addEventListener("change", () => {
+        builderState.edibleImageTier = input.value;
+        renderCakePreview();
+    });
+});
+
+[
+    ["#edibleImageScale", "edibleImageScale"],
+    ["#edibleImageX", "edibleImageX"],
+    ["#edibleImageY", "edibleImageY"],
+    ["#edibleImageRotation", "edibleImageRotation"]
+].forEach(([selector, stateKey]) => {
+    getElement(selector)?.addEventListener(
+        "input",
+        (event) => {
+            builderState[stateKey] =
+                Number(event.target.value);
+            updateEdibleImageRangeOutputs();
+            renderCakePreview();
+        }
+    );
+});
+
 const inspirationFileInput = getElement(
     "#inspirationFiles"
 );
@@ -5466,6 +6169,7 @@ function initializeBuilder() {
     updateTopperOptionsVisibility();
     updateDeliveryFieldsVisibility();
 
+    updateEdibleImageRangeOutputs();
     renderInspirationPreviews();
     renderCakePreview();
     showStep(1);

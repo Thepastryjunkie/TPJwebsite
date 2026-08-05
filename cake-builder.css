@@ -40,7 +40,6 @@
     --accent-color: #FF4FA3;
 }
 
-
 /* =========================================
    RESET
 ========================================= */
@@ -2189,6 +2188,231 @@ fieldset {
 
 
 /* =========================================
+   EDIBLE IMAGE CUSTOMIZER
+========================================= */
+
+.edible-image-toggle-card {
+    padding: 17px 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    border: 2px solid rgba(90, 42, 30, 0.18);
+    border-radius: 18px;
+
+    background: var(--white);
+    cursor: pointer;
+}
+
+.edible-image-toggle-card:has(input:checked) {
+    border-color: var(--signature-pink);
+    background: var(--headline-pink);
+    box-shadow: 0 0 0 4px rgba(255, 79, 163, 0.1);
+}
+
+.edible-image-toggle-card input {
+    width: 21px;
+    height: 21px;
+    margin: 0;
+
+    accent-color: var(--signature-pink);
+}
+
+.edible-image-toggle-card span,
+.edible-image-toggle-card strong,
+.edible-image-toggle-card small {
+    display: block;
+}
+
+.edible-image-toggle-card strong {
+    font-size: 13px;
+}
+
+.edible-image-toggle-card small {
+    margin-top: 3px;
+    color: var(--deep-berry);
+    font-size: 9px;
+}
+
+.edible-image-controls {
+    margin-top: 17px;
+    padding: 18px;
+
+    border: 2px solid rgba(90, 42, 30, 0.14);
+    border-radius: 20px;
+
+    background: #FFFDF9;
+}
+
+.visually-hidden-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.edible-image-upload-row {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.8fr) minmax(160px, 1.2fr);
+    gap: 16px;
+    align-items: center;
+}
+
+.edible-image-thumbnail {
+    min-height: 138px;
+
+    display: grid;
+    place-items: center;
+
+    overflow: hidden;
+
+    border: 2px dashed rgba(90, 42, 30, 0.22);
+    border-radius: 15px;
+
+    background: var(--cream);
+    color: var(--deep-berry);
+
+    text-align: center;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.edible-image-thumbnail img {
+    width: 100%;
+    height: 138px;
+    object-fit: contain;
+    background: var(--white);
+}
+
+.edible-image-upload-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.edible-image-secondary-button {
+    min-height: 43px;
+    padding: 10px 16px;
+
+    border: 2px solid rgba(90, 42, 30, 0.28);
+    border-radius: 14px;
+
+    background: var(--white);
+    color: var(--buttercream-brown);
+
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.edible-image-secondary-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.edible-image-option-group {
+    margin: 18px 0 0;
+    padding: 0;
+    border: 0;
+}
+
+.edible-image-option-group > legend {
+    margin-bottom: 9px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.edible-image-shape-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.edible-image-shape-row label {
+    min-height: 48px;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    border: 2px solid rgba(90, 42, 30, 0.16);
+    border-radius: 13px;
+
+    background: var(--white);
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.edible-image-shape-row label:has(input:checked) {
+    border-color: var(--signature-pink);
+    background: var(--headline-pink);
+}
+
+.edible-image-shape-row input {
+    margin: 0;
+    accent-color: var(--signature-pink);
+}
+
+.edible-image-adjustments {
+    margin-top: 18px;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.edible-image-adjustments label {
+    padding: 13px;
+
+    display: grid;
+    gap: 8px;
+
+    border-radius: 14px;
+    background: var(--white);
+}
+
+.edible-image-adjustments span {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.edible-image-adjustments output {
+    color: var(--deep-berry);
+}
+
+.edible-image-adjustments input[type="range"] {
+    width: 100%;
+    accent-color: var(--signature-pink);
+}
+
+.edible-image-control-footer {
+    margin-top: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.edible-image-control-footer p {
+    margin: 0;
+    color: var(--deep-berry);
+    font-size: 9px;
+    line-height: 1.55;
+}
+
+
+/* =========================================
    DECORATION CARDS
 ========================================= */
 
@@ -4075,6 +4299,25 @@ fieldset {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+
+}
+
+
+@media (max-width: 620px) {
+
+    .edible-image-upload-row,
+    .edible-image-adjustments {
+        grid-template-columns: 1fr;
+    }
+
+    .edible-image-shape-row {
+        grid-template-columns: 1fr;
+    }
+
+    .edible-image-control-footer {
+        align-items: stretch;
+        flex-direction: column;
     }
 
 }
