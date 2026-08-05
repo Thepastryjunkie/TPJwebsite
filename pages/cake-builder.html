@@ -1695,14 +1695,114 @@
 
                                 </label>
 
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="square"
+                                    >
+
+                                    <span class="shape-drawing shape-square"></span>
+
+                                    <strong>
+                                        Square
+                                    </strong>
+
+                                    <small>
+                                        Clean edges and generous servings
+                                    </small>
+
+                                </label>
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="sheet"
+                                    >
+
+                                    <span class="shape-drawing shape-sheet"></span>
+
+                                    <strong>
+                                        Sheet
+                                    </strong>
+
+                                    <small>
+                                        Half and full sheet cakes
+                                    </small>
+
+                                </label>
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="numberLetter"
+                                    >
+
+                                    <span class="shape-drawing shape-number-letter"></span>
+
+                                    <strong>
+                                        Number / Letter
+                                    </strong>
+
+                                    <small>
+                                        Single or double character cakes
+                                    </small>
+
+                                </label>
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="tier"
+                                    >
+
+                                    <span class="shape-drawing shape-tier"></span>
+
+                                    <strong>
+                                        2-Tier
+                                    </strong>
+
+                                    <small>
+                                        4-inch and 6-inch stacked cakes
+                                    </small>
+
+                                </label>
+
+                                <label class="shape-choice-card">
+
+                                    <input
+                                        type="radio"
+                                        name="cakeShape"
+                                        value="cupcakes"
+                                    >
+
+                                    <span class="shape-drawing shape-cupcakes"></span>
+
+                                    <strong>
+                                        Cupcakes Only
+                                    </strong>
+
+                                    <small>
+                                        Custom 4-, 8-, or 12-count sets
+                                    </small>
+
+                                </label>
+
                             </div>
 
                         </fieldset>
 
-                        <fieldset class="builder-fieldset board-customizer">
+                        <fieldset id="cakeBoardCustomizer" class="builder-fieldset board-customizer">
                             <legend>Cake Board</legend>
                             <div class="compact-choice-row">
-                                <label><span>Board shape</span><select id="cakeBoardStyle"><option value="round">Round</option><option value="square">Square</option><option value="rectangleHorizontal">Rectangle</option></select></label>
+                                <label><span>Board shape</span><select id="cakeBoardStyle"><option value="round">Round</option><option value="square">Square</option><option value="rectangleHorizontal">Rectangle</option><option value="letterNumber" hidden>Letter / Number Board</option></select></label>
                                 <label><span>Board color</span><input id="cakeBoardColor" type="color" value="#F4C3D7"></label>
                             </div>
                             <p id="cakeBoardNotice" class="field-note">Board choices update the realistic preview only and do not change pricing.</p>
@@ -1855,6 +1955,33 @@
 
                             </div>
 
+                        </fieldset>
+
+                        <fieldset
+                            id="roundCoverageOptions"
+                            class="builder-fieldset"
+                        >
+                            <legend>Round Cake Coverage</legend>
+                            <p class="fieldset-description">
+                                Choose how much buttercream covers the outside of your round cake.
+                            </p>
+                            <div class="description-choice-grid">
+                                <label class="description-choice-card">
+                                    <input type="radio" name="cakeCoverage" value="full" checked>
+                                    <strong>Full Buttercream</strong>
+                                    <span>Fully iced on the top and sides.</span>
+                                </label>
+                                <label class="description-choice-card">
+                                    <input type="radio" name="cakeCoverage" value="semi-naked">
+                                    <strong>Semi-Naked</strong>
+                                    <span>Light buttercream coat · Subtracts $10.</span>
+                                </label>
+                                <label class="description-choice-card">
+                                    <input type="radio" name="cakeCoverage" value="naked">
+                                    <strong>Naked</strong>
+                                    <span>Barely iced sides · Subtracts $15.</span>
+                                </label>
+                            </div>
                         </fieldset>
 
 
@@ -2024,6 +2151,243 @@
                         </fieldset>
 
 
+                        <!-- SQUARE SIZES -->
+
+                        <fieldset
+                            id="squareSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Square Cake Size
+                            </legend>
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="square-6">
+                                    <span class="size-label">6"</span>
+                                    <strong>Square Cake</strong>
+                                    <small>2 layers · Serves 10–14</small>
+                                    <b>$195</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="square-8">
+                                    <span class="size-label">8"</span>
+                                    <strong>Square Cake</strong>
+                                    <small>2 layers · Serves 20–26</small>
+                                    <b>$265</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="square-10">
+                                    <span class="size-label">10"</span>
+                                    <strong>Square Cake</strong>
+                                    <small>2 layers · Serves 38–50</small>
+                                    <b>$365</b>
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <!-- SHEET SIZES -->
+
+                        <fieldset
+                            id="sheetSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Sheet Cake Size
+                            </legend>
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="sheet-half">
+                                    <span class="size-label">1/2</span>
+                                    <strong>Half Sheet Cake</strong>
+                                    <small>Serves 40–50</small>
+                                    <b>$245</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="sheet-full">
+                                    <span class="size-label">Full</span>
+                                    <strong>Full Sheet Cake</strong>
+                                    <small>Serves 70–90</small>
+                                    <b>$385</b>
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <!-- NUMBER / LETTER SIZES -->
+
+                        <fieldset
+                            id="numberLetterSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Number / Letter Cake Size
+                            </legend>
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="number-letter-single">
+                                    <span class="size-label">1</span>
+                                    <strong>Single Number / Letter</strong>
+                                    <small>Serves 15–20</small>
+                                    <b>$185</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="number-letter-double">
+                                    <span class="size-label">2</span>
+                                    <strong>Double Number / Letter</strong>
+                                    <small>Serves 30–40</small>
+                                    <b>$335</b>
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+                        <!-- TWO-TIER OPTIONS -->
+
+                        <fieldset
+                            id="tierSizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Two-Tier Cake
+                            </legend>
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="tier-4-6-standard">
+                                    <span class="size-label">4" + 6"</span>
+                                    <strong>Standard Two-Tier</strong>
+                                    <small>2 layers per tier · Serves 12–18</small>
+                                    <b>$300</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="tier-4-6-tall">
+                                    <span class="size-label">4" + 6" Tall</span>
+                                    <strong>Tall Two-Tier</strong>
+                                    <small>3 layers per tier · Serves 18–26</small>
+                                    <b>$360</b>
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <!-- CUPCAKES-ONLY OPTIONS -->
+
+                        <fieldset
+                            id="cupcakeOnlySizeOptions"
+                            class="builder-fieldset cake-size-group is-hidden"
+                        >
+
+                            <legend>
+                                Cupcake Count
+                            </legend>
+
+                            <div class="cake-size-grid">
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="cupcakes-4">
+                                    <span class="size-label">4</span>
+                                    <strong>Gourmet Cupcakes</strong>
+                                    <small>4 individually decorated cupcakes</small>
+                                    <b>$20</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="cupcakes-8">
+                                    <span class="size-label">8</span>
+                                    <strong>Gourmet Cupcakes</strong>
+                                    <small>8 individually decorated cupcakes</small>
+                                    <b>$40</b>
+                                </label>
+
+                                <label class="cake-size-card">
+                                    <input type="radio" name="cakeSize" value="cupcakes-12">
+                                    <span class="size-label">12</span>
+                                    <strong>Gourmet Cupcakes</strong>
+                                    <small>12 individually decorated cupcakes</small>
+                                    <b>$60</b>
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <fieldset
+                            id="numberLetterDetails"
+                            class="builder-fieldset is-hidden"
+                        >
+
+                            <legend>
+                                Your Number or Letter
+                            </legend>
+
+                            <div class="number-letter-config">
+
+                                <label>
+                                    <span>Cake type</span>
+                                    <select id="numberLetterKind">
+                                        <option value="number">Number</option>
+                                        <option value="letter">Letter</option>
+                                    </select>
+                                </label>
+
+                                <div id="numberCakeControls" class="number-character-fields">
+
+                                    <label>
+                                        <span>First number</span>
+                                        <select id="numberCakeFirst">
+                                            <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                                        </select>
+                                    </label>
+
+                                    <label id="secondNumberField" class="is-hidden">
+                                        <span>Second number</span>
+                                        <select id="numberCakeSecond">
+                                            <option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                                        </select>
+                                    </label>
+
+                                </div>
+
+                                <div id="letterCakeControls" class="is-hidden">
+                                    <label>
+                                        <span>Letter or letters</span>
+                                        <input id="letterCakeText" type="text" value="A" maxlength="1" autocomplete="off" inputmode="text">
+                                    </label>
+                                    <p class="field-note">
+                                        Enter the actual letter(s) for your order. The preview uses A as the representative letter-cake shape.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </fieldset>
+
+
                         <fieldset class="builder-fieldset">
 
                             <legend>
@@ -2076,15 +2440,15 @@
 
                         <div class="step-heading">
 
-                            <p class="step-number">
+                            <p id="step3Eyebrow" class="step-number">
                                 Inside The Cake
                             </p>
 
-                            <h2>
+                            <h2 id="step3Title">
                                 What Are You Craving?
                             </h2>
 
-                            <p>
+                            <p id="step3Description">
                                 Choose a favorite or describe the flavor
                                 combination you already have in mind.
                             </p>
@@ -2093,7 +2457,7 @@
 
                         <fieldset class="builder-fieldset">
 
-                            <legend>
+                            <legend id="flavorLegend">
                                 Cake Flavor
                             </legend>
 
@@ -2171,7 +2535,7 @@
 
                         </div>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset class="builder-fieldset cake-only-inside">
 
                             <legend>
                                 Buttercream
@@ -2238,7 +2602,7 @@
 
                         </fieldset>
 
-                        <label class="form-field">
+                        <label class="form-field cake-only-inside">
 
                             <span>
                                 Buttercream flavor
@@ -2253,7 +2617,7 @@
 
                         </label>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset class="builder-fieldset cake-only-inside">
 
                             <legend>
                                 Filling
@@ -2316,7 +2680,7 @@
 
                         <div
                             id="customFillingField"
-                            class="conditional-field is-hidden"
+                            class="conditional-field cake-only-inside is-hidden"
                         >
 
                             <label for="customFilling">
@@ -2332,7 +2696,7 @@
 
                         </div>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset class="builder-fieldset cake-only-inside">
 
                             <legend>
                                 Premium Layers
@@ -2414,7 +2778,7 @@
 
                         <div class="step-heading">
 
-                            <p class="step-number">
+                            <p id="step4Eyebrow" class="step-number">
                                 Outside The Cake
                             </p>
 
@@ -2422,14 +2786,14 @@
                                 Build The Look.
                             </h2>
 
-                            <p>
+                            <p id="step4Description">
                                 Choose the color, buttercream finish, and
                                 details that fit the celebration.
                             </p>
 
                         </div>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset id="singleCakeColorCustomizer" class="builder-fieldset cake-only-look">
 
                             <legend>
                                 Main Buttercream Color
@@ -2515,7 +2879,24 @@
 
                         </fieldset>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset id="tierColorCustomizer" class="builder-fieldset cake-only-look is-hidden">
+                            <legend>Two-Tier Buttercream Colors</legend>
+                            <p class="fieldset-description">
+                                Color each tier separately. These colors update the top and bottom tiers independently.
+                            </p>
+                            <div class="compact-choice-row">
+                                <label>
+                                    <span>Top 4-inch tier</span>
+                                    <input id="tierTopColor" type="color" value="#FFF1DC">
+                                </label>
+                                <label>
+                                    <span>Bottom 6-inch tier</span>
+                                    <input id="tierBottomColor" type="color" value="#FFF1DC">
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="builder-fieldset cake-only-look">
 
                             <legend>
                                 Accent Color
@@ -2537,7 +2918,7 @@
 
                         </fieldset>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset class="builder-fieldset cake-only-look">
 
                             <legend>
                                 Buttercream Finish
@@ -2691,6 +3072,8 @@
                             </div>
 
                         </fieldset>
+
+                        <div id="cupcakeOnlyStudioSlot"></div>
 
                         <fieldset class="builder-fieldset">
 
@@ -3053,7 +3436,7 @@
 
                         </div>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset id="gourmetCupcakeExtras" class="builder-fieldset">
 
                             <legend>
                                 Gourmet Cupcakes
@@ -3131,9 +3514,10 @@
 
                         </fieldset>
 
+                        <div id="cupcakeAddOnStudioSlot">
                         <fieldset id="cupcakeStudio" class="builder-fieldset cupcake-studio">
                             <legend>Cupcake Look</legend>
-                            <p class="field-note">These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above.</p>
+                            <p id="cupcakeStudioCaption" class="field-note">These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above.</p>
                             <div class="cupcake-studio-layout">
                                 <div class="cupcake-control-grid">
                                     <label><span>Liner style</span><select id="cupcakeLinerStyle"><option value="paper">Standard pleated paper</option><option value="metallic-pleated">Metallic foil pleated</option><option value="rigid-cup">Rigid metallic foil cup</option></select></label>
@@ -3154,11 +3538,23 @@
                                     <div id="cupcakeComposite" class="cupcake-composite" aria-label="Cupcake preview">
                                         <img id="cupcakeFoundation" alt=""><span id="cupcakeLinerTint" class="cupcake-tint" aria-hidden="true"></span>
                                         <img id="cupcakeFrosting" alt=""><span id="cupcakeFrostingTint" class="cupcake-tint" aria-hidden="true"></span>
+                                        <div id="cupcakeDecorationPreview" class="cupcake-decoration-preview" aria-hidden="true">
+                                            <span data-cupcake-decoration="chocolateDripDecoration" class="cupcake-decoration cupcake-decoration-drip"></span>
+                                            <span data-cupcake-decoration="pearlsDecoration" class="cupcake-decoration cupcake-decoration-pearls"></span>
+                                            <span data-cupcake-decoration="sprinklesDecoration" class="cupcake-decoration cupcake-decoration-sprinkles"></span>
+                                            <span data-cupcake-decoration="ribbonDecoration" class="cupcake-decoration cupcake-decoration-ribbon"></span>
+                                            <span data-cupcake-decoration="butterfliesDecoration" class="cupcake-decoration cupcake-decoration-butterflies"></span>
+                                            <span data-cupcake-decoration="goldAccentDecoration" class="cupcake-decoration cupcake-decoration-gold"></span>
+                                            <span data-cupcake-decoration="flowersDecoration" class="cupcake-decoration cupcake-decoration-flowers"></span>
+                                            <span data-cupcake-decoration="cherriesDecoration" class="cupcake-decoration cupcake-decoration-cherries"></span>
+                                            <span data-cupcake-decoration="topperDecoration" class="cupcake-decoration cupcake-decoration-topper">TOP</span>
+                                        </div>
                                     </div>
                                     <p id="cupcakeSetCaption">Select a 4-, 8-, or 12-count set above.</p>
                                 </div>
                             </div>
                         </fieldset>
+                        </div>
 
                         <fieldset class="builder-fieldset">
 

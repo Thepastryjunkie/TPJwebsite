@@ -134,6 +134,187 @@ const cakeProducts = {
         standardServings: "16–20",
         tallServings: "20–28",
         allowsExtraLayer: true
+    },
+
+    "tier-4-6-standard": {
+        name: '4" + 6" Two-Tier Cake',
+        shape: "tier",
+        size: '4" + 6"',
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 300,
+        tallPrice: 300,
+        standardServings: "12–18",
+        tallServings: "12–18",
+        heightLabel: "Standard Tiers",
+        structureLabel: "2 layers per tier",
+        previewFile: "TPJ-Asset-007-Blank-Two-Tier-4in-6in-Cake.png",
+        previewKey: "tier",
+        allowsExtraLayer: false
+    },
+
+    "tier-4-6-tall": {
+        name: '4" Tall + 6" Tall Two-Tier Cake',
+        shape: "tier",
+        size: '4" + 6" Tall',
+        standardLayers: 3,
+        tallLayers: 3,
+        standardPrice: 360,
+        tallPrice: 360,
+        standardServings: "18–26",
+        tallServings: "18–26",
+        heightLabel: "Tall Tiers",
+        structureLabel: "3 layers per tier",
+        previewFile: "TPJ-Asset-013-Blank-Tall-Two-Tier-4in-6in-Cake.png",
+        previewKey: "tallTier",
+        allowsExtraLayer: false
+    },
+
+    "cupcakes-4": {
+        name: "4 Gourmet Cupcakes",
+        shape: "cupcakes",
+        size: "4 Count",
+        standardLayers: 0,
+        tallLayers: 0,
+        standardPrice: 20,
+        tallPrice: 20,
+        standardServings: "4 cupcakes",
+        tallServings: "4 cupcakes",
+        cupcakeCount: 4,
+        heightLabel: "4 Count",
+        structureLabel: "4 individually decorated cupcakes",
+        previewFile: "TPJ-Asset-028-Blank-4-Count-Cupcake-Box.png",
+        previewKey: "cupcakes4",
+        allowsExtraLayer: false
+    },
+
+    "cupcakes-8": {
+        name: "8 Gourmet Cupcakes",
+        shape: "cupcakes",
+        size: "8 Count",
+        standardLayers: 0,
+        tallLayers: 0,
+        standardPrice: 40,
+        tallPrice: 40,
+        standardServings: "8 cupcakes",
+        tallServings: "8 cupcakes",
+        cupcakeCount: 8,
+        heightLabel: "8 Count",
+        structureLabel: "8 individually decorated cupcakes",
+        previewFile: "TPJ-Asset-029-Blank-8-Count-Cupcake-Box.png",
+        previewKey: "cupcakes8",
+        allowsExtraLayer: false
+    },
+
+    "cupcakes-12": {
+        name: "12 Gourmet Cupcakes",
+        shape: "cupcakes",
+        size: "12 Count",
+        standardLayers: 0,
+        tallLayers: 0,
+        standardPrice: 60,
+        tallPrice: 60,
+        standardServings: "12 cupcakes",
+        tallServings: "12 cupcakes",
+        cupcakeCount: 12,
+        heightLabel: "12 Count",
+        structureLabel: "12 individually decorated cupcakes",
+        previewFile: "TPJ-Asset-030-Blank-12-Count-Cupcake-Box.png",
+        previewKey: "cupcakes12",
+        allowsExtraLayer: false
+    },
+
+    "square-6": {
+        name: '6" Square Cake',
+        shape: "square",
+        size: '6"',
+        standardLayers: 2,
+        tallLayers: 3,
+        standardPrice: 195,
+        tallPrice: 225,
+        standardServings: "10–14",
+        tallServings: "14–18",
+        allowsExtraLayer: true
+    },
+
+    "square-8": {
+        name: '8" Square Cake',
+        shape: "square",
+        size: '8"',
+        standardLayers: 2,
+        tallLayers: 3,
+        standardPrice: 265,
+        tallPrice: 305,
+        standardServings: "20–26",
+        tallServings: "28–36",
+        allowsExtraLayer: true
+    },
+
+    "square-10": {
+        name: '10" Square Cake',
+        shape: "square",
+        size: '10"',
+        standardLayers: 2,
+        tallLayers: 3,
+        standardPrice: 365,
+        tallPrice: 425,
+        standardServings: "38–50",
+        tallServings: "50–65",
+        allowsExtraLayer: true
+    },
+
+    "sheet-half": {
+        name: "1/2 Sheet Cake",
+        shape: "sheet",
+        size: "1/2 Sheet",
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 245,
+        tallPrice: 245,
+        standardServings: "40–50",
+        tallServings: "40–50",
+        allowsExtraLayer: false
+    },
+
+    "sheet-full": {
+        name: "Full Sheet Cake",
+        shape: "sheet",
+        size: "Full Sheet",
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 385,
+        tallPrice: 385,
+        standardServings: "70–90",
+        tallServings: "70–90",
+        allowsExtraLayer: false
+    },
+
+    "number-letter-single": {
+        name: "Single Number / Letter Cake",
+        shape: "numberLetter",
+        size: "Single",
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 185,
+        tallPrice: 185,
+        standardServings: "15–20",
+        tallServings: "15–20",
+        characterCount: 1,
+        allowsExtraLayer: false
+    },
+
+    "number-letter-double": {
+        name: "Double Number / Letter Cake",
+        shape: "numberLetter",
+        size: "Double",
+        standardLayers: 2,
+        tallLayers: 2,
+        standardPrice: 335,
+        tallPrice: 335,
+        standardServings: "30–40",
+        tallServings: "30–40",
+        characterCount: 2,
+        allowsExtraLayer: false
     }
 };
 
@@ -155,6 +336,10 @@ const builderState = {
     cakeShape: "round",
     cakeProductId: "round-6",
     isTall: false,
+    numberLetterKind: "number",
+    numberCakeFirst: "0",
+    numberCakeSecond: "1",
+    letterCakeText: "A",
 
     cakeFlavor: "",
     customCakeFlavor: "",
@@ -169,6 +354,9 @@ const builderState = {
     mainCakeColor: "original",
     accentColor: "original",
     cakeFinish: "",
+    cakeCoverage: "full",
+    tierTopColor: "original",
+    tierBottomColor: "original",
 
     cakeBoardStyle: "round",
     cakeBoardColor: "original",
@@ -336,13 +524,39 @@ const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
-    star: { standard: "TPJ-Asset-003-Blank-Star-Cake.png", tall: "TPJ-Asset-012-Blank-Tall-Star-3-Layer-Cake.png", key: "star", tallKey: "tallStar" }
+    star: { standard: "TPJ-Asset-003-Blank-Star-Cake.png", tall: "TPJ-Asset-012-Blank-Tall-Star-3-Layer-Cake.png", key: "star", tallKey: "tallStar" },
+    square: { standard: "TPJ-Asset-004-Blank-Square-Cake.png", tall: "TPJ-Asset-011-Blank-Tall-Square-3-Layer-Cake.png", key: "square", tallKey: "tallSquare" }
+};
+
+const sheetAssetMap = {
+    "sheet-half": {
+        file: "TPJ-Asset-005-Blank-Half-Sheet-Cake.png",
+        key: "halfSheet"
+    },
+    "sheet-full": {
+        file: "TPJ-Asset-006-Blank-Full-Sheet-Cake.png",
+        key: "fullSheet"
+    }
+};
+
+const numberCakeAssetMap = {
+    "0": ["TPJ-Asset-014-Blank-Number-0-Cake.png", "number0"],
+    "1": ["TPJ-Asset-015-Blank-Number-1-Cake.png", "number1"],
+    "2": ["TPJ-Asset-016-Blank-Number-2-Cake.png", "number2"],
+    "3": ["TPJ-Asset-017-Blank-Number-3-Cake.png", "number3"],
+    "4": ["TPJ-Asset-018-Blank-Number-4-Cake.png", "number4"],
+    "5": ["TPJ-Asset-019-Blank-Number-5-Cake.png", "number5"],
+    "6": ["TPJ-Asset-020-Blank-Number-6-Cake.png", "number6"],
+    "7": ["TPJ-Asset-021-Blank-Number-7-Cake.png", "number7"],
+    "8": ["TPJ-Asset-022-Blank-Number-8-Cake.png", "number8"],
+    "9": ["TPJ-Asset-023-Blank-Number-9-Cake.png", "number9"]
 };
 
 const boardAssetMap = {
     round: ["TPJ-Asset-033-Round-Cake-Board.png", "TPJ-Asset-033-Round-Cake-Board-Recolor-Mask.png"],
     square: ["TPJ-Asset-034-Square-Cake-Board.png", "TPJ-Asset-034-Square-Cake-Board-Recolor-Mask.png"],
-    rectangleHorizontal: ["TPJ-Asset-037-Rectangle-Horizontal-Cake-Board.png", "TPJ-Asset-037-Rectangle-Horizontal-Cake-Board-Recolor-Mask.png"]
+    rectangleHorizontal: ["TPJ-Asset-037-Rectangle-Horizontal-Cake-Board.png", "TPJ-Asset-037-Rectangle-Horizontal-Cake-Board-Recolor-Mask.png"],
+    letterNumber: ["TPJ-Asset-044-Letter-Number-Cake-Board.png", "TPJ-Asset-044-Letter-Number-Cake-Board-Recolor-Mask.png"]
 };
 
 const cakePlacements = {
@@ -352,6 +566,23 @@ const cakePlacements = {
     tallRound: { round:[55.9934,-65.7743,.90708], square:[55.9934,-70.7743,.90708], rectangleHorizontal:[55.9934,-325.7743,.90708] },
     tallHeart: { round:[130.8091,93.2498,.790743], square:[142.9113,110.8534,.771456], rectangleHorizontal:[130.8091,-166.7502,.790743] },
     tallStar: { round:[126.8638,96.3035,.797665], square:[139.0623,113.8327,.77821], rectangleHorizontal:[126.8638,-163.6965,.797665] },
+    square: { square:[157.597,200.0746,.746269], rectangleHorizontal:[145.8619,-75.2985,.764925] },
+    tallSquare: { square:[-25.2259,-155.3974,1.031187], rectangleHorizontal:[-25.2259,-410.3974,1.031187] },
+    tier: { round:[88,40,.87], square:[100,55,.84], rectangleHorizontal:[88,-220,.87] },
+    tallTier: { round:[75,0,.88], square:[78,4,.87], rectangleHorizontal:[75,-260,.88] },
+    halfSheet: { rectangleHorizontal:[159.0955,248.2004,.762644] },
+    fullSheet: { rectangleHorizontal:[179.5674,316.6618,.712675] },
+    number0: { letterNumber:[163.2443,21.1758,.742009] },
+    number1: { letterNumber:[155.4427,9.6082,.744368] },
+    number2: { letterNumber:[160.6533,9.6082,.744368] },
+    number3: { letterNumber:[164.3592,14,.737864] },
+    number4: { letterNumber:[186.8887,47.667,.68929] },
+    number5: { letterNumber:[164.808,13.3366,.737148] },
+    number6: { letterNumber:[165.5975,13.3429,.730067] },
+    number7: { letterNumber:[162.8835,15.4757,.737864] },
+    number8: { letterNumber:[163.1278,15.6922,.735721] },
+    number9: { letterNumber:[168.8929,20.9751,.726577] },
+    letter: { letterNumber:[206.6667,133.3333,.666667] },
     heart5in: { round:[80.6229,131.3771,.868644], square:[93.9492,148.0508,.847458], rectangleHorizontal:[80.6229,-128.6229,.868644] },
     tallHeart5in: { round:[92.6802,113.9979,.851506], square:[105.7124,131.0955,.830737], rectangleHorizontal:[92.6802,-146.0021,.851506] }
 };
@@ -469,6 +700,85 @@ function getSelectedCakeProduct() {
 }
 
 
+function getCakeShapeName(product = getSelectedCakeProduct()) {
+    const shapeNames = {
+        round: "Round",
+        heart: "Heart",
+        star: "Star",
+        square: "Square",
+        sheet: "Sheet",
+        numberLetter: "Number / Letter",
+        tier: "Two-Tier Round",
+        cupcakes: "Cupcakes Only"
+    };
+
+    return shapeNames[product.shape] || product.shape;
+}
+
+
+function getCakeHeightLabel() {
+    const product = getSelectedCakeProduct();
+
+    if (product.heightLabel) {
+        return product.heightLabel;
+    }
+
+    if (product.shape === "numberLetter") {
+        return product.characterCount === 2
+            ? "Double"
+            : "Single";
+    }
+
+    if (product.shape === "sheet") {
+        return "Standard";
+    }
+
+    return builderState.isTall
+        ? "Tall"
+        : "Standard";
+}
+
+
+function getNumberLetterCharacters() {
+    const product = getSelectedCakeProduct();
+    const count = product.characterCount || 1;
+
+    if (builderState.numberLetterKind === "letter") {
+        const cleaned = builderState.letterCakeText
+            .toUpperCase()
+            .replace(/[^A-Z]/g, "")
+            .slice(0, count);
+
+        return cleaned || (count === 2 ? "AA" : "A");
+    }
+
+    return count === 2
+        ? `${builderState.numberCakeFirst}${builderState.numberCakeSecond}`
+        : builderState.numberCakeFirst;
+}
+
+
+function getDisplayCakeName() {
+    const product = getSelectedCakeProduct();
+
+    if (product.shape !== "numberLetter") {
+        return product.name;
+    }
+
+    const kindLabel =
+        builderState.numberLetterKind === "letter"
+            ? "Letter"
+            : "Number";
+
+    const countLabel =
+        product.characterCount === 2
+            ? "Double"
+            : "Single";
+
+    return `${countLabel} ${kindLabel} Cake · ${getNumberLetterCharacters()}`;
+}
+
+
 function cakeAllowsExtraLayer() {
     return (
         getSelectedCakeProduct()
@@ -480,9 +790,33 @@ function cakeAllowsExtraLayer() {
 function getCakeBasePrice() {
     const product = getSelectedCakeProduct();
 
-    return builderState.isTall
+    const regularPrice = builderState.isTall
         ? product.tallPrice
         : product.standardPrice;
+
+    return Math.max(
+        0,
+        regularPrice - getCakeFinishDiscount()
+    );
+}
+
+
+function getCakeFinishDiscount() {
+    const product = getSelectedCakeProduct();
+
+    if (product.shape !== "round") {
+        return 0;
+    }
+
+    if (builderState.cakeCoverage === "naked") {
+        return 15;
+    }
+
+    if (builderState.cakeCoverage === "semi-naked") {
+        return 10;
+    }
+
+    return 0;
 }
 
 
@@ -501,6 +835,19 @@ function getCakeLayerCount() {
     return builderState.isTall
         ? product.tallLayers
         : product.standardLayers;
+}
+
+
+function getCakeStructureLabel() {
+    const product = getSelectedCakeProduct();
+
+    if (product.structureLabel) {
+        return product.structureLabel;
+    }
+
+    const layerCount = getCakeLayerCount();
+
+    return `${layerCount} ${layerCount === 1 ? "layer" : "layers"}`;
 }
 
 
@@ -543,8 +890,16 @@ function calculateTopperTotal() {
 
 function calculateCheckboxExtraTotal() {
     return builderState.extras.reduce(
-        (total, extra) =>
-            total + extra.price,
+        (total, extra) => {
+            const isCupcakeBundle =
+                /^\d+ Gourmet Cupcakes$/.test(extra.name);
+
+            if (isCupcakesOnlyProduct() && isCupcakeBundle) {
+                return total;
+            }
+
+            return total + extra.price;
+        },
         0
     );
 }
@@ -568,9 +923,12 @@ function calculateExtrasTotal() {
 
 
 function calculateCakeSubtotal() {
+    const isCupcakesOnly =
+        getSelectedCakeProduct().shape === "cupcakes";
+
     return (
         getCakeBasePrice() +
-        calculatePremiumFillingTotal() +
+        (isCupcakesOnly ? 0 : calculatePremiumFillingTotal()) +
         calculateDecorationTotal() +
         calculateTopperTotal()
     );
@@ -612,8 +970,8 @@ function loadRealisticImage(url) {
 function makeTintedLayer(image, mask, color) {
     const layer = document.createElement("canvas");
 
-    layer.width = realisticCakeCanvas.width;
-    layer.height = realisticCakeCanvas.height;
+    layer.width = image.naturalWidth || image.width;
+    layer.height = image.naturalHeight || image.height;
 
     const layerContext = layer.getContext("2d");
 
@@ -686,6 +1044,20 @@ layerContext.globalAlpha =
 
     return layer;
 }
+
+function getContainedAssetSize(image, scale) {
+    const sourceWidth = image.naturalWidth || image.width;
+    const sourceHeight = image.naturalHeight || image.height;
+    const containScale = Math.min(
+        realisticCakeCanvas.width / sourceWidth,
+        realisticCakeCanvas.height / sourceHeight
+    );
+
+    return {
+        width: sourceWidth * containScale * scale,
+        height: sourceHeight * containScale * scale
+    };
+}
 function drawRecoloredAsset(
     context,
     image,
@@ -728,40 +1100,295 @@ function drawRecoloredAsset(
     context.restore();
 }
 
+function getNumberLetterPreviewEntries(product) {
+    const isDouble = product.characterCount === 2;
+    const doublePlacements = [
+        [40, 330, 0.46],
+        [610, 330, 0.46]
+    ];
+
+    if (builderState.numberLetterKind === "letter") {
+        const entry = {
+            file: "TPJ-Asset-024-Blank-Letter-A-Cake.png",
+            key: "letter"
+        };
+
+        return isDouble
+            ? doublePlacements.map((placement) => ({
+                ...entry,
+                placement
+            }))
+            : [entry];
+    }
+
+    const digits = isDouble
+        ? [
+            builderState.numberCakeFirst,
+            builderState.numberCakeSecond
+        ]
+        : [builderState.numberCakeFirst];
+
+    return digits.map((digit, index) => {
+        const [file, key] =
+            numberCakeAssetMap[digit] ||
+            numberCakeAssetMap["0"];
+
+        return {
+            file,
+            key,
+            placement: isDouble
+                ? doublePlacements[index]
+                : null
+        };
+    });
+}
+
+function getCakePreviewEntries(product) {
+    if (product.previewFile) {
+        return [{
+            file: product.previewFile,
+            key: product.previewKey
+        }];
+    }
+
+    if (product.shape === "sheet") {
+        const sheetAsset =
+            sheetAssetMap[builderState.cakeProductId] ||
+            sheetAssetMap["sheet-half"];
+
+        return [sheetAsset];
+    }
+
+    if (product.shape === "numberLetter") {
+        return getNumberLetterPreviewEntries(product);
+    }
+
+    const shapeAssets =
+        cakeAssetMap[product.shape] ||
+        cakeAssetMap.round;
+
+    let file = builderState.isTall
+        ? shapeAssets.tall
+        : shapeAssets.standard;
+
+    let key = builderState.isTall
+        ? shapeAssets.tallKey
+        : shapeAssets.key;
+
+    if (builderState.cakeProductId === "heart-5-tall") {
+        file = "TPJ-Asset-026-Blank-Tall-5in-Heart-Standalone-Cake.png";
+        key = "tallHeart5in";
+    }
+
+    if (
+        product.shape === "round" &&
+        builderState.cakeCoverage === "naked"
+    ) {
+        file = "TPJ-Asset-031-Naked-Round-Cake.png";
+        key = builderState.isTall ? "tallRound" : "round";
+    }
+
+    if (
+        product.shape === "round" &&
+        builderState.cakeCoverage === "semi-naked"
+    ) {
+        file = "TPJ-Asset-032-Semi-Naked-Round-Cake.png";
+        key = builderState.isTall ? "tallRound" : "round";
+    }
+
+    return [{ file, key }];
+}
+
+function drawContainedCanvasImage(context, image, canvas) {
+    const scale = Math.min(
+        canvas.width / image.naturalWidth,
+        canvas.height / image.naturalHeight
+    );
+    const width = image.naturalWidth * scale;
+    const height = image.naturalHeight * scale;
+    const x = (canvas.width - width) / 2;
+    const y = (canvas.height - height) / 2;
+
+    context.drawImage(image, x, y, width, height);
+}
+
+function drawBentoColorPreview(context, image, canvas) {
+    if (builderState.mainCakeColor !== "original") {
+        context.save();
+        context.beginPath();
+        context.moveTo(180, 585);
+        context.bezierCurveTo(195, 490, 335, 465, 430, 535);
+        context.bezierCurveTo(520, 470, 650, 505, 665, 600);
+        context.lineTo(650, 805);
+        context.bezierCurveTo(615, 895, 475, 925, 405, 925);
+        context.bezierCurveTo(300, 900, 185, 845, 175, 755);
+        context.closePath();
+        context.clip();
+        drawRecoloredAsset(
+            context,
+            image,
+            image,
+            builderState.mainCakeColor,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+        context.restore();
+    }
+
+    if (builderState.cupcakeFrostingColor !== "original") {
+        context.save();
+        context.beginPath();
+        [
+            [792, 650],
+            [1038, 674],
+            [786, 850],
+            [1033, 875]
+        ].forEach(([x, y]) => {
+            context.moveTo(x + 115, y);
+            context.arc(x, y, 115, 0, Math.PI * 2);
+        });
+        context.clip();
+        drawRecoloredAsset(
+            context,
+            image,
+            image,
+            builderState.cupcakeFrostingColor,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+        context.restore();
+    }
+}
+
+function drawTwoTierColors(
+    context,
+    image,
+    x,
+    y,
+    width,
+    height
+) {
+    const topTierBottom = y + height * 0.49;
+
+    context.save();
+    context.beginPath();
+    context.rect(x, y, width, topTierBottom - y);
+    context.clip();
+    drawRecoloredAsset(
+        context,
+        image,
+        image,
+        builderState.tierTopColor,
+        x,
+        y,
+        width,
+        height
+    );
+    context.restore();
+
+    context.save();
+    context.beginPath();
+    context.rect(x, topTierBottom, width, y + height - topTierBottom);
+    context.clip();
+    drawRecoloredAsset(
+        context,
+        image,
+        image,
+        builderState.tierBottomColor,
+        x,
+        y,
+        width,
+        height
+    );
+    context.restore();
+}
+
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
 
     const renderVersion = ++realisticRenderVersion;
+    const product = getSelectedCakeProduct();
+    const isBento =
+        builderState.cakeProductId === "heart-5-bento";
+    const isCupcakesOnly = product.shape === "cupcakes";
+    const isStandalonePreview = isBento || isCupcakesOnly;
 
-    const boardKey = builderState.cakeBoardStyle;
-    const boardAssets = boardAssetMap[boardKey] || boardAssetMap.round;
-    const isBento = builderState.cakeProductId === "heart-5-bento";
-    const isFiveInchHeart = builderState.cakeProductId === "heart-5-tall";
-    const shapeAssets = cakeAssetMap[builderState.cakeShape] || cakeAssetMap.round;
+    let boardKey = builderState.cakeBoardStyle;
 
-    let cakeFile = builderState.isTall ? shapeAssets.tall : shapeAssets.standard;
-    let placementKey = builderState.isTall ? shapeAssets.tallKey : shapeAssets.key;
-
-    if (isFiveInchHeart) {
-        cakeFile = "TPJ-Asset-026-Blank-Tall-5in-Heart-Standalone-Cake.png";
-        placementKey = "tallHeart5in";
+    if (product.shape === "sheet") {
+        boardKey = "rectangleHorizontal";
     }
 
-    if (isBento) {
-        cakeFile = "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png";
+    if (product.shape === "numberLetter") {
+        boardKey = "letterNumber";
     }
 
-    const cakeUrl = `${finalAssetRoot}/cakes/${cakeFile}`;
-    const boardUrl = `${finalAssetRoot}/boards/${boardAssets[0]}`;
-    const boardMaskUrl = `${finalAssetRoot}/boards/${boardAssets[1]}`;
+    if (product.shape === "square" && boardKey === "round") {
+        boardKey = "square";
+    }
+
+    const boardAssets =
+        boardAssetMap[boardKey] ||
+        boardAssetMap.round;
+
+    const previewEntries = isBento
+        ? [{
+            file: "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png",
+            key: "heart5in"
+        }]
+        : getCakePreviewEntries(product);
+
+    const cakeUrls = previewEntries.map(
+        (entry) =>
+            `${finalAssetRoot}/cakes/${entry.file}`
+    );
 
     try {
-        const requestedImages = isBento
-            ? await Promise.all([loadRealisticImage(cakeUrl)])
-            : await Promise.all([
+        if (isStandalonePreview) {
+            const standaloneImage = await loadRealisticImage(
+                cakeUrls[0]
+            );
+
+            if (renderVersion !== realisticRenderVersion) return;
+
+            const context = realisticCakeCanvas.getContext("2d");
+            context.clearRect(
+                0,
+                0,
+                realisticCakeCanvas.width,
+                realisticCakeCanvas.height
+            );
+            drawContainedCanvasImage(
+                context,
+                standaloneImage,
+                realisticCakeCanvas
+            );
+
+            if (isBento) {
+                drawBentoColorPreview(
+                    context,
+                    standaloneImage,
+                    realisticCakeCanvas
+                );
+            }
+            return;
+        }
+
+        const boardUrl =
+            `${finalAssetRoot}/boards/${boardAssets[0]}`;
+
+        const boardMaskUrl =
+            `${finalAssetRoot}/boards/${boardAssets[1]}`;
+
+        const [boardImage, boardMask, ...cakeImages] =
+            await Promise.all([
                 loadRealisticImage(boardUrl),
                 loadRealisticImage(boardMaskUrl),
-                loadRealisticImage(cakeUrl)
+                ...cakeUrls.map(loadRealisticImage)
             ]);
 
         if (renderVersion !== realisticRenderVersion) return;
@@ -773,20 +1400,6 @@ async function updateRealisticCakePreview() {
             realisticCakeCanvas.width,
             realisticCakeCanvas.height
         );
-
-        if (isBento) {
-            context.drawImage(
-                requestedImages[0],
-                0,
-                0,
-                realisticCakeCanvas.width,
-                realisticCakeCanvas.height
-            );
-            return;
-        }
-
-             const [boardImage, boardMask, cakeImage] =
-            requestedImages;
 
         const boardYOffset =
             boardKey === "rectangleHorizontal"
@@ -804,34 +1417,42 @@ async function updateRealisticCakePreview() {
             realisticCakeCanvas.height
         );
 
-        const placementBoardKey =
-            boardKey === "rectangleHorizontal"
-                ? "round"
-                : boardKey;
+        previewEntries.forEach((entry, index) => {
+            const cakeImage = cakeImages[index];
+            const placement =
+                entry.placement ||
+                cakePlacements[entry.key]?.[boardKey] ||
+                cakePlacements[entry.key]?.round ||
+                [0, 0, 1];
 
-        const placement =
-            cakePlacements[placementKey]?.[
-                placementBoardKey
-            ] ||
-            cakePlacements[placementKey]?.round ||
-            [0, 0, 1];
+            const [x, y, scale] = placement;
+            const size = getContainedAssetSize(
+                cakeImage,
+                scale
+            );
 
-        const [x, y, scale] = placement;
-
-        const cakeSize =
-            realisticCakeCanvas.width * scale;
-
-        drawRecoloredAsset(
-            context,
-            cakeImage,
-            cakeImage,
-            builderState.mainCakeColor,
-            x,
-            y,
-            cakeSize,
-            cakeSize
-        );
-
+            if (product.shape === "tier") {
+                drawTwoTierColors(
+                    context,
+                    cakeImage,
+                    x,
+                    y + boardYOffset,
+                    size.width,
+                    size.height
+                );
+            } else {
+                drawRecoloredAsset(
+                    context,
+                    cakeImage,
+                    cakeImage,
+                    builderState.mainCakeColor,
+                    x,
+                    y + boardYOffset,
+                    size.width,
+                    size.height
+                );
+            }
+        });
     } catch (error) {
         console.error(
             "The realistic cake preview could not be rendered.",
@@ -976,10 +1597,47 @@ function updateCupcakePreview() {
 
     setText(
         "#cupcakeSetCaption",
-        selectedSet
+        getSelectedCakeProduct().shape === "cupcakes"
+            ? `${getDisplayCakeName()} · preview applies to every cupcake`
+            : builderState.cakeProductId === "heart-5-bento"
+            ? "Bento box · preview applies to all four included cupcakes"
+            : selectedSet
             ? `${selectedSet.name} · preview applies to every cupcake`
             : "Select a 4-, 8-, or 12-count set above."
     );
+
+    const isBento =
+        builderState.cakeProductId === "heart-5-bento";
+    const cupcakeDesignIsActive =
+        getSelectedCakeProduct().shape === "cupcakes" ||
+        isBento ||
+        Boolean(selectedSet);
+    const selectedDecorationIds = new Set(
+        builderState.decorations.map((decoration) => decoration.id)
+    );
+
+    if (getElement("#topperDecorationOption")?.checked) {
+        selectedDecorationIds.add("topperDecoration");
+    }
+
+    getElements("[data-cupcake-decoration]").forEach((element) => {
+        element.classList.toggle(
+            "is-visible",
+            cupcakeDesignIsActive &&
+                selectedDecorationIds.has(
+                    element.dataset.cupcakeDecoration
+                )
+        );
+    });
+
+    const cupcakeTopper = getElement(
+        '[data-cupcake-decoration="topperDecoration"]'
+    );
+
+    if (cupcakeTopper) {
+        cupcakeTopper.textContent =
+            builderState.topperWording.trim().slice(0, 8) || "TOP";
+    }
 }
 
 function updateRendererColors() {
@@ -1339,33 +1997,181 @@ function updateSelectedCardStates() {
 
 
 /* =========================================
+   PRODUCT-SPECIFIC BUILDER PATHS
+========================================= */
+
+function isCupcakesOnlyProduct() {
+    return getSelectedCakeProduct().shape === "cupcakes";
+}
+
+
+function updateProductModeUI() {
+    const product = getSelectedCakeProduct();
+    const isCupcakesOnly = product.shape === "cupcakes";
+    const isBento = builderState.cakeProductId === "heart-5-bento";
+    const isRoundCake = product.shape === "round";
+    const isTwoTier = product.shape === "tier";
+    const usesCupcakeStudio = isCupcakesOnly || isBento;
+
+    cakeRenderer?.classList.toggle(
+        "is-cupcake-box-preview",
+        isCupcakesOnly
+    );
+    cakeRenderer?.classList.toggle(
+        "is-bento-preview",
+        isBento
+    );
+
+    getElement("#cakeBoardCustomizer")?.classList.toggle(
+        "is-hidden",
+        isCupcakesOnly
+    );
+
+    getElements(".cake-only-inside").forEach((element) => {
+        element.classList.toggle("is-hidden", isCupcakesOnly);
+    });
+
+    getElements(".cake-only-look").forEach((element) => {
+        element.classList.toggle("is-hidden", isCupcakesOnly);
+    });
+
+    getElement("#gourmetCupcakeExtras")?.classList.toggle(
+        "is-hidden",
+        isCupcakesOnly
+    );
+
+    getElement("#roundCoverageOptions")?.classList.toggle(
+        "is-hidden",
+        !isRoundCake
+    );
+
+    getElement("#tierColorCustomizer")?.classList.toggle(
+        "is-hidden",
+        !isTwoTier
+    );
+
+    getElement("#singleCakeColorCustomizer")?.classList.toggle(
+        "is-hidden",
+        isCupcakesOnly || isTwoTier
+    );
+
+    const cupcakeStudio = getElement("#cupcakeStudio");
+    const targetSlot = getElement(
+        usesCupcakeStudio
+            ? "#cupcakeOnlyStudioSlot"
+            : "#cupcakeAddOnStudioSlot"
+    );
+
+    if (
+        cupcakeStudio &&
+        targetSlot &&
+        cupcakeStudio.parentElement !== targetSlot
+    ) {
+        targetSlot.appendChild(cupcakeStudio);
+    }
+
+    setText(
+        "#step3Eyebrow",
+        isCupcakesOnly ? "Inside The Cupcake" : "Inside The Cake"
+    );
+    setText(
+        "#step3Title",
+        isCupcakesOnly ? "Choose Your Cupcake Flavor." : "What Are You Craving?"
+    );
+    setText(
+        "#step3Description",
+        isCupcakesOnly
+            ? "Choose one flavor for the selected cupcake set."
+            : "Choose a favorite or describe the flavor combination you already have in mind."
+    );
+    setText(
+        "#flavorLegend",
+        isCupcakesOnly ? "Cupcake Flavor" : "Cake Flavor"
+    );
+
+    setText(
+        "#step4Eyebrow",
+        isCupcakesOnly ? "Decorate The Cupcakes" : "Outside The Cake"
+    );
+    setText(
+        "#step4Description",
+        isCupcakesOnly
+            ? "Choose the liner, icing style, icing color, and finishing details."
+            : "Choose the color, buttercream finish, and details that fit the celebration."
+    );
+
+    setText(
+        "#cupcakeStudioCaption",
+        isCupcakesOnly
+            ? `These choices apply to all ${product.cupcakeCount} cupcakes in this order.`
+            : isBento
+            ? "These choices apply to all four cupcakes included in the bento box."
+            : "These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above."
+    );
+}
+
+
+function normalizeProductSpecificState(product) {
+    const isCupcakesOnly = product.shape === "cupcakes";
+    const isRoundCake = product.shape === "round";
+
+    if (!isRoundCake) {
+        builderState.cakeCoverage = "full";
+        getElements('input[name="cakeCoverage"]').forEach((input) => {
+            input.checked = input.value === "full";
+        });
+    }
+
+    if (!isCupcakesOnly) {
+        return;
+    }
+
+    builderState.buttercreamStyle = "";
+    builderState.buttercreamFlavor = "";
+    builderState.cakeFilling = "";
+    builderState.customFilling = "";
+    builderState.premiumFillings = [];
+    builderState.cakeFinish = "";
+
+    builderState.extras = builderState.extras.filter(
+        (extra) => !/^\d+ Gourmet Cupcakes$/.test(extra.name)
+    );
+
+    getElements(
+        'input[name="buttercreamStyle"], input[name="cakeFilling"], [data-premium-filling], input[name="cakeFinish"]'
+    ).forEach((input) => {
+        input.checked = false;
+    });
+
+    getElements("[data-extra-name]").forEach((input) => {
+        if (/^\d+ Gourmet Cupcakes$/.test(input.dataset.extraName || "")) {
+            input.checked = false;
+        }
+    });
+}
+
+
+/* =========================================
    PREVIEW SUMMARY
 ========================================= */
 
 function updatePreviewSummary() {
     const product = getSelectedCakeProduct();
 
-    const heightLabel =
-        builderState.isTall
-            ? "Tall"
-            : "Standard";
+    const heightLabel = getCakeHeightLabel();
 
-    const layerCount = getCakeLayerCount();
-
-    const shapeName =
-        product.shape.charAt(0).toUpperCase() +
-        product.shape.slice(1);
+    const shapeName = getCakeShapeName(product);
 
     const total = calculateEstimatedTotal();
 
     if (previewCakeName) {
         previewCakeName.textContent =
-            product.name;
+            getDisplayCakeName();
     }
 
     if (previewCakeDescription) {
         previewCakeDescription.textContent =
-            `${shapeName} · ${heightLabel} · ${layerCount} ${layerCount === 1 ? "layer" : "layers"}`;
+            `${shapeName} · ${heightLabel} · ${getCakeStructureLabel()}`;
     }
 
     if (previewServingCount) {
@@ -1385,7 +2191,7 @@ function updatePreviewSummary() {
 
     setText(
         "#mobileSummaryTitle",
-        product.name
+        getDisplayCakeName()
     );
 
     setText(
@@ -1415,6 +2221,7 @@ function updatePreviewSummary() {
 ========================================= */
 
 function renderCakePreview() {
+    updateProductModeUI();
     updateRealisticCakePreview();
     updateCupcakePreview();
     updateVisibleCakeShape();
@@ -1565,6 +2372,13 @@ function showValidationMessage(message) {
 
 
 function validateStepOne() {
+    builderState.eventDate =
+        getElement("#eventDate")?.value || "";
+    builderState.fulfillmentDate =
+        getElement("#fulfillmentDate")?.value || "";
+    builderState.guestCount =
+        Number(getElement("#guestCount")?.value) || 0;
+
     if (!builderState.occasion) {
         showValidationMessage(
             "Choose an occasion before continuing."
@@ -1649,6 +2463,10 @@ function validateStepThree() {
         return false;
     }
 
+    if (isCupcakesOnlyProduct()) {
+        return true;
+    }
+
     if (!builderState.buttercreamStyle) {
         showValidationMessage(
             "Choose a buttercream."
@@ -1682,7 +2500,15 @@ function validateStepThree() {
 
 
 function validateStepFour() {
-    if (!builderState.cakeFinish) {
+    if (isCupcakesOnlyProduct()) {
+        if (!builderState.cupcakeFrostingStyle) {
+            showValidationMessage(
+                "Choose an icing style for the cupcakes."
+            );
+
+            return false;
+        }
+    } else if (!builderState.cakeFinish) {
         showValidationMessage(
             "Choose a buttercream finish."
         );
@@ -2027,6 +2853,26 @@ function showCakeSizeGroup(shape) {
 
         star: getElement(
             "#starSizeOptions"
+        ),
+
+        square: getElement(
+            "#squareSizeOptions"
+        ),
+
+        sheet: getElement(
+            "#sheetSizeOptions"
+        ),
+
+        numberLetter: getElement(
+            "#numberLetterSizeOptions"
+        ),
+
+        tier: getElement(
+            "#tierSizeOptions"
+        ),
+
+        cupcakes: getElement(
+            "#cupcakeOnlySizeOptions"
         )
     };
 
@@ -2038,6 +2884,122 @@ function showCakeSizeGroup(shape) {
             );
         }
     );
+
+    getElement(
+        "#numberLetterDetails"
+    )?.classList.toggle(
+        "is-hidden",
+        shape !== "numberLetter"
+    );
+}
+
+
+function updateCakeBoardControls() {
+    const boardSelect = getElement(
+        "#cakeBoardStyle"
+    );
+
+    if (!boardSelect) {
+        return;
+    }
+
+    const product = getSelectedCakeProduct();
+
+    if (product.shape === "cupcakes") {
+        boardSelect.disabled = true;
+        return;
+    }
+
+    const allowedBoards = {
+        square: ["square", "rectangleHorizontal"],
+        sheet: ["rectangleHorizontal"],
+        numberLetter: ["letterNumber"]
+    }[product.shape] || [
+        "round",
+        "square",
+        "rectangleHorizontal"
+    ];
+
+    if (!allowedBoards.includes(builderState.cakeBoardStyle)) {
+        builderState.cakeBoardStyle = allowedBoards[0];
+    }
+
+    getElements(
+        "#cakeBoardStyle option"
+    ).forEach((option) => {
+        option.hidden = !allowedBoards.includes(
+            option.value
+        );
+    });
+
+    boardSelect.value = builderState.cakeBoardStyle;
+    boardSelect.disabled = allowedBoards.length === 1;
+
+    const boardNotice = getElement(
+        "#cakeBoardNotice"
+    );
+
+    if (boardNotice) {
+        if (product.shape === "sheet") {
+            boardNotice.textContent =
+                "Sheet cakes use the horizontal rectangle board. You can still choose its color.";
+        } else if (product.shape === "numberLetter") {
+            boardNotice.textContent =
+                "Number and letter cakes use their dedicated board. You can still choose its color.";
+        } else if (product.shape === "square") {
+            boardNotice.textContent =
+                "Square cakes can use a square or horizontal rectangle board. Board choices do not change pricing.";
+        } else {
+            boardNotice.textContent =
+                "Board choices update the realistic preview only and do not change pricing.";
+        }
+    }
+}
+
+
+function updateNumberLetterControls() {
+    const isNumber =
+        builderState.numberLetterKind === "number";
+
+    getElement(
+        "#numberCakeControls"
+    )?.classList.toggle(
+        "is-hidden",
+        !isNumber
+    );
+
+    getElement(
+        "#letterCakeControls"
+    )?.classList.toggle(
+        "is-hidden",
+        isNumber
+    );
+
+    const isDouble =
+        getSelectedCakeProduct().characterCount === 2;
+
+    getElement(
+        "#secondNumberField"
+    )?.classList.toggle(
+        "is-hidden",
+        !isDouble
+    );
+
+    const letterInput = getElement(
+        "#letterCakeText"
+    );
+
+    if (letterInput) {
+        letterInput.maxLength = isDouble ? 2 : 1;
+
+        if (letterInput.value.length > letterInput.maxLength) {
+            letterInput.value = letterInput.value.slice(
+                0,
+                letterInput.maxLength
+            );
+            builderState.letterCakeText = letterInput.value;
+        }
+    }
 }
 
 
@@ -2045,7 +3007,12 @@ function chooseDefaultCakeForShape(shape) {
     const defaultProducts = {
         round: "round-6",
         heart: "heart-6",
-        star: "star-8"
+        star: "star-8",
+        square: "square-6",
+        sheet: "sheet-half",
+        numberLetter: "number-letter-single",
+        tier: "tier-4-6-standard",
+        cupcakes: "cupcakes-4"
     };
 
     const productId =
@@ -2054,6 +3021,10 @@ function chooseDefaultCakeForShape(shape) {
 
     builderState.cakeProductId =
         productId;
+
+    normalizeProductSpecificState(
+        getSelectedCakeProduct()
+    );
 
     builderState.isTall = false;
 
@@ -2068,6 +3039,9 @@ function chooseDefaultCakeForShape(shape) {
     if (sizeInput) {
         sizeInput.checked = true;
     }
+
+    updateCakeBoardControls();
+    updateNumberLetterControls();
 }
 
 
@@ -2085,11 +3059,16 @@ function updateCakeSelection(input) {
     builderState.cakeShape =
         product.shape;
 
+    normalizeProductSpecificState(product);
+
     builderState.isTall = false;
 
     if (extraLayerToggle) {
         extraLayerToggle.checked = false;
     }
+
+    updateCakeBoardControls();
+    updateNumberLetterControls();
 
     renderCakePreview();
 }
@@ -2762,11 +3741,7 @@ function populateReviewUploads() {
 function populateReview() {
     const product = getSelectedCakeProduct();
 
-    const shapeName =
-        product.shape.charAt(0).toUpperCase() +
-        product.shape.slice(1);
-
-    const layerCount = getCakeLayerCount();
+    const shapeName = getCakeShapeName(product);
 
     setText(
         "#reviewOccasion",
@@ -2796,12 +3771,12 @@ function populateReview() {
 
     setText(
         "#reviewCakeSelection",
-        product.name
+        getDisplayCakeName()
     );
 
     setText(
         "#reviewCakeShape",
-        `${shapeName} · ${builderState.isTall ? "Tall" : "Standard"} · ${layerCount} ${layerCount === 1 ? "layer" : "layers"}`
+        `${shapeName} · ${getCakeHeightLabel()} · ${getCakeStructureLabel()}`
     );
 
     setText(
@@ -2815,8 +3790,9 @@ function populateReview() {
     );
 
     const buttercreamSummary = [
-        builderState.buttercreamStyle ||
-            "Not selected",
+        isCupcakesOnlyProduct()
+            ? "Selected in Cupcake Look"
+            : builderState.buttercreamStyle || "Not selected",
 
         builderState.buttercreamFlavor.trim()
     ]
@@ -2830,12 +3806,16 @@ function populateReview() {
 
     setText(
         "#reviewFilling",
-        getDisplayFilling()
+        isCupcakesOnlyProduct()
+            ? "Not applicable"
+            : getDisplayFilling()
     );
 
     setText(
         "#reviewPremiumFilling",
-        builderState.premiumFillings.length
+        isCupcakesOnlyProduct()
+            ? "Not applicable"
+            : builderState.premiumFillings.length
             ? builderState.premiumFillings
                   .map(
                       (filling) =>
@@ -2847,13 +3827,20 @@ function populateReview() {
 
     setText(
         "#reviewColors",
-        `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
+        isCupcakesOnlyProduct()
+            ? `${builderState.cupcakeLinerColor} liner · ${builderState.cupcakeFrostingColor} icing`
+            : product.shape === "tier"
+            ? `${builderState.tierTopColor} top tier · ${builderState.tierBottomColor} bottom tier`
+            : `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
     );
 
     setText(
         "#reviewFinish",
-        builderState.cakeFinish ||
-            "Not selected"
+        isCupcakesOnlyProduct()
+            ? builderState.cupcakeFrostingStyle || "Not selected"
+            : product.shape === "round"
+            ? `${builderState.cakeCoverage} coverage${builderState.cakeFinish ? ` · ${builderState.cakeFinish}` : ""}`
+            : builderState.cakeFinish || "Not selected"
     );
 
     setText(
@@ -3110,6 +4097,10 @@ closeMobileSummary();
     builderState.cakeShape = "round";
     builderState.cakeProductId = "round-6";
     builderState.isTall = false;
+    builderState.numberLetterKind = "number";
+    builderState.numberCakeFirst = "0";
+    builderState.numberCakeSecond = "1";
+    builderState.letterCakeText = "A";
 
     builderState.cakeFlavor = "";
     builderState.customCakeFlavor = "";
@@ -3124,6 +4115,9 @@ closeMobileSummary();
     builderState.mainCakeColor = "original";
     builderState.accentColor = "original";
     builderState.cakeFinish = "";
+    builderState.cakeCoverage = "full";
+    builderState.tierTopColor = "original";
+    builderState.tierBottomColor = "original";
     builderState.cakeBoardStyle = "round";
     builderState.cakeBoardColor = "original";
     builderState.cupcakeLinerStyle = "paper";
@@ -3194,12 +4188,20 @@ closeMobileSummary();
         'input[name="cakeSize"][value="round-6"]'
     );
 
+    const fullCoverageInput = getElement(
+        'input[name="cakeCoverage"][value="full"]'
+    );
+
     if (roundShapeInput) {
         roundShapeInput.checked = true;
     }
 
     if (roundSixInput) {
         roundSixInput.checked = true;
+    }
+
+    if (fullCoverageInput) {
+        fullCoverageInput.checked = true;
     }
 
     if (extraLayerToggle) {
@@ -3223,18 +4225,36 @@ closeMobileSummary();
     }
 const resetValues = {
     cakeBoardStyle: "round",
-    cakeBoardColor: "original",
     cupcakeLinerStyle: "paper",
     cupcakeFrostingStyle:"",
-    cupcakeLinerColor: "original",
-    cupcakeFrostingColor: "original"
+    numberLetterKind: "number",
+    numberCakeFirst: "0",
+    numberCakeSecond: "1",
+    letterCakeText: "A"
 };
     Object.entries(resetValues).forEach(([id, value]) => {
         const control = getElement(`#${id}`);
         if (control) control.value = value;
     });
 
+    const resetColorValues = {
+        cakeBoardColor: "#F4C3D7",
+        cupcakeLinerColor: "#F4C3D7",
+        cupcakeFrostingColor: "#F7B6D2",
+        customMainColor: "#FF4FA3",
+        accentColor: "#FF4FA3",
+        tierTopColor: "#FFF1DC",
+        tierBottomColor: "#FFF1DC"
+    };
+
+    Object.entries(resetColorValues).forEach(([id, value]) => {
+        const control = getElement(`#${id}`);
+        if (control) control.value = value;
+    });
+
     showCakeSizeGroup("round");
+    updateCakeBoardControls();
+    updateNumberLetterControls();
 
     updateOtherOccasionVisibility();
     updateCustomCakeFlavorVisibility();
@@ -3329,7 +4349,7 @@ getElement(
 );
 
 getElement("#eventDate")?.addEventListener(
-    "change",
+    "input",
     (event) => {
         builderState.eventDate =
             event.target.value;
@@ -3339,7 +4359,7 @@ getElement("#eventDate")?.addEventListener(
 getElement(
     "#fulfillmentDate"
 )?.addEventListener(
-    "change",
+    "input",
     (event) => {
         builderState.fulfillmentDate =
             event.target.value;
@@ -3395,6 +4415,53 @@ getElements(
         }
     );
 });
+
+getElement(
+    "#numberLetterKind"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.numberLetterKind =
+            event.target.value;
+
+        updateNumberLetterControls();
+        renderCakePreview();
+    }
+);
+
+[
+    ["#numberCakeFirst", "numberCakeFirst"],
+    ["#numberCakeSecond", "numberCakeSecond"]
+].forEach(([selector, stateKey]) => {
+    getElement(selector)?.addEventListener(
+        "change",
+        (event) => {
+            builderState[stateKey] =
+                event.target.value;
+            renderCakePreview();
+        }
+    );
+});
+
+getElement(
+    "#letterCakeText"
+)?.addEventListener(
+    "input",
+    (event) => {
+        const count =
+            getSelectedCakeProduct()
+                .characterCount || 1;
+
+        const cleaned = event.target.value
+            .toUpperCase()
+            .replace(/[^A-Z]/g, "")
+            .slice(0, count);
+
+        event.target.value = cleaned;
+        builderState.letterCakeText = cleaned;
+        renderCakePreview();
+    }
+);
 
 extraLayerToggle?.addEventListener(
     "change",
@@ -3577,6 +4644,28 @@ getElement("#accentColor")?.addEventListener(
         renderCakePreview();
     }
 );
+
+getElements(
+    'input[name="cakeCoverage"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeCoverage = input.value;
+            renderCakePreview();
+        }
+    );
+});
+
+[
+    ["#tierTopColor", "tierTopColor"],
+    ["#tierBottomColor", "tierBottomColor"]
+].forEach(([selector, stateKey]) => {
+    getElement(selector)?.addEventListener("input", (event) => {
+        builderState[stateKey] = event.target.value;
+        renderCakePreview();
+    });
+});
 
 getElements(
     'input[name="cakeFinish"]'
@@ -4008,6 +5097,8 @@ getElement(
 
 function initializeBuilder() {
     showCakeSizeGroup("round");
+    updateCakeBoardControls();
+    updateNumberLetterControls();
 
     updateOtherOccasionVisibility();
     updateCustomCakeFlavorVisibility();
