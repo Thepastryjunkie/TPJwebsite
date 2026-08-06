@@ -2858,7 +2858,44 @@
                             </label>
 
                         </fieldset>
+<fieldset
+    id="finishColorCustomizer"
+    class="builder-fieldset cake-only-look is-hidden"
+>
 
+    <legend>
+        Watercolor / Palette Knife Colors
+    </legend>
+
+    <p class="fieldset-description">
+        Choose both colors used by the finish design.
+    </p>
+
+    <div class="compact-choice-row">
+
+        <label>
+            <span>Finish Color 1</span>
+
+            <input
+                id="finishAccentOne"
+                type="color"
+                value="#FF4FA3"
+            >
+        </label>
+
+        <label>
+            <span>Finish Color 2</span>
+
+            <input
+                id="finishAccentTwo"
+                type="color"
+                value="#F4D66E"
+            >
+        </label>
+
+    </div>
+
+</fieldset>
                         <fieldset class="builder-fieldset cake-only-look">
 
                             <legend>
@@ -3093,7 +3130,39 @@
                                     </div>
 
                                 </fieldset>
+<fieldset
+    id="edibleImagePlacementTarget"
+    class="edible-image-option-group"
+>
 
+    <legend>Image Placement</legend>
+
+    <div class="compact-choice-row">
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImagePlacement"
+                value="front"
+                checked
+            >
+
+            <span>Front Face</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImagePlacement"
+                value="top"
+            >
+
+            <span>Top Center</span>
+        </label>
+
+    </div>
+
+</fieldset>
                                 <fieldset
                                     id="edibleImageTierTarget"
                                     class="edible-image-option-group is-hidden"
@@ -4837,8 +4906,7 @@
     </div>
 
 
-  <script src="../js/cake-builder.js?v=watercolor-palette-fix-2"></script>
-
+  <script src="../js/cake-builder.js?v=finish-colors-edible-placement-1"></script>
 </body>
 
 </html>

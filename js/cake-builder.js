@@ -355,6 +355,9 @@ const builderState = {
 
     mainCakeColor: "original",
     accentColor: "original",
+    finishAccentOne: "#FF4FA3",
+finishAccentTwo: "#F4D66E",
+
     cakeFinish: "",
     cakeCoverage: "full",
     tierTopColor: "original",
@@ -364,6 +367,7 @@ const builderState = {
     edibleImageFile: null,
     edibleImageUrl: "",
     edibleImageShape: "original",
+    edibleImagePlacement: "front",
     edibleImageScale: 70,
     edibleImageX: 0,
     edibleImageY: 0,
@@ -1645,7 +1649,6 @@ function addRoundedRectanglePath(
     context.closePath();
 }
 
-
 function drawEdibleImageInArea(
     context,
     image,
@@ -1656,56 +1659,143 @@ function drawEdibleImageInArea(
     }
 
     const sizeScale = clampNumber(
-        Number(builderState.edibleImageScale) / 100,
+        Number(
+            builderState.edibleImageScale
+        ) / 100,
         0.35,
         1.15
     );
 
-    let width = area.width * sizeScale;
-    let height = area.height * sizeScale;
-    const imageAspect =
-        image.naturalWidth / image.naturalHeight || 1;
+    let width =
+        area.width * sizeScale;
 
-    if (builderState.edibleImageShape === "circle") {
-        const diameter = Math.min(width, height);
+    let height =
+        area.height * sizeScale;
+
+    const imageAspect =
+        image.naturalWidth /
+            image.naturalHeight ||
+        1;
+
+    if (
+        builderState.edibleImageShape ===
+        "circle"
+    ) {
+        const diameter =
+            Math.min(
+                width,
+                height
+            );
+
         width = diameter;
         height = diameter;
-    } else if (builderState.edibleImageShape === "rectangle") {
-        height = Math.min(height, width / 1.35);
+    } else if (
+        builderState.edibleImageShape ===
+        "rectangle"
+    ) {
+        height =
+            Math.min(
+                height,
+                width / 1.35
+            );
     } else if (imageAspect >= 1) {
-        height = Math.min(height, width / imageAspect);
+        height =
+            Math.min(
+                height,
+                width / imageAspect
+            );
     } else {
-        width = Math.min(width, height * imageAspect);
+        width =
+            Math.min(
+                width,
+                height * imageAspect
+            );
+    }
+
+    /*
+        A top-surface edible image must look
+        compressed by the cake's perspective.
+    */
+
+    if (area.surface === "top") {
+        height *= 0.55;
     }
 
     const centerX =
         area.centerX +
         area.width *
-            (clampNumber(Number(builderState.edibleImageX), -40, 40) / 100) *
+            (
+                clampNumber(
+                    Number(
+                        builderState.edibleImageX
+                    ),
+                    -40,
+                    40
+                ) / 100
+            ) *
             0.48;
 
     const centerY =
         area.centerY +
         area.height *
-            (clampNumber(Number(builderState.edibleImageY), -40, 40) / 100) *
+            (
+                clampNumber(
+                    Number(
+                        builderState.edibleImageY
+                    ),
+                    -40,
+                    40
+                ) / 100
+            ) *
             0.48;
 
-    const left = -width / 2;
-    const top = -height / 2;
+    const left =
+        -width / 2;
+
+    const top =
+        -height / 2;
 
     context.save();
-    context.translate(centerX, centerY);
-    context.rotate(
-        clampNumber(
-            Number(builderState.edibleImageRotation),
-            -20,
-            20
-        ) * Math.PI / 180
+
+    context.translate(
+        centerX,
+        centerY
     );
 
-    if (builderState.edibleImageShape === "circle") {
+    context.rotate(
+        clampNumber(
+            Number(
+                builderState
+                    .edibleImageRotation
+            ),
+            -20,
+            20
+        ) *
+            Math.PI /
+            180
+    );
+
+    if (
+        builderState.edibleImageShape ===
+        "circle"
+    ) {
         context.beginPath();
-        context.arc(0, 0, width / 2, 0, Math.PI * 2);
+
+        /*
+            This remains circular on the face,
+            but becomes an ellipse on top because
+            top placement compresses the height.
+        */
+
+        context.ellipse(
+            0,
+            0,
+            width / 2,
+            height / 2,
+            0,
+            0,
+            Math.PI * 2
+        );
     } else {
         addRoundedRectanglePath(
             context,
@@ -1713,25 +1803,54 @@ function drawEdibleImageInArea(
             top,
             width,
             height,
-            Math.min(width, height) * 0.045
+            Math.min(
+                width,
+                height
+            ) * 0.045
         );
     }
 
     context.clip();
 
-    const targetAspect = width / height;
+    const targetAspect =
+        width / height;
+
     let sourceX = 0;
     let sourceY = 0;
-    let sourceWidth = image.naturalWidth;
-    let sourceHeight = image.naturalHeight;
 
-    if (builderState.edibleImageShape !== "original") {
-        if (imageAspect > targetAspect) {
-            sourceWidth = image.naturalHeight * targetAspect;
-            sourceX = (image.naturalWidth - sourceWidth) / 2;
+    let sourceWidth =
+        image.naturalWidth;
+
+    let sourceHeight =
+        image.naturalHeight;
+
+    if (
+        builderState.edibleImageShape !==
+        "original"
+    ) {
+        if (
+            imageAspect >
+            targetAspect
+        ) {
+            sourceWidth =
+                image.naturalHeight *
+                targetAspect;
+
+            sourceX =
+                (
+                    image.naturalWidth -
+                    sourceWidth
+                ) / 2;
         } else {
-            sourceHeight = image.naturalWidth / targetAspect;
-            sourceY = (image.naturalHeight - sourceHeight) / 2;
+            sourceHeight =
+                image.naturalWidth /
+                targetAspect;
+
+            sourceY =
+                (
+                    image.naturalHeight -
+                    sourceHeight
+                ) / 2;
         }
     }
 
@@ -1749,8 +1868,6 @@ function drawEdibleImageInArea(
 
     context.restore();
 }
-
-
 function getEdibleImageArea(
     product,
     x,
@@ -1758,53 +1875,286 @@ function getEdibleImageArea(
     width,
     height
 ) {
-    if (product.shape === "tier") {
-        const useTopTier =
-            builderState.edibleImageTier === "top";
+    const placement =
+        builderState.edibleImagePlacement ||
+        "front";
 
-        return useTopTier
+    const isTopPlacement =
+        placement === "top";
+
+    /*
+        TWO-TIER CAKES
+    */
+
+    if (product.shape === "tier") {
+        const isTallTier =
+            builderState.cakeProductId ===
+            "tier-4-6-tall";
+
+        /*
+            Top Center means the very top of
+            the complete tiered cake.
+        */
+
+        if (isTopPlacement) {
+            return isTallTier
+                ? {
+                    centerX:
+                        x + width * 0.5,
+
+                    centerY:
+                        y + height * 0.105,
+
+                    width:
+                        width * 0.22,
+
+                    height:
+                        height * 0.13,
+
+                    surface: "top"
+                }
+                : {
+                    centerX:
+                        x + width * 0.5,
+
+                    centerY:
+                        y + height * 0.17,
+
+                    width:
+                        width * 0.25,
+
+                    height:
+                        height * 0.14,
+
+                    surface: "top"
+                };
+        }
+
+        const useTopTier =
+            builderState.edibleImageTier ===
+            "top";
+
+        /*
+            Front face of the smaller top tier.
+        */
+
+        if (useTopTier) {
+            return isTallTier
+                ? {
+                    centerX:
+                        x + width * 0.5,
+
+                    centerY:
+                        y + height * 0.32,
+
+                    width:
+                        width * 0.19,
+
+                    height:
+                        height * 0.19,
+
+                    surface: "front"
+                }
+                : {
+                    centerX:
+                        x + width * 0.5,
+
+                    centerY:
+                        y + height * 0.35,
+
+                    width:
+                        width * 0.21,
+
+                    height:
+                        height * 0.16,
+
+                    surface: "front"
+                };
+        }
+
+        /*
+            Front face of the larger bottom tier.
+            This is deliberately lower than the
+            previous 0.61 position.
+        */
+
+        return isTallTier
             ? {
-                centerX: x + width * 0.5,
-                centerY: y + height * 0.31,
-                width: width * 0.22,
-                height: height * 0.14
+                centerX:
+                    x + width * 0.5,
+
+                centerY:
+                    y + height * 0.73,
+
+                width:
+                    width * 0.29,
+
+                height:
+                    height * 0.19,
+
+                surface: "front"
             }
             : {
-                centerX: x + width * 0.5,
-                centerY: y + height * 0.61,
-                width: width * 0.32,
-                height: height * 0.18
+                centerX:
+                    x + width * 0.5,
+
+                centerY:
+                    y + height * 0.71,
+
+                width:
+                    width * 0.31,
+
+                height:
+                    height * 0.18,
+
+                surface: "front"
             };
     }
 
+    /*
+        SHEET CAKES
+    */
+
     if (product.shape === "sheet") {
         return {
-            centerX: x + width * 0.5,
-            centerY: y + height * 0.43,
-            width: width * 0.38,
-            height: height * 0.24
+            centerX:
+                x + width * 0.5,
+
+            centerY:
+                y + height * 0.38,
+
+            width:
+                width * 0.4,
+
+            height:
+                height * 0.23,
+
+            surface: "top"
         };
     }
 
-    if (product.shape === "numberLetter") {
+    /*
+        NUMBER AND LETTER CAKES
+    */
+
+    if (
+        product.shape ===
+        "numberLetter"
+    ) {
         return {
-            centerX: x + width * 0.5,
-            centerY: y + height * 0.44,
-            width: width * 0.3,
-            height: height * 0.22
+            centerX:
+                x + width * 0.5,
+
+            centerY:
+                y + height * 0.43,
+
+            width:
+                width * 0.3,
+
+            height:
+                height * 0.22,
+
+            surface: "top"
         };
     }
 
-    const isTallCake = builderState.isTall;
+    const isTallCake =
+        builderState.isTall ||
+        builderState.cakeProductId ===
+            "heart-5-tall";
+
+    /*
+        TOP CENTER OF A SINGLE CAKE
+    */
+
+    if (isTopPlacement) {
+        const topCenterMap = {
+            round: isTallCake
+                ? 0.2
+                : 0.26,
+
+            heart: isTallCake
+                ? 0.22
+                : 0.29,
+
+            star: isTallCake
+                ? 0.23
+                : 0.31,
+
+            square: isTallCake
+                ? 0.19
+                : 0.26
+        };
+
+        return {
+            centerX:
+                x + width * 0.5,
+
+            centerY:
+                y +
+                height *
+                    (
+                        topCenterMap[
+                            product.shape
+                        ] || 0.26
+                    ),
+
+            width:
+                width *
+                    (
+                        isTallCake
+                            ? 0.25
+                            : 0.31
+                    ),
+
+            height:
+                height *
+                    (
+                        isTallCake
+                            ? 0.13
+                            : 0.16
+                    ),
+
+            surface: "top"
+        };
+    }
+
+    /*
+        FRONT FACE OF A SINGLE CAKE
+    */
 
     return {
-        centerX: x + width * 0.5,
-        centerY: y + height * (isTallCake ? 0.49 : 0.5),
-        width: width * (isTallCake ? 0.27 : 0.31),
-        height: height * (isTallCake ? 0.25 : 0.22)
+        centerX:
+            x + width * 0.5,
+
+        centerY:
+            y +
+            height *
+                (
+                    isTallCake
+                        ? 0.5
+                        : 0.53
+                ),
+
+        width:
+            width *
+                (
+                    isTallCake
+                        ? 0.28
+                        : 0.32
+                ),
+
+        height:
+            height *
+                (
+                    isTallCake
+                        ? 0.24
+                        : 0.21
+                ),
+
+        surface: "front"
     };
 }
-
 
 function drawBentoEdibleImage(
     context,
@@ -1812,354 +2162,339 @@ function drawBentoEdibleImage(
     transform,
     sourceImage
 ) {
-    if (!image || !edibleImageIsReady()) {
+    if (
+        !image ||
+        !edibleImageIsReady()
+    ) {
         return;
     }
 
     context.save();
-    context.translate(transform.x, transform.y);
-    context.scale(
-        transform.width / sourceImage.naturalWidth,
-        transform.height / sourceImage.naturalHeight
+
+    context.translate(
+        transform.x,
+        transform.y
     );
+
+    context.scale(
+        transform.width /
+            sourceImage.naturalWidth,
+
+        transform.height /
+            sourceImage.naturalHeight
+    );
+
+    const isTopPlacement =
+        builderState.edibleImagePlacement ===
+        "top";
 
     drawEdibleImageInArea(
         context,
         image,
-        {
-            centerX: 430,
-            centerY: 548,
-            width: 260,
-            height: 145
-        }
+        isTopPlacement
+            ? {
+                centerX: 430,
+                centerY: 515,
+                width: 250,
+                height: 125,
+                surface: "top"
+            }
+            : {
+                centerX: 430,
+                centerY: 630,
+                width: 255,
+                height: 145,
+                surface: "front"
+            }
     );
 
     context.restore();
 }
+const realisticFinishShapeMap = {
+    round: "Round",
+    heart: "Heart",
+    star: "Star",
+    square: "Square",
+
+    tallRound: "Tall-Round",
+    tallHeart: "Tall-Heart",
+    tallStar: "Tall-Star",
+    tallSquare: "Tall-Square",
+
+    tier: "Two-Tier",
+    tallTier: "Tall-Two-Tier",
+
+    halfSheet: "Half-Sheet",
+    fullSheet: "Full-Sheet",
+
+    heart5in: "5in-Heart",
+    tallHeart5in: "Tall-5in-Heart"
+};
+
+
+function getRealisticFinishFiles(
+    entryKey,
+    isBento = false
+) {
+    const shapeName = isBento
+        ? "Bento-Heart"
+        : realisticFinishShapeMap[entryKey];
+
+    if (!shapeName) {
+        return null;
+    }
+
+    if (
+        builderState.cakeFinish ===
+        "Watercolor Finish"
+    ) {
+        return {
+            type: "watercolor",
+
+            files: [
+                `TPJ-Finish-Watercolor-${shapeName}-Accent-1-Mask.png`,
+
+                `TPJ-Finish-Watercolor-${shapeName}-Accent-2-Mask.png`
+            ]
+        };
+    }
+
+    if (
+        builderState.cakeFinish ===
+        "Palette Knife Finish"
+    ) {
+        return {
+            type: "paletteKnife",
+
+            files: [
+                `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-1-Strokes.png`,
+
+                `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-1-Mask.png`,
+
+                `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-2-Strokes.png`,
+
+                `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-2-Mask.png`
+            ]
+        };
+    }
+
+    return null;
+}
+
+
+async function loadRealisticFinishAssets(
+    entryKey,
+    isBento = false
+) {
+    const finishDefinition =
+        getRealisticFinishFiles(
+            entryKey,
+            isBento
+        );
+
+    if (!finishDefinition) {
+        return null;
+    }
+
+    const images = await Promise.all(
+        finishDefinition.files.map(
+            (file) =>
+                loadRealisticImage(
+                    `${finalAssetRoot}/cakes/${file}`
+                )
+        )
+    );
+
+    return {
+        type: finishDefinition.type,
+        images
+    };
+}
+function makeFlatTintedMask(
+    mask,
+    color
+) {
+    const layer =
+        document.createElement("canvas");
+
+    layer.width =
+        mask.naturalWidth ||
+        mask.width;
+
+    layer.height =
+        mask.naturalHeight ||
+        mask.height;
+
+    const layerContext =
+        layer.getContext("2d");
+
+    /*
+        Place the original soft-edged mask.
+    */
+
+    layerContext.drawImage(
+        mask,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    /*
+        Fill only the visible mask pixels
+        with the selected accent color.
+    */
+
+    layerContext.globalCompositeOperation =
+        "source-in";
+
+    layerContext.fillStyle =
+        color;
+
+    layerContext.fillRect(
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    layerContext.globalCompositeOperation =
+        "source-over";
+
+    return layer;
+}
+
+
 function drawRealisticCakeFinish(
     context,
-    cakeImage,
-    product,
+    finishAssets,
     x,
     y,
     width,
     height
 ) {
-    const normalizedFinish = String(
-        builderState.cakeFinish || ""
-    )
-        .trim()
-        .toLowerCase();
-
-    const isWatercolor =
-        normalizedFinish === "watercolor finish";
-
-    const isPaletteKnife =
-        normalizedFinish === "palette knife finish";
-
-    if (!isWatercolor && !isPaletteKnife) {
+    if (!finishAssets) {
         return;
     }
 
-    /*
-        Draw the finish on a temporary canvas.
-        The actual cake PNG is then used as a mask,
-        keeping the finish on the visible cake only.
-    */
+    const accentOne =
+    builderState.finishAccentOne ||
+    "#FF4FA3";
 
-    const overlay = document.createElement("canvas");
-
-    overlay.width =
-        realisticCakeCanvas.width;
-
-    overlay.height =
-        realisticCakeCanvas.height;
-
-    const overlayContext =
-        overlay.getContext("2d");
-
-    const accentColor =
-        builderState.accentColor !== "original"
-            ? builderState.accentColor
-            : "#FF4FA3";
-
-    const berryColor = "#7B294F";
-    const goldColor = "#F4D66E";
-
-    /*
-        WATERCOLOR
-    */
-
-    if (isWatercolor) {
-        const watercolorBlobs = [
-            {
-                centerX: x + width * 0.39,
-                centerY: y + height * 0.43,
-                radiusX: width * 0.23,
-                radiusY: height * 0.13,
-                color: accentColor,
-                rotation: -0.22,
-                opacity: 0.58
-            },
-            {
-                centerX: x + width * 0.62,
-                centerY: y + height * 0.55,
-                radiusX: width * 0.25,
-                radiusY: height * 0.15,
-                color: berryColor,
-                rotation: 0.16,
-                opacity: 0.48
-            },
-            {
-                centerX: x + width * 0.47,
-                centerY: y + height * 0.68,
-                radiusX: width * 0.2,
-                radiusY: height * 0.11,
-                color: goldColor,
-                rotation: -0.1,
-                opacity: 0.38
-            },
-            {
-                centerX: x + width * 0.7,
-                centerY: y + height * 0.36,
-                radiusX: width * 0.16,
-                radiusY: height * 0.1,
-                color: accentColor,
-                rotation: 0.24,
-                opacity: 0.34
-            }
-        ];
-
-        watercolorBlobs.forEach((blob) => {
-            const rgb =
-                hexToRgb(blob.color);
-
-            overlayContext.save();
-
-            overlayContext.translate(
-                blob.centerX,
-                blob.centerY
-            );
-
-            overlayContext.rotate(
-                blob.rotation
-            );
-
-            const gradient =
-                overlayContext.createRadialGradient(
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    Math.max(
-                        blob.radiusX,
-                        blob.radiusY
-                    )
-                );
-
-            gradient.addColorStop(
-                0,
-                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${blob.opacity})`
-            );
-
-            gradient.addColorStop(
-                0.58,
-                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${blob.opacity * 0.72})`
-            );
-
-            gradient.addColorStop(
-                1,
-                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 0)`
-            );
-
-            overlayContext.fillStyle =
-                gradient;
-
-            overlayContext.beginPath();
-
-            overlayContext.ellipse(
-                0,
-                0,
-                blob.radiusX,
-                blob.radiusY,
-                0,
-                0,
-                Math.PI * 2
-            );
-
-            overlayContext.fill();
-            overlayContext.restore();
-        });
-    }
-
-    /*
-        PALETTE KNIFE
-    */
-
-    if (isPaletteKnife) {
-        const paletteStrokes = [
-            {
-                startX: x + width * 0.27,
-                startY: y + height * 0.4,
-                endX: x + width * 0.57,
-                endY: y + height * 0.35,
-                thickness:
-                    Math.max(
-                        18,
-                        height * 0.055
-                    ),
-                color: accentColor
-            },
-            {
-                startX: x + width * 0.5,
-                startY: y + height * 0.49,
-                endX: x + width * 0.75,
-                endY: y + height * 0.44,
-                thickness:
-                    Math.max(
-                        16,
-                        height * 0.05
-                    ),
-                color: goldColor
-            },
-            {
-                startX: x + width * 0.31,
-                startY: y + height * 0.61,
-                endX: x + width * 0.63,
-                endY: y + height * 0.66,
-                thickness:
-                    Math.max(
-                        20,
-                        height * 0.06
-                    ),
-                color: berryColor
-            },
-            {
-                startX: x + width * 0.58,
-                startY: y + height * 0.72,
-                endX: x + width * 0.79,
-                endY: y + height * 0.66,
-                thickness:
-                    Math.max(
-                        14,
-                        height * 0.045
-                    ),
-                color: accentColor
-            }
-        ];
-
-        paletteStrokes.forEach(
-            (stroke) => {
-                overlayContext.save();
-
-                overlayContext.globalAlpha =
-                    0.92;
-
-                overlayContext.strokeStyle =
-                    stroke.color;
-
-                overlayContext.lineWidth =
-                    stroke.thickness;
-
-                overlayContext.lineCap =
-                    "round";
-
-                overlayContext.lineJoin =
-                    "round";
-
-                const middleX =
-                    (
-                        stroke.startX +
-                        stroke.endX
-                    ) / 2;
-
-                const middleY =
-                    Math.min(
-                        stroke.startY,
-                        stroke.endY
-                    ) -
-                    stroke.thickness * 0.7;
-
-                overlayContext.beginPath();
-
-                overlayContext.moveTo(
-                    stroke.startX,
-                    stroke.startY
-                );
-
-                overlayContext.quadraticCurveTo(
-                    middleX,
-                    middleY,
-                    stroke.endX,
-                    stroke.endY
-                );
-
-                overlayContext.stroke();
-
-                /*
-                    Small highlight makes each stroke
-                    resemble thick palette-knife icing.
-                */
-
-                overlayContext.globalAlpha =
-                    0.38;
-
-                overlayContext.strokeStyle =
-                    "#FFFFFF";
-
-                overlayContext.lineWidth =
-                    Math.max(
-                        3,
-                        stroke.thickness * 0.15
-                    );
-
-                overlayContext.stroke();
-
-                overlayContext.restore();
-            }
-        );
-    }
-
-    /*
-        Use the cake image itself as the clipping mask.
-        Transparent areas of the PNG remove the finish.
-    */
-
-    overlayContext.save();
-
-    overlayContext.globalCompositeOperation =
-        "destination-in";
-
-    overlayContext.globalAlpha = 1;
-
-    overlayContext.drawImage(
-        cakeImage,
-        x,
-        y,
-        width,
-        height
-    );
-
-    overlayContext.restore();
-
-    /*
-        Draw the finished masked artwork
-        onto the real preview canvas.
-    */
+const accentTwo =
+    builderState.finishAccentTwo ||
+    "#F4D66E";
 
     context.save();
 
-    context.globalCompositeOperation =
-        "source-over";
 
-    context.globalAlpha = 1;
+    /*
+        WATERCOLOR QA MASKS
+    */
 
-    context.drawImage(
-        overlay,
-        0,
-        0
-    );
+    if (
+        finishAssets.type ===
+        "watercolor"
+    ) {
+        const [
+            accentOneMask,
+            accentTwoMask
+        ] = finishAssets.images;
+
+        const accentOneLayer =
+            makeFlatTintedMask(
+                accentOneMask,
+                accentOne
+            );
+
+        const accentTwoLayer =
+            makeFlatTintedMask(
+                accentTwoMask,
+                accentTwo
+            );
+
+        context.globalCompositeOperation =
+            "multiply";
+
+        context.globalAlpha = 0.78;
+
+        context.drawImage(
+            accentOneLayer,
+            x,
+            y,
+            width,
+            height
+        );
+
+        context.globalAlpha = 0.68;
+
+        context.drawImage(
+            accentTwoLayer,
+            x,
+            y,
+            width,
+            height
+        );
+    }
+
+
+    /*
+        PALETTE KNIFE QA STROKES
+    */
+
+    if (
+        finishAssets.type ===
+        "paletteKnife"
+    ) {
+        const [
+            accentOneStrokes,
+            accentOneMask,
+            accentTwoStrokes,
+            accentTwoMask
+        ] = finishAssets.images;
+
+        /*
+            makeTintedLayer preserves the
+            highlights, shadows and raised
+            buttercream texture from the
+            approved stroke PNGs.
+        */
+
+        const accentOneLayer =
+            makeTintedLayer(
+                accentOneStrokes,
+                accentOneMask,
+                accentOne
+            );
+
+        const accentTwoLayer =
+            makeTintedLayer(
+                accentTwoStrokes,
+                accentTwoMask,
+                accentTwo
+            );
+
+        context.globalCompositeOperation =
+            "source-over";
+
+        context.globalAlpha = 1;
+
+        context.drawImage(
+            accentOneLayer,
+            x,
+            y,
+            width,
+            height
+        );
+
+        context.drawImage(
+            accentTwoLayer,
+            x,
+            y,
+            width,
+            height
+        );
+    }
 
     context.restore();
 }
@@ -2206,19 +2541,31 @@ async function updateRealisticCakePreview() {
 
     try {
         if (isStandalonePreview) {
-            const [
-                standaloneImage,
-                cupcakeDesign,
-                edibleImage
-            ] = await Promise.all([
-                loadRealisticImage(cakeUrls[0]),
-                renderCupcakeDesignCanvas(),
-                edibleImageIsReady()
-                    ? loadRealisticImage(
-                        builderState.edibleImageUrl
-                    )
-                    : Promise.resolve(null)
-            ]);
+           const [
+    standaloneImage,
+    cupcakeDesign,
+    edibleImage,
+    standaloneFinishAssets
+] = await Promise.all([
+    loadRealisticImage(
+        cakeUrls[0]
+    ),
+
+    renderCupcakeDesignCanvas(),
+
+    edibleImageIsReady()
+        ? loadRealisticImage(
+            builderState.edibleImageUrl
+        )
+        : Promise.resolve(null),
+
+    isBento
+        ? loadRealisticFinishAssets(
+            "heart5in",
+            true
+        )
+        : Promise.resolve(null)
+]); 
 
             if (renderVersion !== realisticRenderVersion) return;
 
@@ -2255,6 +2602,14 @@ async function updateRealisticCakePreview() {
                     standaloneImage,
                     transform
                 );
+  drawRealisticCakeFinish(
+        context,
+        standaloneFinishAssets,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
 
                 drawBentoEdibleImage(
                     context,
@@ -2280,25 +2635,43 @@ async function updateRealisticCakePreview() {
         const boardMaskUrl =
             `${finalAssetRoot}/boards/${boardAssets[1]}`;
 
-        const [
-            boardImage,
-            boardMask,
-            cakeImages,
-            edibleImage
-        ] =
-            await Promise.all([
-                loadRealisticImage(boardUrl),
-                loadRealisticImage(boardMaskUrl),
-                Promise.all(
-                    cakeUrls.map(loadRealisticImage)
-                ),
-                edibleImageIsReady()
-                    ? loadRealisticImage(
-                        builderState.edibleImageUrl
-                    )
-                    : Promise.resolve(null)
-            ]);
+      const [
+    boardImage,
+    boardMask,
+    cakeImages,
+    edibleImage,
+    finishAssetSets
+] =
+    await Promise.all([
+        loadRealisticImage(
+            boardUrl
+        ),
 
+        loadRealisticImage(
+            boardMaskUrl
+        ),
+
+        Promise.all(
+            cakeUrls.map(
+                loadRealisticImage
+            )
+        ),
+
+        edibleImageIsReady()
+            ? loadRealisticImage(
+                builderState.edibleImageUrl
+            )
+            : Promise.resolve(null),
+
+        Promise.all(
+            previewEntries.map(
+                (entry) =>
+                    loadRealisticFinishAssets(
+                        entry.key
+                    )
+            )
+        )
+    ]);
         if (renderVersion !== realisticRenderVersion) return;
 
         const context = realisticCakeCanvas.getContext("2d");
@@ -2374,10 +2747,9 @@ previewEntries.forEach((entry, index) => {
         x, y, and size only exist inside this loop.
     */
 
-    drawRealisticCakeFinish(
+  drawRealisticCakeFinish(
     context,
-    cakeImage,
-    product,
+    finishAssetSets[index],
     x,
     y + boardYOffset,
     size.width,
@@ -3130,7 +3502,23 @@ function updateCakeHeight() {
 /* =========================================
    RENDERER FINISHES
 ========================================= */
+function updateFinishColorControls() {
+    const finishColorCustomizer =
+        getElement(
+            "#finishColorCustomizer"
+        );
 
+    const finishUsesTwoColors =
+        builderState.cakeFinish ===
+            "Watercolor Finish" ||
+        builderState.cakeFinish ===
+            "Palette Knife Finish";
+
+    finishColorCustomizer?.classList.toggle(
+        "is-hidden",
+        !finishUsesTwoColors
+    );
+}
 function updateFinishVisibility() {
     getElements(
         ".cake-finish-group"
@@ -3420,7 +3808,6 @@ function normalizeProductSpecificState(product) {
     });
 }
 
-
 function updateEdibleImageControls() {
     const controls = getElement(
         "#edibleImageControls"
@@ -3451,11 +3838,15 @@ function updateEdibleImageControls() {
         "is-hidden",
         !builderState.edibleImageEnabled
     );
+const showTierTarget =
+    product.shape === "tier" &&
+    builderState.edibleImagePlacement ===
+        "front";
 
-    tierTarget?.classList.toggle(
-        "is-hidden",
-        product.shape !== "tier"
-    );
+tierTarget?.classList.toggle(
+    "is-hidden",
+    !showTierTarget
+);
 
     if (removeButton) {
         removeButton.disabled =
@@ -3480,39 +3871,57 @@ function updateEdibleImageControls() {
     }
 
     if (placementNote) {
-        if (product.shape === "tier") {
-            placementNote.textContent =
-                "Choose the top or bottom tier, then adjust the image while watching the live preview.";
-        } else if (product.shape === "sheet") {
-            placementNote.textContent =
-                "The image is placed flat on top of the sheet cake.";
-        } else if (product.shape === "numberLetter") {
-            placementNote.textContent =
-                "The image is placed on the exposed top. A double cake repeats the uploaded image on both characters.";
-        } else if (product.shape === "cupcakes") {
-            placementNote.textContent =
-                builderState.cupcakeFrostingStyle ===
-                    "low-piped-edible-image"
-                    ? "The image is centered on every cupcake in the selected set."
-                    : "Choose Low Piped / Edible Image icing so the image has a flat frosting surface.";
-        } else if (
-            builderState.cakeProductId ===
-            "heart-5-bento"
-        ) {
-            placementNote.textContent =
-                "The image is placed on the heart cake. The four cupcakes remain unchanged.";
+    if (
+        product.shape === "tier" &&
+        builderState.edibleImagePlacement ===
+            "top"
+    ) {
+        placementNote.textContent =
+            "The image is centered on the top surface of the uppermost tier.";
+    } else if (
+        product.shape === "tier"
+    ) {
+        placementNote.textContent =
+            "Choose the top or bottom tier face, then adjust the image while watching the preview.";
+    } else if (
+        product.shape === "sheet"
+    ) {
+        placementNote.textContent =
+            "The image is placed flat on top of the sheet cake.";
+    } else if (
+        product.shape ===
+        "numberLetter"
+    ) {
+        placementNote.textContent =
+            "The image is placed on the exposed top surface.";
+    } else if (
+        product.shape === "cupcakes"
+    ) {
+        placementNote.textContent =
+            builderState.cupcakeFrostingStyle ===
+                "low-piped-edible-image"
+                ? "The image is centered on every cupcake."
+                : "Choose Flat Edible-Image Icing so the image has a usable surface.";
+    } else if (
+        builderState.edibleImagePlacement ===
+        "top"
+    ) {
+        placementNote.textContent =
+            "The image is centered on the top surface of the cake.";
         } else {
-            placementNote.textContent =
-                "The image is centered on the visible cake face. Adjust it while watching the live preview.";
-        }
+        placementNote.textContent =
+            "The image is centered on the front face of the cake.";
     }
 }
 
+/*
+    Close updateEdibleImageControls
+*/
+}
 
 /* =========================================
    PREVIEW SUMMARY
 ========================================= */
-
 function updatePreviewSummary() {
     const product = getSelectedCakeProduct();
 
@@ -3588,6 +3997,7 @@ function renderCakePreview() {
     updateCakeHeight();
     updateRendererColors();
     updateFinishVisibility();
+    updateFinishColorControls();
     updateDecorationVisibility();
     updateSelectedCardStates();
     updatePreviewSummary();
@@ -5851,7 +6261,31 @@ getElement("#accentColor")?.addEventListener(
         renderCakePreview();
     }
 );
+[
+    [
+        "#finishAccentOne",
+        "finishAccentOne"
+    ],
 
+    [
+        "#finishAccentTwo",
+        "finishAccentTwo"
+    ]
+].forEach(
+    ([selector, stateKey]) => {
+        getElement(
+            selector
+        )?.addEventListener(
+            "input",
+            (event) => {
+                builderState[stateKey] =
+                    event.target.value;
+
+                renderCakePreview();
+            }
+        );
+    }
+);
 getElements(
     'input[name="cakeCoverage"]'
 ).forEach((input) => {
@@ -6187,6 +6621,11 @@ function setEdibleImageFile(file) {
 
 
 function resetEdibleImagePosition() {
+    builderState.edibleImagePlacement =
+    "front";
+
+builderState.edibleImageTier =
+    "bottom";
     builderState.edibleImageScale = 70;
     builderState.edibleImageX = 0;
     builderState.edibleImageY = 0;
@@ -6201,7 +6640,19 @@ function resetEdibleImagePosition() {
         const input = getElement(selector);
         if (input) input.value = String(value);
     });
+getElements(
+    'input[name="edibleImagePlacement"]'
+).forEach((input) => {
+    input.checked =
+        input.value === "front";
+});
 
+getElements(
+    'input[name="edibleImageTier"]'
+).forEach((input) => {
+    input.checked =
+        input.value === "bottom";
+});
     updateEdibleImageRangeOutputs();
     renderCakePreview();
 }
@@ -6260,7 +6711,41 @@ getElements(
         renderCakePreview();
     });
 });
+getElements(
+    'input[name="edibleImagePlacement"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.edibleImagePlacement =
+                input.value;
 
+            /*
+                Top center on a tiered cake always
+                means the uppermost cake surface.
+            */
+
+            if (
+                input.value === "top" &&
+                getSelectedCakeProduct().shape ===
+                    "tier"
+            ) {
+                builderState.edibleImageTier =
+                    "top";
+
+                getElements(
+                    'input[name="edibleImageTier"]'
+                ).forEach((tierInput) => {
+                    tierInput.checked =
+                        tierInput.value ===
+                        "top";
+                });
+            }
+
+            renderCakePreview();
+        }
+    );
+});
 getElements(
     'input[name="edibleImageTier"]'
 ).forEach((input) => {
@@ -6509,7 +6994,5 @@ function initializeBuilder() {
     renderInspirationPreviews();
     renderCakePreview();
     showStep(1);
-}
-
-
+}  
 initializeBuilder();
