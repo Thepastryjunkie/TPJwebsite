@@ -1838,121 +1838,147 @@ function drawBentoEdibleImage(
 }
 function drawRealisticCakeFinish(
     context,
+    cakeImage,
     product,
     x,
     y,
     width,
     height
 ) {
-    const finish = builderState.cakeFinish;
+    const normalizedFinish = String(
+        builderState.cakeFinish || ""
+    )
+        .trim()
+        .toLowerCase();
 
-    if (
-        finish !== "Watercolor Finish" &&
-        finish !== "Palette Knife Finish"
-    ) {
+    const isWatercolor =
+        normalizedFinish === "watercolor finish";
+
+    const isPaletteKnife =
+        normalizedFinish === "palette knife finish";
+
+    if (!isWatercolor && !isPaletteKnife) {
         return;
     }
 
     /*
-        Keep the artwork approximately on the
-        visible front face of the cake.
+        Draw the finish on a temporary canvas.
+        The actual cake PNG is then used as a mask,
+        keeping the finish on the visible cake only.
     */
 
-    const isTall =
-        builderState.isTall ||
-        builderState.cakeProductId === "heart-5-tall" ||
-        builderState.cakeProductId === "tier-4-6-tall";
+    const overlay = document.createElement("canvas");
 
-    const frontLeft =
-        x + width * 0.27;
+    overlay.width =
+        realisticCakeCanvas.width;
 
-    const frontTop =
-        y + height * (isTall ? 0.31 : 0.38);
+    overlay.height =
+        realisticCakeCanvas.height;
 
-    const frontWidth =
-        width * 0.46;
+    const overlayContext =
+        overlay.getContext("2d");
 
-    const frontHeight =
-        height * (isTall ? 0.42 : 0.31);
+    const accentColor =
+        builderState.accentColor !== "original"
+            ? builderState.accentColor
+            : "#FF4FA3";
 
-    context.save();
+    const berryColor = "#7B294F";
+    const goldColor = "#F4D66E";
 
     /*
-        Clip the finish so it does not spill
-        far outside the center cake area.
+        WATERCOLOR
     */
 
-    context.beginPath();
-    context.roundRect(
-        frontLeft,
-        frontTop,
-        frontWidth,
-        frontHeight,
-        Math.min(frontWidth, frontHeight) * 0.12
-    );
-
-    context.clip();
-
-
-    if (finish === "Watercolor Finish") {
-        const accent =
-            builderState.accentColor !== "original"
-                ? builderState.accentColor
-                : "#FF4FA3";
-
-        const mainColor =
-            builderState.mainCakeColor !== "original"
-                ? builderState.mainCakeColor
-                : "#F7B6D2";
-
-        context.globalCompositeOperation = "multiply";
-        context.globalAlpha = 0.24;
-
+    if (isWatercolor) {
         const watercolorBlobs = [
             {
-                x: frontLeft + frontWidth * 0.25,
-                y: frontTop + frontHeight * 0.27,
-                radiusX: frontWidth * 0.25,
-                radiusY: frontHeight * 0.22,
-                color: accent,
-                rotation: -0.18
+                centerX: x + width * 0.39,
+                centerY: y + height * 0.43,
+                radiusX: width * 0.23,
+                radiusY: height * 0.13,
+                color: accentColor,
+                rotation: -0.22,
+                opacity: 0.58
             },
             {
-                x: frontLeft + frontWidth * 0.68,
-                y: frontTop + frontHeight * 0.47,
-                radiusX: frontWidth * 0.31,
-                radiusY: frontHeight * 0.25,
-                color: "#7B294F",
-                rotation: 0.15
+                centerX: x + width * 0.62,
+                centerY: y + height * 0.55,
+                radiusX: width * 0.25,
+                radiusY: height * 0.15,
+                color: berryColor,
+                rotation: 0.16,
+                opacity: 0.48
             },
             {
-                x: frontLeft + frontWidth * 0.43,
-                y: frontTop + frontHeight * 0.77,
-                radiusX: frontWidth * 0.28,
-                radiusY: frontHeight * 0.2,
-                color: mainColor,
-                rotation: -0.08
+                centerX: x + width * 0.47,
+                centerY: y + height * 0.68,
+                radiusX: width * 0.2,
+                radiusY: height * 0.11,
+                color: goldColor,
+                rotation: -0.1,
+                opacity: 0.38
+            },
+            {
+                centerX: x + width * 0.7,
+                centerY: y + height * 0.36,
+                radiusX: width * 0.16,
+                radiusY: height * 0.1,
+                color: accentColor,
+                rotation: 0.24,
+                opacity: 0.34
             }
         ];
 
         watercolorBlobs.forEach((blob) => {
-            context.save();
+            const rgb =
+                hexToRgb(blob.color);
 
-            context.translate(
-                blob.x,
-                blob.y
+            overlayContext.save();
+
+            overlayContext.translate(
+                blob.centerX,
+                blob.centerY
             );
 
-            context.rotate(
+            overlayContext.rotate(
                 blob.rotation
             );
 
-            context.fillStyle =
-                blob.color;
+            const gradient =
+                overlayContext.createRadialGradient(
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    Math.max(
+                        blob.radiusX,
+                        blob.radiusY
+                    )
+                );
 
-            context.beginPath();
+            gradient.addColorStop(
+                0,
+                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${blob.opacity})`
+            );
 
-            context.ellipse(
+            gradient.addColorStop(
+                0.58,
+                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${blob.opacity * 0.72})`
+            );
+
+            gradient.addColorStop(
+                1,
+                `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 0)`
+            );
+
+            overlayContext.fillStyle =
+                gradient;
+
+            overlayContext.beginPath();
+
+            overlayContext.ellipse(
                 0,
                 0,
                 blob.radiusX,
@@ -1962,99 +1988,180 @@ function drawRealisticCakeFinish(
                 Math.PI * 2
             );
 
-            context.fill();
-            context.restore();
+            overlayContext.fill();
+            overlayContext.restore();
         });
     }
 
+    /*
+        PALETTE KNIFE
+    */
 
-    if (finish === "Palette Knife Finish") {
-        const accent =
-            builderState.accentColor !== "original"
-                ? builderState.accentColor
-                : "#FF4FA3";
-
-        const strokes = [
+    if (isPaletteKnife) {
+        const paletteStrokes = [
             {
-                x: frontLeft + frontWidth * 0.15,
-                y: frontTop + frontHeight * 0.27,
-                width: frontWidth * 0.34,
-                height: frontHeight * 0.15,
-                color: accent,
-                rotation: -0.18
+                startX: x + width * 0.27,
+                startY: y + height * 0.4,
+                endX: x + width * 0.57,
+                endY: y + height * 0.35,
+                thickness:
+                    Math.max(
+                        18,
+                        height * 0.055
+                    ),
+                color: accentColor
             },
             {
-                x: frontLeft + frontWidth * 0.53,
-                y: frontTop + frontHeight * 0.18,
-                width: frontWidth * 0.3,
-                height: frontHeight * 0.14,
-                color: "#F4D66E",
-                rotation: 0.12
+                startX: x + width * 0.5,
+                startY: y + height * 0.49,
+                endX: x + width * 0.75,
+                endY: y + height * 0.44,
+                thickness:
+                    Math.max(
+                        16,
+                        height * 0.05
+                    ),
+                color: goldColor
             },
             {
-                x: frontLeft + frontWidth * 0.37,
-                y: frontTop + frontHeight * 0.61,
-                width: frontWidth * 0.39,
-                height: frontHeight * 0.16,
-                color: "#7B294F",
-                rotation: -0.08
+                startX: x + width * 0.31,
+                startY: y + height * 0.61,
+                endX: x + width * 0.63,
+                endY: y + height * 0.66,
+                thickness:
+                    Math.max(
+                        20,
+                        height * 0.06
+                    ),
+                color: berryColor
+            },
+            {
+                startX: x + width * 0.58,
+                startY: y + height * 0.72,
+                endX: x + width * 0.79,
+                endY: y + height * 0.66,
+                thickness:
+                    Math.max(
+                        14,
+                        height * 0.045
+                    ),
+                color: accentColor
             }
         ];
 
-        context.globalCompositeOperation = "source-over";
-        context.globalAlpha = 0.88;
+        paletteStrokes.forEach(
+            (stroke) => {
+                overlayContext.save();
 
-        strokes.forEach((stroke) => {
-            context.save();
+                overlayContext.globalAlpha =
+                    0.92;
 
-            context.translate(
-                stroke.x,
-                stroke.y
-            );
+                overlayContext.strokeStyle =
+                    stroke.color;
 
-            context.rotate(
-                stroke.rotation
-            );
+                overlayContext.lineWidth =
+                    stroke.thickness;
 
-            context.fillStyle =
-                stroke.color;
+                overlayContext.lineCap =
+                    "round";
 
-            context.beginPath();
+                overlayContext.lineJoin =
+                    "round";
 
-            context.moveTo(
-                0,
-                stroke.height * 0.55
-            );
+                const middleX =
+                    (
+                        stroke.startX +
+                        stroke.endX
+                    ) / 2;
 
-            context.bezierCurveTo(
-                stroke.width * 0.12,
-                0,
-                stroke.width * 0.72,
-                -stroke.height * 0.1,
-                stroke.width,
-                stroke.height * 0.48
-            );
+                const middleY =
+                    Math.min(
+                        stroke.startY,
+                        stroke.endY
+                    ) -
+                    stroke.thickness * 0.7;
 
-            context.bezierCurveTo(
-                stroke.width * 0.76,
-                stroke.height,
-                stroke.width * 0.18,
-                stroke.height,
-                0,
-                stroke.height * 0.55
-            );
+                overlayContext.beginPath();
 
-            context.closePath();
-            context.fill();
+                overlayContext.moveTo(
+                    stroke.startX,
+                    stroke.startY
+                );
 
-            context.restore();
-        });
+                overlayContext.quadraticCurveTo(
+                    middleX,
+                    middleY,
+                    stroke.endX,
+                    stroke.endY
+                );
+
+                overlayContext.stroke();
+
+                /*
+                    Small highlight makes each stroke
+                    resemble thick palette-knife icing.
+                */
+
+                overlayContext.globalAlpha =
+                    0.38;
+
+                overlayContext.strokeStyle =
+                    "#FFFFFF";
+
+                overlayContext.lineWidth =
+                    Math.max(
+                        3,
+                        stroke.thickness * 0.15
+                    );
+
+                overlayContext.stroke();
+
+                overlayContext.restore();
+            }
+        );
     }
 
-    context.restore();
+    /*
+        Use the cake image itself as the clipping mask.
+        Transparent areas of the PNG remove the finish.
+    */
+
+    overlayContext.save();
+
+    overlayContext.globalCompositeOperation =
+        "destination-in";
+
+    overlayContext.globalAlpha = 1;
+
+    overlayContext.drawImage(
+        cakeImage,
+        x,
+        y,
+        width,
+        height
+    );
+
+    overlayContext.restore();
+
+    /*
+        Draw the finished masked artwork
+        onto the real preview canvas.
+    */
+
+    context.save();
+
+    context.globalCompositeOperation =
+        "source-over";
 
     context.globalAlpha = 1;
-    context.globalCompositeOperation = "source-over";
+
+    context.drawImage(
+        overlay,
+        0,
+        0
+    );
+
+    context.restore();
 }
 
 async function updateRealisticCakePreview() {
@@ -2268,13 +2375,15 @@ previewEntries.forEach((entry, index) => {
     */
 
     drawRealisticCakeFinish(
-        context,
-        product,
-        x,
-        y + boardYOffset,
-        size.width,
-        size.height
-    );
+    context,
+    cakeImage,
+    product,
+    x,
+    y + boardYOffset,
+    size.width,
+    size.height
+);
+
 });
         if (edibleImage) {
             previewEntries.forEach((entry, index) => {
@@ -3023,38 +3132,32 @@ function updateCakeHeight() {
 ========================================= */
 
 function updateFinishVisibility() {
-    const finishGroups = getElements(
+    getElements(
         ".cake-finish-group"
-    );
-
-    finishGroups.forEach((group) => {
-        group.classList.add("is-hidden");
+    ).forEach((group) => {
+        group.classList.add(
+            "is-hidden"
+        );
     });
 
-    const finishElementMap = {
-       
-        "Vintage Piping":
-            "#vintagePipingDecoration",
+    /*
+        Watercolor and Palette Knife are drawn
+        directly onto the realistic canvas.
 
-        "Watercolor Finish":
-            "#watercolorFinishDecoration",
+        Vintage Piping still uses the SVG layer.
+    */
 
-        "Palette Knife Finish":
-            "#paletteFinishDecoration"
-    };
-
-    const selectedFinishElement =
-        finishElementMap[
-            builderState.cakeFinish
-        ];
-
-    if (selectedFinishElement) {
+    if (
+        builderState.cakeFinish ===
+        "Vintage Piping"
+    ) {
         getElement(
-            selectedFinishElement
-        )?.classList.remove("is-hidden");
+            "#vintagePipingDecoration"
+        )?.classList.remove(
+            "is-hidden"
+        );
     }
 }
-
 
 /* =========================================
    RENDERER DECORATIONS
