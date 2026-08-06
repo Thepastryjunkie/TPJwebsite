@@ -340,6 +340,7 @@ const builderState = {
     numberCakeFirst: "0",
     numberCakeSecond: "1",
     letterCakeText: "A",
+    numberLetterStyle: "",
     characterOneColor: "original",
     characterTwoColor: "original",
 
@@ -1121,24 +1122,75 @@ function drawRecoloredAsset(
     context.restore();
 }
 
+function getNumberLetterStyleSlug() {
+    if (
+        builderState.numberLetterStyle ===
+        "Layered Piped"
+    ) {
+        return "Layered-Piped";
+    }
+
+    if (
+        builderState.numberLetterStyle ===
+        "Fully Frosted & Piped"
+    ) {
+        return "Fully-Frosted-Piped";
+    }
+
+    return "";
+}
+
+
 function getNumberLetterPreviewEntries(product) {
-    const isDouble = product.characterCount === 2;
+    const isDouble =
+        product.characterCount === 2;
+
     const doublePlacements = [
         [40, 330, 0.46],
         [610, 330, 0.46]
     ];
 
-    if (builderState.numberLetterKind === "letter") {
-        const entry = {
-            file: "TPJ-Asset-024-Blank-Letter-A-Cake.png",
-            key: "letter"
+    const styleSlug =
+        getNumberLetterStyleSlug();
+
+    function createEntry(
+        characterType,
+        characterValue,
+        originalFile,
+        key,
+        placement = null
+    ) {
+        const file = styleSlug
+            ? `TPJ-Number-Letter-${styleSlug}-${characterType}-${characterValue}-Base.png`
+            : originalFile;
+
+        return {
+            file,
+            key,
+            characterType,
+            characterValue,
+            placement
         };
+    }
+
+    if (
+        builderState.numberLetterKind ===
+        "letter"
+    ) {
+        const entry = createEntry(
+            "Letter",
+            "A",
+            "TPJ-Asset-024-Blank-Letter-A-Cake.png",
+            "letter"
+        );
 
         return isDouble
-            ? doublePlacements.map((placement) => ({
-                ...entry,
-                placement
-            }))
+            ? doublePlacements.map(
+                (placement) => ({
+                    ...entry,
+                    placement
+                })
+            )
             : [entry];
     }
 
@@ -1149,19 +1201,63 @@ function getNumberLetterPreviewEntries(product) {
         ]
         : [builderState.numberCakeFirst];
 
-    return digits.map((digit, index) => {
-        const [file, key] =
-            numberCakeAssetMap[digit] ||
-            numberCakeAssetMap["0"];
+    return digits.map(
+        (digit, index) => {
+            const [originalFile, key] =
+                numberCakeAssetMap[digit] ||
+                numberCakeAssetMap["0"];
 
-        return {
-            file,
-            key,
-            placement: isDouble
-                ? doublePlacements[index]
-                : null
-        };
-    });
+            return createEntry(
+                "Number",
+                digit,
+                originalFile,
+                key,
+                isDouble
+                    ? doublePlacements[index]
+                    : null
+            );
+        }
+    );
+}
+
+
+async function loadNumberLetterStyleAssets(
+    entry
+) {
+    const styleSlug =
+        getNumberLetterStyleSlug();
+
+    if (
+        !styleSlug ||
+        !entry.characterType ||
+        !entry.characterValue
+    ) {
+        return null;
+    }
+
+    const prefix =
+        `TPJ-Number-Letter-${styleSlug}-${entry.characterType}-${entry.characterValue}`;
+
+    const files = [
+        `${prefix}-Accent-1-Strokes.png`,
+        `${prefix}-Accent-1-Mask.png`,
+        `${prefix}-Accent-2-Strokes.png`,
+        `${prefix}-Accent-2-Mask.png`
+    ];
+
+    const images = await Promise.all(
+        files.map(
+            (file) =>
+                loadRealisticImage(
+                    `${finalAssetRoot}/cakes/${file}?v=tpj-number-letter-styles-1`
+                )
+        )
+    );
+
+    return {
+        type: "numberLetterPiping",
+        images
+    };
 }
 
 function getCakePreviewEntries(product) {
@@ -2256,9 +2352,10 @@ const accentTwo =
         DIMENSIONAL STROKE-AND-MASK FINISHES
     */
 
-   if (
+  if (
     finishAssets.type === "paletteKnife" ||
-    finishAssets.type === "vintagePiping"
+    finishAssets.type === "vintagePiping" ||
+    finishAssets.type === "numberLetterPiping"
 ) {
         const [
             accentOneStrokes,
@@ -2480,8 +2577,12 @@ async function updateRealisticCakePreview() {
         Promise.all(
             previewEntries.map(
                 (entry) =>
-                    loadRealisticFinishAssets(
-                        entry.key
+                   product.shape === "numberLetter"
+            ? loadNumberLetterStyleAssets(
+                entry
+            )
+            : loadRealisticFinishAssets(
+                entry.key  
                     )
             )
         )
@@ -2537,6 +2638,26 @@ previewEntries.forEach((entry, index) => {
             size.height
         );
     } else {
+    const isLayeredNumberLetter =
+        product.shape === "numberLetter" &&
+        builderState.numberLetterStyle ===
+            "Layered Piped";
+
+    if (isLayeredNumberLetter) {
+        /*
+            The layered base contains exposed
+            sponge, so it must retain its
+            original baked-cake color.
+        */
+
+        context.drawImage(
+            cakeImage,
+            x,
+            y + boardYOffset,
+            size.width,
+            size.height
+        );
+    } else {
         const selectedCakeColor =
             product.shape === "numberLetter"
                 ? index === 0
@@ -2555,6 +2676,8 @@ previewEntries.forEach((entry, index) => {
             size.height
         );
     }
+}
+    
 
     /*
         This MUST remain inside the loop because
@@ -3394,13 +3517,23 @@ function updateFinishColorControls() {
             "#finishColorCustomizer"
         );
 
-   const finishUsesTwoColors =
-    builderState.cakeFinish ===
-        "Watercolor Finish" ||
-    builderState.cakeFinish ===
-        "Palette Knife Finish" ||
-    builderState.cakeFinish ===
-        "Vintage Piping";
+    const product =
+        getSelectedCakeProduct();
+
+    const numberLetterUsesPipingColors =
+        product.shape === "numberLetter" &&
+        Boolean(
+            builderState.numberLetterStyle
+        );
+
+    const finishUsesTwoColors =
+        builderState.cakeFinish ===
+            "Watercolor Finish" ||
+        builderState.cakeFinish ===
+            "Palette Knife Finish" ||
+        builderState.cakeFinish ===
+            "Vintage Piping" ||
+        numberLetterUsesPipingColors;
 
     finishColorCustomizer?.classList.toggle(
         "is-hidden",
@@ -3422,6 +3555,22 @@ function updateFinishVisibility() {
             "is-hidden"
         );
     });
+   if (
+    isNumberLetter &&
+    builderState.numberLetterStyle
+) {
+    builderState.cakeFinish =
+        "Smooth Finish";
+
+    const smoothFinishInput =
+        getElement(
+            'input[name="cakeFinish"][value="Smooth Finish"]'
+        );
+
+    if (smoothFinishInput) {
+        smoothFinishInput.checked = true;
+    }
+} 
 }
 
 /* =========================================
@@ -3573,12 +3722,28 @@ function updateProductModeUI() {
         !isTwoTier
     );
 
-    const isNumberLetter = product.shape === "numberLetter";
+    const isNumberLetter =
+    product.shape === "numberLetter";
 
-    getElement("#characterColorCustomizer")?.classList.toggle(
-        "is-hidden",
-        !isNumberLetter
-    );
+const isLayeredNumberLetter =
+    isNumberLetter &&
+    builderState.numberLetterStyle ===
+        "Layered Piped";
+
+getElement(
+    "#numberLetterStyleCustomizer"
+)?.classList.toggle(
+    "is-hidden",
+    !isNumberLetter
+);
+
+getElement(
+    "#characterColorCustomizer"
+)?.classList.toggle(
+    "is-hidden",
+    !isNumberLetter ||
+        isLayeredNumberLetter
+);
 
     getElement("#secondCharacterColorField")?.classList.toggle(
         "is-hidden",
@@ -4111,6 +4276,19 @@ function validateStepThree() {
 
 
 function validateStepFour() {
+        const product =
+        getSelectedCakeProduct();
+
+    if (
+        product.shape === "numberLetter" &&
+        !builderState.numberLetterStyle
+    ) {
+        showValidationMessage(
+            "Choose Layered Piped or Fully Frosted & Piped."
+        );
+
+        return false;
+    }
     if (isCupcakesOnlyProduct()) {
         if (!builderState.cupcakeFrostingStyle) {
             showValidationMessage(
@@ -5473,14 +5651,19 @@ function populateReview() {
             : `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
     );
 
-    setText(
-        "#reviewFinish",
-        isCupcakesOnlyProduct()
-            ? builderState.cupcakeFrostingStyle || "Not selected"
-            : product.shape === "round"
-            ? `${builderState.cakeCoverage} coverage${builderState.cakeFinish ? ` · ${builderState.cakeFinish}` : ""}`
-            : builderState.cakeFinish || "Not selected"
-    );
+  setText(
+    "#reviewFinish",
+    isCupcakesOnlyProduct()
+        ? builderState.cupcakeFrostingStyle ||
+            "Not selected"
+        : product.shape === "numberLetter"
+        ? builderState.numberLetterStyle ||
+            "Not selected"
+        : product.shape === "round"
+        ? `${builderState.cakeCoverage} coverage${builderState.cakeFinish ? ` · ${builderState.cakeFinish}` : ""}`
+        : builderState.cakeFinish ||
+            "Not selected"
+);
 
     const reviewDecorationNames =
         builderState.decorations.map(
@@ -6157,7 +6340,32 @@ getElements(
         renderCakePreview();
     });
 });
+getElements(
+    'input[name="numberLetterStyle"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.numberLetterStyle =
+                input.value;
 
+            builderState.cakeFinish =
+                "Smooth Finish";
+
+            const smoothFinishInput =
+                getElement(
+                    'input[name="cakeFinish"][value="Smooth Finish"]'
+                );
+
+            if (smoothFinishInput) {
+                smoothFinishInput.checked = true;
+            }
+
+            updateSelectedCardStates();
+            renderCakePreview();
+        }
+    );
+});
 getElements(
     'input[name="cakeFinish"]'
 ).forEach((input) => {
