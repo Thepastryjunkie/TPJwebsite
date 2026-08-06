@@ -3451,6 +3451,7 @@ const unsupportedFinishes = [
     "Watercolor Finish",
     "Palette Knife Finish",
     "Vintage Piping"
+    
 ];
 
 
@@ -3510,6 +3511,22 @@ const unsupportedFinishes = [
             }
         );
     }
+    if (
+    isNumberLetter &&
+    builderState.numberLetterStyle
+) {
+    builderState.cakeFinish =
+        "Smooth Finish";
+
+    const smoothFinishInput =
+        getElement(
+            'input[name="cakeFinish"][value="Smooth Finish"]'
+        );
+
+    if (smoothFinishInput) {
+        smoothFinishInput.checked = true;
+    }
+}
 }
 function updateFinishColorControls() {
     const finishColorCustomizer =
@@ -3555,22 +3572,7 @@ function updateFinishVisibility() {
             "is-hidden"
         );
     });
-   if (
-    isNumberLetter &&
-    builderState.numberLetterStyle
-) {
-    builderState.cakeFinish =
-        "Smooth Finish";
-
-    const smoothFinishInput =
-        getElement(
-            'input[name="cakeFinish"][value="Smooth Finish"]'
-        );
-
-    if (smoothFinishInput) {
-        smoothFinishInput.checked = true;
-    }
-} 
+ 
 }
 
 /* =========================================
