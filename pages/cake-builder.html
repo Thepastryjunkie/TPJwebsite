@@ -3105,7 +3105,58 @@
                                     class="form-error-message"
                                     aria-live="polite"
                                 ></p>
+<fieldset
+    id="edibleImagePlacementTarget"
+    class="edible-image-option-group"
+>
 
+    <legend>
+        Requested Placement
+    </legend>
+
+    <p class="fieldset-description">
+        Choose where you would like the edible image placed.
+        Final size and positioning will be adjusted during design review.
+    </p>
+
+    <div class="compact-choice-row edible-image-shape-row">
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImagePlacement"
+                value="top"
+            >
+
+            <span>
+                Center Top
+            </span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImagePlacement"
+                value="front"
+                checked
+            >
+
+            <span>
+                Front Face
+            </span>
+        </label>
+
+    </div>
+
+</fieldset>
+
+<p
+    id="edibleImagePlacementNote"
+    class="field-note"
+>
+    Your uploaded image is shown above for reference and will not
+    be placed on the live cake preview.
+</p>
                                 <fieldset class="edible-image-option-group">
 
                                     <legend>Image Shape</legend>
@@ -3163,68 +3214,13 @@
     </div>
 
 </fieldset>
-                                <fieldset
-                                    id="edibleImageTierTarget"
-                                    class="edible-image-option-group is-hidden"
-                                >
-
-                                    <legend>Two-Tier Placement</legend>
-
-                                    <div class="compact-choice-row edible-image-shape-row">
-
-                                        <label>
-                                            <input type="radio" name="edibleImageTier" value="bottom" checked>
-                                            <span>Bottom Tier</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="radio" name="edibleImageTier" value="top">
-                                            <span>Top Tier</span>
-                                        </label>
-
-                                    </div>
-
-                                </fieldset>
 
                                 <div class="edible-image-adjustments">
 
-                                    <label>
-                                        <span>Size <output id="edibleImageScaleValue">70%</output></span>
-                                        <input id="edibleImageScale" type="range" min="35" max="115" value="70">
-                                    </label>
-
-                                    <label>
-                                        <span>Move Left / Right <output id="edibleImageXValue">0</output></span>
-                                        <input id="edibleImageX" type="range" min="-40" max="40" value="0">
-                                    </label>
-
-                                    <label>
-                                        <span>Move Up / Down <output id="edibleImageYValue">0</output></span>
-                                        <input id="edibleImageY" type="range" min="-40" max="40" value="0">
-                                    </label>
-
-                                    <label>
-                                        <span>Rotate <output id="edibleImageRotationValue">0&deg;</output></span>
-                                        <input id="edibleImageRotation" type="range" min="-20" max="20" value="0">
-                                    </label>
-
+                                    
                                 </div>
 
                                 <div class="edible-image-control-footer">
-
-                                    <p id="edibleImagePlacementNote">
-                                        The image will appear centered on the usable cake surface. Adjust it while watching the live preview.
-                                    </p>
-
-                                    <button
-                                        id="resetEdibleImagePosition"
-                                        class="edible-image-secondary-button"
-                                        type="button"
-                                    >
-                                        Reset Position
-                                    </button>
-
-                                </div>
 
                             </div>
 
@@ -4906,7 +4902,5 @@
     </div>
 
 
-  <script src="../js/cake-builder.js?v=finish-colors-edible-placement-1"></script>
-</body>
-
+ <script src="../js/cake-builder.js?v=vintage-piping-1"></script>
 </html>

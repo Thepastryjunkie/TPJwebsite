@@ -1649,224 +1649,20 @@ function addRoundedRectanglePath(
     context.closePath();
 }
 
-function drawEdibleImageInArea(
+   function drawEdibleImageInArea(
     context,
     image,
     area
 ) {
-    if (!image || !edibleImageIsReady()) {
-        return;
-    }
-
-    const sizeScale = clampNumber(
-        Number(
-            builderState.edibleImageScale
-        ) / 100,
-        0.35,
-        1.15
-    );
-
-    let width =
-        area.width * sizeScale;
-
-    let height =
-        area.height * sizeScale;
-
-    const imageAspect =
-        image.naturalWidth /
-            image.naturalHeight ||
-        1;
-
-    if (
-        builderState.edibleImageShape ===
-        "circle"
-    ) {
-        const diameter =
-            Math.min(
-                width,
-                height
-            );
-
-        width = diameter;
-        height = diameter;
-    } else if (
-        builderState.edibleImageShape ===
-        "rectangle"
-    ) {
-        height =
-            Math.min(
-                height,
-                width / 1.35
-            );
-    } else if (imageAspect >= 1) {
-        height =
-            Math.min(
-                height,
-                width / imageAspect
-            );
-    } else {
-        width =
-            Math.min(
-                width,
-                height * imageAspect
-            );
-    }
-
     /*
-        A top-surface edible image must look
-        compressed by the cake's perspective.
+        Edible images are intentionally not drawn
+        on the live cake preview.
+
+        The uploaded file is shown in the
+        edible-image thumbnail for reference.
     */
 
-    if (area.surface === "top") {
-        height *= 0.55;
-    }
-
-    const centerX =
-        area.centerX +
-        area.width *
-            (
-                clampNumber(
-                    Number(
-                        builderState.edibleImageX
-                    ),
-                    -40,
-                    40
-                ) / 100
-            ) *
-            0.48;
-
-    const centerY =
-        area.centerY +
-        area.height *
-            (
-                clampNumber(
-                    Number(
-                        builderState.edibleImageY
-                    ),
-                    -40,
-                    40
-                ) / 100
-            ) *
-            0.48;
-
-    const left =
-        -width / 2;
-
-    const top =
-        -height / 2;
-
-    context.save();
-
-    context.translate(
-        centerX,
-        centerY
-    );
-
-    context.rotate(
-        clampNumber(
-            Number(
-                builderState
-                    .edibleImageRotation
-            ),
-            -20,
-            20
-        ) *
-            Math.PI /
-            180
-    );
-
-    if (
-        builderState.edibleImageShape ===
-        "circle"
-    ) {
-        context.beginPath();
-
-        /*
-            This remains circular on the face,
-            but becomes an ellipse on top because
-            top placement compresses the height.
-        */
-
-        context.ellipse(
-            0,
-            0,
-            width / 2,
-            height / 2,
-            0,
-            0,
-            Math.PI * 2
-        );
-    } else {
-        addRoundedRectanglePath(
-            context,
-            left,
-            top,
-            width,
-            height,
-            Math.min(
-                width,
-                height
-            ) * 0.045
-        );
-    }
-
-    context.clip();
-
-    const targetAspect =
-        width / height;
-
-    let sourceX = 0;
-    let sourceY = 0;
-
-    let sourceWidth =
-        image.naturalWidth;
-
-    let sourceHeight =
-        image.naturalHeight;
-
-    if (
-        builderState.edibleImageShape !==
-        "original"
-    ) {
-        if (
-            imageAspect >
-            targetAspect
-        ) {
-            sourceWidth =
-                image.naturalHeight *
-                targetAspect;
-
-            sourceX =
-                (
-                    image.naturalWidth -
-                    sourceWidth
-                ) / 2;
-        } else {
-            sourceHeight =
-                image.naturalWidth /
-                targetAspect;
-
-            sourceY =
-                (
-                    image.naturalHeight -
-                    sourceHeight
-                ) / 2;
-        }
-    }
-
-    context.drawImage(
-        image,
-        sourceX,
-        sourceY,
-        sourceWidth,
-        sourceHeight,
-        left,
-        top,
-        width,
-        height
-    );
-
-    context.restore();
+    return;
 }
 function getEdibleImageArea(
     product,
@@ -2253,7 +2049,6 @@ function getRealisticFinishFiles(
 
             files: [
                 `TPJ-Finish-Watercolor-${shapeName}-Accent-1-Mask.png`,
-
                 `TPJ-Finish-Watercolor-${shapeName}-Accent-2-Mask.png`
             ]
         };
@@ -2268,19 +2063,35 @@ function getRealisticFinishFiles(
 
             files: [
                 `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-1-Strokes.png`,
-
                 `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-1-Mask.png`,
-
                 `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-2-Strokes.png`,
-
                 `TPJ-Finish-Palette-Knife-Abstract-${shapeName}-Accent-2-Mask.png`
             ]
         };
     }
 
-    return null;
+  if (
+    builderState.cakeFinish ===
+    "Vintage Piping"
+) {
+    const vintageShapeName = isBento
+        ? "Bento-5in-Heart"
+        : shapeName;
+
+    return {
+        type: "vintagePiping",
+
+        files: [
+            `TPJ-Finish-Vintage-Piping-${vintageShapeName}-Accent-1-Strokes.png`,
+            `TPJ-Finish-Vintage-Piping-${vintageShapeName}-Accent-1-Mask.png`,
+            `TPJ-Finish-Vintage-Piping-${vintageShapeName}-Accent-2-Strokes.png`,
+            `TPJ-Finish-Vintage-Piping-${vintageShapeName}-Accent-2-Mask.png`
+        ]
+    };
 }
 
+    return null;
+}
 
 async function loadRealisticFinishAssets(
     entryKey,
@@ -2295,12 +2106,15 @@ async function loadRealisticFinishAssets(
     if (!finishDefinition) {
         return null;
     }
-
+const assetVersion =
+    finishDefinition.type === "vintagePiping"
+        ? "?v=tpj-vintage-piping-complete-1"
+        : "";
     const images = await Promise.all(
         finishDefinition.files.map(
             (file) =>
                 loadRealisticImage(
-                    `${finalAssetRoot}/cakes/${file}`
+                    `${finalAssetRoot}/cakes/${file}${assetVersion}`
                 )
         )
     );
@@ -2439,13 +2253,13 @@ const accentTwo =
 
 
     /*
-        PALETTE KNIFE QA STROKES
+        DIMENSIONAL STROKE-AND-MASK FINISHES
     */
 
-    if (
-        finishAssets.type ===
-        "paletteKnife"
-    ) {
+   if (
+    finishAssets.type === "paletteKnife" ||
+    finishAssets.type === "vintagePiping"
+) {
         const [
             accentOneStrokes,
             accentOneMask,
@@ -3502,17 +3316,91 @@ function updateCakeHeight() {
 /* =========================================
    RENDERER FINISHES
 ========================================= */
+function updateFinishAvailability() {
+    const product =
+        getSelectedCakeProduct();
+
+    const isNumberLetter =
+        product.shape === "numberLetter";
+
+const unsupportedFinishes = [
+    "Simple Texture",
+    "Watercolor Finish",
+    "Palette Knife Finish",
+    "Vintage Piping"
+];
+
+
+    unsupportedFinishes.forEach(
+        (finishValue) => {
+            const finishInput =
+                getElement(
+                    `input[name="cakeFinish"][value="${finishValue}"]`
+                );
+
+            const finishCard =
+                finishInput?.closest(
+                    ".style-choice-card"
+                );
+
+            /*
+                Hide and disable these two choices
+                only for number and letter cakes.
+            */
+
+            finishCard?.classList.toggle(
+                "is-hidden",
+                isNumberLetter
+            );
+
+            if (finishInput) {
+                finishInput.disabled =
+                    isNumberLetter;
+            }
+        }
+    );
+
+    /*
+        If Watercolor or Palette Knife was already
+        selected before switching to Number / Letter,
+        clear that unsupported selection.
+    */
+
+    if (
+        isNumberLetter &&
+        unsupportedFinishes.includes(
+            builderState.cakeFinish
+        )
+    ) {
+        builderState.cakeFinish = "";
+
+        unsupportedFinishes.forEach(
+            (finishValue) => {
+                const finishInput =
+                    getElement(
+                        `input[name="cakeFinish"][value="${finishValue}"]`
+                    );
+
+                if (finishInput) {
+                    finishInput.checked = false;
+                }
+            }
+        );
+    }
+}
 function updateFinishColorControls() {
     const finishColorCustomizer =
         getElement(
             "#finishColorCustomizer"
         );
 
-    const finishUsesTwoColors =
-        builderState.cakeFinish ===
-            "Watercolor Finish" ||
-        builderState.cakeFinish ===
-            "Palette Knife Finish";
+   const finishUsesTwoColors =
+    builderState.cakeFinish ===
+        "Watercolor Finish" ||
+    builderState.cakeFinish ===
+        "Palette Knife Finish" ||
+    builderState.cakeFinish ===
+        "Vintage Piping";
 
     finishColorCustomizer?.classList.toggle(
         "is-hidden",
@@ -3520,6 +3408,13 @@ function updateFinishColorControls() {
     );
 }
 function updateFinishVisibility() {
+    /*
+        All realistic cake finishes are now
+        rendered directly on the canvas.
+
+        Keep the old SVG finish layers hidden.
+    */
+
     getElements(
         ".cake-finish-group"
     ).forEach((group) => {
@@ -3527,24 +3422,6 @@ function updateFinishVisibility() {
             "is-hidden"
         );
     });
-
-    /*
-        Watercolor and Palette Knife are drawn
-        directly onto the realistic canvas.
-
-        Vintage Piping still uses the SVG layer.
-    */
-
-    if (
-        builderState.cakeFinish ===
-        "Vintage Piping"
-    ) {
-        getElement(
-            "#vintagePipingDecoration"
-        )?.classList.remove(
-            "is-hidden"
-        );
-    }
 }
 
 /* =========================================
@@ -3871,47 +3748,11 @@ tierTarget?.classList.toggle(
     }
 
     if (placementNote) {
-    if (
-        product.shape === "tier" &&
-        builderState.edibleImagePlacement ===
-            "top"
-    ) {
-        placementNote.textContent =
-            "The image is centered on the top surface of the uppermost tier.";
-    } else if (
-        product.shape === "tier"
-    ) {
-        placementNote.textContent =
-            "Choose the top or bottom tier face, then adjust the image while watching the preview.";
-    } else if (
-        product.shape === "sheet"
-    ) {
-        placementNote.textContent =
-            "The image is placed flat on top of the sheet cake.";
-    } else if (
-        product.shape ===
-        "numberLetter"
-    ) {
-        placementNote.textContent =
-            "The image is placed on the exposed top surface.";
-    } else if (
-        product.shape === "cupcakes"
-    ) {
-        placementNote.textContent =
-            builderState.cupcakeFrostingStyle ===
-                "low-piped-edible-image"
-                ? "The image is centered on every cupcake."
-                : "Choose Flat Edible-Image Icing so the image has a usable surface.";
-    } else if (
+    placementNote.textContent =
         builderState.edibleImagePlacement ===
         "top"
-    ) {
-        placementNote.textContent =
-            "The image is centered on the top surface of the cake.";
-        } else {
-        placementNote.textContent =
-            "The image is centered on the front face of the cake.";
-    }
+            ? "Requested placement: centered on top of the cake. The uploaded image is shown above for reference only."
+            : "Requested placement: front face of the cake. The uploaded image is shown above for reference only.";
 }
 
 /*
@@ -3989,6 +3830,7 @@ function updatePreviewSummary() {
 
 function renderCakePreview() {
     updateProductModeUI();
+    updateFinishAvailability();
     updateEdibleImageControls();
     updateRealisticCakePreview();
     updateCupcakePreview();
@@ -5647,10 +5489,16 @@ function populateReview() {
         );
 
     if (edibleImageIsReady()) {
-        reviewDecorationNames.push(
-            "Edible Image"
-        );
-    }
+    const placementLabel =
+        builderState.edibleImagePlacement ===
+        "top"
+            ? "Center Top"
+            : "Front Face";
+
+    reviewDecorationNames.push(
+        `Edible Image · ${placementLabel}`
+    );
+}
 
     setText(
         "#reviewDecorations",
@@ -6720,39 +6568,15 @@ getElements(
             builderState.edibleImagePlacement =
                 input.value;
 
-            /*
-                Top center on a tiered cake always
-                means the uppermost cake surface.
-            */
+            updateEdibleImageControls();
 
             if (
-                input.value === "top" &&
-                getSelectedCakeProduct().shape ===
-                    "tier"
+                builderState.currentStep === 8
             ) {
-                builderState.edibleImageTier =
-                    "top";
-
-                getElements(
-                    'input[name="edibleImageTier"]'
-                ).forEach((tierInput) => {
-                    tierInput.checked =
-                        tierInput.value ===
-                        "top";
-                });
+                populateReview();
             }
-
-            renderCakePreview();
         }
     );
-});
-getElements(
-    'input[name="edibleImageTier"]'
-).forEach((input) => {
-    input.addEventListener("change", () => {
-        builderState.edibleImageTier = input.value;
-        renderCakePreview();
-    });
 });
 
 [
