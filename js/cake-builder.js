@@ -2217,58 +2217,65 @@ async function updateRealisticCakePreview() {
             realisticCakeCanvas.width,
             realisticCakeCanvas.height
         );
+previewEntries.forEach((entry, index) => {
+    const cakeImage = cakeImages[index];
 
-        previewEntries.forEach((entry, index) => {
-            const cakeImage = cakeImages[index];
-            const placement =
-                entry.placement ||
-                cakePlacements[entry.key]?.[boardKey] ||
-                cakePlacements[entry.key]?.round ||
-                [0, 0, 1];
+    const placement =
+        entry.placement ||
+        cakePlacements[entry.key]?.[boardKey] ||
+        cakePlacements[entry.key]?.round ||
+        [0, 0, 1];
 
-            const [x, y, scale] = placement;
-            const size = getContainedAssetSize(
-                cakeImage,
-                scale
-            );
+    const [x, y, scale] = placement;
 
-            if (product.shape === "tier") {
-                drawTwoTierColors(
-                    context,
-                    cakeImage,
-                    x,
-                    y + boardYOffset,
-                    size.width,
-                    size.height
-                );
-            } else {
-                const selectedCakeColor =
-                    product.shape === "numberLetter"
-                        ? index === 0
-                            ? builderState.characterOneColor
-                            : builderState.characterTwoColor
-                        : builderState.mainCakeColor;
+    const size = getContainedAssetSize(
+        cakeImage,
+        scale
+    );
 
-                drawRecoloredAsset(
-                    context,
-                    cakeImage,
-                    cakeImage,
-                    selectedCakeColor,
-                    x,
-                    y + boardYOffset,
-                    size.width,
-                    size.height
-                );
-            }
-        });
-drawRealisticCakeFinish(
-    context,
-    product,
-    x,
-    y + boardYOffset,
-    size.width,
-    size.height
-);
+    if (product.shape === "tier") {
+        drawTwoTierColors(
+            context,
+            cakeImage,
+            x,
+            y + boardYOffset,
+            size.width,
+            size.height
+        );
+    } else {
+        const selectedCakeColor =
+            product.shape === "numberLetter"
+                ? index === 0
+                    ? builderState.characterOneColor
+                    : builderState.characterTwoColor
+                : builderState.mainCakeColor;
+
+        drawRecoloredAsset(
+            context,
+            cakeImage,
+            cakeImage,
+            selectedCakeColor,
+            x,
+            y + boardYOffset,
+            size.width,
+            size.height
+        );
+    }
+
+    /*
+        This MUST remain inside the loop because
+        x, y, and size only exist inside this loop.
+    */
+
+    drawRealisticCakeFinish(
+        context,
+        product,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+});
         if (edibleImage) {
             previewEntries.forEach((entry, index) => {
                 const cakeImage = cakeImages[index];
