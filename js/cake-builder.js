@@ -3959,10 +3959,12 @@ function updatePreviewSummary() {
             formatCurrency(total);
     }
 
-    if (headerCakePrice) {
-        headerCakePrice.textContent =
-            formatCurrency(total);
-    }
+   if (headerCakePrice) {
+    headerCakePrice.textContent =
+        builderState.currentStep === 1
+            ? "$0"
+            : formatCurrency(total);
+}
 
     setText(
         "#mobileSummaryTitle",
@@ -4032,7 +4034,43 @@ function showStep(stepNumber) {
     );
 
     builderState.currentStep = safeStep;
+    const basicsHero =
+    getElement("#builderBasicsHero");
 
+const cakePreviewCard =
+    getElement("#cakePreviewCard");
+
+if (basicsHero) {
+    basicsHero.classList.toggle(
+        "is-hidden",
+        safeStep !== 1
+    );
+}
+
+if (cakePreviewCard) {
+    cakePreviewCard.classList.toggle(
+        "is-hidden",
+        safeStep === 1
+    );
+}
+const cakePreviewMeta =
+    getElement("#cakePreviewMeta");
+
+if (cakePreviewMeta) {
+    cakePreviewMeta.classList.toggle(
+        "is-hidden",
+        safeStep === 1
+    );
+}
+const cakePreviewDisclaimer =
+    getElement("#cakePreviewDisclaimer");
+
+if (cakePreviewDisclaimer) {
+    cakePreviewDisclaimer.classList.toggle(
+        "is-hidden",
+        safeStep === 1
+    );
+}
     getElements(".builder-step").forEach(
         (stepElement) => {
             const elementStep = Number(
@@ -4156,25 +4194,7 @@ function validateStepOne() {
         getElement("#fulfillmentDate")?.value || "";
     builderState.guestCount =
         Number(getElement("#guestCount")?.value) || 0;
-
-    if (!builderState.occasion) {
-        showValidationMessage(
-            "Choose an occasion before continuing."
-        );
-
-        return false;
-    }
-
-    if (
-        builderState.occasion === "Other" &&
-        !builderState.otherOccasion.trim()
-    ) {
-        showValidationMessage(
-            "Tell me what you are celebrating."
-        );
-
-        return false;
-    }
+ 
 
     if (!builderState.eventDate) {
         showValidationMessage(

@@ -95,7 +95,7 @@
                     aria-current="step"
                 >
                     <span>01</span>
-                    Occasion
+                    Basics
                 </button>
 
                 <button
@@ -181,8 +181,20 @@
                 <aside class="cake-preview-column">
 
                   <div class="cake-preview-sticky">
+                    <div
+    id="builderBasicsHero"
+    class="builder-basics-hero"
+>
+    <img
+        src="../images/cake-builder/TPJ-Builder-Basics-Hero.webp"
+        alt="The Pastry Junkie young baker presenting a decorated cake"
+    >
+</div>
 
-    <div class="preview-visual-card">
+    <div
+    id="cakePreviewCard"
+    class="preview-visual-card is-hidden"
+>
 
         <div class="preview-heading-row">
                             <div>
@@ -1173,8 +1185,10 @@
                              PREVIEW TOTALS
                         ========================== -->
 
-                        <div class="preview-summary">
-
+                        <div
+    class="preview-summary"
+    id="cakePreviewMeta"
+>
                             <div>
                                 <span>
                                     Serves
@@ -1191,13 +1205,17 @@
                                 </span>
 
                                 <strong id="previewPrice">
-                                    $185
+                                    0$
                                 </strong>
                             </div>
 
                         </div>
 
-                        <p class="preview-note">
+                      <p
+    class="preview-note"
+    id="cakePreviewDisclaimer"
+>
+                            
                             The preview communicates your selections.
                             Your final cake is designed and reviewed by
                             The Pastry Junkie.
@@ -1226,225 +1244,21 @@
 
                         <div class="step-heading">
 
-                            <p class="step-number">
-                                First, The Occasion
-                            </p>
+    <p class="step-number">
+        First, The Basics
+    </p>
 
-                            <h2>
-                                What Are We Celebrating?
-                            </h2>
+    <h2>
+        Let’s Get Started.
+    </h2>
 
-                            <p>
-                                Give me the date, guest count, and reason
-                                the cake table needs a centerpiece.
-                            </p>
+    <p>
+        Tell me when you need it and how many guests
+        you're serving. I'll use that to help guide
+        your timing and cake size.
+    </p>
 
-                        </div>
-
-                        <fieldset class="builder-fieldset">
-
-                            <legend class="visually-hidden">
-                                Choose an occasion
-                            </legend>
-
-                            <div class="occasion-grid">
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Birthday"
-                                    >
-
-                                    <span class="occasion-number">
-                                        01
-                                    </span>
-
-                                    <strong>
-                                        Birthday
-                                    </strong>
-
-                                    <small>
-                                        Every candle deserves a proper centerpiece.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Baby Shower"
-                                    >
-
-                                    <span class="occasion-number">
-                                        02
-                                    </span>
-
-                                    <strong>
-                                        Baby Shower
-                                    </strong>
-
-                                    <small>
-                                        A sweet welcome for someone new.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Graduation"
-                                    >
-
-                                    <span class="occasion-number">
-                                        03
-                                    </span>
-
-                                    <strong>
-                                        Graduation
-                                    </strong>
-
-                                    <small>
-                                        Caps off. Cake out.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Wedding or Engagement"
-                                    >
-
-                                    <span class="occasion-number">
-                                        04
-                                    </span>
-
-                                    <strong>
-                                        Wedding or Engagement
-                                    </strong>
-
-                                    <small>
-                                        For the question, promise, or party.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Anniversary"
-                                    >
-
-                                    <span class="occasion-number">
-                                        05
-                                    </span>
-
-                                    <strong>
-                                        Anniversary
-                                    </strong>
-
-                                    <small>
-                                        Another chapter worth slicing into.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Holiday"
-                                    >
-
-                                    <span class="occasion-number">
-                                        06
-                                    </span>
-
-                                    <strong>
-                                        Holiday
-                                    </strong>
-
-                                    <small>
-                                        Seasonal, festive, and made for the table.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        type="radio"
-                                        name="occasion"
-                                        value="Just Because"
-                                    >
-
-                                    <span class="occasion-number">
-                                        07
-                                    </span>
-
-                                    <strong>
-                                        Just Because
-                                    </strong>
-
-                                    <small>
-                                        No occasion required.
-                                    </small>
-
-                                </label>
-
-                                <label class="occasion-card">
-
-                                    <input
-                                        id="otherOccasionOption"
-                                        type="radio"
-                                        name="occasion"
-                                        value="Other"
-                                    >
-
-                                    <span class="occasion-number">
-                                        08
-                                    </span>
-
-                                    <strong>
-                                        Something Else
-                                    </strong>
-
-                                    <small>
-                                        Tell me what deserves dessert.
-                                    </small>
-
-                                </label>
-
-                            </div>
-
-                        </fieldset>
-
-                        <div
-                            id="otherOccasionField"
-                            class="conditional-field is-hidden"
-                        >
-                            <label for="otherOccasionText">
-                                What are you celebrating?
-                            </label>
-
-                            <input
-                                id="otherOccasionText"
-                                type="text"
-                                autocomplete="off"
-                                placeholder="Enter the occasion"
-                            >
-                        </div>
+</div>
 
                         <div class="two-column-fields">
 

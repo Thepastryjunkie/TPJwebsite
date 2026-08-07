@@ -172,12 +172,12 @@ fieldset {
     min-height: var(--builder-header-height);
 
     border-top: 5px solid var(--signature-pink);
-    border-bottom: 1px solid rgba(255, 248, 242, 0.12);
+    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
 
-    background: rgba(45, 15, 10, 0.98);
-    color: var(--cream);
+    background: #F8D7E7;
+    color: var(--chocolate);
 
-    box-shadow: 0 10px 30px rgba(45, 15, 10, 0.22);
+    box-shadow: 0 10px 30px rgba(90, 42, 30, 0.12);
 
     backdrop-filter: blur(12px);
 }
@@ -275,10 +275,10 @@ fieldset {
     justify-content: center;
     gap: 9px;
 
-    border: 2px solid rgba(255, 248, 242, 0.32);
+    border: 2px solid var(--chocolate);
     border-radius: 999px;
 
-    background: rgba(255, 248, 242, 0.07);
+    background:var(--chocolate);
     color: var(--cream);
 
     cursor: pointer;
@@ -288,7 +288,13 @@ fieldset {
         background-color 180ms ease,
         transform 180ms ease;
 }
+.header-summary-button span {
+    color: var(--cream);
+}
 
+.header-summary-button strong {
+    color: var(--signature-pink);
+}
 .header-summary-button:hover,
 .header-summary-button:focus-visible {
     border-color: var(--headline-pink);
@@ -448,7 +454,7 @@ fieldset {
     padding: 0 var(--side-padding);
 
     display: grid;
-    grid-template-columns: minmax(430px, 0.92fr) minmax(540px, 1.08fr);
+    grid-template-columns: minmax(560px, 1.2fr) minmax(470px, 0.8fr);
     align-items: start;
     gap: clamp(34px, 4.6vw, 78px);
 }
@@ -4320,4 +4326,42 @@ fieldset {
         flex-direction: column;
     }
 
+}
+/* =========================================
+   STEP 1 BASICS HERO
+========================================= */
+
+.builder-basics-hero {
+    width: 100%;
+    overflow: hidden;
+
+    border: 3px solid var(--chocolate);
+    border-radius: 34px;
+
+    background: var(--blush-pink);
+
+    box-shadow:
+        13px 14px 0 rgba(255, 79, 163, 0.18),
+        0 28px 50px rgba(90, 42, 30, 0.12);
+}
+
+.builder-basics-hero img {
+    display: block;
+
+    width: 100%;
+    height: clamp(460px, 55vw, 650px);
+
+    object-fit: cover;
+    object-position: center;
+
+    border-radius: 30px;
+}
+
+.basics-helper-text {
+    margin: 8px 0 0;
+
+    color: rgba(90, 42, 30, 0.68);
+
+    font-size: 11px;
+    line-height: 1.6;
 }
