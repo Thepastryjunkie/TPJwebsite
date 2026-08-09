@@ -2360,7 +2360,21 @@ const realisticExtraNameMap = {
     silverLeafDecoration: "Metallic-Leaf-Silver", // future-safe
     pearlsDecoration: "Pearls"
 };
+function getNumberLetterExtraSlug(entry) {
+    if (!entry) {
+        return null;
+    }
 
+    if (entry.characterType === "Letter") {
+        return `Letter-${String(
+            entry.characterValue || "A"
+        ).toUpperCase()}`;
+    }
+
+    return `Number-${String(
+        entry.characterValue ?? "0"
+    )}`;
+}
 function getSelectedRealisticExtraIds() {
     return builderState.decorations
         .map((decoration) => decoration.id)
@@ -2422,6 +2436,77 @@ async function loadCakeExtraAssets(entryKey, isBento = false) {
             };
         })
     );
+
+    return loadedAssets.filter(Boolean);
+}
+async function loadNumberLetterExtraAssets(entry) {
+    const shapeSlug =
+        getNumberLetterExtraSlug(entry);
+
+    if (!shapeSlug) {
+        return [];
+    }
+
+    const extraRoot =
+        `${finalAssetRoot}/extras`;
+
+    const selectedExtraIds =
+        getSelectedRealisticExtraIds();
+
+    const loadedAssets =
+        await Promise.all(
+            selectedExtraIds.map(
+                async (id) => {
+
+                    let extraName =
+                        realisticExtraNameMap[id];
+
+                    /*
+                        Gold / Silver Leaf uses
+                        whichever metallic choice
+                        the customer selected.
+                    */
+                    if (
+                        id ===
+                        "goldAccentDecoration"
+                    ) {
+                        extraName =
+                            builderState
+                                .metallicLeafType ===
+                            "Silver"
+                                ? "Metallic-Leaf-Silver"
+                                : "Metallic-Leaf-Gold";
+                    }
+
+                    if (!extraName) {
+                        return null;
+                    }
+
+                    const prefix =
+                        `TPJ-Extra-${extraName}-${shapeSlug}`;
+
+                    const strokes =
+                        await loadOptionalRealisticImage(
+                            `${extraRoot}/${prefix}-Strokes.png`
+                        );
+
+                    const mask =
+                        await loadOptionalRealisticImage(
+                            `${extraRoot}/${prefix}-Mask.png`
+                        );
+
+                    if (!strokes) {
+                        return null;
+                    }
+
+                    return {
+                        id,
+                        strokes,
+                        mask
+                    };
+                }
+            )
+        );
 
     return loadedAssets.filter(Boolean);
 }
@@ -3180,7 +3265,9 @@ Promise.all(
     previewEntries.map(
         (entry) =>
             product.shape === "numberLetter"
-                ? Promise.resolve([])
+                ? loadNumberLetterExtraAssets(
+                    entry
+                )
                 : loadCakeExtraAssets(
                     entry.key
                 )
