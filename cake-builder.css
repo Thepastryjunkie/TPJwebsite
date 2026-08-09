@@ -1572,6 +1572,24 @@ fieldset {
     color: var(--success);
 }
 
+/* =========================================
+   BUILDER OPTION IMAGES
+========================================= */
+
+.option-card-image {
+    display: block;
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+
+    pointer-events: none;
+}
 
 /* =========================================
    SHAPE CHOICES
@@ -1584,7 +1602,7 @@ fieldset {
 }
 
 .shape-choice-card {
-    min-height: 165px;
+    min-height: 250px;
     padding: 21px 15px;
 
     display: flex;
@@ -1597,7 +1615,9 @@ fieldset {
 
     text-align: center;
 }
-
+.shape-choice-card .option-card-image {
+    margin-bottom: 6px;
+}
 .shape-drawing {
     position: relative;
 
@@ -1921,7 +1941,19 @@ fieldset {
 /* =========================================
    TEXT CHOICES
 ========================================= */
+.custom-text-only-card {
+    min-height: 205px;
 
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+}
+
+.custom-text-only-card strong {
+    font-size: 16px;
+    text-align: center;
+}
 .text-choice-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2115,6 +2147,31 @@ fieldset {
     overflow: hidden;
 
     border-radius: 21px;
+}
+.finish-card-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+
+    margin-bottom: 8px;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+
+    pointer-events: none;
+}
+
+.style-choice-card {
+    min-height: 0;
+    padding: 12px 12px 18px;
+
+    justify-content: flex-start;
+}
+
+.style-choice-card > strong {
+    margin-top: auto;
 }
 
 .style-photo-placeholder {
@@ -2429,16 +2486,56 @@ fieldset {
 }
 
 .decoration-choice-card {
-    min-height: 145px;
-    padding: 16px;
+    min-height: 215px;
+    padding: 12px;
 
-    display: grid;
-    grid-template-columns: 54px 1fr;
-    grid-template-rows: auto auto;
-    align-items: center;
-    gap: 4px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 7px;
+
+    overflow: hidden;
 
     border-radius: 20px;
+}
+
+.decoration-card-image {
+    display: block;
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    object-fit: contain;
+
+    margin-bottom: 4px;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+
+    pointer-events: none;
+}
+
+.decoration-choice-card strong {
+    margin-top: auto;
+
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.decoration-choice-card small {
+    color: var(--deep-berry);
+
+    font-size: 9px;
+    font-weight: 700;
+}
+.decoration-choice-card .decoration-line-art {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+
+    margin-bottom: 4px;
 }
 
 .decoration-line-art {
@@ -2609,7 +2706,30 @@ fieldset {
 /* =========================================
    EXTRAS
 ========================================= */
+.quantity-product-info {
+    min-width: 0;
 
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.quantity-product-image {
+    width: 78px;
+    height: 78px;
+
+    flex: 0 0 78px;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+}
+
+.quantity-product-info > div {
+    min-width: 0;
+}
 .extra-product-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2617,7 +2737,7 @@ fieldset {
 }
 
 .extra-product-card {
-    min-height: 145px;
+    min-height: 240px;
     padding: 16px;
 
     display: flex;
@@ -2629,6 +2749,22 @@ fieldset {
     border-radius: 21px;
 
     text-align: center;
+}
+.cupcake-count-card-image {
+    display: block;
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    object-fit: contain;
+
+    margin-bottom: 4px;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+
+    pointer-events: none;
 }
 
 .extra-count {
@@ -2656,7 +2792,7 @@ fieldset {
 }
 
 .quantity-product {
-    min-height: 84px;
+    min-height: 108px;
     padding: 15px 17px;
 
     display: flex;
@@ -3942,19 +4078,36 @@ fieldset {
     }
 
     .builder-main-inner {
-        grid-template-columns: 1fr;
-    }
+    grid-template-columns:
+        minmax(300px, 0.9fr)
+        minmax(0, 1.1fr);
+
+    align-items: start;
+    gap: 24px;
+}
 
     .cake-preview-sticky {
-        position: relative;
-        top: auto;
+    position: sticky;
 
-        height: auto;
-        min-height: auto;
-        max-height: none;
+    top: calc(
+        var(--builder-header-height) +
+        var(--builder-progress-height) +
+        12px
+    );
 
-        overflow: visible;
-    }
+    align-self: start;
+
+    height: auto;
+    min-height: 0;
+    max-height: calc(
+        100vh -
+        var(--builder-header-height) -
+        var(--builder-progress-height) -
+        24px
+    );
+
+    overflow: auto;
+}
 
     .builder-form-column {
         width: 100%;
@@ -3972,6 +4125,104 @@ fieldset {
 ========================================= */
 
 @media (max-width: 720px) {
+    .builder-main-inner {
+    grid-template-columns:
+        minmax(140px, 42vw)
+        minmax(0, 1fr);
+
+    align-items: start;
+    gap: 10px;
+
+    padding: 0 8px;
+}
+
+.cake-preview-column {
+    min-width: 0;
+}
+
+.builder-form-column {
+    min-width: 0;
+}
+
+.cake-preview-sticky {
+    position: sticky;
+
+    top: calc(
+        var(--builder-header-height) +
+        var(--builder-progress-height) +
+        8px
+    );
+
+    max-height: calc(
+        100vh -
+        var(--builder-header-height) -
+        var(--builder-progress-height) -
+        16px
+    );
+
+    overflow-y: auto;
+
+    gap: 8px;
+}
+
+.preview-visual-card {
+    padding: 10px;
+
+    border-width: 2px;
+    border-radius: 18px;
+}
+
+.preview-heading-row {
+    display: block;
+}
+
+.preview-heading-row h1 {
+    font-size: 20px;
+}
+
+.preview-eyebrow,
+.preview-heading-row > div > p:last-child {
+    font-size: 7px;
+}
+
+.reset-cake-button {
+    margin-top: 7px;
+
+    min-height: 28px;
+    padding: 5px 8px;
+
+    font-size: 7px;
+}
+
+.cake-renderer-stage {
+    height: auto;
+    aspect-ratio: 1 / 1;
+
+    margin-top: 8px;
+
+    border-radius: 14px;
+}
+
+.preview-summary {
+    padding: 8px 6px;
+
+    grid-template-columns: 1fr;
+    gap: 6px;
+
+    border-radius: 14px;
+}
+
+.preview-summary span {
+    font-size: 6px;
+}
+
+.preview-summary strong {
+    font-size: 17px;
+}
+
+.preview-note {
+    display: none;
+}
 
     :root {
         --builder-header-height: 68px;
@@ -4364,4 +4615,39 @@ fieldset {
 
     font-size: 11px;
     line-height: 1.6;
+}
+.text-choice-card.image-choice-card {
+    min-height: 205px;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.text-choice-card.image-choice-card strong {
+    margin-top: auto;
+    padding: 2px 4px 6px;
+}
+.decoration-text-only-preview {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+
+    margin-bottom: 4px;
+
+    border-radius: 14px;
+
+    background: var(--cream);
+    color: var(--chocolate);
+
+    font-family: 'Lilita One', cursive;
+    font-size: 24px;
+    line-height: 1.05;
+    text-align: center;
 }

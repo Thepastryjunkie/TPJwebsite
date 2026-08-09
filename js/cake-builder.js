@@ -397,7 +397,10 @@ butterflyColor: "#F6B6C8",
 cherryColor: "#E5172F",
 cherryGlitter: "No",
 
-dripColor: "#5A2A1E",
+dripChocolateType: "Milk Chocolate",
+whiteChocolateColored: "No",
+whiteChocolateDripColor: "#F7B6D2",
+dripColor: "#84563C",
 
 pearlColor: "#FFF7F2",
 
@@ -2536,7 +2539,6 @@ function getRealisticExtraColor(
     return colorMap[decorationId] || null;
 }
 
-
 function getRenderedExtraLayer(asset) {
     const selectedColor =
         getRealisticExtraColor(
@@ -2544,14 +2546,34 @@ function getRenderedExtraLayer(asset) {
         );
 
     /*
-        Gold and Silver Leaf stay in
-        their original metallic artwork.
+        Metallic leaf keeps its
+        original artwork.
     */
+    if (!selectedColor) {
+        return asset.strokes;
+    }
 
+    /*
+        Chocolate Drip:
+        use the visible drip artwork itself
+        as the recolor mask.
+
+        This prevents light colors like
+        white chocolate from tinting the
+        transparent canvas around the drip.
+    */
     if (
-        !selectedColor ||
-        !asset.mask
+        asset.id ===
+        "chocolateDripDecoration"
     ) {
+        return makeTintedLayer(
+            asset.strokes,
+            asset.strokes,
+            selectedColor
+        );
+    }
+
+    if (!asset.mask) {
         return asset.strokes;
     }
 
@@ -2561,6 +2583,7 @@ function getRenderedExtraLayer(asset) {
         selectedColor
     );
 }
+
 function drawCakeDripExtra(
     context,
     assets,
@@ -5579,6 +5602,35 @@ function updateExtraDetailControlsVisibility() {
         "goldAccentDecoration"
     )
 );
+const dripSelected =
+    decorationIsSelected(
+        "chocolateDripDecoration"
+    );
+
+const whiteChocolateSelected =
+    builderState.dripChocolateType ===
+    "White Chocolate";
+
+const whiteChocolateColored =
+    builderState.whiteChocolateColored ===
+    "Yes";
+
+getElement(
+    "#whiteChocolateColorQuestion"
+)?.classList.toggle(
+    "is-hidden",
+    !dripSelected ||
+    !whiteChocolateSelected
+);
+
+getElement(
+    "#whiteChocolateColorOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !dripSelected ||
+    !whiteChocolateSelected ||
+    !whiteChocolateColored
+);
 }
 function updateFlowerSourceVisibility() {
     const flowersSelected =
@@ -7173,6 +7225,40 @@ getElements(
                                 ) || 0
                         })
                     );
+                    const dripStillSelected =
+    builderState.decorations.some(
+        (decoration) =>
+            decoration.id ===
+            "chocolateDripDecoration"
+    );
+
+if (!dripStillSelected) {
+    builderState.dripChocolateType =
+        "Milk Chocolate";
+
+    builderState.whiteChocolateColored =
+        "No";
+
+    builderState.whiteChocolateDripColor =
+        "#F7B6D2";
+
+    updateDripColorFromSelection();
+
+    getElements(
+        'input[name="dripChocolateType"]'
+    ).forEach((dripInput) => {
+        dripInput.checked =
+            dripInput.value ===
+            "Milk Chocolate";
+    });
+
+    getElements(
+        'input[name="whiteChocolateColored"]'
+    ).forEach((colorInput) => {
+        colorInput.checked =
+            colorInput.value === "No";
+    });
+}
 
             updateFlowerSourceVisibility();
 updateExtraDetailControlsVisibility();
@@ -7243,7 +7329,6 @@ getElement(
     ["#bowColor", "bowColor"],
     ["#butterflyColor", "butterflyColor"],
     ["#cherryColor", "cherryColor"],
-    ["#dripColor", "dripColor"],
     ["#pearlColor", "pearlColor"],
     ["#flowerColor", "flowerColor"]
 ].forEach(([selector, stateKey]) => {
@@ -7278,7 +7363,124 @@ getElements(
         }
     );
 });
+const dripChocolateColorMap = {
+    "Milk Chocolate": "#84563C",
+    "Dark Chocolate": "#3B2118",
+    "White Chocolate": "#F3E2C7"
+};
 
+
+function updateDripColorFromSelection() {
+    if (
+        builderState.dripChocolateType ===
+            "White Chocolate" &&
+        builderState.whiteChocolateColored ===
+            "Yes"
+    ) {
+        builderState.dripColor =
+            builderState.whiteChocolateDripColor;
+
+        return;
+    }
+
+    builderState.dripColor =
+        dripChocolateColorMap[
+            builderState.dripChocolateType
+        ] || "#84563C";
+}
+
+
+getElements(
+    'input[name="dripChocolateType"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.dripChocolateType =
+                input.value;
+
+            /*
+                If they switch away from
+                White Chocolate, custom color
+                is automatically turned off.
+            */
+            if (
+                input.value !==
+                "White Chocolate"
+            ) {
+                builderState.whiteChocolateColored =
+                    "No";
+
+                const noInput =
+                    getElement(
+                        'input[name="whiteChocolateColored"][value="No"]'
+                    );
+
+                if (noInput) {
+                    noInput.checked = true;
+                }
+            }
+
+            updateDripColorFromSelection();
+            updateExtraDetailControlsVisibility();
+            updateSelectedCardStates();
+            renderCakePreview();
+
+            if (
+                builderState.currentStep === 8
+            ) {
+                populateReview();
+            }
+        }
+    );
+});
+
+
+getElements(
+    'input[name="whiteChocolateColored"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.whiteChocolateColored =
+                input.value;
+
+            updateDripColorFromSelection();
+            updateExtraDetailControlsVisibility();
+            updateSelectedCardStates();
+            renderCakePreview();
+
+            if (
+                builderState.currentStep === 8
+            ) {
+                populateReview();
+            }
+        }
+    );
+});
+
+
+getElements(
+    'input[name="whiteChocolateDripColor"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.whiteChocolateDripColor =
+                input.value;
+
+            updateDripColorFromSelection();
+            updateSelectedCardStates();
+            renderCakePreview();
+
+            if (
+                builderState.currentStep === 8
+            ) {
+                populateReview();
+            }
+        }
+    );
+});
 
 getElements(
     'input[name="flowerType"]'
@@ -7857,6 +8059,25 @@ function initializeBuilder() {
     updateCustomCakeFlavorVisibility();
     updateCustomFillingVisibility();
     updateFlowerSourceVisibility();
+    updateDripColorFromSelection();
+    const defaultDripType =
+    getElement(
+        'input[name="dripChocolateType"][value="Milk Chocolate"]'
+    );
+
+if (defaultDripType) {
+    defaultDripType.checked = true;
+}
+
+const defaultWhiteChocolateColored =
+    getElement(
+        'input[name="whiteChocolateColored"][value="No"]'
+    );
+
+if (defaultWhiteChocolateColored) {
+    defaultWhiteChocolateColored.checked =
+        true;
+}
     updateExtraDetailControlsVisibility();
     updateTopperOptionsVisibility();
     updateDeliveryFieldsVisibility();
