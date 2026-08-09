@@ -389,8 +389,22 @@ finishAccentTwo: "#F4D66E",
     cupcakeFrostingColor: "original",
 
     decorations: [],
-    flowerSource: "",
+flowerSource: "",
 
+bowColor: "#F4E6D8",
+butterflyColor: "#F6B6C8",
+
+cherryColor: "#E5172F",
+cherryGlitter: "No",
+
+dripColor: "#5A2A1E",
+
+pearlColor: "#FFF7F2",
+
+flowerColor: "#FFF3D6",
+flowerType: "",
+customFlowerType: "",
+metallicLeafType: "Gold",
     topperType: "",
     topperPrice: 0,
     topperWording: "",
@@ -2295,8 +2309,7 @@ async function loadSelectedBorderAssets(
             bottom: null
         };
     }
-
-    const placement =
+     const placement =
         builderState.cakeBorderPlacement;
 
     const needsTop =
@@ -2332,6 +2345,290 @@ async function loadSelectedBorderAssets(
         top,
         bottom
     };
+}
+/* =========================================
+   REALISTIC EXTRA ASSETS
+========================================= */
+
+const realisticExtraNameMap = {
+    ribbonDecoration: "Bows",
+    butterfliesDecoration: "Butterflies",
+    cherriesDecoration: "Cherries",
+    chocolateDripDecoration: "Chocolate-Drip",
+    flowersDecoration: "Fresh-Flowers",
+    goldAccentDecoration: "Metallic-Leaf-Gold",
+    silverLeafDecoration: "Metallic-Leaf-Silver", // future-safe
+    pearlsDecoration: "Pearls"
+};
+
+function getSelectedRealisticExtraIds() {
+    return builderState.decorations
+        .map((decoration) => decoration.id)
+        .filter((id) => Boolean(realisticExtraNameMap[id]));
+}
+
+async function loadOptionalRealisticImage(url) {
+    try {
+        return await loadRealisticImage(url);
+    } catch (error) {
+        console.warn("Missing preview asset:", url);
+        return null;
+    }
+}
+
+function getCakeExtraShapeName(entryKey, isBento = false) {
+    return getBorderShapeName(entryKey, isBento);
+}
+
+async function loadCakeExtraAssets(entryKey, isBento = false) {
+    const shapeName = getCakeExtraShapeName(entryKey, isBento);
+
+    if (!shapeName) {
+        return [];
+    }
+
+    const extraRoot = `${finalAssetRoot}/extras`;
+    const selectedExtraIds = getSelectedRealisticExtraIds();
+
+    const loadedAssets = await Promise.all(
+        selectedExtraIds.map(async (id) => {
+            const styleName =
+    id === "goldAccentDecoration"
+        ? builderState.metallicLeafType === "Silver"
+            ? "Metallic-Leaf-Silver"
+            : "Metallic-Leaf-Gold"
+        : realisticExtraNameMap[id];
+
+            if (!styleName) {
+                return null;
+            }
+
+            const strokes = await loadOptionalRealisticImage(
+                `${extraRoot}/TPJ-Extra-${styleName}-${shapeName}-Strokes.png`
+            );
+
+            const mask = await loadOptionalRealisticImage(
+                `${extraRoot}/TPJ-Extra-${styleName}-${shapeName}-Mask.png`
+            );
+
+            if (!strokes) {
+                return null;
+            }
+
+            return {
+                id,
+                strokes,
+                mask
+            };
+        })
+    );
+
+    return loadedAssets.filter(Boolean);
+}
+function getRealisticExtraColor(
+    decorationId
+) {
+    const colorMap = {
+        ribbonDecoration:
+            builderState.bowColor,
+
+        butterfliesDecoration:
+            builderState.butterflyColor,
+
+        cherriesDecoration:
+            builderState.cherryColor,
+
+        chocolateDripDecoration:
+            builderState.dripColor,
+
+        flowersDecoration:
+            builderState.flowerColor,
+
+        pearlsDecoration:
+            builderState.pearlColor
+    };
+
+    return colorMap[decorationId] || null;
+}
+
+
+function getRenderedExtraLayer(asset) {
+    const selectedColor =
+        getRealisticExtraColor(
+            asset.id
+        );
+
+    /*
+        Gold and Silver Leaf stay in
+        their original metallic artwork.
+    */
+
+    if (
+        !selectedColor ||
+        !asset.mask
+    ) {
+        return asset.strokes;
+    }
+
+    return makeTintedLayer(
+        asset.strokes,
+        asset.mask,
+        selectedColor
+    );
+}
+function drawCakeDripExtra(
+    context,
+    assets,
+    x,
+    y,
+    width,
+    height
+) {
+    const dripAsset =
+        assets?.find(
+            (asset) =>
+                asset.id ===
+                "chocolateDripDecoration"
+        );
+
+    if (!dripAsset) {
+        return;
+    }
+
+    context.save();
+
+    context.drawImage(
+        getRenderedExtraLayer(dripAsset),
+        x,
+        y,
+        width,
+        height
+    );
+
+    context.restore();
+}
+
+
+function drawCakeForegroundExtras(
+    context,
+    assets,
+    x,
+    y,
+    width,
+    height
+) {
+    if (!assets?.length) {
+        return;
+    }
+
+    assets
+        .filter(
+            (asset) =>
+                asset.id !==
+                "chocolateDripDecoration"
+        )
+        .forEach((asset) => {
+            context.save();
+
+            context.drawImage(
+                getRenderedExtraLayer(asset), 
+                x,
+                y,
+                width,
+                height
+            );
+
+            context.restore();
+        });
+}
+
+function getCupcakeExtraStyleName() {
+    switch (builderState.cupcakeFrostingStyle) {
+        case "low-piped-edible-image":
+            return "Flat";
+        case "true-rosette":
+            return "Rosette";
+        case "classic-tall-swirl":
+            return "Swirl";
+        default:
+            return null;
+    }
+}
+
+async function loadCupcakeExtraAssets() {
+    const styleName =
+        getCupcakeExtraStyleName();
+
+    if (!styleName) {
+        return [];
+    }
+
+    const extraRoot = `${finalAssetRoot}/extras`;
+
+    const selectedExtraIds =
+        getSelectedRealisticExtraIds().filter(
+            (id) => id !== "chocolateDripDecoration"
+        );
+
+    const loadedAssets = await Promise.all(
+        selectedExtraIds.map(async (id) => {
+            const extraName =
+    id === "goldAccentDecoration"
+        ? builderState.metallicLeafType === "Silver"
+            ? "Metallic-Leaf-Silver"
+            : "Metallic-Leaf-Gold"
+        : realisticExtraNameMap[id];
+
+            if (!extraName) {
+                return null;
+            }
+
+            const strokes = await loadOptionalRealisticImage(
+                `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Strokes.png`
+            );
+
+            const mask = await loadOptionalRealisticImage(
+                `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Mask.png`
+            );
+
+            if (!strokes) {
+                return null;
+            }
+
+            return {
+                id,
+                strokes,
+                mask
+            };
+        })
+    );
+
+    return loadedAssets.filter(Boolean);
+}
+
+function drawCupcakeExtraAssets(
+    context,
+    assets,
+    width,
+    height
+) {
+    if (!assets?.length) {
+        return;
+    }
+
+    assets.forEach((asset) => {
+        context.save();
+
+        context.drawImage(
+            getRenderedExtraLayer(asset),
+            0,
+            0,
+            width,
+            height
+        );
+
+        context.restore();
+    });
 }
 function getRealisticFinishFiles(
     entryKey,
@@ -2661,13 +2958,14 @@ async function updateRealisticCakePreview() {
 
     try {
         if (isStandalonePreview) {
-        const [
+     const [
     standaloneImage,
     cupcakeDesign,
     edibleImage,
     standaloneFinishAssets,
-    standaloneBorderAssets
-] = await Promise.all([  
+    standaloneBorderAssets,
+    standaloneExtraAssets
+] = await Promise.all([    
     loadRealisticImage(
         cakeUrls[0]
     ),
@@ -2694,9 +2992,15 @@ async function updateRealisticCakePreview() {
     : Promise.resolve({
         top: null,
         bottom: null
-    })
-]); 
+    }),
 
+isBento
+    ? loadCakeExtraAssets(
+        "heart5in",
+        true
+    )
+    : Promise.resolve([])
+]);
             if (renderVersion !== realisticRenderVersion) return;
 
             const context = realisticCakeCanvas.getContext("2d");
@@ -2732,15 +3036,31 @@ async function updateRealisticCakePreview() {
                     standaloneImage,
                     transform
                 );
-  drawRealisticCakeFinish(
-        context,
-        standaloneFinishAssets,
-        transform.x,
-        transform.y,
-        transform.width,
-        transform.height
-    );
-    if (standaloneBorderAssets?.bottom) {
+ drawRealisticCakeFinish(
+    context,
+    standaloneFinishAssets,
+    transform.x,
+    transform.y,
+    transform.width,
+    transform.height
+);
+
+
+/*
+    Drip first.
+*/
+
+drawCakeDripExtra(
+    context,
+    standaloneExtraAssets,
+    transform.x,
+    transform.y,
+    transform.width,
+    transform.height
+);
+
+
+if (standaloneBorderAssets?.bottom) {
     drawCakeBorder(
         context,
         standaloneBorderAssets.bottom,
@@ -2761,6 +3081,20 @@ if (standaloneBorderAssets?.top) {
         transform.height
     );
 }
+
+
+/*
+    Remaining extras last.
+*/
+
+drawCakeForegroundExtras(
+    context,
+    standaloneExtraAssets,
+    transform.x,
+    transform.y,
+    transform.width,
+    transform.height
+);
 
                 drawBentoEdibleImage(
                     context,
@@ -2792,7 +3126,8 @@ if (standaloneBorderAssets?.top) {
     cakeImages,
     edibleImage,
     finishAssetSets,
-    borderAssetSets
+    borderAssetSets,
+    extraAssetSets
 ] =
     await Promise.all([
         loadRealisticImage(
@@ -2840,7 +3175,18 @@ Promise.all(
                     entry.key
                 )
     )
+),
+Promise.all(
+    previewEntries.map(
+        (entry) =>
+            product.shape === "numberLetter"
+                ? Promise.resolve([])
+                : loadCakeExtraAssets(
+                    entry.key
+                )
+    )
 )
+
     ]);
         if (renderVersion !== realisticRenderVersion) return;
 
@@ -2947,6 +3293,23 @@ previewEntries.forEach((entry, index) => {
     size.width,
     size.height
 );
+
+
+/*
+    Chocolate drip belongs underneath
+    the buttercream border.
+*/
+
+drawCakeDripExtra(
+    context,
+    extraAssetSets[index],
+    x,
+    y + boardYOffset,
+    size.width,
+    size.height
+);
+
+
 const borderAssets =
     borderAssetSets[index];
 
@@ -2971,6 +3334,22 @@ if (borderAssets?.top) {
         size.height
     );
 }
+
+
+/*
+    Bows, butterflies, cherries,
+    flowers, leaf and pearls sit above
+    the border.
+*/
+
+drawCakeForegroundExtras(
+    context,
+    extraAssetSets[index],
+    x,
+    y + boardYOffset,
+    size.width,
+    size.height
+);
 
 });
         if (edibleImage) {
@@ -3054,150 +3433,6 @@ function getCupcakeFrostingFiles(liner, style) {
     return null;
 }
 
-function drawCupcakeCanvasDecorations(context, width, height) {
-    const selected = new Set(
-        builderState.decorations.map((decoration) => decoration.id)
-    );
-
-    if (getElement("#topperDecorationOption")?.checked) {
-        selected.add("topperDecoration");
-    }
-
-    const centerX = width * 0.5;
-
-    if (selected.has("sprinklesDecoration")) {
-        const colors = [
-            "#FF4FA3",
-            "#70B7E6",
-            "#F2C94C",
-            "#8DCB84",
-            "#A97BDC",
-            "#84563C"
-        ];
-
-        const positions = [
-            [0.39, 0.23, -0.5], [0.45, 0.18, 0.7],
-            [0.52, 0.22, -0.3], [0.59, 0.19, 0.5],
-            [0.63, 0.27, -0.8], [0.56, 0.31, 0.4],
-            [0.47, 0.30, -0.6], [0.41, 0.34, 0.8],
-            [0.51, 0.37, 0.2], [0.61, 0.36, -0.4]
-        ];
-
-        positions.forEach(([x, y, rotation], index) => {
-            context.save();
-            context.translate(width * x, height * y);
-            context.rotate(rotation);
-            context.fillStyle = colors[index % colors.length];
-            context.fillRect(-9, -3, 18, 6);
-            context.restore();
-        });
-    }
-
-    if (selected.has("pearlsDecoration")) {
-        [[0.42, 0.24], [0.5, 0.18], [0.59, 0.25], [0.47, 0.34], [0.58, 0.35]]
-            .forEach(([x, y]) => {
-                context.beginPath();
-                context.arc(width * x, height * y, width * 0.012, 0, Math.PI * 2);
-                context.fillStyle = "#FFFDF8";
-                context.fill();
-                context.strokeStyle = "#D9C8B8";
-                context.lineWidth = width * 0.004;
-                context.stroke();
-            });
-    }
-
-    if (selected.has("chocolateDripDecoration")) {
-        context.save();
-        context.fillStyle = "#5A2A1E";
-        context.beginPath();
-        context.ellipse(centerX, height * 0.39, width * 0.2, height * 0.05, 0, 0, Math.PI * 2);
-        context.fill();
-        [0.42, 0.5, 0.58].forEach((x, index) => {
-            context.beginPath();
-            context.arc(width * x, height * (0.42 + index * 0.012), width * 0.025, 0, Math.PI * 2);
-            context.fill();
-        });
-        context.restore();
-    }
-
-    if (selected.has("goldAccentDecoration")) {
-        [[0.4, 0.2], [0.55, 0.18], [0.62, 0.3], [0.46, 0.35]].forEach(([x, y], index) => {
-            context.beginPath();
-            context.arc(width * x, height * y, width * (index % 2 ? 0.016 : 0.01), 0, Math.PI * 2);
-            context.fillStyle = index % 2 ? "#F2D47C" : "#D6A63A";
-            context.fill();
-        });
-    }
-
-    if (selected.has("cherriesDecoration")) {
-        context.fillStyle = "#B92D40";
-        [0.47, 0.54].forEach((x, index) => {
-            context.beginPath();
-            context.arc(width * x, height * (0.2 + index * 0.012), width * 0.035, 0, Math.PI * 2);
-            context.fill();
-        });
-    }
-
-    if (selected.has("flowersDecoration")) {
-        context.save();
-        context.translate(centerX, height * 0.23);
-        context.fillStyle = "#F486B6";
-        for (let index = 0; index < 6; index += 1) {
-            context.rotate(Math.PI / 3);
-            context.beginPath();
-            context.ellipse(width * 0.045, 0, width * 0.045, width * 0.024, 0, 0, Math.PI * 2);
-            context.fill();
-        }
-        context.beginPath();
-        context.arc(0, 0, width * 0.025, 0, Math.PI * 2);
-        context.fillStyle = "#F7D978";
-        context.fill();
-        context.restore();
-    }
-
-    if (selected.has("butterfliesDecoration")) {
-        context.save();
-        context.translate(centerX, height * 0.21);
-        context.rotate(-0.25);
-        context.fillStyle = "#C9A9EA";
-        [-1, 1].forEach((direction) => {
-            context.beginPath();
-            context.ellipse(direction * width * 0.03, 0, width * 0.035, width * 0.02, direction * 0.35, 0, Math.PI * 2);
-            context.fill();
-        });
-        context.restore();
-    }
-
-    if (selected.has("ribbonDecoration")) {
-        context.save();
-        context.translate(centerX, height * 0.56);
-        context.strokeStyle = normalizeHexColor(builderState.accentColor);
-        context.lineWidth = width * 0.018;
-        [-1, 1].forEach((direction) => {
-            context.beginPath();
-            context.ellipse(direction * width * 0.04, 0, width * 0.045, width * 0.027, direction * 0.3, 0, Math.PI * 2);
-            context.stroke();
-        });
-        context.restore();
-    }
-
-    if (selected.has("topperDecoration")) {
-        const wording = builderState.topperWording.trim().slice(0, 8) || "TOP";
-        context.save();
-        context.translate(centerX, height * 0.105);
-        context.fillStyle = "#D6A63A";
-        context.fillRect(-width * 0.105, -height * 0.028, width * 0.21, height * 0.056);
-        context.fillStyle = "#FFFFFF";
-        context.font = `900 ${Math.round(width * 0.034)}px Arial`;
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillText(wording, 0, 0, width * 0.19);
-        context.fillStyle = "#84563C";
-        context.fillRect(-width * 0.006, height * 0.028, width * 0.012, height * 0.08);
-        context.restore();
-    }
-}
-
 async function renderCupcakeDesignCanvas() {
     const liner = builderState.cupcakeLinerStyle || "paper";
     const foundationFiles =
@@ -3275,10 +3510,18 @@ async function renderCupcakeDesignCanvas() {
             );
         }
 
-        drawCupcakeCanvasDecorations(context, canvas.width, canvas.height);
-    }
+      const cupcakeExtraAssets =
+    await loadCupcakeExtraAssets();
 
-    return canvas;
+drawCupcakeExtraAssets(
+    context,
+    cupcakeExtraAssets,
+    canvas.width,
+    canvas.height
+);
+}
+
+return canvas;
 }
 
 const cupcakeSetLayouts = {
@@ -3463,38 +3706,13 @@ function updateCupcakePreview() {
             : "Select a 4-, 8-, or 12-count set above."
     );
 
-    const isBento =
-        builderState.cakeProductId === "heart-5-bento";
-    const cupcakeDesignIsActive =
-        getSelectedCakeProduct().shape === "cupcakes" ||
-        isBento ||
-        Boolean(selectedSet);
-    const selectedDecorationIds = new Set(
-        builderState.decorations.map((decoration) => decoration.id)
+ getElements(
+    "[data-cupcake-decoration]"
+).forEach((element) => {
+    element.classList.remove(
+        "is-visible"
     );
-
-    if (getElement("#topperDecorationOption")?.checked) {
-        selectedDecorationIds.add("topperDecoration");
-    }
-
-    getElements("[data-cupcake-decoration]").forEach((element) => {
-        element.classList.toggle(
-            "is-visible",
-            cupcakeDesignIsActive &&
-                selectedDecorationIds.has(
-                    element.dataset.cupcakeDecoration
-                )
-        );
-    });
-
-    const cupcakeTopper = getElement(
-        '[data-cupcake-decoration="topperDecoration"]'
-    );
-
-    if (cupcakeTopper) {
-        cupcakeTopper.textContent =
-            builderState.topperWording.trim().slice(0, 8) || "TOP";
-    }
+});   
 }
 
 function updateRendererColors() {
@@ -3859,6 +4077,15 @@ function updateFinishVisibility() {
 ========================================= */
 
 function updateDecorationVisibility() {
+    /*
+        Realistic extras are now rendered
+        directly on the canvas.
+
+        Keep all old SVG decoration layers hidden.
+        The extra-layer indicator is the only
+        legacy layer that may still be used.
+    */
+
     getElements(
         ".cake-decoration-group"
     ).forEach((element) => {
@@ -3870,40 +4097,11 @@ function updateDecorationVisibility() {
             return;
         }
 
-        const isSelected =
-            builderState.decorations.some(
-                (decoration) =>
-                    decoration.id ===
-                    element.id
-            );
-
-        const isTopper =
-            element.id ===
-                "topperDecoration" &&
-            Boolean(builderState.topperType);
-
-        element.classList.toggle(
-            "is-hidden",
-            !isSelected && !isTopper
+        element.classList.add(
+            "is-hidden"
         );
     });
-
-    const topperTextPreview = getElement(
-        "#topperTextPreview"
-    );
-
-    if (topperTextPreview) {
-        const wording =
-            builderState.topperWording.trim() ||
-            "Celebrate";
-
-        topperTextPreview.textContent =
-            wording.length > 15
-                ? `${wording.slice(0, 15)}…`
-                : wording;
-    }
 }
-
 
 /* =========================================
    SELECTED CARD STATES
@@ -5217,7 +5415,84 @@ function updateCustomFillingVisibility() {
 /* =========================================
    FLOWER AND TOPPER OPTIONS
 ========================================= */
+function decorationIsSelected(decorationId) {
+    return builderState.decorations.some(
+        (decoration) =>
+            decoration.id === decorationId
+    );
+}
 
+
+function updateExtraDetailControlsVisibility() {
+    getElement(
+        "#bowDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "ribbonDecoration"
+        )
+    );
+
+    getElement(
+        "#butterflyDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "butterfliesDecoration"
+        )
+    );
+
+    getElement(
+        "#cherryDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "cherriesDecoration"
+        )
+    );
+
+    getElement(
+        "#dripDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "chocolateDripDecoration"
+        )
+    );
+
+    getElement(
+        "#pearlDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "pearlsDecoration"
+        )
+    );
+
+    getElement(
+        "#flowerDetailOptions"
+    )?.classList.toggle(
+        "is-hidden",
+        !decorationIsSelected(
+            "flowersDecoration"
+        )
+    );
+
+    getElement(
+        "#customFlowerTypeField"
+    )?.classList.toggle(
+        "is-hidden",
+        builderState.flowerType !== "Other"
+    );
+    getElement(
+    "#metallicLeafDetailOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !decorationIsSelected(
+        "goldAccentDecoration"
+    )
+);
+}
 function updateFlowerSourceVisibility() {
     const flowersSelected =
         builderState.decorations.some(
@@ -6813,8 +7088,9 @@ getElements(
                     );
 
             updateFlowerSourceVisibility();
-            updateTopperOptionsVisibility();
-            renderCakePreview();
+updateExtraDetailControlsVisibility();
+updateTopperOptionsVisibility();
+renderCakePreview();
         }
     );
 });
@@ -6832,7 +7108,20 @@ getElements(
         }
     );
 });
+getElements(
+    'input[name="metallicLeafType"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.metallicLeafType =
+                input.value;
 
+            updateSelectedCardStates();
+            renderCakePreview();
+        }
+    );
+});
 getElements(
     'input[name="topperType"]'
 ).forEach((input) => {
@@ -6863,7 +7152,83 @@ getElement(
         renderCakePreview();
     }
 );
+[
+    ["#bowColor", "bowColor"],
+    ["#butterflyColor", "butterflyColor"],
+    ["#cherryColor", "cherryColor"],
+    ["#dripColor", "dripColor"],
+    ["#pearlColor", "pearlColor"],
+    ["#flowerColor", "flowerColor"]
+].forEach(([selector, stateKey]) => {
+    getElement(
+        selector
+    )?.addEventListener(
+        "input",
+        (event) => {
+            builderState[stateKey] =
+                event.target.value;
 
+            renderCakePreview();
+        }
+    );
+});
+
+
+getElements(
+    'input[name="cherryGlitter"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cherryGlitter =
+                input.value;
+
+            if (
+                builderState.currentStep === 8
+            ) {
+                populateReview();
+            }
+        }
+    );
+});
+
+
+getElements(
+    'input[name="flowerType"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.flowerType =
+                input.value;
+
+            updateExtraDetailControlsVisibility();
+updateSelectedCardStates();
+            if (
+                builderState.currentStep === 8
+            ) {
+                populateReview();
+            }
+        }
+    );
+});
+
+
+getElement(
+    "#customFlowerType"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState.customFlowerType =
+            event.target.value;
+
+        if (
+            builderState.currentStep === 8
+        ) {
+            populateReview();
+        }
+    }
+);
 
 /* =========================================
    EXTRA EVENTS
@@ -7405,6 +7770,7 @@ function initializeBuilder() {
     updateCustomCakeFlavorVisibility();
     updateCustomFillingVisibility();
     updateFlowerSourceVisibility();
+    updateExtraDetailControlsVisibility();
     updateTopperOptionsVisibility();
     updateDeliveryFieldsVisibility();
 
