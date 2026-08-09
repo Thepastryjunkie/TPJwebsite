@@ -354,9 +354,15 @@ const builderState = {
     customFilling: "",
     premiumFillings: [],
 
-    mainCakeColor: "original",
-    accentColor: "original",
-    finishAccentOne: "#FF4FA3",
+   mainCakeColor: "original",
+   accentColor: "original",
+
+cakeBorderStyle: "",
+cakeBorderPlacement: "both",
+cakeBorderColor: "#FF4FA3",
+cakeBorderSprinkles: false,
+
+finishAccentOne: "#FF4FA3",
 finishAccentTwo: "#F4D66E",
 
     cakeFinish: "",
@@ -2122,8 +2128,211 @@ const realisticFinishShapeMap = {
     heart5in: "5in-Heart",
     tallHeart5in: "Tall-5in-Heart"
 };
+const borderStyleNameMap = {
+    shell: "Shell",
+    rope: "Rope",
+    rosette: "Rosette",
+    ruffle: "Ruffle"
+};
+function getBorderShapeName(
+    entryKey,
+    isBento = false
+) {
+    if (isBento) {
+        return "Bento-5in-Heart";
+    }
 
+    return realisticFinishShapeMap[
+        entryKey
+    ] || null;
+}
+function getBorderAssetFiles(
+    entryKey,
+    placement,
+    isBento = false
+) {
+    const styleName =
+        borderStyleNameMap[
+            builderState.cakeBorderStyle
+        ];
 
+    const shapeName =
+        getBorderShapeName(
+            entryKey,
+            isBento
+        );
+
+    if (
+        !styleName ||
+        !shapeName
+    ) {
+        return null;
+    }
+
+    const placementName =
+        placement === "top"
+            ? "Top"
+            : "Bottom";
+
+    const prefix =
+        `TPJ-Border-${styleName}-${shapeName}-${placementName}`;
+
+    return {
+        strokes:
+            `${prefix}-Strokes.png`,
+
+        mask:
+            `${prefix}-Mask.png`,
+
+        sprinkles:
+            `${prefix}-Sprinkles.png`
+    };
+}
+async function loadBorderAssets(
+    entryKey,
+    placement,
+    isBento = false
+) {
+    const files =
+        getBorderAssetFiles(
+            entryKey,
+            placement,
+            isBento
+        );
+
+    if (!files) {
+        return null;
+    }
+
+    const borderRoot =
+        `${finalAssetRoot}/borders`;
+
+    const [
+        strokes,
+        mask,
+        sprinkles
+    ] = await Promise.all([
+        loadRealisticImage(
+            `${borderRoot}/${files.strokes}`
+        ),
+
+        loadRealisticImage(
+            `${borderRoot}/${files.mask}`
+        ),
+
+        loadRealisticImage(
+            `${borderRoot}/${files.sprinkles}`
+        )
+    ]);
+
+    return {
+        strokes,
+        mask,
+        sprinkles
+    };
+}
+function drawCakeBorder(
+    context,
+    assets,
+    x,
+    y,
+    width,
+    height
+) {
+    if (!assets) {
+        return;
+    }
+
+    const borderColor =
+        builderState.cakeBorderColor ||
+        "#FF4FA3";
+
+    const tintedBorder =
+        makeTintedLayer(
+            assets.strokes,
+            assets.mask,
+            borderColor
+        );
+
+    context.save();
+
+    context.globalCompositeOperation =
+        "source-over";
+
+    context.globalAlpha = 1;
+
+    context.drawImage(
+        tintedBorder,
+        x,
+        y,
+        width,
+        height
+    );
+
+    if (
+        builderState.cakeBorderSprinkles
+    ) {
+        context.drawImage(
+            assets.sprinkles,
+            x,
+            y,
+            width,
+            height
+        );
+    }
+
+    context.restore();
+}
+async function loadSelectedBorderAssets(
+    entryKey,
+    isBento = false
+) {
+    if (
+        !builderState.cakeBorderStyle
+    ) {
+        return {
+            top: null,
+            bottom: null
+        };
+    }
+
+    const placement =
+        builderState.cakeBorderPlacement;
+
+    const needsTop =
+        placement === "top" ||
+        placement === "both";
+
+    const needsBottom =
+        placement === "bottom" ||
+        placement === "both";
+
+    const [
+        top,
+        bottom
+    ] = await Promise.all([
+        needsTop
+            ? loadBorderAssets(
+                entryKey,
+                "top",
+                isBento
+            )
+            : Promise.resolve(null),
+
+        needsBottom
+            ? loadBorderAssets(
+                entryKey,
+                "bottom",
+                isBento
+            )
+            : Promise.resolve(null)
+    ]);
+
+    return {
+        top,
+        bottom
+    };
+}
 function getRealisticFinishFiles(
     entryKey,
     isBento = false
@@ -2452,12 +2661,13 @@ async function updateRealisticCakePreview() {
 
     try {
         if (isStandalonePreview) {
-           const [
+        const [
     standaloneImage,
     cupcakeDesign,
     edibleImage,
-    standaloneFinishAssets
-] = await Promise.all([
+    standaloneFinishAssets,
+    standaloneBorderAssets
+] = await Promise.all([  
     loadRealisticImage(
         cakeUrls[0]
     ),
@@ -2475,7 +2685,16 @@ async function updateRealisticCakePreview() {
             "heart5in",
             true
         )
-        : Promise.resolve(null)
+        : Promise.resolve(null),
+        isBento
+    ? loadSelectedBorderAssets(
+        "heart5in",
+        true
+    )
+    : Promise.resolve({
+        top: null,
+        bottom: null
+    })
 ]); 
 
             if (renderVersion !== realisticRenderVersion) return;
@@ -2521,6 +2740,27 @@ async function updateRealisticCakePreview() {
         transform.width,
         transform.height
     );
+    if (standaloneBorderAssets?.bottom) {
+    drawCakeBorder(
+        context,
+        standaloneBorderAssets.bottom,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
+
+if (standaloneBorderAssets?.top) {
+    drawCakeBorder(
+        context,
+        standaloneBorderAssets.top,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
 
                 drawBentoEdibleImage(
                     context,
@@ -2551,7 +2791,8 @@ async function updateRealisticCakePreview() {
     boardMask,
     cakeImages,
     edibleImage,
-    finishAssetSets
+    finishAssetSets,
+    borderAssetSets
 ] =
     await Promise.all([
         loadRealisticImage(
@@ -2574,18 +2815,32 @@ async function updateRealisticCakePreview() {
             )
             : Promise.resolve(null),
 
-        Promise.all(
-            previewEntries.map(
-                (entry) =>
-                   product.shape === "numberLetter"
-            ? loadNumberLetterStyleAssets(
-                entry
-            )
-            : loadRealisticFinishAssets(
-                entry.key  
-                    )
-            )
-        )
+      Promise.all(
+    previewEntries.map(
+        (entry) =>
+            product.shape === "numberLetter"
+                ? loadNumberLetterStyleAssets(
+                    entry
+                )
+                : loadRealisticFinishAssets(
+                    entry.key
+                )
+    )
+),
+
+Promise.all(
+    previewEntries.map(
+        (entry) =>
+            product.shape === "numberLetter"
+                ? Promise.resolve({
+                    top: null,
+                    bottom: null
+                })
+                : loadSelectedBorderAssets(
+                    entry.key
+                )
+    )
+)
     ]);
         if (renderVersion !== realisticRenderVersion) return;
 
@@ -2692,6 +2947,30 @@ previewEntries.forEach((entry, index) => {
     size.width,
     size.height
 );
+const borderAssets =
+    borderAssetSets[index];
+
+if (borderAssets?.bottom) {
+    drawCakeBorder(
+        context,
+        borderAssets.bottom,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
+
+if (borderAssets?.top) {
+    drawCakeBorder(
+        context,
+        borderAssets.top,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 
 });
         if (edibleImage) {
@@ -6272,6 +6551,15 @@ getElements(
 /* =========================================
    COLOR AND FINISH EVENTS
 ========================================= */
+function updateBorderControlsVisibility() {
+    const controls =
+        getElement("#cakeBorderControls");
+
+    controls?.classList.toggle(
+        "is-hidden",
+        !builderState.cakeBorderStyle
+    );
+}
 
 getElements(
     'input[name="mainCakeColor"]'
@@ -6403,6 +6691,81 @@ getElements(
 });
 
 
+/* =========================================
+   BORDER EVENTS
+========================================= */
+
+getElements(
+    'input[name="cakeBorderStyle"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeBorderStyle =
+                input.value;
+
+            if (!input.value) {
+                builderState.cakeBorderSprinkles =
+                    false;
+
+                const sprinkleToggle =
+                    getElement(
+                        "#cakeBorderSprinkles"
+                    );
+
+                if (sprinkleToggle) {
+                    sprinkleToggle.checked =
+                        false;
+                }
+            }
+
+            updateBorderControlsVisibility();
+            updateSelectedCardStates();
+            renderCakePreview();
+        }
+    );
+});
+
+
+getElements(
+    'input[name="cakeBorderPlacement"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeBorderPlacement =
+                input.value;
+
+            renderCakePreview();
+        }
+    );
+});
+
+
+getElement(
+    "#cakeBorderColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState.cakeBorderColor =
+            event.target.value;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#cakeBorderSprinkles"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.cakeBorderSprinkles =
+            event.target.checked;
+
+        renderCakePreview();
+    }
+);
 /* =========================================
    DECORATION EVENTS
 ========================================= */
@@ -7036,6 +7399,7 @@ function initializeBuilder() {
     showCakeSizeGroup("round");
     updateCakeBoardControls();
     updateNumberLetterControls();
+    updateBorderControlsVisibility();
 
     updateOtherOccasionVisibility();
     updateCustomCakeFlavorVisibility();

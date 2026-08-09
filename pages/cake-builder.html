@@ -2713,27 +2713,158 @@
                             </div>
                         </fieldset>
 
-                        <fieldset class="builder-fieldset cake-only-look">
+              <fieldset
+    id="cakeBorderCustomizer"
+    class="builder-fieldset cake-only-look"
+>
 
-                            <legend>
-                                Accent Color
-                            </legend>
+    <legend>
+        Buttercream Border
+    </legend>
 
-                            <label class="custom-color-field">
+    <p class="fieldset-description">
+        Choose a piped border for your cake.
+    </p>
 
-                                <span>
-                                    Choose the secondary color
-                                </span>
+    <div class="text-choice-grid">
 
-                                <input
-                                    id="accentColor"
-                                    type="color"
-                                    value="#FF4FA3"
-                                >
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="cakeBorderStyle"
+                value=""
+                checked
+            >
+            <strong>None</strong>
+        </label>
 
-                            </label>
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="cakeBorderStyle"
+                value="shell"
+            >
+            <strong>Shell</strong>
+        </label>
 
-                        </fieldset>
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="cakeBorderStyle"
+                value="rope"
+            >
+            <strong>Rope</strong>
+        </label>
+        
+<label class="text-choice-card">
+    <input
+        type="radio"
+        name="cakeBorderStyle"
+        value="rosette"
+    >
+    <strong>Rosette</strong>
+</label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="cakeBorderStyle"
+                value="ruffle"
+            >
+            <strong>Ruffle</strong>
+        </label>
+
+    </div>
+
+
+    <div
+        id="cakeBorderControls"
+        class="conditional-section is-hidden"
+    >
+
+        <fieldset class="builder-fieldset">
+
+            <legend>
+                Border Placement
+            </legend>
+
+            <div class="compact-choice-row">
+
+                <label>
+                    <input
+                        type="radio"
+                        name="cakeBorderPlacement"
+                        value="top"
+                    >
+                    <span>Top</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="cakeBorderPlacement"
+                        value="bottom"
+                    >
+                    <span>Bottom</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="cakeBorderPlacement"
+                        value="both"
+                        checked
+                    >
+                    <span>Top + Bottom</span>
+                </label>
+
+            </div>
+
+        </fieldset>
+
+
+        <label class="custom-color-field">
+
+            <span>
+                Border Color
+            </span>
+
+            <input
+                id="cakeBorderColor"
+                type="color"
+                value="#FF4FA3"
+            >
+
+        </label>
+
+
+        <label class="extra-layer-control">
+
+            <input
+                id="cakeBorderSprinkles"
+                type="checkbox"
+            >
+
+            <span class="toggle-track"></span>
+
+            <span class="toggle-copy">
+
+                <strong>
+                    Add Sprinkles
+                </strong>
+
+                <small>
+                    Sprinkles will be added directly to the selected border.
+                </small>
+
+            </span>
+
+        </label>
+
+    </div>
+
+</fieldset>
+
 <fieldset
     id="finishColorCustomizer"
     class="builder-fieldset cake-only-look is-hidden"
@@ -3154,24 +3285,6 @@
 
                                 </label>
 
-                                <label class="decoration-choice-card">
-
-                                    <input
-                                        type="checkbox"
-                                        data-decoration-id="sprinklesDecoration"
-                                        data-decoration-name="Themed Sprinkles"
-                                        data-price="6"
-                                    >
-
-                                    <span class="decoration-line-art detail-sprinkles"></span>
-
-                                    <strong>
-                                        Themed Sprinkles
-                                    </strong>
-
-                                    <small>
-                                        +$6
-                                    </small>
 
                                 </label>
 
