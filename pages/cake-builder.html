@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2626,7 +2627,23 @@
                                     </span>
 
                                 </label>
+<label class="description-choice-card">
 
+    <input
+        type="radio"
+        name="buttercreamStyle"
+        value="Whipped Buttercream"
+    >
+
+    <strong>
+        Whipped Buttercream
+    </strong>
+
+    <span>
+        Light, airy, and less sweet.
+    </span>
+
+</label>
                             </div>
 
                         </fieldset>
@@ -2768,7 +2785,19 @@
 
             <strong>Cookie Butter</strong>
         </label>
+<label class="text-choice-card custom-text-only-card">
 
+    <input
+        type="radio"
+        name="cakeFilling"
+        value="Whipped Cream"
+    >
+
+    <strong>
+        Whipped Cream
+    </strong>
+
+</label>
         <label class="text-choice-card custom-text-only-card">
             <input
                 id="customFillingOption"
@@ -3580,6 +3609,48 @@
 
 </fieldset>
 
+
+<fieldset
+    id="edibleImageTierTarget"
+    class="edible-image-option-group is-hidden"
+>
+
+    <legend>
+        Front-Face Tier
+    </legend>
+
+    <div class="compact-choice-row edible-image-shape-row">
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImageTier"
+                value="top"
+            >
+
+            <span>
+                Top Tier
+            </span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImageTier"
+                value="bottom"
+                checked
+            >
+
+            <span>
+                Bottom Tier
+            </span>
+        </label>
+
+    </div>
+
+</fieldset>
+
+
 <p
     id="edibleImagePlacementNote"
     class="field-note"
@@ -3587,6 +3658,58 @@
     Your uploaded image is shown above for reference and will not
     be placed on the live cake preview.
 </p>
+
+
+<fieldset class="edible-image-option-group">
+
+    <legend>
+        Image Shape
+    </legend>
+
+    <div class="compact-choice-row edible-image-shape-row">
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImageShape"
+                value="original"
+                checked
+            >
+
+            <span>
+                Original
+            </span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImageShape"
+                value="rectangle"
+            >
+
+            <span>
+                Rectangle
+            </span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="edibleImageShape"
+                value="circle"
+            >
+
+            <span>
+                Circle
+            </span>
+        </label>
+
+    </div>
+
+</fieldset>
+
+
                                 <fieldset class="edible-image-option-group">
 
                                     <legend>Image Shape</legend>
@@ -3650,11 +3773,13 @@
                                     
                                 </div>
 
-                                <div class="edible-image-control-footer">
+                           <div class="edible-image-control-footer">
 
-                            </div>
+</div>
 
-                        </fieldset>
+</div>
+
+</fieldset>     
 
                         <div id="cupcakeOnlyStudioSlot"></div>
 
@@ -3716,8 +3841,6 @@
 
                                 </label>
 
-
-                                </label>
 
                                 <label class="decoration-choice-card">
 
@@ -4224,17 +4347,18 @@
 
     </div>
 
+<p class="field-note">
+    White chocolate is colored using food-safe chocolate coloring.
+    Final shades are matched as closely as possible.
+</p>
 
-    <p class="field-note">
-        White chocolate is colored using food-safe chocolate coloring.
-        Final shades are matched as closely as possible.
-    </p>
+</div>
 
-</div>  
+</div>
 
 <div
     id="pearlDetailOptions"
-    class="conditional-section is-hidden"
+   class="conditional-section is-hidden"
 >
 
     <p class="fieldset-description">
@@ -4620,7 +4744,10 @@
                                             <span data-cupcake-decoration="topperDecoration" class="cupcake-decoration cupcake-decoration-topper">TOP</span>
 
                                     </div>
-                                    <p id="cupcakeSetCaption">Select a 4-, 8-, or 12-count set above.</p>
+
+</div>
+
+<p id="cupcakeSetCaption">Select a 4-, 8-, or 12-count set above.</p>
                                 </div>
                                 <div
     id="cupcakeLinerColorSection"
@@ -4632,9 +4759,12 @@
     </strong>
 
     <div
-        id="cupcakeLinerColorSwatches"
-        class="color-choice-grid"
-    ></div>
+    id="cupcakeLinerColorSwatches"
+    class="color-choice-grid"
+></div>
+
+</div>
+
 <div class="cupcake-swatch-section">
 
     <strong class="swatch-subheading">
@@ -4872,12 +5002,14 @@
 
 </div>
 
-                        </fieldset>
+</div>
 
-                        <fieldset class="builder-fieldset">
+</fieldset>
 
-                            <legend>
-                                Dessert Jars
+<fieldset class="builder-fieldset">
+
+    <legend>
+        Dessert Jars
                             </legend>
 
                             <div class="quantity-product-list">
