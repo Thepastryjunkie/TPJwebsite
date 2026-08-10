@@ -1938,20 +1938,30 @@ if (builderState.cakeProductId === "heart-5-tall") {
     key = "tallHeart5in";
 }
     if (
-        product.shape === "round" &&
-        builderState.cakeCoverage === "naked"
-    ) {
-        file = "TPJ-Asset-031-Naked-Round-Cake.png";
-        key = builderState.isTall ? "tallRound" : "round";
-    }
+    product.shape === "round" &&
+    builderState.cakeCoverage === "naked"
+) {
+    file = builderState.isTall
+        ? "TPJ-Asset-047-Naked-Tall-Round-Cake.png"
+        : "TPJ-Asset-031-Naked-Round-Cake.png";
+
+    key = builderState.isTall
+        ? "tallRound"
+        : "round";
+}
 
     if (
-        product.shape === "round" &&
-        builderState.cakeCoverage === "semi-naked"
-    ) {
-        file = "TPJ-Asset-032-Semi-Naked-Round-Cake.png";
-        key = builderState.isTall ? "tallRound" : "round";
-    }
+    product.shape === "round" &&
+    builderState.cakeCoverage === "semi-naked"
+) {
+    file = builderState.isTall
+        ? "TPJ-Asset-048-Semi-Naked-Tall-Round-Cake.png"
+        : "TPJ-Asset-032-Semi-Naked-Round-Cake.png";
+
+    key = builderState.isTall
+        ? "tallRound"
+        : "round";
+}
 
     return [{ file, key }];
 }
