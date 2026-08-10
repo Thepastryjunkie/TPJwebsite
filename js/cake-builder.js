@@ -8572,7 +8572,19 @@ function updateCupcakeLinerColorChoices() {
             renderCakePreview();
         }
     );
-}
+}getElements(
+    'input[name="cakeCoverage"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeCoverage =
+                input.value;
+
+            renderCakePreview();
+        }
+    );
+});
 getElements(
     'input[name="cakeFinish"]'
 ).forEach((input) => {
