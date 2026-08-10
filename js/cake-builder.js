@@ -1937,7 +1937,7 @@ if (builderState.cakeProductId === "heart-5-tall") {
 
     key = "tallHeart5in";
 }
-    if (
+if (
     product.shape === "round" &&
     builderState.cakeCoverage === "naked"
 ) {
@@ -1950,7 +1950,7 @@ if (builderState.cakeProductId === "heart-5-tall") {
         : "round";
 }
 
-    if (
+   if (
     product.shape === "round" &&
     builderState.cakeCoverage === "semi-naked"
 ) {

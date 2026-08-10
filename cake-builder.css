@@ -4977,37 +4977,28 @@ fieldset {
         than a skinny vertical strip.
     */
 
-    #cakePreviewCard
-    .cake-renderer-stage {
-        width: 100%;
-        max-width: none;
+   #cakePreviewCard
+.cake-renderer-stage {
+    width: 100%;
+    max-width: none;
 
-        height:
-            clamp(
-                185px,
-                26vh,
-                225px
-            );
+    height: auto;
+    aspect-ratio: 1 / 0.72;
 
-        aspect-ratio: auto;
+    margin: 8px auto 0;
 
-        margin:
-            8px
-            auto
-            0;
+    border-radius: 14px;
+}
 
-        border-radius: 14px;
-    }
+#cakePreviewCard
+.realistic-cake-renderer {
+    width: 86%;
+    height: auto;
+    aspect-ratio: 1 / 1;
 
-
-    #cakePreviewCard
-    .realistic-cake-renderer {
-        width: 100%;
-        height: 100%;
-
-        aspect-ratio: auto;
-    }
-
+    align-self: center;
+    justify-self: center;
+}
 
     #cakePreviewCard
     .realistic-cake-canvas {
@@ -5092,5 +5083,86 @@ fieldset {
         min-height: 50px;
 
         flex: 1;
+    }
+}
+/* =========================================
+   MOBILE DEVICE LANDSCAPE
+   Keep builder in mobile stacked layout
+========================================= */
+
+@media
+    (max-height: 500px)
+    and (orientation: landscape) {
+
+    .builder-main {
+        padding: 12px 0 84px;
+    }
+
+    .builder-main-inner {
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+
+        padding: 0 14px;
+    }
+
+    .cake-preview-column,
+    .builder-form-column {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .cake-preview-column {
+        display: contents;
+    }
+
+    .cake-preview-sticky {
+        position: static;
+
+        width: 100%;
+        max-height: none;
+
+        padding: 0;
+
+        overflow: visible;
+    }
+
+    #cakePreviewCard.preview-visual-card {
+        width: 100%;
+
+        padding: 10px 12px;
+
+        border-radius: 20px;
+    }
+
+    #cakePreviewCard
+    .cake-renderer-stage {
+        width: 100%;
+        max-width: none;
+
+        height: 210px;
+        aspect-ratio: auto;
+
+        margin-top: 8px;
+    }
+
+    #cakePreviewCard
+    .realistic-cake-renderer {
+        width: min(72%, 430px);
+        height: 100%;
+
+        aspect-ratio: 1 / 1;
+    }
+
+    #cakePreviewMeta,
+    #cakePreviewDisclaimer {
+        display: none !important;
+    }
+
+    .builder-form-column {
+        padding-top: 0;
     }
 }
