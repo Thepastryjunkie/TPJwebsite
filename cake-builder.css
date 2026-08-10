@@ -4755,3 +4755,342 @@ fieldset {
     line-height: 1.05;
     text-align: center;
 }
+/* =========================================
+   FINAL MOBILE BUILDER LAYOUT
+   Full-width live preview above controls
+========================================= */
+
+@media (max-width: 720px) {
+
+    /*
+        MOBILE PAGE LAYOUT
+
+        Preview sits above the options instead
+        of being squeezed beside them.
+    */
+
+    .builder-main {
+        padding:
+            14px
+            0
+            90px;
+    }
+
+
+    .builder-main-inner {
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        align-items: start;
+
+        gap: 18px;
+
+        padding:
+            0
+            12px;
+    }
+
+
+    /*
+        Remove the old left/right
+        mobile column behavior.
+    */
+
+    .cake-preview-column,
+    .builder-form-column {
+        width: 100%;
+        min-width: 0;
+    }
+
+
+    /*
+        This allows the preview wrapper to
+        remain sticky while the form below
+        continues scrolling.
+    */
+
+    .cake-preview-column {
+        display: contents;
+    }
+
+
+    .cake-preview-sticky {
+        width: 100%;
+
+        position: static;
+
+        top: auto;
+
+        max-height: none;
+
+        overflow: visible;
+
+        gap: 0;
+
+        padding: 0;
+    }
+
+
+    /*
+        Once the actual cake preview is showing,
+        keep it visible underneath the sticky
+        header + progress bar.
+    */
+
+    .cake-preview-sticky:has(
+        #cakePreviewCard:not(.is-hidden)
+    ) {
+        position: sticky;
+
+        top: calc(
+            var(--builder-header-height) +
+            var(--builder-progress-height) +
+            6px
+        );
+
+        z-index: 650;
+    }
+
+
+    /*
+        COMPACT MOBILE CAKE CARD
+
+        Full phone width, but short enough
+        that customers can still see and
+        use the controls underneath.
+    */
+
+    #cakePreviewCard.preview-visual-card {
+        width: 100%;
+
+        padding:
+            10px
+            12px
+            12px;
+
+        overflow: hidden;
+
+        border-width: 2px;
+        border-radius: 20px;
+
+        box-shadow:
+            5px 6px 0
+            rgba(255, 79, 163, 0.18),
+
+            0 14px 30px
+            rgba(90, 42, 30, 0.09);
+    }
+
+
+    /*
+        Cake name + Reset share one
+        compact row above the cake.
+    */
+
+    #cakePreviewCard
+    .preview-heading-row {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 0;
+    }
+
+
+    #cakePreviewCard
+    .preview-heading-row > div {
+        min-width: 0;
+        flex: 1;
+    }
+
+
+    /*
+        "Your Cake So Far" is unnecessary
+        on this compact sticky version.
+    */
+
+    #cakePreviewCard
+    .preview-eyebrow {
+        display: none;
+    }
+
+
+    #cakePreviewCard
+    .preview-heading-row h1 {
+        max-width: none;
+
+        margin: 0;
+
+        font-size: 21px;
+        line-height: 1;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+
+    #cakePreviewCard
+    .preview-heading-row
+    > div
+    > p:last-child {
+        margin:
+            4px
+            0
+            0;
+
+        font-size: 8px;
+        line-height: 1.25;
+    }
+
+
+    #cakePreviewCard
+    .reset-cake-button {
+        flex: 0 0 auto;
+
+        margin: 0;
+
+        min-height: 30px;
+
+        padding:
+            5px
+            9px;
+
+        font-size: 7px;
+    }
+
+
+    /*
+        LIVE CAKE AREA
+
+        Wide like your reference rather
+        than a skinny vertical strip.
+    */
+
+    #cakePreviewCard
+    .cake-renderer-stage {
+        width: 100%;
+        max-width: none;
+
+        height:
+            clamp(
+                185px,
+                26vh,
+                225px
+            );
+
+        aspect-ratio: auto;
+
+        margin:
+            8px
+            auto
+            0;
+
+        border-radius: 14px;
+    }
+
+
+    #cakePreviewCard
+    .realistic-cake-renderer {
+        width: 100%;
+        height: 100%;
+
+        aspect-ratio: auto;
+    }
+
+
+    #cakePreviewCard
+    .realistic-cake-canvas {
+        width: 100%;
+        height: 100%;
+
+        object-fit: contain;
+    }
+
+
+    /*
+        The price is already visible in
+        "Your Cake" in the header.
+
+        Hide the large duplicate totals
+        under the mobile sticky preview
+        so the cake does not consume half
+        the phone screen.
+    */
+
+    #cakePreviewMeta,
+    #cakePreviewDisclaimer {
+        display: none !important;
+    }
+
+
+    /*
+        OPTIONS BEGIN DIRECTLY UNDER
+        THE LIVE CAKE
+    */
+
+    .builder-form-column {
+        width: 100%;
+
+        padding-top: 0;
+    }
+
+
+    .builder-form-column
+    .step-heading {
+        margin-top: 0;
+    }
+
+
+    /*
+        KEEP PREVIOUS / CONTINUE
+        VISIBLE AT THE BOTTOM
+    */
+
+    .builder-step-navigation {
+        position: sticky;
+
+        bottom: 0;
+
+        z-index: 700;
+
+        margin-right: -12px;
+        margin-left: -12px;
+
+        padding:
+            12px;
+
+        border-top:
+            1px solid
+            rgba(90, 42, 30, 0.12);
+
+        background:
+            rgba(
+                255,
+                248,
+                242,
+                0.96
+            );
+
+        backdrop-filter:
+            blur(12px);
+    }
+
+
+    .step-navigation-button {
+        min-width: 0;
+        min-height: 50px;
+
+        flex: 1;
+    }
+}
