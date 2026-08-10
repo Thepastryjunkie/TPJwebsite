@@ -341,8 +341,6 @@ const builderState = {
     numberCakeSecond: "1",
     letterCakeText: "A",
     numberLetterStyle: "",
-    characterOneColor: "original",
-    characterTwoColor: "original",
 
     cakeFlavor: "",
     customCakeFlavor: "",
@@ -354,45 +352,47 @@ const builderState = {
     customFilling: "",
     premiumFillings: [],
 
-   mainCakeColor: "original",
-   accentColor: "original",
+ mainCakeColor: "#FFF1DC",
+customMainColor: "#F7B6D2",
+mainCakeUsesCustomShade: false,
+
+accentColor: "#F7B6D2",
 
 cakeBorderStyle: "",
 cakeBorderPlacement: "both",
-cakeBorderColor: "#FF4FA3",
+cakeBorderColor: "#F7B6D2",
+cakeBorderUsesCustomShade: false,
+customCakeBorderColor: "#F7B6D2",
 cakeBorderSprinkles: false,
 
-finishAccentOne: "#FF4FA3",
-finishAccentTwo: "#F4D66E",
+finishAccentOne: "#F7B6D2",
+finishAccentTwo: "#D9C2F0",
 
-    cakeFinish: "",
-    cakeCoverage: "full",
-    tierTopColor: "original",
-    tierBottomColor: "original",
+cakeFinish: "",
+cakeCoverage: "full",
 
-    edibleImageEnabled: false,
-    edibleImageFile: null,
-    edibleImageUrl: "",
-    edibleImageShape: "original",
-    edibleImagePlacement: "front",
-    edibleImageScale: 70,
-    edibleImageX: 0,
-    edibleImageY: 0,
-    edibleImageRotation: 0,
-    edibleImageTier: "bottom",
+tierTopColor: "#FFF1DC",
+tierBottomColor: "#FFF1DC",
 
-    cakeBoardStyle: "round",
-    cakeBoardColor: "original",
-    cupcakeLinerStyle: "paper",
-    cupcakeFrostingStyle: "",
-    cupcakeLinerColor: "original",
-    cupcakeFrostingColor: "original",
+characterOneColor: "#FFF1DC",
+characterTwoColor: "#FFF1DC",
 
-    decorations: [],
+cakeBoardStyle: "round",
+cakeBoardColor: "#FFFFFF",
+matchBoardToCakePalette: false,
+
+cupcakeLinerStyle: "paper",
+cupcakeFrostingStyle: "",
+cupcakeLinerColor: "#FFFFFF",
+cupcakeFrostingColor: "#FFF1DC",
+cupcakeFrostingUsesCustomShade: false,
+customCupcakeFrostingColor: "#F7B6D2",
+
+decorations: [],
 flowerSource: "",
 
-bowColor: "#F4E6D8",
-butterflyColor: "#F6B6C8",
+bowColor: "#F7B6D2",
+butterflyColor: "#F7B6D2",
 
 cherryColor: "#E5172F",
 cherryGlitter: "No",
@@ -642,6 +642,418 @@ const stepValidationMessage = getElement(
 /* =========================================
    COLOR UTILITIES
 ========================================= */
+const curatedButtercreamPalette = [
+    {
+        name: "Soft Pink",
+        value: "#F7B6D2"
+    },
+    {
+        name: "Hot Pink",
+        value: "#E95A9D"
+    },
+    {
+        name: "Chocolate",
+        value: "#84563C"
+    },
+    {
+        name: "Cream",
+        value: "#F3E2C7"
+    },
+    {
+        name: "White",
+        value: "#FFFDFC"
+    },
+    {
+        name: "Black",
+        value: "#24201F"
+    },
+    {
+        name: "Lavender",
+        value: "#D4C0E8"
+    },
+    {
+        name: "Baby Blue",
+        value: "#BDD5E8"
+    },
+    {
+        name: "Sage",
+        value: "#B9C8AE"
+    },
+    {
+        name: "Yellow",
+        value: "#F1D77D"
+    }
+];
+
+
+const boardPalette = [
+    {
+        name: "White",
+        value: "#FFFFFF"
+    },
+    {
+        name: "Silver",
+        value: "#C9C9C7"
+    },
+    {
+        name: "Gold",
+        value: "#C7A14A"
+    },
+    {
+        name: "Black",
+        value: "#24201F"
+    },
+    {
+        name: "Natural / Kraft",
+        value: "#B78B5C"
+    }
+];
+
+
+const bowButterflyPalette = [
+    ...curatedButtercreamPalette.slice(
+        0,
+        2
+    ),
+
+    {
+        name: "White",
+        value: "#FFFDFC"
+    },
+    {
+        name: "Black",
+        value: "#24201F"
+    },
+    {
+        name: "Gold",
+        value: "#C7A14A"
+    },
+    {
+        name: "Silver",
+        value: "#C9C9C7"
+    },
+    {
+        name: "Lavender",
+        value: "#D4C0E8"
+    },
+    {
+        name: "Baby Blue",
+        value: "#BDD5E8"
+    },
+    {
+        name: "Sage",
+        value: "#B9C8AE"
+    },
+    {
+        name: "Yellow",
+        value: "#F1D77D"
+    }
+];
+
+
+const pearlPalette = [
+    {
+        name: "White",
+        value: "#FFFDFC"
+    },
+    {
+        name: "Ivory",
+        value: "#F3E2C7"
+    },
+    {
+        name: "Soft Pink",
+        value: "#F7B6D2"
+    },
+    {
+        name: "Gold",
+        value: "#C7A14A"
+    },
+    {
+        name: "Silver",
+        value: "#C9C9C7"
+    },
+    {
+        name: "Black",
+        value: "#24201F"
+    }
+];
+
+
+const cherryPalette = [
+    {
+        name: "Red",
+        value: "#D92B3F"
+    },
+    {
+        name: "Pink",
+        value: "#E95A9D"
+    },
+    {
+        name: "White",
+        value: "#FFFDFC"
+    },
+    {
+        name: "Black",
+        value: "#24201F"
+    },
+    {
+        name: "Gold",
+        value: "#C7A14A"
+    },
+    {
+        name: "Silver",
+        value: "#C9C9C7"
+    }
+];
+
+
+const flowerPalette = [
+    {
+        name: "White / Ivory",
+        value: "#FFF3D6"
+    },
+    {
+        name: "Pink",
+        value: "#F7B6D2"
+    },
+    {
+        name: "Red",
+        value: "#C9555F"
+    },
+    {
+        name: "Purple",
+        value: "#B89BCB"
+    },
+    {
+        name: "Blue",
+        value: "#AFC8DD"
+    },
+    {
+        name: "Yellow",
+        value: "#E8D278"
+    },
+    {
+        name: "Peach",
+        value: "#E9B796"
+    },
+    {
+        name: "Greenery",
+        value: "#A6B99B"
+    }
+];
+
+
+const cupcakeLinerPalettes = {
+    paper: [
+        {
+            name: "White",
+            value: "#FFFFFF"
+        },
+        {
+            name: "Black",
+            value: "#24201F"
+        },
+        {
+            name: "Soft Pink",
+            value: "#F7B6D2"
+        }
+    ],
+
+    "metallic-pleated": [
+        {
+            name: "Gold",
+            value: "#C7A14A"
+        },
+        {
+            name: "Silver",
+            value: "#C9C9C7"
+        },
+        {
+            name: "Rose Gold",
+            value: "#C99783"
+        },
+        {
+            name: "Black",
+            value: "#24201F"
+        }
+    ],
+
+    "rigid-cup": [
+        {
+            name: "Gold",
+            value: "#C7A14A"
+        },
+        {
+            name: "Silver",
+            value: "#C9C9C7"
+        },
+        {
+            name: "Rose Gold",
+            value: "#C99783"
+        },
+        {
+            name: "Black",
+            value: "#24201F"
+        },
+        {
+            name: "White",
+            value: "#FFFFFF"
+        }
+    ]
+};
+function buildColorSwatches(
+    containerSelector,
+    inputName,
+    palette,
+    selectedValue,
+    onChange,
+    options = {}
+) {
+    const container =
+        getElement(containerSelector);
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    palette.forEach((color) => {
+        const label =
+            document.createElement(
+                "label"
+            );
+
+        label.className =
+            "color-choice";
+
+        const input =
+            document.createElement(
+                "input"
+            );
+
+        input.type = "radio";
+        input.name = inputName;
+        input.value = color.value;
+
+        input.checked =
+            selectedValue ===
+            color.value;
+
+        const swatch =
+            document.createElement(
+                "span"
+            );
+
+        swatch.className =
+            "color-swatch";
+
+        swatch.style.setProperty(
+            "--swatch-color",
+            color.value
+        );
+
+        const name =
+            document.createElement(
+                "small"
+            );
+
+        name.textContent =
+            color.name;
+
+        input.addEventListener(
+            "change",
+            () => {
+                if (!input.checked) {
+                    return;
+                }
+
+                onChange(
+                    color.value,
+                    color.name
+                );
+
+                updateSelectedCardStates();
+            }
+        );
+
+        label.append(
+            input,
+            swatch,
+            name
+        );
+
+        container.appendChild(
+            label
+        );
+    });
+
+    if (options.allowCustom) {
+        const customLabel =
+            document.createElement(
+                "label"
+            );
+
+        customLabel.className =
+            "color-choice custom-shade-tile";
+
+        const customInput =
+            document.createElement(
+                "input"
+            );
+
+        customInput.type = "radio";
+        customInput.name = inputName;
+        customInput.value = "custom";
+
+        customInput.checked =
+            Boolean(
+                options.customSelected
+            );
+
+        const customSwatch =
+            document.createElement(
+                "span"
+            );
+
+        customSwatch.className =
+            "custom-shade-icon";
+
+        customSwatch.textContent = "+";
+
+        const customText =
+            document.createElement(
+                "small"
+            );
+
+        customText.textContent =
+            "Custom Shade";
+
+        customInput.addEventListener(
+            "change",
+            () => {
+                if (
+                    customInput.checked &&
+                    options.onCustomSelected
+                ) {
+                    options.onCustomSelected();
+                }
+
+                updateSelectedCardStates();
+            }
+        );
+
+        customLabel.append(
+            customInput,
+            customSwatch,
+            customText
+        );
+
+        container.appendChild(
+            customLabel
+        );
+    }
+}
 
 function normalizeHexColor(hexColor) {
     if (
@@ -964,16 +1376,27 @@ function calculateExtrasTotal() {
 
 function calculateCakeSubtotal() {
     const isCupcakesOnly =
-        getSelectedCakeProduct().shape === "cupcakes";
+        getSelectedCakeProduct()
+            .shape === "cupcakes";
+
+    const customBoardFee =
+        builderState
+            .matchBoardToCakePalette
+            ? 5
+            : 0;
 
     return (
         getCakeBasePrice() +
-        (isCupcakesOnly ? 0 : calculatePremiumFillingTotal()) +
+        (
+            isCupcakesOnly
+                ? 0
+                : calculatePremiumFillingTotal()
+        ) +
         calculateDecorationTotal() +
-        calculateTopperTotal()
+        calculateTopperTotal() +
+        customBoardFee
     );
 }
-
 
 function calculateEstimatedTotal() {
     return (
@@ -1007,15 +1430,34 @@ function loadRealisticImage(url) {
 
     return realisticImageCache.get(url);
 }
-function makeTintedLayer(image, mask, color) {
-    const layer = document.createElement("canvas");
+function makeTintedLayer(
+    image,
+    mask,
+    color
+) {
+    const layer =
+        document.createElement(
+            "canvas"
+        );
 
-    layer.width = image.naturalWidth || image.width;
-    layer.height = image.naturalHeight || image.height;
+    layer.width =
+        image.naturalWidth ||
+        image.width;
 
-    const layerContext = layer.getContext("2d");
+    layer.height =
+        image.naturalHeight ||
+        image.height;
 
-    /* Create the recolorable shape */
+    const layerContext =
+        layer.getContext("2d");
+
+
+    /*
+        STEP 1:
+        Build the color only inside
+        the recolor mask.
+    */
+
     layerContext.drawImage(
         mask,
         0,
@@ -1024,9 +1466,11 @@ function makeTintedLayer(image, mask, color) {
         layer.height
     );
 
-    /* Fill the masked area with the selected color */
-    layerContext.globalCompositeOperation = "source-in";
-    layerContext.fillStyle = color;
+    layerContext.globalCompositeOperation =
+        "source-in";
+
+    layerContext.fillStyle =
+        color;
 
     layerContext.fillRect(
         0,
@@ -1035,15 +1479,30 @@ function makeTintedLayer(image, mask, color) {
         layer.height
     );
 
-    /* Restore shadows from the original artwork */
-  const isSimpleTextureAsset =
-    image.src.includes(
-        "Simple-Texture-Horizontal-Comb"
-    );
 
-layerContext.globalCompositeOperation = "multiply";
-layerContext.globalAlpha =
-    isSimpleTextureAsset ? 0.78 : 0.34;
+    const isSimpleTextureAsset =
+        image.src.includes(
+            "Simple-Texture-Horizontal-Comb"
+        );
+
+
+    /*
+        STEP 2:
+        Bring a meaningful amount of the
+        ORIGINAL artwork back over the color.
+
+        This preserves frosting texture,
+        highlights and dimensional detail.
+    */
+
+    layerContext.globalCompositeOperation =
+        "source-over";
+
+    layerContext.globalAlpha =
+        isSimpleTextureAsset
+            ? 0.42
+            : 0.30;
+
     layerContext.drawImage(
         image,
         0,
@@ -1052,18 +1511,20 @@ layerContext.globalAlpha =
         layer.height
     );
 
-    /* Preserve dimension without washing dark colors back to gray. */
-const selectedRgb = hexToRgb(color);
 
-const isVeryDark =
-    selectedRgb.red +
-    selectedRgb.green +
-    selectedRgb.blue < 90;
+    /*
+        STEP 3:
+        Restore deeper shadows lightly.
+    */
 
-layerContext.globalCompositeOperation = "screen";
-layerContext.globalAlpha =
-     isVeryDark?  (isSimpleTextureAsset ? 0.26 : 0.10)
-    : (isSimpleTextureAsset ? 0.04 : 0.08);
+    layerContext.globalCompositeOperation =
+        "multiply";
+
+    layerContext.globalAlpha =
+        isSimpleTextureAsset
+            ? 0.18
+            : 0.11;
+
     layerContext.drawImage(
         image,
         0,
@@ -1072,8 +1533,46 @@ layerContext.globalAlpha =
         layer.height
     );
 
-    /* Remove anything drawn outside the recolor mask */
-    layerContext.globalCompositeOperation = "destination-in";
+
+    /*
+        STEP 4:
+        Very small highlight restoration.
+    */
+
+    const selectedRgb =
+        hexToRgb(color);
+
+    const isVeryDark =
+        selectedRgb.red +
+        selectedRgb.green +
+        selectedRgb.blue <
+        90;
+
+    layerContext.globalCompositeOperation =
+        "screen";
+
+    layerContext.globalAlpha =
+        isVeryDark
+            ? 0.025
+            : 0.015;
+
+    layerContext.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+
+    /*
+        STEP 5:
+        Clip everything back to the mask.
+    */
+
+    layerContext.globalCompositeOperation =
+        "destination-in";
+
     layerContext.globalAlpha = 1;
 
     layerContext.drawImage(
@@ -1084,7 +1583,10 @@ layerContext.globalAlpha =
         layer.height
     );
 
-    layerContext.globalCompositeOperation = "source-over";
+
+    layerContext.globalCompositeOperation =
+        "source-over";
+
     layerContext.globalAlpha = 1;
 
     return layer;
@@ -2538,7 +3040,86 @@ function getRealisticExtraColor(
 
     return colorMap[decorationId] || null;
 }
+function makeDripTintedLayer(
+    image,
+    color
+) {
+    const layer =
+        document.createElement(
+            "canvas"
+        );
 
+    layer.width =
+        image.naturalWidth ||
+        image.width;
+
+    layer.height =
+        image.naturalHeight ||
+        image.height;
+
+    const context =
+        layer.getContext("2d");
+
+
+    /*
+        Start with the real drip alpha.
+    */
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+
+    /*
+        Color only existing visible
+        drip pixels.
+    */
+
+    context.globalCompositeOperation =
+        "source-in";
+
+    context.fillStyle =
+        color;
+
+    context.fillRect(
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+
+    /*
+        Restore a little chocolate
+        shine and dimension.
+    */
+
+    context.globalCompositeOperation =
+        "multiply";
+
+    context.globalAlpha =
+        0.18;
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+
+    context.globalCompositeOperation =
+        "source-over";
+
+    context.globalAlpha = 1;
+
+    return layer;
+}
 function getRenderedExtraLayer(asset) {
     const selectedColor =
         getRealisticExtraColor(
@@ -2566,11 +3147,10 @@ function getRenderedExtraLayer(asset) {
         asset.id ===
         "chocolateDripDecoration"
     ) {
-        return makeTintedLayer(
-            asset.strokes,
-            asset.strokes,
-            selectedColor
-        );
+       return makeDripTintedLayer(
+    asset.strokes,
+    selectedColor
+);
     }
 
     if (!asset.mask) {
@@ -3023,7 +3603,44 @@ const accentTwo =
 
     context.restore();
 }
+function getEffectiveBoardColor() {
+    if (
+        !builderState
+            .matchBoardToCakePalette
+    ) {
+        return builderState
+            .cakeBoardColor;
+    }
 
+    const product =
+        getSelectedCakeProduct();
+
+    if (
+        product.shape === "tier"
+    ) {
+        return (
+            builderState
+                .tierBottomColor ||
+            "#FFF1DC"
+        );
+    }
+
+    if (
+        product.shape ===
+        "numberLetter"
+    ) {
+        return (
+            builderState
+                .characterOneColor ||
+            "#FFF1DC"
+        );
+    }
+
+    return (
+        builderState.mainCakeColor ||
+        "#FFF1DC"
+    );
+}
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
 
@@ -3317,7 +3934,7 @@ Promise.all(
             context,
             boardImage,
             boardMask,
-            builderState.cakeBoardColor,
+            getEffectiveBoardColor(),
             0,
             boardYOffset,
             realisticCakeCanvas.width,
@@ -6965,6 +7582,67 @@ getElements(
 /* =========================================
    COLOR AND FINISH EVENTS
 ========================================= */
+getElement(
+    "#customMainColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState.customMainColor =
+            event.target.value;
+
+        builderState.mainCakeColor =
+            event.target.value;
+
+        builderState
+            .mainCakeUsesCustomShade =
+            true;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#customCakeBorderColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState
+            .customCakeBorderColor =
+            event.target.value;
+
+        builderState.cakeBorderColor =
+            event.target.value;
+
+        builderState
+            .cakeBorderUsesCustomShade =
+            true;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#customCupcakeFrostingColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState
+            .customCupcakeFrostingColor =
+            event.target.value;
+
+        builderState
+            .cupcakeFrostingColor =
+            event.target.value;
+
+        builderState
+            .cupcakeFrostingUsesCustomShade =
+            true;
+
+        renderCakePreview();
+    }
+);
 function updateBorderControlsVisibility() {
     const controls =
         getElement("#cakeBorderControls");
@@ -6974,122 +7652,419 @@ function updateBorderControlsVisibility() {
         !builderState.cakeBorderStyle
     );
 }
+function showCustomShadeControls(
+    fieldSelector,
+    noteSelector,
+    shouldShow
+) {
+    getElement(
+        fieldSelector
+    )?.classList.toggle(
+        "is-hidden",
+        !shouldShow
+    );
 
-getElements(
-    'input[name="mainCakeColor"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
+    getElement(
+        noteSelector
+    )?.classList.toggle(
+        "is-hidden",
+        !shouldShow
+    );
+}
+
+
+function buildBuilderColorControls() {
+
+    /*
+        MAIN CAKE
+    */
+
+    buildColorSwatches(
+        "#mainCakeColorSwatches",
+        "mainCakeColorChoice",
+        curatedButtercreamPalette,
+        builderState.mainCakeColor,
+        (value) => {
             builderState.mainCakeColor =
-                input.value;
+                value;
+
+            builderState
+                .mainCakeUsesCustomShade =
+                false;
+
+            showCustomShadeControls(
+                "#customMainColorField",
+                "#customMainColorNote",
+                false
+            );
 
             renderCakePreview();
-        }
-    );
-});
+        },
+        {
+            allowCustom: true,
 
-getElement(
-    "#customMainColor"
-)?.addEventListener(
-    "input",
-    (event) => {
-        builderState.mainCakeColor =
-            event.target.value;
+            customSelected:
+                builderState
+                    .mainCakeUsesCustomShade,
 
-        getElements(
-            'input[name="mainCakeColor"]'
-        ).forEach((input) => {
-            input.checked = false;
-        });
+            onCustomSelected: () => {
+                builderState
+                    .mainCakeUsesCustomShade =
+                    true;
 
-        renderCakePreview();
-    }
-);
+                builderState.mainCakeColor =
+                    builderState
+                        .customMainColor;
 
-getElement("#accentColor")?.addEventListener(
-    "input",
-    (event) => {
-        builderState.accentColor =
-            event.target.value;
-
-        renderCakePreview();
-    }
-);
-[
-    [
-        "#finishAccentOne",
-        "finishAccentOne"
-    ],
-
-    [
-        "#finishAccentTwo",
-        "finishAccentTwo"
-    ]
-].forEach(
-    ([selector, stateKey]) => {
-        getElement(
-            selector
-        )?.addEventListener(
-            "input",
-            (event) => {
-                builderState[stateKey] =
-                    event.target.value;
+                showCustomShadeControls(
+                    "#customMainColorField",
+                    "#customMainColorNote",
+                    true
+                );
 
                 renderCakePreview();
             }
-        );
-    }
-);
-getElements(
-    'input[name="cakeCoverage"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.cakeCoverage = input.value;
+        }
+    );
+
+
+    /*
+        TWO-TIER
+    */
+
+    buildColorSwatches(
+        "#tierTopColorSwatches",
+        "tierTopColorChoice",
+        curatedButtercreamPalette,
+        builderState.tierTopColor,
+        (value) => {
+            builderState.tierTopColor =
+                value;
+
             renderCakePreview();
         }
     );
-});
 
-[
-    ["#tierTopColor", "tierTopColor"],
-    ["#tierBottomColor", "tierBottomColor"],
-    ["#characterOneColor", "characterOneColor"],
-    ["#characterTwoColor", "characterTwoColor"]
-].forEach(([selector, stateKey]) => {
-    getElement(selector)?.addEventListener("input", (event) => {
-        builderState[stateKey] = event.target.value;
-        renderCakePreview();
-    });
-});
-getElements(
-    'input[name="numberLetterStyle"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.numberLetterStyle =
-                input.value;
 
-            builderState.cakeFinish =
-                "Smooth Finish";
+    buildColorSwatches(
+        "#tierBottomColorSwatches",
+        "tierBottomColorChoice",
+        curatedButtercreamPalette,
+        builderState.tierBottomColor,
+        (value) => {
+            builderState.tierBottomColor =
+                value;
 
-            const smoothFinishInput =
-                getElement(
-                    'input[name="cakeFinish"][value="Smooth Finish"]'
+            renderCakePreview();
+        }
+    );
+
+
+    /*
+        NUMBER / LETTER
+    */
+
+    buildColorSwatches(
+        "#characterOneColorSwatches",
+        "characterOneColorChoice",
+        curatedButtercreamPalette,
+        builderState.characterOneColor,
+        (value) => {
+            builderState.characterOneColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    buildColorSwatches(
+        "#characterTwoColorSwatches",
+        "characterTwoColorChoice",
+        curatedButtercreamPalette,
+        builderState.characterTwoColor,
+        (value) => {
+            builderState.characterTwoColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    /*
+        BORDER
+    */
+
+    buildColorSwatches(
+        "#cakeBorderColorSwatches",
+        "cakeBorderColorChoice",
+        curatedButtercreamPalette,
+        builderState.cakeBorderColor,
+        (value) => {
+            builderState.cakeBorderColor =
+                value;
+
+            builderState
+                .cakeBorderUsesCustomShade =
+                false;
+
+            showCustomShadeControls(
+                "#customCakeBorderColorField",
+                "#customCakeBorderColorNote",
+                false
+            );
+
+            renderCakePreview();
+        },
+        {
+            allowCustom: true,
+
+            customSelected:
+                builderState
+                    .cakeBorderUsesCustomShade,
+
+            onCustomSelected: () => {
+                builderState
+                    .cakeBorderUsesCustomShade =
+                    true;
+
+                builderState.cakeBorderColor =
+                    builderState
+                        .customCakeBorderColor;
+
+                showCustomShadeControls(
+                    "#customCakeBorderColorField",
+                    "#customCakeBorderColorNote",
+                    true
                 );
 
-            if (smoothFinishInput) {
-                smoothFinishInput.checked = true;
+                renderCakePreview();
             }
+        }
+    );
 
-            updateSelectedCardStates();
+
+    /*
+        FINISH ACCENTS
+    */
+
+    buildColorSwatches(
+        "#finishAccentOneSwatches",
+        "finishAccentOneChoice",
+        curatedButtercreamPalette,
+        builderState.finishAccentOne,
+        (value) => {
+            builderState.finishAccentOne =
+                value;
+
             renderCakePreview();
         }
     );
-});
+
+
+    buildColorSwatches(
+        "#finishAccentTwoSwatches",
+        "finishAccentTwoChoice",
+        curatedButtercreamPalette,
+        builderState.finishAccentTwo,
+        (value) => {
+            builderState.finishAccentTwo =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    /*
+        PHYSICAL EXTRAS
+    */
+
+    buildColorSwatches(
+        "#bowColorSwatches",
+        "bowColorChoice",
+        bowButterflyPalette,
+        builderState.bowColor,
+        (value) => {
+            builderState.bowColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    buildColorSwatches(
+        "#butterflyColorSwatches",
+        "butterflyColorChoice",
+        bowButterflyPalette,
+        builderState.butterflyColor,
+        (value) => {
+            builderState.butterflyColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    buildColorSwatches(
+        "#cherryColorSwatches",
+        "cherryColorChoice",
+        cherryPalette,
+        builderState.cherryColor,
+        (value) => {
+            builderState.cherryColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    buildColorSwatches(
+        "#pearlColorSwatches",
+        "pearlColorChoice",
+        pearlPalette,
+        builderState.pearlColor,
+        (value) => {
+            builderState.pearlColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    buildColorSwatches(
+        "#flowerColorSwatches",
+        "flowerColorChoice",
+        flowerPalette,
+        builderState.flowerColor,
+        (value) => {
+            builderState.flowerColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    /*
+        BOARD
+    */
+
+    buildColorSwatches(
+        "#cakeBoardColorSwatches",
+        "cakeBoardColorChoice",
+        boardPalette,
+        builderState.cakeBoardColor,
+        (value) => {
+            builderState.cakeBoardColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+
+
+    /*
+        CUPCAKE FROSTING
+    */
+
+    buildColorSwatches(
+        "#cupcakeFrostingColorSwatches",
+        "cupcakeFrostingColorChoice",
+        curatedButtercreamPalette,
+        builderState
+            .cupcakeFrostingColor,
+        (value) => {
+            builderState
+                .cupcakeFrostingColor =
+                value;
+
+            builderState
+                .cupcakeFrostingUsesCustomShade =
+                false;
+
+            showCustomShadeControls(
+                "#customCupcakeFrostingColorField",
+                "#customCupcakeFrostingColorNote",
+                false
+            );
+
+            renderCakePreview();
+        },
+        {
+            allowCustom: true,
+
+            customSelected:
+                builderState
+                    .cupcakeFrostingUsesCustomShade,
+
+            onCustomSelected: () => {
+                builderState
+                    .cupcakeFrostingUsesCustomShade =
+                    true;
+
+                builderState
+                    .cupcakeFrostingColor =
+                    builderState
+                        .customCupcakeFrostingColor;
+
+                showCustomShadeControls(
+                    "#customCupcakeFrostingColorField",
+                    "#customCupcakeFrostingColorNote",
+                    true
+                );
+
+                renderCakePreview();
+            }
+        }
+    );
+
+
+    updateCupcakeLinerColorChoices();
+} 
+function updateCupcakeLinerColorChoices() {
+    const linerStyle =
+        builderState
+            .cupcakeLinerStyle ||
+        "paper";
+
+    const palette =
+        cupcakeLinerPalettes[
+            linerStyle
+        ] ||
+        cupcakeLinerPalettes.paper;
+
+    const currentStillExists =
+        palette.some(
+            (color) =>
+                color.value ===
+                builderState
+                    .cupcakeLinerColor
+        );
+
+    if (!currentStillExists) {
+        builderState.cupcakeLinerColor =
+            palette[0].value;
+    }
+
+    buildColorSwatches(
+        "#cupcakeLinerColorSwatches",
+        "cupcakeLinerColorChoice",
+        palette,
+        builderState.cupcakeLinerColor,
+        (value) => {
+            builderState.cupcakeLinerColor =
+                value;
+
+            renderCakePreview();
+        }
+    );
+}
 getElements(
     'input[name="cakeFinish"]'
 ).forEach((input) => {
@@ -7154,20 +8129,6 @@ getElements(
         }
     );
 });
-
-
-getElement(
-    "#cakeBorderColor"
-)?.addEventListener(
-    "input",
-    (event) => {
-        builderState.cakeBorderColor =
-            event.target.value;
-
-        renderCakePreview();
-    }
-);
-
 
 getElement(
     "#cakeBorderSprinkles"
@@ -7325,26 +8286,6 @@ getElement(
         renderCakePreview();
     }
 );
-[
-    ["#bowColor", "bowColor"],
-    ["#butterflyColor", "butterflyColor"],
-    ["#cherryColor", "cherryColor"],
-    ["#pearlColor", "pearlColor"],
-    ["#flowerColor", "flowerColor"]
-].forEach(([selector, stateKey]) => {
-    getElement(
-        selector
-    )?.addEventListener(
-        "input",
-        (event) => {
-            builderState[stateKey] =
-                event.target.value;
-
-            renderCakePreview();
-        }
-    );
-});
-
 
 getElements(
     'input[name="cherryGlitter"]'
@@ -7523,19 +8464,61 @@ getElement(
    EXTRA EVENTS
 ========================================= */
 
-[
-    ["#cakeBoardStyle", "cakeBoardStyle"],
-    ["#cakeBoardColor", "cakeBoardColor"],
-    ["#cupcakeLinerStyle", "cupcakeLinerStyle"],
-    ["#cupcakeFrostingStyle", "cupcakeFrostingStyle"],
-    ["#cupcakeLinerColor", "cupcakeLinerColor"],
-    ["#cupcakeFrostingColor", "cupcakeFrostingColor"]
-].forEach(([selector, stateKey]) => {
-    getElement(selector)?.addEventListener("input", (event) => {
-        builderState[stateKey] = event.target.value;
+getElement(
+    "#cakeBoardStyle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.cakeBoardStyle =
+            event.target.value;
+
         renderCakePreview();
-    });
-});
+    }
+);
+
+
+getElement(
+    "#matchBoardToCakePalette"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState
+            .matchBoardToCakePalette =
+            event.target.checked;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#cupcakeLinerStyle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState
+            .cupcakeLinerStyle =
+            event.target.value;
+
+        updateCupcakeLinerColorChoices();
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#cupcakeFrostingStyle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState
+            .cupcakeFrostingStyle =
+            event.target.value;
+
+        renderCakePreview();
+    }
+);
 
 getElements(
     "[data-extra-name]"
@@ -8050,6 +9033,28 @@ getElement(
 ========================================= */
 
 function initializeBuilder() {
+    buildBuilderColorControls();
+
+showCustomShadeControls(
+    "#customMainColorField",
+    "#customMainColorNote",
+    builderState
+        .mainCakeUsesCustomShade
+);
+
+showCustomShadeControls(
+    "#customCakeBorderColorField",
+    "#customCakeBorderColorNote",
+    builderState
+        .cakeBorderUsesCustomShade
+);
+
+showCustomShadeControls(
+    "#customCupcakeFrostingColorField",
+    "#customCupcakeFrostingColorNote",
+    builderState
+        .cupcakeFrostingUsesCustomShade
+);
     showCakeSizeGroup("round");
     updateCakeBoardControls();
     updateNumberLetterControls();

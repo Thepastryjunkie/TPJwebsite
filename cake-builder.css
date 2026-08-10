@@ -2122,8 +2122,110 @@ fieldset {
     background: transparent;
 
     cursor: pointer;
+    
+}
+.custom-shade-tile {
+    justify-content: center;
 }
 
+.custom-shade-icon {
+    width: 46px;
+    height: 46px;
+
+    display: grid;
+    place-items: center;
+
+    border: 3px dashed
+        rgba(90, 42, 30, 0.32);
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #F7B6D2,
+            #D4C0E8,
+            #BDD5E8,
+            #F1D77D
+        );
+
+    color: var(--chocolate);
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+
+.swatch-subsection {
+    margin-top: 22px;
+}
+
+.swatch-subsection +
+.swatch-subsection {
+    margin-top: 30px;
+}
+
+
+.swatch-subheading {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: var(--chocolate);
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+.cupcake-swatch-section {
+    margin-top: 18px;
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.58
+        );
+}
+
+
+.color-choice-grid {
+    align-items: stretch;
+}
+
+
+.color-choice {
+    min-height: 86px;
+}
+
+
+.color-choice.is-selected {
+    transform: translateY(-2px);
+}
+
+
+.color-swatch {
+    position: relative;
+}
+
+
+.color-swatch::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+
+    box-shadow:
+        inset 0 1px 1px
+        rgba(255, 255, 255, 0.55);
+}
 
 /* =========================================
    STYLE CARDS

@@ -1569,15 +1569,89 @@
 
                         </fieldset>
 
-                        <fieldset id="cakeBoardCustomizer" class="builder-fieldset board-customizer">
-                            <legend>Cake Board</legend>
-                            <div class="compact-choice-row">
-                                <label><span>Board shape</span><select id="cakeBoardStyle"><option value="round">Round</option><option value="square">Square</option><option value="rectangleHorizontal">Rectangle</option><option value="letterNumber" hidden>Letter / Number Board</option></select></label>
-                                <label><span>Board color</span><input id="cakeBoardColor" type="color" value="#F4C3D7"></label>
-                            </div>
-                            <p id="cakeBoardNotice" class="field-note">Board choices update the realistic preview only and do not change pricing.</p>
-                        </fieldset>
+                       <fieldset
+    id="cakeBoardCustomizer"
+    class="builder-fieldset board-customizer"
+>
 
+    <legend>
+        Cake Board
+    </legend>
+
+    <label class="form-field">
+
+        <span>
+            Board Shape
+        </span>
+
+        <select id="cakeBoardStyle">
+
+            <option value="round">
+                Round
+            </option>
+
+            <option value="square">
+                Square
+            </option>
+
+            <option value="rectangleHorizontal">
+                Rectangle
+            </option>
+
+            <option
+                value="letterNumber"
+                hidden
+            >
+                Letter / Number Board
+            </option>
+
+        </select>
+
+    </label>
+
+
+    <p class="fieldset-description">
+        Board Color
+    </p>
+
+    <div
+        id="cakeBoardColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
+
+    <label class="extra-layer-control">
+
+        <input
+            id="matchBoardToCakePalette"
+            type="checkbox"
+        >
+
+        <span class="toggle-track"></span>
+
+        <span class="toggle-copy">
+
+            <strong>
+                Match Drum to Cake Palette
+            </strong>
+
+            <small>
+                Custom Wrapped Drum · +$5
+            </small>
+
+        </span>
+
+    </label>
+
+
+    <p
+        id="cakeBoardNotice"
+        class="field-note"
+    >
+        Standard board colors are subject to availability.
+    </p>
+
+</fieldset>
 
                         <!-- ROUND SIZES -->
 
@@ -2845,102 +2919,79 @@
                                 Main Buttercream Color
                             </legend>
 
-                            <div class="color-choice-grid">
+                            <div
+    id="mainCakeColorSwatches"
+    class="color-choice-grid"
+></div>
+<div
+    id="customMainColorField"
+    class="custom-color-field is-hidden"
+>
 
-                                <label class="color-choice">
-                                  <input type="radio" name="mainCakeColor" value="#F7B6D2"> 
-                                    <span class="color-swatch" style="--swatch-color:#F7B6D2;"></span>
-                                    <small>Soft Pink</small>
-                                </label>
+    <span>
+        Custom Buttercream Shade
+    </span>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#FF4FA3">
-                                    <span class="color-swatch" style="--swatch-color:#FF4FA3;"></span>
-                                    <small>Hot Pink</small>
-                                </label>
+    <input
+        id="customMainColor"
+        type="color"
+        value="#F7B6D2"
+    >
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#84563C">
-                                    <span class="color-swatch" style="--swatch-color:#84563C;"></span>
-                                    <small>Chocolate</small>
-                                </label>
+</div>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#FFF1DC">
-                                    <span class="color-swatch" style="--swatch-color:#FFF1DC;"></span>
-                                    <small>Cream</small>
-                                </label>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#FFFFFF">
-                                    <span class="color-swatch" style="--swatch-color:#FFFFFF;"></span>
-                                    <small>White</small>
-                                </label>
+<p
+    id="customMainColorNote"
+    class="field-note is-hidden"
+>
+    We match custom buttercream shades as closely as possible using food-safe gel dyes.
+</p>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#171313">
-                                    <span class="color-swatch" style="--swatch-color:#171313;"></span>
-                                    <small>Black</small>
-                                </label>
+</fieldset>
+                     <fieldset
+    id="tierColorCustomizer"
+    class="builder-fieldset cake-only-look is-hidden"
+>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#D9C2F0">
-                                    <span class="color-swatch" style="--swatch-color:#D9C2F0;"></span>
-                                    <small>Lavender</small>
-                                </label>
+    <legend>
+        Two-Tier Buttercream Colors
+    </legend>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#BFDDF5">
-                                    <span class="color-swatch" style="--swatch-color:#BFDDF5;"></span>
-                                    <small>Baby Blue</small>
-                                </label>
+    <p class="fieldset-description">
+        Choose each tier color separately.
+    </p>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#B8C9AF">
-                                    <span class="color-swatch" style="--swatch-color:#B8C9AF;"></span>
-                                    <small>Sage</small>
-                                </label>
 
-                                <label class="color-choice">
-                                    <input type="radio" name="mainCakeColor" value="#F7D978">
-                                    <span class="color-swatch" style="--swatch-color:#F7D978;"></span>
-                                    <small>Yellow</small>
-                                </label>
+    <div class="swatch-subsection">
 
-                            </div>
+        <strong class="swatch-subheading">
+            Top 4-inch Tier
+        </strong>
 
-                            <label class="custom-color-field">
+        <div
+            id="tierTopColorSwatches"
+            class="color-choice-grid"
+        ></div>
 
-                                <span>
-                                    Custom main color
-                                </span>
+    </div>
 
-                                <input
-                                    id="customMainColor"
-                                    type="color"
-                                    value="#FF4FA3"
-                                >
 
-                            </label>
+    <div class="swatch-subsection">
 
-                        </fieldset>
+        <strong class="swatch-subheading">
+            Bottom 6-inch Tier
+        </strong>
 
-                        <fieldset id="tierColorCustomizer" class="builder-fieldset cake-only-look is-hidden">
-                            <legend>Two-Tier Buttercream Colors</legend>
-                            <p class="fieldset-description">
-                                Color each tier separately. These colors update the top and bottom tiers independently.
-                            </p>
-                            <div class="compact-choice-row">
-                                <label>
-                                    <span>Top 4-inch tier</span>
-                                    <input id="tierTopColor" type="color" value="#FFF1DC">
-                                </label>
-                                <label>
-                                    <span>Bottom 6-inch tier</span>
-                                    <input id="tierBottomColor" type="color" value="#FFF1DC">
-                                </label>
-                            </div>
-                        </fieldset>
+        <div
+            id="tierBottomColorSwatches"
+            class="color-choice-grid"
+        ></div>
+
+    </div>
+
+</fieldset>
+
 <fieldset
     id="numberLetterStyleCustomizer"
     class="builder-fieldset cake-only-look is-hidden"
@@ -3004,22 +3055,51 @@
     </div>
 
 </fieldset>
-                        <fieldset id="characterColorCustomizer" class="builder-fieldset cake-only-look is-hidden">
-                            <legend>Number / Letter Cake Colors</legend>
-                            <p class="fieldset-description">
-                                Choose each number or letter color separately. For a single cake, only the first color is used.
-                            </p>
-                            <div class="compact-choice-row">
-                                <label>
-                                    <span>First number or letter</span>
-                                    <input id="characterOneColor" type="color" value="#FFF1DC">
-                                </label>
-                                <label id="secondCharacterColorField" class="is-hidden">
-                                    <span>Second number or letter</span>
-                                    <input id="characterTwoColor" type="color" value="#FFF1DC">
-                                </label>
-                            </div>
-                        </fieldset>
+          <fieldset
+    id="characterColorCustomizer"
+    class="builder-fieldset cake-only-look is-hidden"
+>
+
+    <legend>
+        Number / Letter Cake Colors
+    </legend>
+
+    <p class="fieldset-description">
+        Choose each character color separately.
+    </p>
+
+
+    <div class="swatch-subsection">
+
+        <strong class="swatch-subheading">
+            First Number or Letter
+        </strong>
+
+        <div
+            id="characterOneColorSwatches"
+            class="color-choice-grid"
+        ></div>
+
+    </div>
+
+
+    <div
+        id="secondCharacterColorField"
+        class="swatch-subsection is-hidden"
+    >
+
+        <strong class="swatch-subheading">
+            Second Number or Letter
+        </strong>
+
+        <div
+            id="characterTwoColorSwatches"
+            class="color-choice-grid"
+        ></div>
+
+    </div>
+
+</fieldset>              
 
               <fieldset
     id="cakeBorderCustomizer"
@@ -3060,7 +3140,7 @@
                 type="radio"
                 name="cakeBorderStyle"
                 value="rope"
-            >><img src="../images/cake-builder/cards/07-borders/TPJ-Card-Border-Rope.png" alt="">
+            ><img src="../images/cake-builder/cards/07-borders/TPJ-Card-Border-Rope.png" alt="">
             <strong>Rope</strong>
         </label>
 
@@ -3133,19 +3213,44 @@
         </fieldset>
 
 
-        <label class="custom-color-field">
+       <fieldset class="builder-fieldset">
 
-            <span>
-                Border Color
-            </span>
+    <legend>
+        Border Color
+    </legend>
 
-            <input
-                id="cakeBorderColor"
-                type="color"
-                value="#FF4FA3"
-            >
+    <div
+        id="cakeBorderColorSwatches"
+        class="color-choice-grid"
+    ></div>
 
-        </label>
+
+    <div
+        id="customCakeBorderColorField"
+        class="custom-color-field is-hidden"
+    >
+
+        <span>
+            Custom Border Shade
+        </span>
+
+        <input
+            id="customCakeBorderColor"
+            type="color"
+            value="#F7B6D2"
+        >
+
+    </div>
+
+
+    <p
+        id="customCakeBorderColorNote"
+        class="field-note is-hidden"
+    >
+        We match custom buttercream shades as closely as possible using food-safe gel dyes.
+    </p>
+
+</fieldset> 
 
 
         <label class="extra-layer-control">
@@ -3181,34 +3286,38 @@
 >
 
     <legend>
-        Watercolor / Palette Knife Colors
+        Finish Colors
     </legend>
 
     <p class="fieldset-description">
-        Choose both colors used by the finish design.
+        Choose two colors for Watercolor, Palette Knife, or Vintage Piping.
     </p>
 
-    <div class="compact-choice-row">
 
-        <label>
-            <span>Finish Color 1</span>
+    <div class="swatch-subsection">
 
-            <input
-                id="finishAccentOne"
-                type="color"
-                value="#FF4FA3"
-            >
-        </label>
+        <strong class="swatch-subheading">
+            Color 1
+        </strong>
 
-        <label>
-            <span>Finish Color 2</span>
+        <div
+            id="finishAccentOneSwatches"
+            class="color-choice-grid"
+        ></div>
 
-            <input
-                id="finishAccentTwo"
-                type="color"
-                value="#F4D66E"
-            >
-        </label>
+    </div>
+
+
+    <div class="swatch-subsection">
+
+        <strong class="swatch-subheading">
+            Color 2
+        </strong>
+
+        <div
+            id="finishAccentTwoSwatches"
+            class="color-choice-grid"
+        ></div>
 
     </div>
 
@@ -3797,44 +3906,46 @@
     id="bowDetailOptions"
     class="conditional-section is-hidden"
 >
-    <label class="custom-color-field">
-        <span>Bow Color</span>
-        <input
-            id="bowColor"
-            type="color"
-            value="#F4E6D8"
-        >
-    </label>
-</div>
 
+    <p class="fieldset-description">
+        Bow Color
+    </p>
+
+    <div
+        id="bowColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
+</div>
 
 <div
     id="butterflyDetailOptions"
     class="conditional-section is-hidden"
 >
-    <label class="custom-color-field">
-        <span>Butterfly Color</span>
-        <input
-            id="butterflyColor"
-            type="color"
-            value="#F6B6C8"
-        >
-    </label>
-</div>
 
+    <p class="fieldset-description">
+        Butterfly Color
+    </p>
+
+    <div
+        id="butterflyColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
+</div>
 
 <div
     id="cherryDetailOptions"
     class="conditional-section is-hidden"
 >
-    <label class="custom-color-field">
-        <span>Cherry Color</span>
-        <input
-            id="cherryColor"
-            type="color"
-            value="#E5172F"
-        >
-    </label>
+    <p class="fieldset-description">
+    Cherry Color
+</p>
+
+<div
+    id="cherryColorSwatches"
+    class="color-choice-grid"
+></div>
 
     <fieldset class="builder-fieldset">
         <legend>Glitter Cherries?</legend>
@@ -3975,166 +4086,166 @@
     </fieldset>
 
 
-    <div
-        id="whiteChocolateColorOptions"
-        class="is-hidden"
-    >
+  <div
+    id="whiteChocolateColorOptions"
+    class="is-hidden"
+>
 
-        <p class="fieldset-description">
-            Choose a color for your white chocolate drip.
-        </p>
+    <p class="fieldset-description">
+        Choose a color for your white chocolate drip.
+    </p>
 
-        <div class="color-choice-grid">
+    <div class="color-choice-grid">
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#F7B6D2"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#F7B6D2;"
-                ></span>
-                <small>Soft Pink</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#F7B6D2"
+            >
 
+            <span
+                class="color-swatch"
+                style="--swatch-color:#F7B6D2;"
+            ></span>
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#FF4FA3"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#FF4FA3;"
-                ></span>
-                <small>Hot Pink</small>
-            </label>
+            <small>
+                Soft Pink
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#FFF1DC"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#FFF1DC;"
-                ></span>
-                <small>Cream</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#E95A9D"
+            >
+
+            <span
+                class="color-swatch"
+                style="--swatch-color:#E95A9D;"
+            ></span>
+
+            <small>
+                Hot Pink
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#FFFFFF"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#FFFFFF;"
-                ></span>
-                <small>White</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#24201F"
+            >
+
+            <span
+                class="color-swatch"
+                style="--swatch-color:#24201F;"
+            ></span>
+
+            <small>
+                Black
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#171313"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#171313;"
-                ></span>
-                <small>Black</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#D4C0E8"
+            >
+
+            <span
+                class="color-swatch"
+                style="--swatch-color:#D4C0E8;"
+            ></span>
+
+            <small>
+                Lavender
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#D9C2F0"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#D9C2F0;"
-                ></span>
-                <small>Lavender</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#BDD5E8"
+            >
+
+            <span
+                class="color-swatch"
+                style="--swatch-color:#BDD5E8;"
+            ></span>
+
+            <small>
+                Baby Blue
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#BFDDF5"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#BFDDF5;"
-                ></span>
-                <small>Baby Blue</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#B9C8AE"
+            >
+
+            <span
+                class="color-swatch"
+                style="--swatch-color:#B9C8AE;"
+            ></span>
+
+            <small>
+                Sage
+            </small>
+        </label>
 
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#B8C9AF"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#B8C9AF;"
-                ></span>
-                <small>Sage</small>
-            </label>
+        <label class="color-choice">
+            <input
+                type="radio"
+                name="whiteChocolateDripColor"
+                value="#F1D77D"
+            >
 
+            <span
+                class="color-swatch"
+                style="--swatch-color:#F1D77D;"
+            ></span>
 
-            <label class="color-choice">
-                <input
-                    type="radio"
-                    name="whiteChocolateDripColor"
-                    value="#F7D978"
-                >
-                <span
-                    class="color-swatch"
-                    style="--swatch-color:#F7D978;"
-                ></span>
-                <small>Yellow</small>
-            </label>
-
-        </div>
-
-        <p class="field-note">
-            White chocolate is colored using food-safe chocolate coloring.
-            Final shades are matched as closely as possible.
-        </p>
+            <small>
+                Yellow
+            </small>
+        </label>
 
     </div>
 
-</div>
 
+    <p class="field-note">
+        White chocolate is colored using food-safe chocolate coloring.
+        Final shades are matched as closely as possible.
+    </p>
+
+</div>  
 
 <div
     id="pearlDetailOptions"
     class="conditional-section is-hidden"
 >
-    <label class="custom-color-field">
-        <span>Pearl Color</span>
-        <input
-            id="pearlColor"
-            type="color"
-            value="#FFF7F2"
-        >
-    </label>
+
+    <p class="fieldset-description">
+        Pearl Color
+    </p>
+
+    <div
+        id="pearlColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
 </div>
 
 
@@ -4142,14 +4253,18 @@
     id="flowerDetailOptions"
     class="conditional-section is-hidden"
 >
-    <label class="custom-color-field">
-        <span>Flower Color</span>
-        <input
-            id="flowerColor"
-            type="color"
-            value="#FFF3D6"
-        >
-    </label>
+    <p class="fieldset-description">
+    Flower Color Family
+</p>
+
+<div
+    id="flowerColorSwatches"
+    class="color-choice-grid"
+></div>
+
+<p class="field-note">
+    Accent colors are matched to available physical inventory and seasonal flower availability.
+</p>
 
     <fieldset class="builder-fieldset">
 
@@ -4486,8 +4601,8 @@
         <option value="low-piped-edible-image">Flat edible-image icing</option>
     </select>
 </label>
-                                    <label><span>Liner color</span><input id="cupcakeLinerColor" type="color" value="#F4C3D7"></label>
-                                    <label><span>Frosting color</span><input id="cupcakeFrostingColor" type="color" value="#F7B6D2"></label>
+    
+                                    
                                 </div>
                                 <div class="cupcake-live-preview">
                                     <div id="cupcakeComposite" class="cupcake-composite" aria-label="Cupcake preview">
@@ -4503,10 +4618,60 @@
                                             <span data-cupcake-decoration="flowersDecoration" class="cupcake-decoration cupcake-decoration-flowers"></span>
                                             <span data-cupcake-decoration="cherriesDecoration" class="cupcake-decoration cupcake-decoration-cherries"></span>
                                             <span data-cupcake-decoration="topperDecoration" class="cupcake-decoration cupcake-decoration-topper">TOP</span>
-                                        </div>
+
                                     </div>
                                     <p id="cupcakeSetCaption">Select a 4-, 8-, or 12-count set above.</p>
                                 </div>
+                                <div
+    id="cupcakeLinerColorSection"
+    class="cupcake-swatch-section"
+>
+
+    <strong class="swatch-subheading">
+        Liner Color
+    </strong>
+
+    <div
+        id="cupcakeLinerColorSwatches"
+        class="color-choice-grid"
+    ></div>
+<div class="cupcake-swatch-section">
+
+    <strong class="swatch-subheading">
+        Frosting Color
+    </strong>
+
+    <div
+        id="cupcakeFrostingColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
+
+    <div
+        id="customCupcakeFrostingColorField"
+        class="custom-color-field is-hidden"
+    >
+
+        <span>
+            Custom Frosting Shade
+        </span>
+
+        <input
+            id="customCupcakeFrostingColor"
+            type="color"
+            value="#F7B6D2"
+        >
+
+    </div>
+
+
+    <p
+        id="customCupcakeFrostingColorNote"
+        class="field-note is-hidden"
+    >
+        We match custom buttercream shades as closely as possible using food-safe gel dyes.
+    </p>
+</div>
                             </div>
                         </fieldset>
                         </div>
