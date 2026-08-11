@@ -4339,8 +4339,8 @@ fieldset {
     text-align: center;
 }
 /* =========================================
-   FINAL MOBILE EXPERIENCE
-   Compact Product Configurator
+   MOBILE COMPACT PRODUCT-CONFIGURATOR VIEW
+   Fashion-Nova-style density
 ========================================= */
 
 @media (max-width: 720px) {
@@ -4348,155 +4348,116 @@ fieldset {
     :root {
         --builder-header-height: 56px;
         --builder-progress-height: 50px;
-        --side-padding: 9px;
+        --side-padding: 10px;
     }
 
 
-    /* =====================================
+    /* =========================
        HEADER
-    ===================================== */
+    ========================= */
 
     .builder-header {
-        min-height:
-            var(--builder-header-height);
-
-        border-top-width: 4px;
+        min-height: var(--builder-header-height);
     }
-
 
     .builder-header-inner {
         min-height:
-            var(--builder-header-height);
+            calc(
+                var(--builder-header-height) - 4px
+            );
 
-        padding:
-            6px
-            10px;
+        padding: 6px 10px;
     }
-
 
     .builder-back-link {
-        max-width: 90px;
-
-        gap: 5px;
-
         font-size: 8px;
+        gap: 5px;
     }
-
 
     .builder-back-link span {
         font-size: 14px;
     }
 
-
     .header-summary-button {
-        min-width: 100px;
-        min-height: 38px;
+        min-width: 94px;
+        min-height: 36px;
 
-        padding:
-            5px
-            10px;
+        padding: 5px 9px;
 
         gap: 6px;
     }
 
-
     .header-summary-button span {
         font-size: 7px;
     }
-
 
     .header-summary-button strong {
         font-size: 18px;
     }
 
 
-    /* =====================================
+    /* =========================
        PROGRESS
-    ===================================== */
+    ========================= */
 
     .builder-progress {
-        top:
-            var(--builder-header-height);
-
         min-height:
             var(--builder-progress-height);
-    }
 
+        top:
+            var(--builder-header-height);
+    }
 
     .builder-progress-inner {
         min-height:
             var(--builder-progress-height);
 
-        padding:
-            5px
-            8px;
+        padding: 5px 8px;
 
         grid-template-columns:
-            repeat(
-                8,
-                73px
-            );
+            repeat(8, 74px);
 
         gap: 4px;
-
-        overflow-x: auto;
-
-        scrollbar-width: none;
     }
-
-
-    .builder-progress-inner::-webkit-scrollbar {
-        display: none;
-    }
-
 
     .progress-step {
         min-width: 70px;
         min-height: 36px;
 
-        padding:
-            4px
-            5px;
+        padding: 4px 5px;
 
         gap: 5px;
 
-        border-radius: 11px;
+        border-radius: 10px;
 
         font-size: 6px;
     }
 
-
     .progress-step span {
-        width: 20px;
-        height: 20px;
+        width: 19px;
+        height: 19px;
 
         font-size: 7px;
     }
 
 
-    /* =====================================
-       MAIN MOBILE WORKSPACE
-    ===================================== */
+    /* =========================
+       MAIN
+    ========================= */
 
     .builder-main {
         padding:
             8px
             0
-            70px;
+            72px;
     }
-
 
     .builder-main-inner {
         width: 100%;
 
-        display: grid;
+        grid-template-columns: 1fr;
 
-        grid-template-columns:
-            minmax(0, 1fr);
-
-        align-items: start;
-
-        gap: 9px;
+        gap: 10px;
 
         padding:
             0
@@ -4504,111 +4465,68 @@ fieldset {
     }
 
 
-    .cake-preview-column,
-    .builder-form-column {
-        width: 100%;
-        min-width: 0;
-    }
-
-
-    /*
-        IMPORTANT:
-        The preview is NOT sticky in portrait.
-
-        The whole point now is to fit the
-        cake + useful controls into the same
-        general viewport instead of allowing
-        the preview to cover the editor.
-    */
+    /* =========================
+       PREVIEW
+    ========================= */
 
     .cake-preview-column {
-        display: block;
+        display: contents;
     }
-
 
     .cake-preview-sticky {
         position: static;
 
-        top: auto;
-
         width: 100%;
-
-        max-height: none;
-
-        overflow: visible;
 
         padding: 0;
 
         gap: 0;
+
+        max-height: none;
+
+        overflow: visible;
     }
-
-
-    /* =====================================
-       COMPACT LIVE CAKE PREVIEW
-    ===================================== */
 
     #cakePreviewCard.preview-visual-card {
         width: 100%;
 
         padding:
-            7px
-            9px
-            8px;
-
-        overflow: hidden;
+            8px
+            10px
+            9px;
 
         border-width: 2px;
-        border-radius: 17px;
+        border-radius: 18px;
 
         box-shadow:
-            4px
-            5px
-            0
-            rgba(
-                255,
-                79,
-                163,
-                0.16
-            );
+            4px 5px 0
+            rgba(255, 79, 163, 0.16);
     }
-
 
     #cakePreviewCard
     .preview-heading-row {
         display: flex;
 
         align-items: center;
-
         justify-content: space-between;
 
-        gap: 7px;
+        gap: 8px;
 
         padding: 0;
     }
-
-
-    #cakePreviewCard
-    .preview-heading-row
-    > div {
-        min-width: 0;
-
-        flex: 1;
-    }
-
 
     #cakePreviewCard
     .preview-eyebrow {
         display: none;
     }
 
-
     #cakePreviewCard
     .preview-heading-row h1 {
-        max-width: none;
-
         margin: 0;
 
-        font-size: 19px;
+        max-width: none;
+
+        font-size: 20px;
         line-height: 1;
 
         white-space: nowrap;
@@ -4617,7 +4535,6 @@ fieldset {
 
         text-overflow: ellipsis;
     }
-
 
     #cakePreviewCard
     .preview-heading-row
@@ -4632,14 +4549,11 @@ fieldset {
         line-height: 1.2;
     }
 
-
     #cakePreviewCard
     .reset-cake-button {
         flex: 0 0 auto;
 
-        margin: 0;
-
-        min-height: 27px;
+        min-height: 28px;
 
         padding:
             4px
@@ -4650,19 +4564,18 @@ fieldset {
 
 
     /*
-        Fashion-Nova-style product-image
-        proportion.
+        This is the big change.
 
-        Enough room to see the cake,
-        but it no longer consumes an
-        entire phone screen.
+        Your current mobile stage is hundreds
+        of pixels tall. This turns it into
+        a real product-preview area.
     */
 
     #cakePreviewCard
     .cake-renderer-stage {
         width: 100%;
 
-        height: 220px;
+        height: 230px;
 
         max-width: none;
 
@@ -4671,14 +4584,13 @@ fieldset {
             auto
             0;
 
-        border-radius: 11px;
+        border-radius: 12px;
     }
-
 
     #cakePreviewCard
     .realistic-cake-renderer {
-        width: 74%;
-        max-width: 74%;
+        width: 72%;
+        max-width: 72%;
 
         height: 100%;
 
@@ -4689,19 +4601,11 @@ fieldset {
     }
 
 
-    #cakePreviewCard
-    .realistic-cake-canvas {
-        width: 100%;
-        height: 100%;
-
-        object-fit: contain;
-    }
-
-
     /*
-        Price is already in the header.
-        These duplicate blocks waste mobile
-        vertical space.
+        Header already shows price.
+
+        Hide the duplicate preview totals
+        so the actual options move up.
     */
 
     #cakePreviewMeta,
@@ -4710,172 +4614,84 @@ fieldset {
     }
 
 
-    /* =====================================
-       BUILDER FORM
-    ===================================== */
+    /* =========================
+       STEP HEADINGS
+    ========================= */
 
     .builder-form-column {
+        width: 100%;
+
         padding-top: 0;
     }
 
-
-    /*
-        Keep Step 1's editorial heading.
-        Steps 2-8 get compact headings.
-    */
-
-    #builderStep1
-    .step-heading {
-        margin-top: 12px;
-        margin-bottom: 26px;
-    }
-
-
-    #builderStep1
-    .step-heading h2 {
-        font-size:
-            clamp(
-                48px,
-                14vw,
-                68px
-            );
-    }
-
-
-    #builderStep1
-    .step-heading
-    > p:last-child {
-        font-size: 13px;
-    }
-
-
-    #builderStep2
-    .step-heading,
-    #builderStep3
-    .step-heading,
-    #builderStep4
-    .step-heading,
-    #builderStep5
-    .step-heading,
-    #builderStep6
-    .step-heading,
-    #builderStep7
-    .step-heading,
-    #builderStep8
     .step-heading {
         margin:
-            3px
+            4px
             0
-            10px;
+            12px;
     }
 
+    .step-number {
+        margin-bottom: 4px;
 
-    #builderStep2
-    .step-heading h2,
-    #builderStep3
-    .step-heading h2,
-    #builderStep4
-    .step-heading h2,
-    #builderStep5
-    .step-heading h2,
-    #builderStep6
-    .step-heading h2,
-    #builderStep7
-    .step-heading h2,
-    #builderStep8
+        font-size: 7px;
+    }
+
     .step-heading h2 {
         font-size:
             clamp(
                 28px,
-                8vw,
+                9vw,
                 38px
             );
 
-        line-height: 0.94;
+        line-height: 0.92;
     }
 
-
-    #builderStep2
-    .step-heading
-    > p:last-child,
-    #builderStep3
-    .step-heading
-    > p:last-child,
-    #builderStep4
-    .step-heading
-    > p:last-child,
-    #builderStep5
-    .step-heading
-    > p:last-child,
-    #builderStep6
-    .step-heading
-    > p:last-child,
-    #builderStep7
-    .step-heading
-    > p:last-child,
-    #builderStep8
     .step-heading
     > p:last-child {
-        margin-top: 6px;
+        margin-top: 7px;
 
-        font-size: 9px;
-        line-height: 1.35;
+        font-size: 10px;
+        line-height: 1.4;
     }
 
 
-    /* =====================================
+    /* =========================
        FIELDSETS
-    ===================================== */
+    ========================= */
 
     .builder-fieldset {
-        margin-bottom: 14px;
+        margin-bottom: 16px;
     }
-
 
     .builder-fieldset
     > legend {
-        margin-bottom: 7px;
+        margin-bottom: 9px;
 
-        font-size: 19px;
+        font-size: 20px;
     }
-
 
     .fieldset-description {
         margin:
-            -2px
+            -3px
             0
-            8px;
+            9px;
 
-        font-size: 8px;
-        line-height: 1.35;
+        font-size: 9px;
+        line-height: 1.4;
     }
-
 
     .field-note {
-        margin-top: 6px;
+        margin-top: 7px;
 
-        font-size: 7px;
-        line-height: 1.35;
+        font-size: 8px;
     }
 
 
-    /* =====================================
-       STEP 1 BASICS
-       Preserve the layout you already like.
-    ===================================== */
-
-    #builderStep1
-    .two-column-fields {
-        grid-template-columns:
-            1fr;
-    }
-
-
-    /* =====================================
-       TWO-COLUMN PRODUCT CHOICES
-
-       This is the major scroll reduction.
-    ===================================== */
+    /* =========================
+       TWO-COLUMN MOBILE GRIDS
+    ========================= */
 
     .shape-choice-grid,
     .cake-size-grid,
@@ -4893,41 +4709,13 @@ fieldset {
                 minmax(0, 1fr)
             );
 
-        gap: 7px;
-    }
-
-
-    /*
-        Do NOT force inspiration uploads
-        or normal paired form fields into
-        those product-card dimensions.
-    */
-
-    .inspiration-preview-grid {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-
-        gap: 7px;
-    }
-
-
-    .two-column-fields {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-
         gap: 8px;
     }
 
 
-    /* =====================================
+    /* =========================
        SHAPE CARDS
-    ===================================== */
+    ========================= */
 
     .shape-choice-card {
         min-height: 0;
@@ -4939,62 +4727,53 @@ fieldset {
         flex-direction: column;
 
         align-items: center;
+
         justify-content: flex-start;
 
-        gap: 4px;
+        gap: 5px;
+
+        border-radius: 14px;
 
         text-align: center;
-
-        border-radius: 13px;
     }
-
 
     .shape-choice-card
     .option-card-image {
         width: 100%;
 
-        aspect-ratio:
-            1 / 0.72;
+        aspect-ratio: 1 / 0.72;
 
-        object-fit: contain;
+        object-fit: cover;
 
-        border-radius: 9px;
+        border-radius: 10px;
     }
-
-
-    .shape-drawing {
-        width: 50px;
-        height: 50px;
-    }
-
 
     .shape-choice-card strong {
-        font-size: 12px;
-        line-height: 1.05;
+        font-size: 13px;
+        line-height: 1;
     }
-
 
     .shape-choice-card small {
         display: none;
     }
 
 
-    /* =====================================
-       CAKE SIZE CARDS
-    ===================================== */
+    /* =========================
+       SIZE CARDS
+    ========================= */
 
     .cake-size-card {
         min-height: 0;
 
         padding:
-            8px
-            7px;
+            9px
+            8px;
 
         display: grid;
 
         grid-template-columns:
-            42px
-            minmax(0, 1fr);
+            46px
+            1fr;
 
         grid-template-rows:
             auto
@@ -5003,15 +4782,14 @@ fieldset {
 
         gap:
             2px
-            5px;
+            6px;
 
         justify-items: start;
 
         text-align: left;
 
-        border-radius: 13px;
+        border-radius: 14px;
     }
-
 
     .size-label {
         grid-row:
@@ -5020,30 +4798,27 @@ fieldset {
         align-self: center;
         justify-self: center;
 
-        font-size: 24px;
+        font-size: 26px;
     }
 
-
     .cake-size-card strong {
-        font-size: 10px;
+        font-size: 11px;
         line-height: 1.1;
     }
 
-
     .cake-size-card small {
         font-size: 7px;
-        line-height: 1.15;
+        line-height: 1.2;
     }
-
 
     .cake-size-card b {
-        font-size: 12px;
+        font-size: 13px;
     }
 
 
-    /* =====================================
-       IMAGE CHOICE CARDS
-    ===================================== */
+    /* =========================
+       PHOTO CHOICE CARDS
+    ========================= */
 
     .text-choice-card.image-choice-card,
     .description-choice-card,
@@ -5052,13 +4827,12 @@ fieldset {
     .decoration-choice-card {
         min-height: 0;
 
-        padding: 6px;
+        padding: 7px;
 
-        gap: 4px;
+        border-radius: 14px;
 
-        border-radius: 13px;
+        gap: 5px;
     }
-
 
     .text-choice-card.image-choice-card
     .option-card-image,
@@ -5071,37 +4845,21 @@ fieldset {
     .decoration-card-image {
         width: 100%;
 
-        height: auto;
+        aspect-ratio: 1 / 0.78;
 
-        aspect-ratio:
-            1 / 0.76;
+        object-fit: cover;
 
-        object-fit: contain;
-
-        border-radius: 9px;
+        border-radius: 10px;
     }
 
-
-    .text-choice-card.image-choice-card
-    strong,
+    .text-choice-card strong,
     .description-choice-card strong,
     .upgrade-card strong,
     .style-choice-card strong,
     .decoration-choice-card strong {
-        margin-top: 0;
-
-        padding: 0;
-
-        font-size: 10px;
+        font-size: 11px;
         line-height: 1.1;
     }
-
-
-    /*
-        Desktop can keep the editorial copy.
-        Portrait mobile uses the image/name
-        as the decision control.
-    */
 
     .description-choice-card span,
     .style-choice-card small,
@@ -5110,39 +4868,38 @@ fieldset {
     }
 
 
-    /* =====================================
-       TEXT-ONLY CHOICE CARDS
-    ===================================== */
+    /* =========================
+       TEXT-ONLY CHOICES
+    ========================= */
 
     .text-choice-card:not(
         .image-choice-card
     ) {
-        min-height: 48px;
+        min-height: 54px;
 
         padding:
-            8px
-            6px;
+            10px
+            8px;
 
         display: grid;
 
         place-items: center;
 
+        border-radius: 12px;
+
         text-align: center;
-
-        border-radius: 11px;
     }
-
 
     .text-choice-card:not(
         .image-choice-card
     ) strong {
-        font-size: 10px;
+        font-size: 11px;
     }
 
 
-    /* =====================================
-       COLOR SWATCHES
-    ===================================== */
+    /* =========================
+       COLORS
+    ========================= */
 
     .color-choice-grid {
         grid-template-columns:
@@ -5151,168 +4908,126 @@ fieldset {
                 minmax(0, 1fr)
             );
 
-        gap: 6px;
+        gap: 7px;
     }
-
 
     .color-choice {
-        min-height: 70px;
+        min-height: 76px;
 
-        padding:
-            6px
-            3px;
+        padding: 7px 4px;
 
-        border-radius: 11px;
+        border-radius: 12px;
     }
-
 
     .color-swatch {
-        width: 34px;
-        height: 34px;
+        width: 38px;
+        height: 38px;
     }
-
 
     .color-choice strong,
     .color-choice span {
-        font-size: 6px;
+        font-size: 7px;
     }
 
 
-    /* =====================================
-       NORMAL FORM CONTROLS
-    ===================================== */
+    /* =========================
+       FORM CONTROLS
+    ========================= */
 
     .form-field {
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
-
 
     .form-field > span,
     .conditional-field > label {
-        margin-bottom: 4px;
+        margin-bottom: 5px;
 
-        font-size: 9px;
+        font-size: 10px;
     }
-
 
     .form-field input,
     .form-field textarea,
     .form-field select,
     .conditional-field input {
-        min-height: 42px;
+        min-height: 44px;
 
         padding:
-            8px
-            10px;
+            9px
+            11px;
 
-        border-radius: 11px;
+        border-radius: 12px;
 
-        font-size: 11px;
+        font-size: 12px;
     }
-
 
     .form-field textarea {
-        min-height: 78px;
+        min-height: 85px;
     }
-
 
     .date-field-shell {
         padding:
-            8px
-            10px;
-
-        border-radius: 11px;
-    }
-
-
-    /* =====================================
-       TOGGLES
-    ===================================== */
-
-    .extra-layer-control {
-        min-height: 58px;
-
-        padding:
-            8px
-            10px;
-    }
-
-
-    .conditional-field,
-    .conditional-section {
-        margin-bottom: 12px;
-
-        padding: 10px;
+            9px
+            11px;
 
         border-radius: 12px;
     }
 
-
-    /* =====================================
-       QUANTITY PRODUCTS
-    ===================================== */
-
-    .quantity-product {
-        padding: 9px;
-
-        gap: 7px;
-
-        align-items: center;
-    }
-
-
-    .quantity-control {
-        justify-content: center;
-    }
-
-
-    /* =====================================
-       UPLOADS
-    ===================================== */
-
-    .inspiration-upload-zone {
-        min-height: 150px;
-
-        padding:
-            14px
-            12px;
-    }
-
-
-    .inspiration-preview-card img {
-        height: 145px;
-    }
-
-
-    /* =====================================
-       REVIEW
-    ===================================== */
-
-    .review-list
-    > div {
-        grid-template-columns:
-            85px
-            minmax(0, 1fr);
-    }
-
-
-    .review-list dd {
-        font-size: 10px;
-    }
-
-
-    .review-upload-previews {
+    .two-column-fields {
         grid-template-columns:
             repeat(
                 2,
                 minmax(0, 1fr)
             );
+
+        gap: 8px;
+
+        margin-bottom: 12px;
     }
 
 
-    /* =====================================
-       PREVIOUS / CONTINUE
-    ===================================== */
+    /* =========================
+       TOGGLES / CONDITIONALS
+    ========================= */
+
+    .extra-layer-control {
+        min-height: 64px;
+
+        padding:
+            10px
+            12px;
+    }
+
+    .conditional-field,
+    .conditional-section {
+        margin-bottom: 14px;
+
+        padding: 12px;
+
+        border-radius: 14px;
+    }
+
+
+    /* =========================
+       QUANTITY PRODUCTS
+    ========================= */
+
+    .quantity-product {
+        padding:
+            10px;
+
+        gap: 8px;
+    }
+
+    .quantity-control {
+        align-self: auto;
+
+        justify-content: center;
+    }
+
+
+    /* =========================
+       STICKY NAVIGATION
+    ========================= */
 
     .builder-step-navigation {
         position: sticky;
@@ -5325,19 +5040,14 @@ fieldset {
             0
             -8px;
 
-        padding: 8px;
+        padding:
+            8px;
 
-        gap: 7px;
+        gap: 8px;
 
         border-top:
-            1px
-            solid
-            rgba(
-                90,
-                42,
-                30,
-                0.12
-            );
+            1px solid
+            rgba(90, 42, 30, 0.12);
 
         background:
             rgba(
@@ -5351,265 +5061,13 @@ fieldset {
             blur(12px);
     }
 
-
     .step-navigation-button {
-        min-width: 0;
         min-height: 43px;
-
-        flex: 1;
 
         padding:
             8px
-            11px;
+            12px;
 
-        font-size: 9px;
-    }
-
-
-    /* =====================================
-       SUCCESS
-    ===================================== */
-
-    .success-card {
-        padding:
-            28px
-            16px;
-
-        border-radius: 22px;
-
-        box-shadow:
-            6px
-            7px
-            0
-            var(--signature-pink);
-    }
-}
-
-
-/* =========================================
-   VERY SMALL PHONES
-========================================= */
-
-@media (max-width: 390px) {
-
-    #cakePreviewCard
-    .cake-renderer-stage {
-        height: 205px;
-    }
-
-
-    #cakePreviewCard
-    .realistic-cake-renderer {
-        width: 70%;
-        max-width: 70%;
-    }
-
-
-    .color-choice-grid {
-        grid-template-columns:
-            repeat(
-                4,
-                minmax(0, 1fr)
-            );
-    }
-
-
-    .cake-size-card {
-        grid-template-columns:
-            38px
-            minmax(0, 1fr);
-    }
-
-
-    .size-label {
-        font-size: 21px;
-    }
-}
-
-
-/* =========================================
-   PHONE LANDSCAPE
-   Desktop-style mini workspace
-========================================= */
-
-@media
-    (max-height: 520px)
-    and (orientation: landscape) {
-
-    :root {
-        --builder-header-height: 58px;
-        --builder-progress-height: 52px;
-        --side-padding: 12px;
-    }
-
-
-    .builder-main {
-        padding:
-            12px
-            0
-            64px;
-    }
-
-
-    .builder-main-inner {
-        width: 100%;
-
-        display: grid;
-
-        grid-template-columns:
-            minmax(
-                280px,
-                0.9fr
-            )
-            minmax(
-                340px,
-                1.1fr
-            );
-
-        align-items: start;
-
-        gap: 18px;
-
-        padding:
-            0
-            14px;
-    }
-
-
-    .cake-preview-column {
-        display: block;
-
-        width: 100%;
-        min-width: 0;
-    }
-
-
-    .builder-form-column {
-        width: 100%;
-        min-width: 0;
-
-        padding-top: 0;
-    }
-
-
-    .cake-preview-sticky {
-        position: sticky;
-
-        top:
-            calc(
-                var(--builder-header-height) +
-                var(--builder-progress-height) +
-                6px
-            );
-
-        width: 100%;
-
-        max-height:
-            calc(
-                100vh -
-                var(--builder-header-height) -
-                var(--builder-progress-height) -
-                12px
-            );
-
-        overflow-y: auto;
-
-        padding: 0;
-    }
-
-
-    #cakePreviewCard.preview-visual-card {
-        width: 100%;
-
-        padding: 9px;
-
-        border-radius: 18px;
-    }
-
-
-    #cakePreviewCard
-    .preview-heading-row h1 {
-        font-size:
-            clamp(
-                18px,
-                2.4vw,
-                27px
-            );
-
-        white-space: normal;
-    }
-
-
-    #cakePreviewCard
-    .cake-renderer-stage {
-        width: 100%;
-
-        height: auto;
-
-        aspect-ratio: 1 / 1;
-
-        margin:
-            7px
-            auto
-            0;
-    }
-
-
-    #cakePreviewCard
-    .realistic-cake-renderer {
-        width: 82%;
-        max-width: 82%;
-
-        height: auto;
-
-        aspect-ratio: 1 / 1;
-
-        align-self: center;
-        justify-self: center;
-    }
-
-
-    /*
-        Landscape behaves like desktop:
-        summary information can return.
-    */
-
-    #cakePreviewMeta {
-        display: grid !important;
-    }
-
-
-    #cakePreviewDisclaimer {
-        display: block !important;
-    }
-
-
-    /*
-        The option side should remain
-        vertically scrollable while the
-        preview stays beside it.
-    */
-
-    .builder-form-column {
-        max-height:
-            calc(
-                100vh -
-                var(--builder-header-height) -
-                var(--builder-progress-height) -
-                14px
-            );
-
-        overflow-y: auto;
-
-        padding-right: 4px;
-    }
-
-
-    .builder-step-navigation {
-        position: sticky;
-
-        bottom: 0;
-
-        z-index: 900;
+        font-size: 10px;
     }
 }
