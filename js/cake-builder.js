@@ -9655,3 +9655,218 @@ if (defaultWhiteChocolateColored) {
     showStep(1);
 }  
 initializeBuilder();
+/* =========================================
+   MATCH EACH IMAGE SLOT TO ITS OWN ARTWORK
+========================================= */
+
+function getTpjImageEdgeColor(image, edge) {
+    const sampleSize = 32;
+    const edgeDepth = 4;
+    const cornerDepth = 8;
+    const canvas = document.createElement("canvas");
+
+    canvas.width = sampleSize;
+    canvas.height = sampleSize;
+
+    const context = canvas.getContext(
+        "2d",
+        { willReadFrequently: true }
+    );
+
+    if (!context) {
+        return "rgb(255, 248, 242)";
+    }
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        sampleSize,
+        sampleSize
+    );
+
+    const pixels = context.getImageData(
+        0,
+        0,
+        sampleSize,
+        sampleSize
+    ).data;
+
+    const reds = [];
+    const greens = [];
+    const blues = [];
+
+    for (let y = 0; y < sampleSize; y += 1) {
+        for (let x = 0; x < sampleSize; x += 1) {
+            const isLeft =
+                x < edgeDepth;
+
+            const isRight =
+                x >= sampleSize - edgeDepth;
+
+            const isCorner =
+                (
+                    x < cornerDepth ||
+                    x >= sampleSize - cornerDepth
+                ) &&
+                (
+                    y < cornerDepth ||
+                    y >= sampleSize - cornerDepth
+                );
+
+            const shouldSample =
+                edge === "left"
+                    ? isLeft
+                    : edge === "right"
+                        ? isRight
+                        : isCorner;
+
+            if (!shouldSample) {
+                continue;
+            }
+
+            const pixelIndex =
+                (y * sampleSize + x) * 4;
+
+            if (pixels[pixelIndex + 3] < 180) {
+                continue;
+            }
+
+            reds.push(
+                pixels[pixelIndex]
+            );
+
+            greens.push(
+                pixels[pixelIndex + 1]
+            );
+
+            blues.push(
+                pixels[pixelIndex + 2]
+            );
+        }
+    }
+
+    const median = (values) => {
+        values.sort(
+            (first, second) =>
+                first - second
+        );
+
+        return values[
+            Math.floor(values.length / 2)
+        ];
+    };
+
+    if (!reds.length) {
+        return "rgb(255, 248, 242)";
+    }
+
+    return `rgb(${median(reds)}, ${median(greens)}, ${median(blues)})`;
+}
+
+
+function applyTpjImageBackground(
+    image,
+    isHeroPhoto = false
+) {
+    const applyBackground = () => {
+        if (!image.naturalWidth) {
+            return;
+        }
+
+        try {
+            if (isHeroPhoto) {
+                const heroColor =
+                    getTpjImageEdgeColor(
+                        image,
+                        "corners"
+                    );
+
+                image.style.backgroundColor =
+                    heroColor;
+
+                image.closest(
+                    ".builder-basics-hero"
+                )?.style.setProperty(
+                    "background-color",
+                    heroColor
+                );
+
+                return;
+            }
+
+            const leftColor =
+                getTpjImageEdgeColor(
+                    image,
+                    "left"
+                );
+
+            const rightColor =
+                getTpjImageEdgeColor(
+                    image,
+                    "right"
+                );
+
+            image.style.backgroundColor =
+                leftColor;
+
+            image.style.backgroundImage =
+                `linear-gradient(
+                    90deg,
+                    ${leftColor} 0%,
+                    ${leftColor} 25%,
+                    ${rightColor} 75%,
+                    ${rightColor} 100%
+                )`;
+        } catch (error) {
+            /*
+               Existing CSS remains as the
+               fallback if sampling is blocked.
+            */
+        }
+    };
+
+    if (
+        image.complete &&
+        image.naturalWidth
+    ) {
+        applyBackground();
+    } else {
+        image.addEventListener(
+            "load",
+            applyBackground,
+            { once: true }
+        );
+    }
+}
+
+
+function matchTpjBuilderImageBackgrounds() {
+    document.querySelectorAll(
+        [
+            ".option-card-image",
+            ".finish-card-image",
+            ".decoration-card-image",
+            ".cupcake-count-card-image",
+            ".quantity-product-image",
+            ".text-choice-card > img"
+        ].join(",")
+    ).forEach((image) => {
+        applyTpjImageBackground(image);
+    });
+
+    const heroPhoto =
+        document.querySelector(
+            ".builder-basics-hero img"
+        );
+
+    if (heroPhoto) {
+        applyTpjImageBackground(
+            heroPhoto,
+            true
+        );
+    }
+}
+
+
+matchTpjBuilderImageBackgrounds();
