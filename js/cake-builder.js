@@ -5856,10 +5856,35 @@ if (cakePreviewDisclaimer) {
         populateReview();
     }
 
-    window.scrollTo({
-        top: 0,
+    const progressTrack =
+    getElement(".builder-progress-inner");
+
+const activeProgressStep =
+    getElement(
+        `.progress-step[data-step-target="${safeStep}"]`
+    );
+
+if (
+    progressTrack &&
+    activeProgressStep
+) {
+    const centeredLeft =
+        activeProgressStep.offsetLeft -
+        (
+            progressTrack.clientWidth -
+            activeProgressStep.offsetWidth
+        ) / 2;
+
+    progressTrack.scrollTo({
+        left: Math.max(0, centeredLeft),
         behavior: "smooth"
     });
+}
+
+window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+});
 }
 
 
