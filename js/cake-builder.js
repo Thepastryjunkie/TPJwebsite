@@ -80,8 +80,8 @@ const cakeProducts = {
         size: '5"',
         standardLayers: 1,
         tallLayers: 1,
-        standardPrice: 165,
-        tallPrice: 165,
+        standardPrice: 145,
+        tallPrice: 145,
         standardServings: "2–4",
         tallServings: "2–4",
         allowsExtraLayer: false
@@ -338,7 +338,9 @@ const builderState = {
 
     cakeShape: "round",
     cakeProductId: "round-6",
+    bentoCupcakeCount: 4,
     isTall: false,
+    fondantEnabled: false,
     numberLetterKind: "number",
     numberCakeFirst: "0",
     numberCakeSecond: "1",
@@ -392,6 +394,13 @@ cupcakeFrostingUsesCustomShade: false,
 customCupcakeFrostingColor: "#F7B6D2",
 
 decorations: [],
+
+decorationQuantities: {
+    ribbonDecoration: 1,
+    butterfliesDecoration: 1,
+    flowersDecoration: 1,
+    cherriesDecoration: 1
+},
 flowerSource: "",
 
 bowColor: "#F7B6D2",
@@ -411,6 +420,7 @@ flowerColor: "#FFF3D6",
 flowerType: "",
 customFlowerType: "",
 metallicLeafType: "Gold",
+cakeTopperEnabled: false,
     topperType: "",
     topperPrice: 0,
     topperWording: "",
@@ -420,7 +430,9 @@ metallicLeafType: "Gold",
 
     inspirationFiles: [],
 
-    edibleImageEnabled: false,
+  edibleImageEnabled: false,
+edibleImageQuantity: 1,
+edibleImages: [],
 edibleImageFile: null,
 edibleImageUrl: "",
 edibleImagePlacement: "front",
@@ -430,6 +442,11 @@ edibleImageScale: 70,
 edibleImageX: 0,
 edibleImageY: 0,
 edibleImageRotation: 0,
+
+toyFigurineEnabled: false,
+toyFigurineDetails: "",
+sculptedPiecesEnabled: false,
+sculptedPiecesDetails: "", 
 
     cakeNameText: "",
     cakeAgeText: "",
@@ -1254,7 +1271,192 @@ function cakeAllowsExtraLayer() {
             .allowsExtraLayer !== false
     );
 }
+ function cakeSupportsCoverage(
+    product = getSelectedCakeProduct()
+) {
+    return [
+        "round",
+        "heart",
+        "star",
+        "square",
+        "tier"
+    ].includes(product.shape);
+}
 
+
+function getBentoCupcakeUpgradePrice() {
+    return (
+        builderState.cakeProductId ===
+            "heart-5-bento" &&
+        builderState.bentoCupcakeCount === 8
+    )
+        ? 20
+        : 0;
+}
+
+
+function getSurfaceUpcharge(type) {
+    const product = getSelectedCakeProduct();
+
+    if (
+        product.shape === "cupcakes" ||
+        builderState.cakeCoverage !== "full"
+    ) {
+        return 0;
+    }
+
+    const prices = type === "fondant"
+        ? {
+            small: 25,
+            standard6: 35,
+            tall6: 45,
+            standard8: 45,
+            tall8: 55,
+            standard9: 55,
+            tall9: 65,
+            standard10: 65,
+            tall10: 75,
+            halfSheet: 60,
+            fullSheet: 85,
+            standardTier: 80,
+            tallTier: 105,
+            singleCharacter: 50,
+            doubleCharacter: 85
+        }
+        : {
+            small: 15,
+            standard6: 20,
+            tall6: 25,
+            standard8: 25,
+            tall8: 30,
+            standard9: 30,
+            tall9: 35,
+            standard10: 35,
+            tall10: 40,
+            halfSheet: 35,
+            fullSheet: 50,
+            standardTier: 45,
+            tallTier: 60,
+            singleCharacter: 30,
+            doubleCharacter: 50
+        };
+
+    if (
+        [
+            "round-4",
+            "heart-5-bento",
+            "heart-5-tall"
+        ].includes(builderState.cakeProductId)
+    ) {
+        return prices.small;
+    }
+
+    if (product.shape === "sheet") {
+        return builderState.cakeProductId ===
+            "sheet-full"
+            ? prices.fullSheet
+            : prices.halfSheet;
+    }
+
+    if (product.shape === "tier") {
+        return builderState.cakeProductId ===
+            "tier-4-6-tall"
+            ? prices.tallTier
+            : prices.standardTier;
+    }
+
+    if (product.shape === "numberLetter") {
+        return product.characterCount === 2
+            ? prices.doubleCharacter
+            : prices.singleCharacter;
+    }
+
+    const size =
+        Number.parseInt(product.size, 10);
+
+    const height =
+        builderState.isTall
+            ? "tall"
+            : "standard";
+
+    if (size === 6) {
+        return prices[`${height}6`];
+    }
+
+    if (size === 8) {
+        return prices[`${height}8`];
+    }
+
+    if (size === 9) {
+        return prices[`${height}9`];
+    }
+
+    if (size === 10) {
+        return prices[`${height}10`];
+    }
+
+    return prices.small;
+}
+
+
+function getGanacheCoatingPrice() {
+    return builderState.buttercreamStyle ===
+        "Ganache Coating"
+        ? getSurfaceUpcharge("ganache")
+        : 0;
+}
+
+
+function getFondantPrice() {
+    return builderState.fondantEnabled
+        ? getSurfaceUpcharge("fondant")
+        : 0;
+}
+
+
+function getIncludedEdibleImageCount() {
+    if (
+        builderState.cakeProductId !==
+        "heart-5-bento"
+    ) {
+        return 0;
+    }
+
+    return builderState.bentoCupcakeCount === 8
+        ? 5
+        : 3;
+}
+
+
+function calculateEdibleImageTotal() {
+    if (!builderState.edibleImageEnabled) {
+        return 0;
+    }
+
+    const quantity = Math.max(
+        0,
+        Number(
+            builderState.edibleImageQuantity
+        ) || 0
+    );
+
+    if (
+        builderState.cakeProductId ===
+        "heart-5-bento"
+    ) {
+        return Math.max(
+            0,
+            quantity -
+                getIncludedEdibleImageCount()
+        ) * 2;
+    }
+
+    if (isCupcakesOnlyProduct()) {
+        return quantity * 2;
+    }
+
+    return quantity * 15;
+}
 
 function getCakeBasePrice() {
     const product = getSelectedCakeProduct();
@@ -1265,7 +1467,9 @@ function getCakeBasePrice() {
 
     return Math.max(
         0,
-        regularPrice - getCakeFinishDiscount()
+       regularPrice +
+getBentoCupcakeUpgradePrice() -
+getCakeFinishDiscount() 
     );
 }
 
@@ -1273,7 +1477,7 @@ function getCakeBasePrice() {
 function getCakeFinishDiscount() {
     const product = getSelectedCakeProduct();
 
-    if (product.shape !== "round") {
+    if (!cakeSupportsCoverage(product)) {
         return 0;
     }
 
@@ -1309,6 +1513,12 @@ function getCakeLayerCount() {
 
 function getCakeStructureLabel() {
     const product = getSelectedCakeProduct();
+    if (
+    builderState.cakeProductId ===
+    "heart-5-bento"
+) {
+    return `1-layer heart cake + ${builderState.bentoCupcakeCount} cupcakes`;
+}
 
     if (product.structureLabel) {
         return product.structureLabel;
@@ -1346,14 +1556,20 @@ function calculatePremiumFillingTotal() {
 function calculateDecorationTotal() {
     return builderState.decorations.reduce(
         (total, decoration) =>
-            total + decoration.price,
+            total +
+            (
+                decoration.total ??
+                decoration.price
+            ),
         0
     );
 }
 
 
 function calculateTopperTotal() {
-    return builderState.topperPrice || 0;
+    return builderState.cakeTopperEnabled
+        ? builderState.topperPrice || 0
+        : 0;
 }
 
 
@@ -1409,9 +1625,12 @@ function calculateCakeSubtotal() {
                 ? 0
                 : calculatePremiumFillingTotal()
         ) +
-        calculateDecorationTotal() +
-        calculateTopperTotal() +
-        customBoardFee
+       calculateDecorationTotal() +
+calculateTopperTotal() +
+getGanacheCoatingPrice() +
+getFondantPrice() +
+calculateEdibleImageTotal() +
+customBoardFee 
     );
 }
 
@@ -1544,84 +1763,110 @@ function makeTintedLayer(
 
 
     const isSimpleTextureAsset =
-        image.src.includes(
-            "Simple-Texture-Horizontal-Comb"
-        );
+    image.src.includes(
+        "Simple-Texture-Horizontal-Comb"
+    );
+
+const isHeartSimpleTextureAsset =
+    isSimpleTextureAsset &&
+    image.src.includes("-Heart");
 
 
     /*
-        Bring more of the original artwork
-        back so buttercream texture,
-        piping and shading stay visible.
-    */
+    Preserve the selected color while using
+    only grayscale highlights and shadows
+    from the original artwork for dimension.
+*/
 
-    layerContext.globalCompositeOperation =
-        "source-over";
-
-    layerContext.globalAlpha =
-        isSimpleTextureAsset
-            ? 0.52
-            : 0.42;
-
-    layerContext.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
+const detailLayer =
+    document.createElement(
+        "canvas"
     );
 
+detailLayer.width = layer.width;
+detailLayer.height = layer.height;
 
-    /*
-        Preserve dimension without making
-        the selected color overly intense.
-    */
+const detailContext =
+    detailLayer.getContext("2d");
 
-    layerContext.globalCompositeOperation =
-        "multiply";
+detailContext.drawImage(
+    image,
+    0,
+    0,
+    layer.width,
+    layer.height
+);
 
-    layerContext.globalAlpha =
-        isSimpleTextureAsset
-            ? 0.14
-            : 0.08;
+/*
+    Remove the original cream/pink color
+    while retaining its light and shadow.
+*/
 
-    layerContext.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
+detailContext.globalCompositeOperation =
+    "saturation";
 
+detailContext.fillStyle =
+    "#808080";
 
-    const selectedRgb =
-        hexToRgb(
-            normalizedColor
-        );
+detailContext.fillRect(
+    0,
+    0,
+    layer.width,
+    layer.height
+);
 
-    const isVeryDark =
-        selectedRgb.red +
-        selectedRgb.green +
-        selectedRgb.blue <
-        90;
+detailContext.globalCompositeOperation =
+    "destination-in";
 
+detailContext.drawImage(
+    image,
+    0,
+    0,
+    layer.width,
+    layer.height
+);
 
-    layerContext.globalCompositeOperation =
-        "screen";
+detailContext.globalCompositeOperation =
+    "source-over";
 
-    layerContext.globalAlpha =
-        isVeryDark
-            ? 0.025
-            : 0.015;
+/*
+    Reveal dimension without washing out
+    or overpowering the selected color.
+*/
 
-    layerContext.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
+layerContext.globalCompositeOperation =
+    "soft-light";
 
+layerContext.globalAlpha =
+    isHeartSimpleTextureAsset
+        ? 0.45
+        : isSimpleTextureAsset
+        ? 0.82
+        : 0.65;
+
+layerContext.drawImage(
+    detailLayer,
+    0,
+    0,
+    layer.width,
+    layer.height
+);
+
+layerContext.globalCompositeOperation =
+    "multiply";
+
+layerContext.globalAlpha =
+    isHeartSimpleTextureAsset
+        ? 0.05
+        : 0.12;
+
+layerContext.drawImage(
+    detailLayer,
+    0,
+    0,
+    layer.width,
+    layer.height
+);
 
     /*
         Final clip back to the original mask.
@@ -1847,8 +2092,114 @@ async function loadNumberLetterStyleAssets(
         images
     };
 }
+function getCoveragePreviewEntry(product) {
+    const coverage =
+        builderState.cakeCoverage;
 
+    if (
+        coverage === "full" ||
+        !cakeSupportsCoverage(product)
+    ) {
+        return null;
+    }
+
+    const coverageName =
+        coverage === "naked"
+            ? "Naked"
+            : "Semi-Naked";
+
+    if (
+        builderState.cakeProductId ===
+        "heart-5-bento"
+    ) {
+        return {
+            file:
+                `TPJ-Coverage-${coverageName}-Bento-5in-Heart-4-Cupcakes.png`,
+            key: "heart5in"
+        };
+    }
+
+    if (
+        builderState.cakeProductId ===
+        "heart-5-tall"
+    ) {
+        return {
+            file:
+                `TPJ-Coverage-${coverageName}-Tall-5in-Heart.png`,
+            key: "tallHeart5in"
+        };
+    }
+
+    if (product.shape === "tier") {
+        const isTallTier =
+            builderState.cakeProductId ===
+            "tier-4-6-tall";
+
+        return {
+            file: isTallTier
+                ? `TPJ-Coverage-${coverageName}-Tall-Two-Tier-4in-6in.png`
+                : `TPJ-Coverage-${coverageName}-Two-Tier-4in-6in.png`,
+
+            key: isTallTier
+                ? "tallTier"
+                : "tier"
+        };
+    }
+
+    if (product.shape === "round") {
+        return {
+            file:
+                coverage === "naked"
+                    ? builderState.isTall
+                        ? "TPJ-Asset-047-Naked-Tall-Round-Cake.png"
+                        : "TPJ-Asset-031-Naked-Round-Cake.png"
+                    : builderState.isTall
+                        ? "TPJ-Asset-048-Semi-Naked-Tall-Round-Cake.png"
+                        : "TPJ-Asset-032-Semi-Naked-Round-Cake.png",
+
+            key: builderState.isTall
+                ? "tallRound"
+                : "round"
+        };
+    }
+
+    const shapeName = {
+        heart: "Heart",
+        star: "Star",
+        square: "Square"
+    }[product.shape];
+
+    if (!shapeName) {
+        return null;
+    }
+
+    return {
+        file:
+            `TPJ-Coverage-${coverageName}-${builderState.isTall ? "Tall-" : ""}${shapeName}.png`,
+
+        key: builderState.isTall
+            ? `tall${shapeName}`
+            : product.shape
+    };
+}
 function getCakePreviewEntries(product) {
+    const coverageEntry =
+    getCoveragePreviewEntry(product);
+
+if (coverageEntry) {
+    return [coverageEntry];
+}
+
+if (
+    builderState.cakeProductId ===
+    "heart-5-bento"
+) {
+    return [{
+        file:
+            "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png",
+        key: "heart5in"
+    }];
+}
     if (product.previewFile) {
         return [{
             file: product.previewFile,
@@ -1937,31 +2288,7 @@ if (builderState.cakeProductId === "heart-5-tall") {
 
     key = "tallHeart5in";
 }
-if (
-    product.shape === "round" &&
-    builderState.cakeCoverage === "naked"
-) {
-    file = builderState.isTall
-        ? "TPJ-Asset-047-Naked-Tall-Round-Cake.png"
-        : "TPJ-Asset-031-Naked-Round-Cake.png";
 
-    key = builderState.isTall
-        ? "tallRound"
-        : "round";
-}
-
-   if (
-    product.shape === "round" &&
-    builderState.cakeCoverage === "semi-naked"
-) {
-    file = builderState.isTall
-        ? "TPJ-Asset-048-Semi-Naked-Tall-Round-Cake.png"
-        : "TPJ-Asset-032-Semi-Naked-Round-Cake.png";
-
-    key = builderState.isTall
-        ? "tallRound"
-        : "round";
-}
 
     return [{ file, key }];
 }
@@ -1988,6 +2315,115 @@ function drawContainedCanvasImage(
 }
 
 const bentoCakeMaskCache = new WeakMap();
+
+const coverageButtercreamMaskCache =
+    new WeakMap();
+
+
+function getCoverageButtercreamMask(image) {
+    if (
+        coverageButtercreamMaskCache.has(
+            image
+        )
+    ) {
+        return coverageButtercreamMaskCache.get(
+            image
+        );
+    }
+
+    const width =
+        image.naturalWidth || image.width;
+
+    const height =
+        image.naturalHeight || image.height;
+
+    const sourceCanvas =
+        document.createElement("canvas");
+
+    sourceCanvas.width = width;
+    sourceCanvas.height = height;
+
+    const sourceContext =
+        sourceCanvas.getContext("2d", {
+            willReadFrequently: true
+        });
+
+    sourceContext.drawImage(
+        image,
+        0,
+        0
+    );
+
+    const sourcePixels =
+        sourceContext.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+    const maskCanvas =
+        document.createElement("canvas");
+
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+
+    const maskContext =
+        maskCanvas.getContext("2d");
+
+    const maskPixels =
+        maskContext.createImageData(
+            width,
+            height
+        );
+
+    for (
+        let offset = 0;
+        offset < sourcePixels.data.length;
+        offset += 4
+    ) {
+        const red =
+            sourcePixels.data[offset];
+
+        const green =
+            sourcePixels.data[offset + 1];
+
+        const blue =
+            sourcePixels.data[offset + 2];
+
+        const alpha =
+            sourcePixels.data[offset + 3];
+
+        const isButtercream =
+            alpha > 20 &&
+            red > 180 &&
+            green > 150 &&
+            blue > 125 &&
+            red - green < 60 &&
+            green - blue < 95;
+
+        if (isButtercream) {
+            maskPixels.data[offset] = 255;
+            maskPixels.data[offset + 1] = 255;
+            maskPixels.data[offset + 2] = 255;
+            maskPixels.data[offset + 3] =
+                alpha;
+        }
+    }
+
+    maskContext.putImageData(
+        maskPixels,
+        0,
+        0
+    );
+
+    coverageButtercreamMaskCache.set(
+        image,
+        maskCanvas
+    );
+
+    return maskCanvas;
+}
 
 function getBentoCakeMask(image) {
     if (bentoCakeMaskCache.has(image)) {
@@ -2114,7 +2550,9 @@ function drawBentoColorPreview(context, image, canvas) {
         drawRecoloredAsset(
             context,
             image,
-            image,
+            builderState.cakeCoverage === "full"
+    ? image
+    : getCoverageButtercreamMask(image),
             builderState.mainCakeColor,
             0,
             0,
@@ -2125,6 +2563,211 @@ function drawBentoColorPreview(context, image, canvas) {
         context.restore();
     }
 
+function getBentoTransformMap(
+    image,
+    transform
+) {
+    const sourceWidth =
+        image.naturalWidth || image.width;
+
+    const sourceHeight =
+        image.naturalHeight || image.height;
+
+    const scaleX =
+        transform.width / sourceWidth;
+
+    const scaleY =
+        transform.height / sourceHeight;
+
+    return {
+        x: (value) =>
+            transform.x + value * scaleX,
+
+        y: (value) =>
+            transform.y + value * scaleY,
+
+        radiusX: (value) =>
+            value * scaleX,
+
+        radiusY: (value) =>
+            value * scaleY,
+
+        scaleX,
+        scaleY
+    };
+}
+
+function traceBentoCakePath(
+    context,
+    map
+) {
+    context.beginPath();
+
+    context.moveTo(
+        map.x(451),
+        map.y(521)
+    );
+
+    context.bezierCurveTo(
+        map.x(410), map.y(500),
+        map.x(377), map.y(481),
+        map.x(334), map.y(483)
+    );
+
+    context.bezierCurveTo(
+        map.x(268), map.y(486),
+        map.x(219), map.y(523),
+        map.x(218), map.y(583)
+    );
+
+    context.lineTo(
+        map.x(218),
+        map.y(720)
+    );
+
+    context.bezierCurveTo(
+        map.x(218), map.y(789),
+        map.x(289), map.y(843),
+        map.x(392), map.y(870)
+    );
+
+    context.bezierCurveTo(
+        map.x(500), map.y(844),
+        map.x(636), map.y(791),
+        map.x(636), map.y(715)
+    );
+
+    context.lineTo(
+        map.x(636),
+        map.y(587)
+    );
+
+    context.bezierCurveTo(
+        map.x(635), map.y(525),
+        map.x(592), map.y(503),
+        map.x(547), map.y(505)
+    );
+
+    context.bezierCurveTo(
+        map.x(507), map.y(505),
+        map.x(482), map.y(527),
+        map.x(451), map.y(521)
+    );
+
+    context.closePath();
+}
+
+function drawBentoSimpleTexture(
+    context,
+    map
+) {
+    if (
+        builderState.cakeFinish !==
+        "Simple Texture"
+    ) {
+        return;
+    }
+
+    context.save();
+    traceBentoCakePath(context, map);
+    context.clip();
+
+    for (
+        let sourceY = 585;
+        sourceY <= 825;
+        sourceY += 15
+    ) {
+        context.beginPath();
+        context.moveTo(
+            map.x(210),
+            map.y(sourceY)
+        );
+
+        context.bezierCurveTo(
+            map.x(315), map.y(sourceY + 4),
+            map.x(535), map.y(sourceY + 4),
+            map.x(645), map.y(sourceY)
+        );
+
+        context.strokeStyle =
+            "rgba(86, 50, 34, 0.16)";
+
+        context.lineWidth =
+            Math.max(
+                1,
+                2.2 * map.scaleY
+            );
+
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(
+            map.x(210),
+            map.y(sourceY - 2)
+        );
+
+        context.bezierCurveTo(
+            map.x(315), map.y(sourceY + 2),
+            map.x(535), map.y(sourceY + 2),
+            map.x(645), map.y(sourceY - 2)
+        );
+
+        context.strokeStyle =
+            "rgba(255, 255, 255, 0.20)";
+
+        context.lineWidth =
+            Math.max(
+                1,
+                1.4 * map.scaleY
+            );
+
+        context.stroke();
+    }
+
+    context.restore();
+}
+
+function drawBentoColorPreview(
+    context,
+    image,
+    transform
+) {
+    const map =
+        getBentoTransformMap(
+            image,
+            transform
+        );
+
+    if (
+        builderState.mainCakeColor !==
+        "original"
+    ) {
+        context.save();
+        traceBentoCakePath(
+            context,
+            map
+        );
+        context.clip();
+
+        drawRecoloredAsset(
+            context,
+            image,
+            image,
+            builderState.mainCakeColor,
+            transform.x,
+            transform.y,
+            transform.width,
+            transform.height
+        );
+
+        context.restore();
+    }
+
+    drawBentoSimpleTexture(
+        context,
+        map
+    );
+
     if (
         builderState.cupcakeFrostingColor !==
         "original"
@@ -2133,23 +2776,30 @@ function drawBentoColorPreview(context, image, canvas) {
         context.beginPath();
 
         [
-    [768, 621, 90, 70],
-    [987, 656, 86, 71],
-    [725, 799, 98, 84],
-    [952, 846, 96, 85]
-].forEach(([x, y, radiusX, radiusY]) => {
-    context.moveTo(x + radiusX, y);
+            [768, 621, 90, 70],
+            [987, 656, 86, 71],
+            [725, 799, 98, 84],
+            [952, 846, 96, 85]
+        ].forEach(
+            ([x, y, radiusX, radiusY]) => {
+                context.moveTo(
+                    map.x(x) +
+                        map.radiusX(radiusX),
+                    map.y(y)
+                );
 
-    context.ellipse(
-        x,
-        y,
-        radiusX,
-        radiusY,
-        0,
-        0,
-        Math.PI * 2
-    );
-});
+                context.ellipse(
+                    map.x(x),
+                    map.y(y),
+                    map.radiusX(radiusX),
+                    map.radiusY(radiusY),
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+            }
+        );
+
         context.clip();
 
         drawRecoloredAsset(
@@ -2157,14 +2807,16 @@ function drawBentoColorPreview(context, image, canvas) {
             image,
             image,
             builderState.cupcakeFrostingColor,
-            0,
-            0,
-            canvas.width,
-            canvas.height
+            transform.x,
+            transform.y,
+            transform.width,
+            transform.height
         );
 
         context.restore();
     }
+}
+
 }
 function drawTwoTierColors(
     context,
@@ -2172,7 +2824,8 @@ function drawTwoTierColors(
     x,
     y,
     width,
-    height
+    height,
+    recolorMask = image
 ) {
     const isTall =
         builderState.cakeProductId ===
@@ -2203,7 +2856,7 @@ function drawTwoTierColors(
     drawRecoloredAsset(
         context,
         image,
-        image,
+        recolorMask,
         builderState.tierBottomColor,
         x,
         y,
@@ -2272,7 +2925,7 @@ function drawTwoTierColors(
     drawRecoloredAsset(
         context,
         image,
-        image,
+        recolorMask,
         builderState.tierTopColor,
         x,
         y,
@@ -2282,7 +2935,135 @@ function drawTwoTierColors(
 
     context.restore();
 }
+function drawTwoTierSimpleTexture(
+    context,
+    image,
+    x,
+    y,
+    width,
+    height,
+    textureMask = image
+) {
+    if (
+        builderState.cakeFinish !==
+        "Simple Texture"
+    ) {
+        return;
+    }
 
+    const sourceWidth =
+        image.naturalWidth || image.width;
+
+    const sourceHeight =
+        image.naturalHeight || image.height;
+
+    const layer =
+        document.createElement("canvas");
+
+    layer.width = sourceWidth;
+    layer.height = sourceHeight;
+
+    const layerContext =
+        layer.getContext("2d");
+
+    const isTall =
+        builderState.cakeProductId ===
+        "tier-4-6-tall";
+
+    const sideRanges = isTall
+        ? [
+            [0.105, 0.485],
+            [0.565, 0.905]
+        ]
+        : [
+            [0.205, 0.455],
+            [0.545, 0.835]
+        ];
+
+    const rowGap = Math.max(
+        10,
+        Math.round(
+            sourceHeight * 0.012
+        )
+    );
+
+    sideRanges.forEach(
+        ([startRatio, endRatio]) => {
+            const startY =
+                sourceHeight * startRatio;
+
+            const endY =
+                sourceHeight * endRatio;
+
+            for (
+                let rowY = startY;
+                rowY <= endY;
+                rowY += rowGap
+            ) {
+                layerContext.beginPath();
+                layerContext.moveTo(0, rowY);
+                layerContext.lineTo(
+                    sourceWidth,
+                    rowY
+                );
+
+                layerContext.strokeStyle =
+                    "rgba(86, 50, 34, 0.15)";
+
+                layerContext.lineWidth =
+                    Math.max(
+                        1,
+                        sourceHeight * 0.002
+                    );
+
+                layerContext.stroke();
+
+                layerContext.beginPath();
+                layerContext.moveTo(
+                    0,
+                    rowY - 2
+                );
+                layerContext.lineTo(
+                    sourceWidth,
+                    rowY - 2
+                );
+
+                layerContext.strokeStyle =
+                    "rgba(255, 255, 255, 0.18)";
+
+                layerContext.lineWidth =
+                    Math.max(
+                        1,
+                        sourceHeight * 0.0013
+                    );
+
+                layerContext.stroke();
+            }
+        }
+    );
+
+    layerContext.globalCompositeOperation =
+        "destination-in";
+
+    layerContext.drawImage(
+    textureMask,
+        0,
+        0,
+        sourceWidth,
+        sourceHeight
+    );
+
+    layerContext.globalCompositeOperation =
+        "source-over";
+
+    context.drawImage(
+        layer,
+        x,
+        y,
+        width,
+        height
+    );
+}
 
 /* =========================================
    EDIBLE IMAGE CANVAS LAYER
@@ -2294,7 +3075,28 @@ function edibleImageIsReady() {
         builderState.edibleImageUrl
     );
 }
+function edibleImagesAreComplete() {
+    if (!builderState.edibleImageEnabled) {
+        return true;
+    }
 
+    const requestedQuantity = Math.max(
+        1,
+        Number(
+            builderState.edibleImageQuantity
+        ) || 1
+    );
+
+    return Array.from(
+        { length: requestedQuantity },
+        (_, index) =>
+            Boolean(
+                builderState.edibleImages[
+                    index
+                ]?.url
+            )
+    ).every(Boolean);
+}
 
 function addRoundedRectanglePath(
     context,
@@ -2718,7 +3520,19 @@ const realisticFinishShapeMap = {
     fullSheet: "Full-Sheet",
 
     heart5in: "5in-Heart",
-    tallHeart5in: "Tall-5in-Heart"
+tallHeart5in: "Tall-5in-Heart",
+
+number0: "Number-0",
+number1: "Number-1",
+number2: "Number-2",
+number3: "Number-3",
+number4: "Number-4",
+number5: "Number-5",
+number6: "Number-6",
+number7: "Number-7",
+number8: "Number-8",
+number9: "Number-9",
+letter: "Letter-A"
 };
 const borderStyleNameMap = {
     shell: "Shell",
@@ -2804,18 +3618,24 @@ async function loadBorderAssets(
         mask,
         sprinkles
     ] = await Promise.all([
-        loadRealisticImage(
+        loadOptionalRealisticImage(
             `${borderRoot}/${files.strokes}`
         ),
 
-        loadRealisticImage(
+        loadOptionalRealisticImage(
             `${borderRoot}/${files.mask}`
         ),
 
-        loadRealisticImage(
-            `${borderRoot}/${files.sprinkles}`
-        )
+        builderState.cakeBorderSprinkles
+            ? loadOptionalRealisticImage(
+                `${borderRoot}/${files.sprinkles}`
+            )
+            : Promise.resolve(null)
     ]);
+
+    if (!strokes || !mask) {
+        return null;
+    }
 
     return {
         strokes,
@@ -2833,13 +3653,53 @@ function getBorderDrawBox(
     const source =
         assets?.strokes?.src || "";
 
-    const scaleX =
+    let scaleX = 1;
+    let scaleY = 1;
+    let offsetY = 0;
+
+    /*
+        Square and regular Two-Tier are
+        intentionally left untouched.
+    */
+
+    if (
+        source.includes(
+            "-Tall-5in-Heart-Bottom-"
+        )
+    ) {
+        scaleX = 0.94;
+    } else if (
+        source.includes("-Heart-Top-") &&
+        !source.includes("-5in-Heart-") &&
+        !source.includes("-Bento-")
+    ) {
+        scaleX = 1.04;
+    } else if (
+        source.includes("-Tall-Star-")
+    ) {
+        scaleX = 0.97;
+    } else if (
+        source.includes("-Star-Bottom-")
+    ) {
+        scaleX = 0.94;
+    } else if (
+        source.includes(
+            "-Full-Sheet-Bottom-"
+        )
+    ) {
+        scaleY = 0.90;
+        offsetY = height * 0.10;
+    } else if (
         source.includes("-Round-")
-            ? 0.94
-            : 1;
+    ) {
+        scaleX = 0.94;
+    }
 
     const adjustedWidth =
         width * scaleX;
+
+    const adjustedHeight =
+        height * scaleY;
 
     return {
         x:
@@ -2849,11 +3709,89 @@ function getBorderDrawBox(
                 adjustedWidth
             ) / 2,
 
-        y,
+        y: y + offsetY,
         width: adjustedWidth,
-        height
+        height: adjustedHeight
     };
 }
+
+function drawRegisteredBorderLayer(
+    context,
+    layer,
+    source,
+    drawBox
+) {
+    const isTallTierTop =
+        source.includes(
+            "-Tall-Two-Tier-Top-"
+        );
+
+    if (!isTallTierTop) {
+        context.drawImage(
+            layer,
+            drawBox.x,
+            drawBox.y,
+            drawBox.width,
+            drawBox.height
+        );
+
+        return;
+    }
+
+    /*
+        Preserve the top rim.
+    */
+
+    context.save();
+    context.beginPath();
+    context.rect(
+        drawBox.x,
+        drawBox.y,
+        drawBox.width,
+        drawBox.height * 0.30
+    );
+    context.clip();
+
+    context.drawImage(
+        layer,
+        drawBox.x,
+        drawBox.y,
+        drawBox.width,
+        drawBox.height
+    );
+
+    context.restore();
+
+    /*
+        Lower only the broken middle band.
+    */
+
+    const middleOffset =
+        drawBox.height * 0.018;
+
+    context.save();
+    context.beginPath();
+    context.rect(
+        drawBox.x,
+        drawBox.y +
+            drawBox.height * 0.30 +
+            middleOffset,
+        drawBox.width,
+        drawBox.height * 0.34
+    );
+    context.clip();
+
+    context.drawImage(
+        layer,
+        drawBox.x,
+        drawBox.y + middleOffset,
+        drawBox.width,
+        drawBox.height
+    );
+
+    context.restore();
+}
+
 function drawCakeBorder(
     context,
     assets,
@@ -2877,7 +3815,6 @@ function drawCakeBorder(
             borderColor
         );
 
-
     const drawBox =
         getBorderDrawBox(
             assets,
@@ -2887,6 +3824,8 @@ function drawCakeBorder(
             height
         );
 
+    const source =
+        assets.strokes?.src || "";
 
     context.save();
 
@@ -2895,29 +3834,24 @@ function drawCakeBorder(
 
     context.globalAlpha = 1;
 
-
-    context.drawImage(
+    drawRegisteredBorderLayer(
+        context,
         tintedBorder,
-        drawBox.x,
-        drawBox.y,
-        drawBox.width,
-        drawBox.height
+        source,
+        drawBox
     );
 
-
     if (
-        builderState
-            .cakeBorderSprinkles
+        builderState.cakeBorderSprinkles &&
+        assets.sprinkles
     ) {
-        context.drawImage(
+        drawRegisteredBorderLayer(
+            context,
             assets.sprinkles,
-            drawBox.x,
-            drawBox.y,
-            drawBox.width,
-            drawBox.height
+            source,
+            drawBox
         );
     }
-
 
     context.restore();
 }
@@ -2981,9 +3915,18 @@ const realisticExtraNameMap = {
     chocolateDripDecoration: "Chocolate-Drip",
     flowersDecoration: "Fresh-Flowers",
     goldAccentDecoration: "Metallic-Leaf-Gold",
-    silverLeafDecoration: "Metallic-Leaf-Silver", // future-safe
-    pearlsDecoration: "Pearls"
+        silverLeafDecoration:
+        "Metallic-Leaf-Silver",
+
+    pearlsDecoration: "Pearls",
+
+    macaronsDecoration:
+        "Macarons",
+
+    miniDiscoBallsDecoration:
+        "Mini-Disco-Balls"
 };
+
 function getNumberLetterExtraSlug(entry) {
     if (!entry) {
         return null;
@@ -3000,9 +3943,48 @@ function getNumberLetterExtraSlug(entry) {
     )}`;
 }
 function getSelectedRealisticExtraIds() {
-    return builderState.decorations
-        .map((decoration) => decoration.id)
-        .filter((id) => Boolean(realisticExtraNameMap[id]));
+    const selectedIds =
+        builderState.decorations
+            .map(
+                (decoration) =>
+                    decoration.id
+            )
+            .filter(
+                (id) =>
+                    Boolean(
+                        realisticExtraNameMap[
+                            id
+                        ]
+                    )
+            );
+
+    if (
+        builderState.quantityExtras.some(
+            (extra) =>
+                extra.name ===
+                    "Macarons" &&
+                extra.quantity > 0
+        )
+    ) {
+        selectedIds.push(
+            "macaronsDecoration"
+        );
+    }
+
+    if (
+        builderState.quantityExtras.some(
+            (extra) =>
+                extra.name ===
+                    "Mini Disco Balls" &&
+                extra.quantity > 0
+        )
+    ) {
+        selectedIds.push(
+            "miniDiscoBallsDecoration"
+        );
+    }
+
+    return selectedIds;
 }
 
 async function loadOptionalRealisticImage(url) {
@@ -3311,36 +4293,25 @@ function getDripDrawBox(
     height
 ) {
     const source =
-        dripAsset
-            ?.strokes
-            ?.src || "";
+        dripAsset?.strokes?.src || "";
 
     let scaleX = 1;
     let scaleY = 1;
     let offsetY = 0;
 
-
     if (
-        source.includes(
-            "-Tall-Square-"
-        )
+        source.includes("-Tall-Square-")
     ) {
         scaleX = 0.96;
         scaleY = 0.98;
         offsetY = 5;
-    }
-
-    else if (
-        source.includes(
-            "-Square-"
-        )
+    } else if (
+        source.includes("-Square-")
     ) {
         scaleX = 0.98;
         scaleY = 0.99;
         offsetY = 3;
-    }
-
-    else if (
+    } else if (
         source.includes(
             "-Tall-Two-Tier-"
         )
@@ -3350,36 +4321,16 @@ function getDripDrawBox(
         offsetY = 5;
     }
 
-    else if (
-        source.includes(
-            "-Two-Tier-"
-        )
-    ) {
-        scaleX = 0.98;
-        scaleY = 0.99;
-        offsetY = 3;
-    }
-
-    else if (
-        source.includes(
-            "-Number-"
-        ) ||
-        source.includes(
-            "-Letter-"
-        )
-    ) {
-        scaleX = 0.97;
-        scaleY = 0.98;
-        offsetY = 3;
-    }
-
+    /*
+        Standard Two-Tier and Number/Letter
+        exports use their exact 1:1 boxes.
+    */
 
     const adjustedWidth =
         width * scaleX;
 
     const adjustedHeight =
         height * scaleY;
-
 
     return {
         x:
@@ -3720,7 +4671,108 @@ function makeFlatTintedMask(
     return layer;
 }
 
+function drawVintageFinishLayer(
+    context,
+    layer,
+    source,
+    x,
+    y,
+    width,
+    height
+) {
+    const drawCentered = (
+        scaleX,
+        clipTopRatio = 0,
+        clipBottomRatio = 1
+    ) => {
+        const adjustedWidth =
+            width * scaleX;
 
+        const adjustedX =
+            x +
+            (width - adjustedWidth) / 2;
+
+        context.save();
+        context.beginPath();
+
+        context.rect(
+            x,
+            y + height * clipTopRatio,
+            width,
+            height *
+                (
+                    clipBottomRatio -
+                    clipTopRatio
+                )
+        );
+
+        context.clip();
+
+        context.drawImage(
+            layer,
+            adjustedX,
+            y,
+            adjustedWidth,
+            height
+        );
+
+        context.restore();
+    };
+
+    if (
+        source.includes("-Tall-Round-") &&
+        builderState.cakeCoverage === "full"
+    ) {
+        drawCentered(0.94);
+        return;
+    }
+
+    if (
+        source.includes(
+            "-Tall-Two-Tier-"
+        )
+    ) {
+        drawCentered(
+            0.94,
+            0,
+            0.56
+        );
+
+        drawCentered(
+            1,
+            0.56,
+            1
+        );
+
+        return;
+    }
+
+    if (
+        source.includes("-Two-Tier-")
+    ) {
+        drawCentered(
+            0.94,
+            0,
+            0.55
+        );
+
+        drawCentered(
+            0.97,
+            0.55,
+            1
+        );
+
+        return;
+    }
+
+    context.drawImage(
+        layer,
+        x,
+        y,
+        width,
+        height
+    );
+}
 function drawRealisticCakeFinish(
     context,
     finishAssets,
@@ -3734,15 +4786,14 @@ function drawRealisticCakeFinish(
     }
 
     const accentOne =
-    builderState.finishAccentOne ||
-    "#FF4FA3";
+        builderState.finishAccentOne ||
+        "#FF4FA3";
 
-const accentTwo =
-    builderState.finishAccentTwo ||
-    "#F4D66E";
+    const accentTwo =
+        builderState.finishAccentTwo ||
+        "#F4D66E";
 
     context.save();
-
 
     /*
         WATERCOLOR QA MASKS
@@ -3769,10 +4820,17 @@ const accentTwo =
                 accentTwo
             );
 
-        context.globalCompositeOperation =
-            "multiply";
+        const isBento =
+            builderState.cakeProductId ===
+            "heart-5-bento";
 
-        context.globalAlpha = 0.78;
+        context.globalCompositeOperation =
+            isBento
+                ? "source-over"
+                : "multiply";
+
+        context.globalAlpha =
+            isBento ? 0.72 : 0.78;
 
         context.drawImage(
             accentOneLayer,
@@ -3782,7 +4840,8 @@ const accentTwo =
             height
         );
 
-        context.globalAlpha = 0.68;
+        context.globalAlpha =
+            isBento ? 0.62 : 0.68;
 
         context.drawImage(
             accentTwoLayer,
@@ -3793,29 +4852,24 @@ const accentTwo =
         );
     }
 
-
     /*
         DIMENSIONAL STROKE-AND-MASK FINISHES
     */
 
-  if (
-    finishAssets.type === "paletteKnife" ||
-    finishAssets.type === "vintagePiping" ||
-    finishAssets.type === "numberLetterPiping"
-) {
+    if (
+        finishAssets.type ===
+            "paletteKnife" ||
+        finishAssets.type ===
+            "vintagePiping" ||
+        finishAssets.type ===
+            "numberLetterPiping"
+    ) {
         const [
             accentOneStrokes,
             accentOneMask,
             accentTwoStrokes,
             accentTwoMask
         ] = finishAssets.images;
-
-        /*
-            makeTintedLayer preserves the
-            highlights, shadows and raised
-            buttercream texture from the
-            approved stroke PNGs.
-        */
 
         const accentOneLayer =
             makeTintedLayer(
@@ -3836,21 +4890,49 @@ const accentTwo =
 
         context.globalAlpha = 1;
 
-        context.drawImage(
-            accentOneLayer,
-            x,
-            y,
-            width,
-            height
-        );
+        if (
+            finishAssets.type ===
+            "vintagePiping"
+        ) {
+            const source =
+                accentOneStrokes.src || "";
 
-        context.drawImage(
-            accentTwoLayer,
-            x,
-            y,
-            width,
-            height
-        );
+            drawVintageFinishLayer(
+                context,
+                accentOneLayer,
+                source,
+                x,
+                y,
+                width,
+                height
+            );
+
+            drawVintageFinishLayer(
+                context,
+                accentTwoLayer,
+                source,
+                x,
+                y,
+                width,
+                height
+            );
+        } else {
+            context.drawImage(
+                accentOneLayer,
+                x,
+                y,
+                width,
+                height
+            );
+
+            context.drawImage(
+                accentTwoLayer,
+                x,
+                y,
+                width,
+                height
+            );
+        }
     }
 
     context.restore();
@@ -3921,12 +5003,8 @@ async function updateRealisticCakePreview() {
         boardAssetMap[boardKey] ||
         boardAssetMap.round;
 
-    const previewEntries = isBento
-        ? [{
-            file: "TPJ-Asset-008-Bento-Box-5in-Heart-4-Cupcakes.png",
-            key: "heart5in"
-        }]
-        : getCakePreviewEntries(product);
+    const previewEntries =
+    getCakePreviewEntries(product);
 
     const cakeUrls = previewEntries.map(
         (entry) =>
@@ -4143,14 +5221,9 @@ drawCakeForegroundExtras(
 Promise.all(
     previewEntries.map(
         (entry) =>
-            product.shape === "numberLetter"
-                ? Promise.resolve({
-                    top: null,
-                    bottom: null
-                })
-                : loadSelectedBorderAssets(
-                    entry.key
-                )
+            loadSelectedBorderAssets(
+                entry.key
+            )
     )
 ),
 Promise.all(
@@ -4207,17 +5280,49 @@ previewEntries.forEach((entry, index) => {
         cakeImage,
         scale
     );
+    const isCoveragePreview =
+    builderState.cakeCoverage !== "full" &&
+    cakeSupportsCoverage(product);
+
+const coverageMask =
+    isCoveragePreview
+        ? getCoverageButtercreamMask(
+            cakeImage
+        )
+        : cakeImage;
+
+if (isCoveragePreview) {
+    context.drawImage(
+        cakeImage,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 
     if (product.shape === "tier") {
-        drawTwoTierColors(
-            context,
-            cakeImage,
-            x,
-            y + boardYOffset,
-            size.width,
-            size.height
-        );
-    } else {
+    drawTwoTierColors(
+        context,
+        cakeImage,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height,
+        coverageMask
+        
+    );
+
+    drawTwoTierSimpleTexture(
+        context,
+        cakeImage,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height,
+        coverageMask
+    );
+} else {
     const isLayeredNumberLetter =
         product.shape === "numberLetter" &&
         builderState.numberLetterStyle ===
@@ -4247,8 +5352,8 @@ previewEntries.forEach((entry, index) => {
 
         drawRecoloredAsset(
             context,
-            cakeImage,
-            cakeImage,
+            coverageMask,
+            coverageMask,
             selectedCakeColor,
             x,
             y + boardYOffset,
@@ -4920,16 +6025,15 @@ function updateFinishAvailability() {
         getSelectedCakeProduct();
 
     const isNumberLetter =
-        product.shape === "numberLetter";
+        product.shape ===
+            "numberLetter";
 
-const unsupportedFinishes = [
-    "Simple Texture",
-    "Watercolor Finish",
-    "Palette Knife Finish",
-    "Vintage Piping"
-    
-];
-
+    const unsupportedFinishes = [
+        "Simple Texture",
+        "Watercolor Finish",
+        "Palette Knife Finish",
+        "Vintage Piping"
+    ];
 
     unsupportedFinishes.forEach(
         (finishValue) => {
@@ -4943,66 +6047,52 @@ const unsupportedFinishes = [
                     ".style-choice-card"
                 );
 
-            /*
-                Hide and disable these two choices
-                only for number and letter cakes.
-            */
+            const unavailableForNumberLetter =
+                isNumberLetter;
+
+            const unavailableWithFondant =
+                builderState.fondantEnabled &&
+                finishValue ===
+                    "Simple Texture";
+
+            const unavailable =
+                unavailableForNumberLetter ||
+                unavailableWithFondant;
 
             finishCard?.classList.toggle(
                 "is-hidden",
-                isNumberLetter
+                unavailable
             );
 
             if (finishInput) {
                 finishInput.disabled =
-                    isNumberLetter;
+                    unavailable;
             }
         }
     );
 
-    /*
-        If Watercolor or Palette Knife was already
-        selected before switching to Number / Letter,
-        clear that unsupported selection.
-    */
+    const selectedFinishUnavailable =
+        (
+            isNumberLetter &&
+            unsupportedFinishes.includes(
+                builderState.cakeFinish
+            )
+        ) ||
+        (
+            builderState.fondantEnabled &&
+            builderState.cakeFinish ===
+                "Simple Texture"
+        );
 
-    if (
-        isNumberLetter &&
-        unsupportedFinishes.includes(
-            builderState.cakeFinish
-        )
-    ) {
+    if (selectedFinishUnavailable) {
         builderState.cakeFinish = "";
 
-        unsupportedFinishes.forEach(
-            (finishValue) => {
-                const finishInput =
-                    getElement(
-                        `input[name="cakeFinish"][value="${finishValue}"]`
-                    );
-
-                if (finishInput) {
-                    finishInput.checked = false;
-                }
-            }
-        );
+        getElements(
+            'input[name="cakeFinish"]'
+        ).forEach((finishInput) => {
+            finishInput.checked = false;
+        });
     }
-    if (
-    isNumberLetter &&
-    builderState.numberLetterStyle
-) {
-    builderState.cakeFinish =
-        "Smooth Finish";
-
-    const smoothFinishInput =
-        getElement(
-            'input[name="cakeFinish"][value="Smooth Finish"]'
-        );
-
-    if (smoothFinishInput) {
-        smoothFinishInput.checked = true;
-    }
-}
 }
 function updateFinishColorControls() {
     const finishColorCustomizer =
@@ -5133,15 +6223,152 @@ function updateSelectedCardStates() {
 function isCupcakesOnlyProduct() {
     return getSelectedCakeProduct().shape === "cupcakes";
 }
+function reorderStepFourControls() {
+    const cupcakeSlot = getElement(
+        "#cupcakeOnlyStudioSlot"
+    );
 
+    const fondant = getElement(
+        "#fondantCoverageCustomizer"
+    );
+
+    if (cupcakeSlot && fondant) {
+        fondant.before(cupcakeSlot);
+    }
+
+    const finish = getElement(
+        "#cakeFinishCustomizer"
+    );
+
+    const finishColors = getElement(
+        "#finishColorCustomizer"
+    );
+
+    const borders = getElement(
+        "#cakeBorderCustomizer"
+    );
+
+    if (finish && borders) {
+        borders.before(finish);
+    }
+
+    if (finish && finishColors) {
+        finish.after(finishColors);
+    }
+
+    const topperQuestion = getElement(
+        "#cakeTopperCustomizer"
+    );
+
+    const topperOptions = getElement(
+        "#topperTypeOptions"
+    );
+
+    if (
+        topperQuestion &&
+        topperOptions
+    ) {
+        topperQuestion.after(
+            topperOptions
+        );
+    }
+}
+
+
+function updateSurfaceOptionAvailability() {
+    const product =
+        getSelectedCakeProduct();
+
+    const surfaceOptionsAllowed =
+        product.shape !== "cupcakes" &&
+        builderState.cakeCoverage ===
+            "full";
+
+    const ganacheInput = getElement(
+        'input[name="buttercreamStyle"][value="Ganache Coating"]'
+    );
+
+    const ganacheCard =
+        ganacheInput?.closest(
+            ".description-choice-card"
+        );
+
+    ganacheCard?.classList.toggle(
+        "is-hidden",
+        !surfaceOptionsAllowed
+    );
+
+    if (ganacheInput) {
+        ganacheInput.disabled =
+            !surfaceOptionsAllowed;
+    }
+
+    if (
+        !surfaceOptionsAllowed &&
+        builderState.buttercreamStyle ===
+            "Ganache Coating"
+    ) {
+        builderState.buttercreamStyle =
+            "";
+
+        if (ganacheInput) {
+            ganacheInput.checked = false;
+        }
+    }
+
+    setText(
+        "#ganacheCoatingPriceLabel",
+        surfaceOptionsAllowed
+            ? `+${formatCurrency(
+                getSurfaceUpcharge(
+                    "ganache"
+                )
+            )}`
+            : "Unavailable for this selection"
+    );
+
+    const fondantFieldset = getElement(
+        "#fondantCoverageCustomizer"
+    );
+
+    fondantFieldset?.classList.toggle(
+        "is-hidden",
+        !surfaceOptionsAllowed
+    );
+
+    if (!surfaceOptionsAllowed) {
+        builderState.fondantEnabled =
+            false;
+
+        getElements(
+            'input[name="fondantEnabled"]'
+        ).forEach((input) => {
+            input.checked =
+                input.value === "no";
+        });
+    }
+
+    setText(
+        "#fondantPriceLabel",
+        surfaceOptionsAllowed
+            ? `Yes · +${formatCurrency(
+                getSurfaceUpcharge(
+                    "fondant"
+                )
+            )}`
+            : "Yes · unavailable"
+    );
+}
 
 function updateProductModeUI() {
     const product = getSelectedCakeProduct();
     const isCupcakesOnly = product.shape === "cupcakes";
     const isBento = builderState.cakeProductId === "heart-5-bento";
-    const isRoundCake = product.shape === "round";
+   const supportsCoverage =
+    cakeSupportsCoverage(product);
     const isTwoTier = product.shape === "tier";
     const usesCupcakeStudio = isCupcakesOnly || isBento;
+    
 
     cakeRenderer?.classList.toggle(
         "is-cupcake-box-preview",
@@ -5157,9 +6384,26 @@ function updateProductModeUI() {
         isCupcakesOnly
     );
 
-    getElements(".cake-only-inside").forEach((element) => {
-        element.classList.toggle("is-hidden", isCupcakesOnly);
-    });
+    getElements(
+    ".cake-only-inside"
+).forEach((element) => {
+    const isCustomFillingField =
+        element.id ===
+        "customFillingField";
+
+    const shouldHide =
+        isCupcakesOnly ||
+        (
+            isCustomFillingField &&
+            builderState.cakeFilling !==
+                "Custom Filling"
+        );
+
+    element.classList.toggle(
+        "is-hidden",
+        shouldHide
+    );
+});
 
     getElements(".cake-only-look").forEach((element) => {
         element.classList.toggle("is-hidden", isCupcakesOnly);
@@ -5170,10 +6414,19 @@ function updateProductModeUI() {
         isCupcakesOnly
     );
 
-    getElement("#roundCoverageOptions")?.classList.toggle(
-        "is-hidden",
-        !isRoundCake
-    );
+   getElement(
+    "#cakeCoverageOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !supportsCoverage
+);
+
+getElement(
+    "#bentoCupcakeCountOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !isBento
+); 
 
     getElement("#tierColorCustomizer")?.classList.toggle(
         "is-hidden",
@@ -5215,6 +6468,7 @@ getElement(
     isCupcakesOnly ||
     isTwoTier ||
     isNumberLetter
+    
 );
 
 
@@ -5280,7 +6534,7 @@ const cupcakeStudio =
             : "Choose the color, buttercream finish, and details that fit the celebration."
     );
 
-    setText(
+       setText(
         "#cupcakeStudioCaption",
         isCupcakesOnly
             ? `These choices apply to all ${product.cupcakeCount} cupcakes in this order.`
@@ -5288,22 +6542,22 @@ const cupcakeStudio =
             ? "These choices apply to all four cupcakes included in the bento box."
             : "These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above."
     );
-}
+
+    updateSurfaceOptionAvailability();
+} 
 
 
 function normalizeProductSpecificState(
     product
 ) {
-    const isCupcakesOnly =
+       const isCupcakesOnly =
         product.shape ===
         "cupcakes";
 
-    const isRoundCake =
-        product.shape ===
-        "round";
+    const supportsCoverage =
+        cakeSupportsCoverage(product);
 
-
-    if (!isRoundCake) {
+    if (!supportsCoverage) {
         builderState.cakeCoverage =
             "full";
 
@@ -5311,8 +6565,7 @@ function normalizeProductSpecificState(
             'input[name="cakeCoverage"]'
         ).forEach((input) => {
             input.checked =
-                input.value ===
-                "full";
+                input.value === "full";
         });
     }
 
@@ -5439,54 +6692,180 @@ function normalizeProductSpecificState(
     });
 }
 
+function renderEdibleImageSlots() {
+    const container = getElement(
+        "#edibleImageSlots"
+    );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const quantity = Math.max(
+        1,
+        Number(
+            builderState.edibleImageQuantity
+        ) || 1
+    );
+
+    for (
+        let index = 0;
+        index < quantity;
+        index += 1
+    ) {
+        const upload =
+            builderState.edibleImages[
+                index
+            ] || null;
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "edible-image-upload-row";
+
+        const thumbnail =
+            document.createElement("div");
+
+        thumbnail.className =
+            "edible-image-thumbnail";
+
+        if (upload?.url) {
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src = upload.url;
+            image.alt =
+                `Selected edible image ${index + 1}`;
+
+            thumbnail.appendChild(image);
+        } else {
+            const empty =
+                document.createElement(
+                    "span"
+                );
+
+            empty.textContent =
+                `Image ${index + 1}`;
+
+            thumbnail.appendChild(empty);
+        }
+
+        const actions =
+            document.createElement("div");
+
+        actions.className =
+            "edible-image-upload-actions";
+
+        const fileInput =
+            document.createElement(
+                "input"
+            );
+
+        fileInput.className =
+            "visually-hidden-file-input";
+
+        fileInput.type = "file";
+
+        fileInput.accept =
+            ".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp";
+
+        const chooseButton =
+            document.createElement(
+                "button"
+            );
+
+        chooseButton.className =
+            "upload-select-button";
+
+        chooseButton.type = "button";
+
+        chooseButton.textContent =
+            upload?.url
+                ? `Replace Image ${index + 1}`
+                : `Choose Image ${index + 1}`;
+
+        const removeButton =
+            document.createElement(
+                "button"
+            );
+
+        removeButton.className =
+            "edible-image-secondary-button";
+
+        removeButton.type = "button";
+
+        removeButton.textContent =
+            `Remove Image ${index + 1}`;
+
+        removeButton.disabled =
+            !upload?.url;
+
+        chooseButton.addEventListener(
+            "click",
+            () => fileInput.click()
+        );
+
+        fileInput.addEventListener(
+            "change",
+            () => {
+                setEdibleImageFile(
+                    fileInput.files?.[0],
+                    index
+                );
+            }
+        );
+
+        removeButton.addEventListener(
+            "click",
+            () =>
+                clearEdibleImageFile(
+                    index
+                )
+        );
+
+        actions.append(
+            fileInput,
+            chooseButton,
+            removeButton
+        );
+
+        row.append(
+            thumbnail,
+            actions
+        );
+
+        container.appendChild(row);
+    }
+}
+
+
 function updateEdibleImageControls() {
-    const controls =
-        getElement(
-            "#edibleImageControls"
-        );
+    const controls = getElement(
+        "#edibleImageControls"
+    );
 
-    const enabledInput =
-        getElement(
-            "#edibleImageEnabled"
-        );
+    const tierTarget = getElement(
+        "#edibleImageTierTarget"
+    );
 
-    const thumbnail =
-        getElement(
-            "#edibleImageThumbnail"
-        );
+    const placementTarget = getElement(
+        "#edibleImagePlacementTarget"
+    );
 
-    const removeButton =
-        getElement(
-            "#removeEdibleImage"
-        );
-
-    const tierTarget =
-        getElement(
-            "#edibleImageTierTarget"
-        );
-
-    const placementTarget =
-        getElement(
-            "#edibleImagePlacementTarget"
-        );
-
-    const placementNote =
-        getElement(
-            "#edibleImagePlacementNote"
-        );
+    const placementNote = getElement(
+        "#edibleImagePlacementNote"
+    );
 
     const product =
         getSelectedCakeProduct();
 
     const isCupcakesOnly =
-        product.shape ===
-        "cupcakes";
-
-
-    /*
-        Cupcake edible images can only
-        sit on the top of a cupcake.
-    */
+        product.shape === "cupcakes";
 
     if (isCupcakesOnly) {
         builderState.edibleImagePlacement =
@@ -5496,106 +6875,82 @@ function updateEdibleImageControls() {
             'input[name="edibleImagePlacement"]'
         ).forEach((input) => {
             input.checked =
-                input.value ===
-                "top";
+                input.value === "top";
         });
     }
 
+    getElements(
+        'input[name="edibleImageEnabled"]'
+    ).forEach((input) => {
+        input.checked =
+            input.value ===
+            (
+                builderState
+                    .edibleImageEnabled
+                    ? "yes"
+                    : "no"
+            );
+    });
+
+    controls?.classList.toggle(
+        "is-hidden",
+        !builderState.edibleImageEnabled
+    );
 
     placementTarget?.classList.toggle(
         "is-hidden",
         isCupcakesOnly
     );
 
-
-    if (enabledInput) {
-        enabledInput.checked =
-            builderState
-                .edibleImageEnabled;
-    }
-
-
-    controls?.classList.toggle(
-        "is-hidden",
-        !builderState
-            .edibleImageEnabled
-    );
-
-
     const showTierTarget =
         !isCupcakesOnly &&
-        product.shape ===
-            "tier" &&
-        builderState
-            .edibleImagePlacement ===
+        product.shape === "tier" &&
+        builderState.edibleImagePlacement ===
             "front";
-
 
     tierTarget?.classList.toggle(
         "is-hidden",
         !showTierTarget
     );
 
+    const quantityInput = getElement(
+        "#edibleImageQuantity"
+    );
 
-    if (removeButton) {
-        removeButton.disabled =
-            !builderState
-                .edibleImageUrl;
-    }
-
-
-    if (thumbnail) {
-        thumbnail.innerHTML =
-            "";
-
-        if (
+    if (quantityInput) {
+        quantityInput.value = String(
             builderState
-                .edibleImageUrl
-        ) {
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-            image.src =
-                builderState
-                    .edibleImageUrl;
-
-            image.alt =
-                "Selected edible image";
-
-            thumbnail.appendChild(
-                image
-            );
-        } else {
-            const emptyMessage =
-                document.createElement(
-                    "span"
-                );
-
-            emptyMessage.textContent =
-                "No image selected";
-
-            thumbnail.appendChild(
-                emptyMessage
-            );
-        }
+                .edibleImageQuantity
+        );
     }
 
+    const includedCount =
+        getIncludedEdibleImageCount();
+
+    setText(
+        "#edibleImagePriceNote",
+        builderState.cakeProductId ===
+            "heart-5-bento"
+            ? `Up to ${includedCount} included · additional images $2 each`
+            : isCupcakesOnly
+                ? "$2 each on standalone cupcakes"
+                : "$15 each on cakes"
+    );
 
     if (placementNote) {
         placementNote.textContent =
             isCupcakesOnly
-
-                ? "The uploaded image will be centered on top of the cupcakes. It is shown above for reference only."
-
-                : builderState
-                    .edibleImagePlacement ===
+                ? "Requested placement: centered on top of the cupcakes. The first uploaded design is used as the representative live preview."
+                : builderState.edibleImagePlacement ===
                     "top"
+                    ? "Requested placement: centered on top of the cake. The first uploaded design is used as the representative live preview."
+                    : "Requested placement: front face of the cake. The first uploaded design is used as the representative live preview.";
+    }
 
-                ? "Requested placement: centered on top of the cake. The uploaded image is shown above for reference only."
-
-                : "Requested placement: front face of the cake. The uploaded image is shown above for reference only.";
+    if (
+        builderState.edibleImageEnabled
+    ) {
+        renderEdibleImageSlots();
     }
 }
 
@@ -6033,21 +7388,28 @@ function validateStepThree() {
     return true;
 }
 
-
 function validateStepFour() {
-        const product =
+    const product =
         getSelectedCakeProduct();
+
+    const hasNumberLetterFinish =
+        Boolean(
+            builderState.numberLetterStyle
+        ) ||
+        builderState.cakeFinish ===
+            "Smooth Finish";
 
     if (
         product.shape === "numberLetter" &&
-        !builderState.numberLetterStyle
+        !hasNumberLetterFinish
     ) {
         showValidationMessage(
-            "Choose Layered Piped or Fully Frosted & Piped."
+            "Choose Smooth, Layered Piped, or Fully Frosted & Piped."
         );
 
         return false;
     }
+
     if (isCupcakesOnlyProduct()) {
         if (!builderState.cupcakeFrostingStyle) {
             showValidationMessage(
@@ -6056,7 +7418,10 @@ function validateStepFour() {
 
             return false;
         }
-    } else if (!builderState.cakeFinish) {
+    } else if (
+        product.shape !== "numberLetter" &&
+        !builderState.cakeFinish
+    ) {
         showValidationMessage(
             "Choose a buttercream finish."
         );
@@ -6064,12 +7429,13 @@ function validateStepFour() {
         return false;
     }
 
+
     if (
         builderState.edibleImageEnabled &&
-        !builderState.edibleImageUrl
+!edibleImagesAreComplete()
     ) {
         showValidationMessage(
-            "Upload the edible image or turn the edible-image option off."
+           "Upload every requested edible image or turn the edible-image option off." 
         );
 
         return false;
@@ -6106,15 +7472,9 @@ function validateStepFour() {
         return false;
     }
 
-    const topperSelected =
-        Boolean(
-            getElement(
-                "#topperDecorationOption"
-            )?.checked
-        );
 
     if (
-        topperSelected &&
+        builderState.cakeTopperEnabled &&
         !builderState.topperType
     ) {
         showValidationMessage(
@@ -6126,8 +7486,35 @@ function validateStepFour() {
 
     return true;
 }
+function validateStepFive() {
+    if (
+        builderState.toyFigurineEnabled &&
+        !builderState
+            .toyFigurineDetails
+            .trim()
+    ) {
+        showValidationMessage(
+            "Describe the toys or figurines you would like."
+        );
 
+        return false;
+    }
 
+    if (
+        builderState.sculptedPiecesEnabled &&
+        !builderState
+            .sculptedPiecesDetails
+            .trim()
+    ) {
+        showValidationMessage(
+            "Describe what you would like sculpted."
+        );
+
+        return false;
+    }
+
+    return true;
+}
 function validateStepSix() {
     const acknowledgment = getElement(
         "#inspirationPolicyAcknowledgment"
@@ -6261,7 +7648,7 @@ function validateCurrentStep() {
             return validateStepFour();
 
         case 5:
-            return true;
+    return validateStepFive();
 
         case 6:
             return validateStepSix();
@@ -6810,48 +8197,47 @@ function updateFlowerSourceVisibility() {
 
 
 function updateTopperOptionsVisibility() {
-    const topperCheckbox = getElement(
-        "#topperDecorationOption"
-    );
-
-    const topperSelected =
-        Boolean(topperCheckbox?.checked);
-
     getElement(
         "#topperTypeOptions"
     )?.classList.toggle(
         "is-hidden",
-        !topperSelected
+        !builderState.cakeTopperEnabled
     );
-
-    if (!topperSelected) {
-        builderState.topperType = "";
-        builderState.topperPrice = 0;
-        builderState.topperWording = "";
-
-        getElements(
-            'input[name="topperType"]'
-        ).forEach((input) => {
-            input.checked = false;
-        });
-
-        const wordingInput = getElement(
-            "#topperWording"
-        );
-
-        if (wordingInput) {
-            wordingInput.value = "";
-        }
-    }
-
-    renderCakePreview();
 }
+getElements(
+    'input[name="cakeTopperEnabled"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.cakeTopperEnabled =
+                input.value === "yes";
+
+            updateTopperOptionsVisibility();
+            renderCakePreview();
+        }
+    );
+});
 
 
 /* =========================================
    EXTRAS
 ========================================= */
+function updateQuoteOnlyExtraVisibility() {
+    getElement(
+        "#toyFigurineDetailsField"
+    )?.classList.toggle(
+        "is-hidden",
+        !builderState.toyFigurineEnabled
+    );
 
+    getElement(
+        "#customSculptedDetailsField"
+    )?.classList.toggle(
+        "is-hidden",
+        !builderState.sculptedPiecesEnabled
+    );
+}
 function updateCheckboxExtras() {
     builderState.extras = getElements(
         "[data-extra-name]"
@@ -7364,6 +8750,18 @@ function getExtrasSummary() {
         }
     );
 
+    if (builderState.toyFigurineEnabled) {
+        extras.push(
+            `Toy / Figurine Decorations · ${builderState.toyFigurineDetails.trim()} (quote after design review · excluded from estimate)`
+        );
+    }
+
+    if (builderState.sculptedPiecesEnabled) {
+        extras.push(
+            `Custom 3D Sculpted Pieces · ${builderState.sculptedPiecesDetails.trim()} (quote after design review · excluded from estimate)`
+        );
+    }
+
     return extras.length
         ? extras.join(", ")
         : "No extras selected.";
@@ -7456,7 +8854,39 @@ function populateReview() {
         "#reviewCakeShape",
         `${shapeName} · ${getCakeHeightLabel()} · ${getCakeStructureLabel()}`
     );
+    const coverageSummary =
+        cakeSupportsCoverage(product)
+            ? builderState.cakeCoverage ===
+                "naked"
+                ? "Naked · −$15"
+                : builderState.cakeCoverage ===
+                    "semi-naked"
+                    ? "Semi-Naked · −$10"
+                    : "Full"
+            : "Not applicable";
 
+    setText(
+        "#reviewCoverage",
+        coverageSummary
+    );
+
+    const isBento =
+        builderState.cakeProductId ===
+            "heart-5-bento";
+
+    getElement(
+        "#reviewBentoCupcakesRow"
+    )?.classList.toggle(
+        "is-hidden",
+        !isBento
+    );
+
+    setText(
+        "#reviewBentoCupcakes",
+        builderState.bentoCupcakeCount === 8
+            ? "8 cupcakes · +$20"
+            : "4 cupcakes included"
+    );
     setText(
         "#reviewServings",
         getCakeServings()
@@ -7467,16 +8897,23 @@ function populateReview() {
         getDisplayCakeFlavor()
     );
 
-    const buttercreamSummary = [
+        const buttercreamSummary = [
         isCupcakesOnlyProduct()
             ? "Selected in Cupcake Look"
-            : builderState.buttercreamStyle || "Not selected",
+            : builderState.buttercreamStyle ||
+                "Not selected",
+
+        builderState.buttercreamStyle ===
+            "Ganache Coating"
+            ? `+${formatCurrency(
+                getGanacheCoatingPrice()
+            )}`
+            : "",
 
         builderState.buttercreamFlavor.trim()
     ]
         .filter(Boolean)
         .join(" · ");
-
     setText(
         "#reviewButtercream",
         buttercreamSummary
@@ -7516,37 +8953,87 @@ function populateReview() {
             : `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
     );
 
-  setText(
-    "#reviewFinish",
-    isCupcakesOnlyProduct()
-        ? builderState.cupcakeFrostingStyle ||
-            "Not selected"
-        : product.shape === "numberLetter"
-        ? builderState.numberLetterStyle ||
-            "Not selected"
-        : product.shape === "round"
-        ? `${builderState.cakeCoverage} coverage${builderState.cakeFinish ? ` · ${builderState.cakeFinish}` : ""}`
-        : builderState.cakeFinish ||
-            "Not selected"
-);
+      setText(
+        "#reviewFinish",
+        isCupcakesOnlyProduct()
+            ? builderState
+                .cupcakeFrostingStyle ||
+                "Not selected"
+            : product.shape ===
+                "numberLetter"
+                ? builderState
+                    .numberLetterStyle ||
+                    builderState
+                        .cakeFinish ||
+                    "Not selected"
+                : builderState.cakeFinish ||
+                    "Not selected"
+    ); 
 
-    const reviewDecorationNames =
-        builderState.decorations.map(
-            (decoration) =>
-                decoration.name
-        );
-
-    if (edibleImageIsReady()) {
-    const placementLabel =
-        builderState.edibleImagePlacement ===
-        "top"
-            ? "Center Top"
-            : "Front Face";
-
-    reviewDecorationNames.push(
-        `Edible Image · ${placementLabel}`
+    setText(
+        "#reviewFondant",
+        builderState.fondantEnabled
+            ? `Yes · +${formatCurrency(
+                getFondantPrice()
+            )}`
+            : "No"
     );
-}
+
+    if (builderState.edibleImageEnabled) {
+        const placementLabel =
+            builderState.edibleImagePlacement ===
+                "top"
+                ? "Center Top"
+                : "Front Face";
+
+        const tierLabel =
+            product.shape === "tier" &&
+            builderState
+                .edibleImagePlacement ===
+                    "front"
+                ? ` · ${
+                    builderState
+                        .edibleImageTier ===
+                    "top"
+                        ? "Top Tier"
+                        : "Bottom Tier"
+                }`
+                : "";
+
+        const includedCount =
+            getIncludedEdibleImageCount();
+
+        const includedLabel =
+            includedCount
+                ? ` · up to ${includedCount} included`
+                : "";
+
+        setText(
+            "#reviewEdibleImage",
+            `${builderState.edibleImageQuantity} image${builderState.edibleImageQuantity === 1 ? "" : "s"} · ${placementLabel}${tierLabel}${includedLabel} · ${formatCurrency(calculateEdibleImageTotal())}`
+        );
+    } else {
+        setText(
+            "#reviewEdibleImage",
+            "None"
+        );
+    }
+        const reviewDecorationNames =
+        builderState.decorations.map(
+            (decoration) => {
+                const quantityLabel =
+                    decoration.quantity > 1
+                        ? `${decoration.quantity} × `
+                        : "";
+
+                const price =
+                    decoration.total ??
+                    decoration.price;
+
+                return `${quantityLabel}${decoration.name} (+${formatCurrency(price)})`;
+            }
+        );
+    
 
     setText(
         "#reviewDecorations",
@@ -7555,9 +9042,10 @@ function populateReview() {
             : "None selected"
     );
 
-    const topperSummary =
+        const topperSummary =
+        builderState.cakeTopperEnabled &&
         builderState.topperType
-            ? `${builderState.topperType}${builderState.topperWording.trim() ? ` · “${builderState.topperWording.trim()}”` : ""}`
+            ? `${builderState.topperType} (+${formatCurrency(builderState.topperPrice)})${builderState.topperWording.trim() ? ` · “${builderState.topperWording.trim()}”` : ""}`
             : "None";
 
     setText(
@@ -7940,8 +9428,49 @@ getElement(
         updateNumberLetterControls();
         renderCakePreview();
     }
+    
 );
+getElements(
+    'input[name="numberLetterStyle"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.numberLetterStyle =
+                input.value;
 
+            /*
+                Clear the prior finish selection,
+                but keep Smooth visible so it can
+                be selected separately with a border.
+            */
+            builderState.cakeFinish = "";
+
+            getElements(
+                'input[name="cakeFinish"]'
+            ).forEach((finishInput) => {
+                finishInput.checked = false;
+            });
+
+            renderCakePreview();
+        }
+    );
+});
+getElements(
+    'input[name="bentoCupcakeCount"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.bentoCupcakeCount =
+                Number(input.value) === 8
+                    ? 8
+                    : 4;
+
+            renderCakePreview();
+        }
+    );
+});
 [
     ["#numberCakeFirst", "numberCakeFirst"],
     ["#numberCakeSecond", "numberCakeSecond"]
@@ -8610,6 +10139,7 @@ function updateCupcakeLinerColorChoices() {
         }
     );
 });
+
 getElements(
     'input[name="cakeFinish"]'
 ).forEach((input) => {
@@ -8618,6 +10148,25 @@ getElements(
         () => {
             builderState.cakeFinish =
                 input.value;
+
+            const isNumberLetter =
+                getSelectedCakeProduct().shape ===
+                "numberLetter";
+
+            if (
+                isNumberLetter &&
+                input.value ===
+                    "Smooth Finish"
+            ) {
+                builderState.numberLetterStyle =
+                    "";
+
+                getElements(
+                    'input[name="numberLetterStyle"]'
+                ).forEach((styleInput) => {
+                    styleInput.checked = false;
+                });
+            }
 
             renderCakePreview();
         }
@@ -8696,7 +10245,7 @@ getElements(
     input.addEventListener(
         "change",
         () => {
-            builderState.decorations =
+                        builderState.decorations =
                 getElements(
                     "[data-decoration-id]"
                 )
@@ -8712,24 +10261,40 @@ getElements(
                             "topperDecoration"
                     )
                     .map(
-                        (decorationInput) => ({
-                            id:
+                        (decorationInput) => {
+                            const id =
                                 decorationInput
                                     .dataset
-                                    .decorationId,
+                                    .decorationId;
 
-                            name:
-                                decorationInput
-                                    .dataset
-                                    .decorationName,
-
-                            price:
+                            const price =
                                 Number(
                                     decorationInput
                                         .dataset
                                         .price
-                                ) || 0
-                        })
+                                ) || 0;
+
+                            const quantity =
+                                builderState
+                                    .decorationQuantities[
+                                        id
+                                    ] || 1;
+
+                            return {
+                                id,
+
+                                name:
+                                    decorationInput
+                                        .dataset
+                                        .decorationName,
+
+                                price,
+                                quantity,
+                                total:
+                                    price *
+                                    quantity
+                            };
+                        }
                     );
                     const dripStillSelected =
     builderState.decorations.some(
@@ -8773,7 +10338,50 @@ renderCakePreview();
         }
     );
 });
+getElements(
+    "[data-decoration-quantity]"
+).forEach((input) => {
+    input.addEventListener(
+        "input",
+        () => {
+            const id =
+                input.dataset
+                    .decorationQuantity;
 
+            const quantity = Math.max(
+                1,
+                Number.parseInt(
+                    input.value || "1",
+                    10
+                ) || 1
+            );
+
+            input.value =
+                String(quantity);
+
+            builderState
+                .decorationQuantities[id] =
+                quantity;
+
+            const decoration =
+                builderState.decorations.find(
+                    (item) =>
+                        item.id === id
+                );
+
+            if (decoration) {
+                decoration.quantity =
+                    quantity;
+
+                decoration.total =
+                    decoration.price *
+                    quantity;
+            }
+
+            renderCakePreview();
+        }
+    );
+});
 getElements(
     'input[name="flowerSource"]'
 ).forEach((input) => {
@@ -9149,7 +10757,55 @@ getElements(".quantity-product").forEach(
         );
     }
 );
+getElements(
+    'input[name="toyFigurineEnabled"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.toyFigurineEnabled =
+                input.value === "yes";
 
+            updateQuoteOnlyExtraVisibility();
+            renderCakePreview();
+        }
+    );
+});
+
+getElement(
+    "#toyFigurineDetails"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState.toyFigurineDetails =
+            event.target.value;
+    }
+);
+
+getElements(
+    'input[name="customSculptedEnabled"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.sculptedPiecesEnabled =
+                input.value === "yes";
+
+            updateQuoteOnlyExtraVisibility();
+            renderCakePreview();
+        }
+    );
+});
+
+getElement(
+    "#customSculptedDetails"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState.sculptedPiecesDetails =
+            event.target.value;
+    }
+);
 
 /* =========================================
    UPLOAD EVENTS
@@ -9174,66 +10830,108 @@ function updateEdibleImageRangeOutputs() {
     );
 }
 
+function syncPrimaryEdibleImage() {
+    const firstUpload =
+        builderState.edibleImages[0] ||
+        null;
 
-function clearEdibleImageFile() {
-    if (builderState.edibleImageUrl) {
+    builderState.edibleImageFile =
+        firstUpload?.file || null;
+
+    builderState.edibleImageUrl =
+        firstUpload?.url || "";
+}
+
+
+function clearEdibleImageFile(
+    index = 0
+) {
+    const current =
+        builderState.edibleImages[
+            index
+        ];
+
+    if (current?.url) {
         URL.revokeObjectURL(
-            builderState.edibleImageUrl
+            current.url
         );
     }
 
-    builderState.edibleImageFile = null;
-    builderState.edibleImageUrl = "";
+    builderState.edibleImages[
+        index
+    ] = null;
 
-    const fileInput = getElement(
-        "#edibleImageFile"
+    syncPrimaryEdibleImage();
+
+    setText(
+        "#edibleImageError",
+        ""
     );
 
-    if (fileInput) {
-        fileInput.value = "";
-    }
-
-    setText("#edibleImageError", "");
     renderCakePreview();
 }
 
 
-function setEdibleImageFile(file) {
+function setEdibleImageFile(
+    file,
+    index = 0
+) {
     const errorMessage = getElement(
         "#edibleImageError"
     );
+
     const acceptedTypes = new Set([
         "image/jpeg",
         "image/png",
         "image/webp"
     ]);
 
-    if (!file || !acceptedTypes.has(file.type)) {
+    if (
+        !file ||
+        !acceptedTypes.has(file.type)
+    ) {
         if (errorMessage) {
             errorMessage.textContent =
                 "Choose a JPG, PNG, or WebP image.";
         }
+
         return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
+    if (
+        file.size >
+        15 * 1024 * 1024
+    ) {
         if (errorMessage) {
             errorMessage.textContent =
                 "The edible image must be 15 MB or smaller.";
         }
+
         return;
     }
 
-    if (builderState.edibleImageUrl) {
+    const current =
+        builderState.edibleImages[
+            index
+        ];
+
+    if (current?.url) {
         URL.revokeObjectURL(
-            builderState.edibleImageUrl
+            current.url
         );
     }
 
-    builderState.edibleImageEnabled = true;
-    builderState.edibleImageFile = file;
-    builderState.edibleImageUrl =
-        URL.createObjectURL(file);
+    builderState.edibleImageEnabled =
+        true;
+
+    builderState.edibleImages[
+        index
+    ] = {
+        file,
+        url: URL.createObjectURL(file)
+    };
+
+    syncPrimaryEdibleImage();
 
     if (errorMessage) {
         errorMessage.textContent = "";
@@ -9241,6 +10939,8 @@ function setEdibleImageFile(file) {
 
     renderCakePreview();
 }
+
+  
 
 
 function resetEdibleImagePosition() {
@@ -9281,42 +10981,96 @@ getElements(
 }
 
 
-const edibleImageFileInput = getElement(
-    "#edibleImageFile"
-);
 
-getElement(
-    "#edibleImageEnabled"
-)?.addEventListener(
-    "change",
-    (event) => {
-        builderState.edibleImageEnabled =
-            event.target.checked;
-        renderCakePreview();
+
+function setEdibleImageQuantity(
+    nextQuantity
+) {
+    const quantity = Math.max(
+        1,
+        Number.parseInt(
+            String(nextQuantity),
+            10
+        ) || 1
+    );
+
+    if (
+        quantity <
+        builderState.edibleImages.length
+    ) {
+        builderState.edibleImages
+            .slice(quantity)
+            .forEach((upload) => {
+                if (upload?.url) {
+                    URL.revokeObjectURL(
+                        upload.url
+                    );
+                }
+            });
+
+        builderState.edibleImages.length =
+            quantity;
+
+        syncPrimaryEdibleImage();
     }
-);
+
+    builderState.edibleImageQuantity =
+        quantity;
+
+    renderCakePreview();
+}
+
+
+getElements(
+    'input[name="edibleImageEnabled"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.edibleImageEnabled =
+                input.value === "yes";
+
+            renderCakePreview();
+        }
+    );
+});
+
 
 getElement(
-    "#chooseEdibleImage"
+    "#decreaseEdibleImageQuantity"
 )?.addEventListener(
     "click",
-    () => edibleImageFileInput?.click()
-);
-
-edibleImageFileInput?.addEventListener(
-    "change",
-    (event) => {
-        setEdibleImageFile(
-            event.target.files?.[0]
+    () => {
+        setEdibleImageQuantity(
+            builderState
+                .edibleImageQuantity - 1
         );
     }
 );
 
+
 getElement(
-    "#removeEdibleImage"
+    "#increaseEdibleImageQuantity"
 )?.addEventListener(
     "click",
-    clearEdibleImageFile
+    () => {
+        setEdibleImageQuantity(
+            builderState
+                .edibleImageQuantity + 1
+        );
+    }
+);
+
+
+getElement(
+    "#edibleImageQuantity"
+)?.addEventListener(
+    "input",
+    (event) => {
+        setEdibleImageQuantity(
+            event.target.value
+        );
+    }
 );
 
 getElement(
@@ -9548,7 +11302,19 @@ getElements(
         }
     );
 });
+getElements(
+    'input[name="fondantEnabled"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.fondantEnabled =
+                input.value === "yes";
 
+            renderCakePreview();
+        }
+    );
+});
 
 /* =========================================
    SUMMARY, RESET, SUBMIT
@@ -9595,6 +11361,7 @@ getElement(
 ========================================= */
 
 function initializeBuilder() {
+    reorderStepFourControls();
     buildBuilderColorControls();
 
 showCustomShadeControls(
@@ -9647,7 +11414,8 @@ if (defaultWhiteChocolateColored) {
 }
     updateExtraDetailControlsVisibility();
     updateTopperOptionsVisibility();
-    updateDeliveryFieldsVisibility();
+updateQuoteOnlyExtraVisibility();
+updateDeliveryFieldsVisibility();
 
     updateEdibleImageRangeOutputs();
     renderInspirationPreviews();
@@ -9655,6 +11423,27 @@ if (defaultWhiteChocolateColored) {
     showStep(1);
 }  
 initializeBuilder();
+{
+    const boardFieldset =
+        getElement("#cakeBoardCustomizer");
+
+    const heightFieldset =
+        getElement(
+            "#extraLayerToggle"
+        )?.closest("fieldset");
+
+    if (
+        boardFieldset &&
+        heightFieldset &&
+        heightFieldset.nextElementSibling !==
+            boardFieldset
+    ) {
+        heightFieldset.insertAdjacentElement(
+            "afterend",
+            boardFieldset
+        );
+    }
+}
 /* =========================================
    MATCH EACH IMAGE SLOT TO ITS OWN ARTWORK
 ========================================= */

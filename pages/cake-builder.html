@@ -1803,16 +1803,16 @@
                         </fieldset>
 
                        <fieldset
-    id="roundCoverageOptions"
+   id="cakeCoverageOptions"
     class="builder-fieldset"
 >
 
     <legend>
-        Round Cake Coverage
+        Cake Coverage
     </legend>
 
     <p class="fieldset-description">
-        Choose how much buttercream covers the outside of your round cake.
+     Choose how much coating covers the outside of your cake.   
     </p>
 
     <div class="description-choice-grid">
@@ -1833,7 +1833,7 @@
             >
 
             <strong>
-                Full Buttercream
+            Full Coating
             </strong>
 
             <span>
@@ -1930,9 +1930,11 @@
                                         1 layer · Serves 2–4 · Includes cupcakes
                                     </small>
 
-                                    <b>
-                                        $165
-                                    </b>
+                                    
+                                        <b>
+    Starting at $145
+</b>
+                                    
 
                                 </label>
 
@@ -2018,7 +2020,37 @@
 
                         </fieldset>
 
+<fieldset
+    id="bentoCupcakeCountOptions"
+    class="builder-fieldset is-hidden"
+>
+    <legend>Bento Cupcake Count</legend>
 
+    <p class="fieldset-description">
+        The live preview uses the four-cupcake bento artwork for either choice.
+    </p>
+
+    <div class="compact-choice-row">
+        <label>
+            <input
+                type="radio"
+                name="bentoCupcakeCount"
+                value="4"
+                checked
+            >
+            <span>4 Included</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="bentoCupcakeCount"
+                value="8"
+            >
+            <span>8 · +$20</span>
+        </label>
+    </div>
+</fieldset>
                         <!-- STAR SIZE -->
 
                         <fieldset
@@ -2556,7 +2588,7 @@
                         <fieldset class="builder-fieldset cake-only-inside">
 
                             <legend>
-                                Buttercream
+                                Coating
                             </legend>
 
                             <div class="description-choice-grid">
@@ -2637,6 +2669,7 @@
     class="option-card-image"
     src="../images/cake-builder/cards/04-buttercreams/TPJ-Card-Buttercream-Whipped.png"
     alt=""
+    
 >
 
     <strong>
@@ -2647,6 +2680,25 @@
         Light, airy, and less sweet.
     </span>
 
+</label>
+<label class="description-choice-card">
+    <input
+        type="radio"
+        name="buttercreamStyle"
+        value="Ganache"
+    >
+
+    <img
+        class="option-card-image"
+        src="../images/cake-builder/cards/04-buttercreams/TPJ-Card-Buttercream-Ganache.png"
+        alt=""
+    >
+
+    <strong>Ganache </strong>
+
+    <span id="ganachePriceLabel">
+        Priced by cake size
+    </span>
 </label>
                             </div>
 
@@ -2682,7 +2734,7 @@
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Vanilla"
+                value="Vanilla Buttercream"
             >
 
             <img
@@ -2691,14 +2743,14 @@
                 alt=""
             >
 
-            <strong>Vanilla</strong>
+            <strong>Vanilla Buttercream</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Chocolate"
+                value="Chocolate Buttercream"
             >
 
             <img
@@ -2707,14 +2759,14 @@
                 alt=""
             >
 
-            <strong>Chocolate</strong>
+            <strong>Chocolate Buttercream</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Strawberry"
+                value="Strawberry Filling"
             >
 
             <img
@@ -2723,14 +2775,14 @@
                 alt=""
             >
 
-            <strong>Strawberry</strong>
+            <strong>Strawberry Filling</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Raspberry"
+                value="Raspberry Filling"
             >
 
             <img
@@ -2739,14 +2791,14 @@
                 alt=""
             >
 
-            <strong>Raspberry</strong>
+            <strong>Raspberry Filling</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Blueberry"
+                value="Blueberry Filling"
             >
 
             <img
@@ -2755,14 +2807,14 @@
                 alt=""
             >
 
-            <strong>Blueberry</strong>
+            <strong>Blueberry Filling</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Lemon"
+                value="Lemon Filling"
             >
 
             <img
@@ -2771,14 +2823,14 @@
                 alt=""
             >
 
-            <strong>Lemon</strong>
+            <strong>Lemon Filling</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
             <input
                 type="radio"
                 name="cakeFilling"
-                value="Cookie Butter"
+                value="Cookie Butter Filling"
             >
 
             <img
@@ -2787,7 +2839,7 @@
                 alt=""
             >
 
-            <strong>Cookie Butter</strong>
+            <strong>Cookie Butter Filling</strong>
         </label>
 
         <label class="text-choice-card image-choice-card">
@@ -2795,7 +2847,7 @@
     <input
         type="radio"
         name="cakeFilling"
-        value="Whipped Cream"
+        value="Whipped Cream Filling"
     >
 
     <img
@@ -2805,9 +2857,39 @@
     >
 
     <strong>
-        Whipped Cream
+        Whipped Cream Filling   
     </strong>
+</label>
 
+<label class="text-choice-card image-choice-card">
+
+    <input
+
+        type="radio"
+
+        name="cakeFilling"
+
+        value="Chocolate Ganache"
+
+    >
+
+
+
+    <img
+
+        class="option-card-image"
+
+        src="../images/cake-builder/cards/05-fillings/TPJ-Card-Filling-Ganache.png"
+
+        alt=""
+
+    >
+
+
+
+    <strong>Chocolate Ganache</strong>
+
+</label>
 </label>
         <label class="text-choice-card custom-text-only-card">
             <input
@@ -2820,8 +2902,7 @@
             <strong>
                 Something Else
             </strong>
-        </label>
-
+        
     </div>
 
 </fieldset>
@@ -2847,7 +2928,7 @@
                         <fieldset class="builder-fieldset cake-only-inside">
 
                             <legend>
-                                Premium Layers
+                                Premiums
                             </legend>
 
                             <div class="upgrade-grid">
@@ -2896,27 +2977,25 @@
 
                                 </label>
 
-                                <label class="upgrade-card">
+                              <label class="upgrade-card">
+    <input
+        type="checkbox"
+        data-premium-filling="Fresh Fruit Topping"
+        data-price="12"
+    >
 
-                                    <input
-                                        type="checkbox"
-                                        data-premium-filling="Ganache"
-                                        data-price="12"
-                                    ><img
-    class="option-card-image"
-    src="../images/cake-builder/cards/06-premium-layers/TPJ-Card-Premium-Ganache.png"
-    alt=""
->
+    <img
+        class="option-card-image"
+        src="../images/cake-builder/cards/06-premium-layers/TPJ-Card-Premium-Fresh-Fruit-Topping.png"
+        alt=""
+    >
 
-                                    <strong>
-                                        Ganache
-                                    </strong>
+    <strong>Fresh Fruit Topping</strong>
 
-                                    <span>
-                                        +$12
-                                    </span>
+    <span>+$12</span>
+</label>
 
-                                </label>
+                               
 
                             </div>
 
@@ -2956,7 +3035,7 @@
                         <fieldset id="singleCakeColorCustomizer" class="builder-fieldset cake-only-look">
 
                             <legend>
-                                Main Buttercream Color
+                                Main Coating Color
                             </legend>
 
                             <div
@@ -2969,7 +3048,7 @@
 >
 
     <span>
-        Custom Buttercream Shade
+        Custom Coating Shade
     </span>
 
     <input
@@ -2995,7 +3074,7 @@
 >
 
     <legend>
-        Two-Tier Buttercream Colors
+        Two-Tier Coating Colors
     </legend>
 
     <p class="fieldset-description">
@@ -3054,10 +3133,11 @@
                 value="Layered Piped"
             >
 
-            <div class="style-photo-placeholder">
-                <span>Layered Piped</span>
-                <small>Exposed cake layers</small>
-            </div>
+            <img
+    class="finish-card-image"
+    src="../images/cake-builder/cards/08-finishes/TPJ-Card-Finish-Number-Letter-Layered-Piped.png"
+    alt=""
+>
 
             <strong>
                 Layered Piped
@@ -3077,10 +3157,11 @@
                 value="Fully Frosted & Piped"
             >
 
-            <div class="style-photo-placeholder">
-                <span>Fully Frosted</span>
-                <small>Smooth buttercream base</small>
-            </div>
+            <img
+    class="finish-card-image"
+    src="../images/cake-builder/cards/08-finishes/TPJ-Card-Finish-Number-Letter-Fully-Frosted-Piped.png"
+    alt=""
+>
 
             <strong>
                 Fully Frosted & Piped
@@ -3140,14 +3221,46 @@
     </div>
 
 </fieldset>              
+<fieldset
+    id="fondantCoverageCustomizer"
+    class="builder-fieldset cake-only-look"
+>
+    <legend>Cover Cake in Fondant?</legend>
 
+    <p class="fieldset-description">
+        Fondant is added over the selected coating. The coating and fondant charges stack.
+    </p>
+
+    <div class="compact-choice-row">
+        <label>
+            <input
+                type="radio"
+                name="fondantEnabled"
+                value="no"
+                checked
+            >
+            <span>No</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="fondantEnabled"
+                value="yes"
+            >
+            <span id="fondantPriceLabel">
+                Yes · priced by cake size
+            </span>
+        </label>
+    </div>
+</fieldset>
               <fieldset
     id="cakeBorderCustomizer"
     class="builder-fieldset cake-only-look"
 >
 
     <legend>
-        Buttercream Border
+        Coating Border
     </legend>
 
     <p class="fieldset-description">
@@ -3362,16 +3475,13 @@
     </div>
 
 </fieldset>
-                        <fieldset class="builder-fieldset cake-only-look">
+                        <fieldset id="cakeFinishCustomizer"
+                        class="builder-fieldset cake-only-look">
 
                             <legend>
-                                Buttercream Finish
+                                Finish
                             </legend>
 
-                            <p class="fieldset-description">
-                                The photographs are temporary placeholders.
-                                You will replace them with your own work later.
-                            </p>
 
                             <div class="style-choice-grid">
 
@@ -3497,276 +3607,240 @@
                             </div>
 
                         </fieldset>
-
-                        <fieldset
-                            id="edibleImageCustomizer"
-                            class="builder-fieldset"
-                        >
-
-                            <legend>
-                                Edible Image
-                            </legend>
-
-                            <p class="fieldset-description">
-                                Add a photo, logo, or printed design without replacing your buttercream finish or other decorations.
-                            </p>
-
-                            <label class="edible-image-toggle-card">
-
-                                <input
-                                    id="edibleImageEnabled"
-                                    type="checkbox"
-                                >
-
-                                <span>
-                                    <strong>Add an edible image</strong>
-                                    <small>Upload one JPG, PNG, or WebP image.</small>
-                                </span>
-
-                            </label>
-
-                            <div
-                                id="edibleImageControls"
-                                class="edible-image-controls is-hidden"
-                            >
-
-                                <input
-                                    id="edibleImageFile"
-                                    class="visually-hidden-file-input"
-                                    type="file"
-                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                                >
-
-                                <div class="edible-image-upload-row">
-
-                                    <div
-                                        id="edibleImageThumbnail"
-                                        class="edible-image-thumbnail"
-                                        aria-live="polite"
-                                    >
-                                        <span>No image selected</span>
-                                    </div>
-
-                                    <div class="edible-image-upload-actions">
-
-                                        <button
-                                            id="chooseEdibleImage"
-                                            class="upload-select-button"
-                                            type="button"
-                                        >
-                                            Choose Image
-                                        </button>
-
-                                        <button
-                                            id="removeEdibleImage"
-                                            class="edible-image-secondary-button"
-                                            type="button"
-                                            disabled
-                                        >
-                                            Remove Image
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                                <p
-                                    id="edibleImageError"
-                                    class="form-error-message"
-                                    aria-live="polite"
-                                ></p>
 <fieldset
-    id="edibleImagePlacementTarget"
-    class="edible-image-option-group"
+    id="edibleImageCustomizer"
+    class="builder-fieldset"
 >
-
     <legend>
-        Requested Placement
+        Edible Image
     </legend>
 
     <p class="fieldset-description">
-        Choose where you would like the edible image placed.
-        Final size and positioning will be adjusted during design review.
+        Add a photo, logo, or printed design without replacing your coating finish or other decorations.
     </p>
 
-    <div class="compact-choice-row edible-image-shape-row">
-
+    <div class="compact-choice-row">
         <label>
             <input
                 type="radio"
-                name="edibleImagePlacement"
-                value="top"
-            >
-
-            <span>
-                Center Top
-            </span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImagePlacement"
-                value="front"
+                name="edibleImageEnabled"
+                value="no"
                 checked
             >
-
-            <span>
-                Front Face
-            </span>
+            <span>No</span>
         </label>
 
+        <label>
+            <input
+                type="radio"
+                name="edibleImageEnabled"
+                value="yes"
+            >
+            <span>Yes</span>
+        </label>
     </div>
 
+    <div
+        id="edibleImageControls"
+        class="edible-image-controls is-hidden"
+    >
+        <div class="edible-image-upload-row">
+            <div class="quantity-product-info">
+                <div>
+                    <strong>
+                        How many edible images?
+                    </strong>
+
+                    <span id="edibleImagePriceNote">
+                        $15 each on cakes
+                    </span>
+                </div>
+            </div>
+
+            <div class="quantity-control">
+                <button
+                    id="decreaseEdibleImageQuantity"
+                    type="button"
+                >−</button>
+
+                <input
+                    id="edibleImageQuantity"
+                    type="number"
+                    min="1"
+                    value="1"
+                    inputmode="numeric"
+                >
+
+                <button
+                    id="increaseEdibleImageQuantity"
+                    type="button"
+                >+</button>
+            </div>
+        </div>
+
+        <p class="field-note">
+            Upload each requested image separately. You may choose different files or reuse the same file.
+        </p>
+
+        <div
+            id="edibleImageSlots"
+            aria-live="polite"
+        ></div>
+
+        <p
+            id="edibleImageError"
+            class="form-error-message"
+            aria-live="polite"
+        ></p>
+
+        <fieldset
+            id="edibleImagePlacementTarget"
+            class="edible-image-option-group"
+        >
+            <legend>
+                Requested Placement
+            </legend>
+
+            <p class="fieldset-description">
+                Choose where you would like the edible image placed. Final size and positioning will be adjusted during design review.
+            </p>
+
+            <div class="compact-choice-row edible-image-shape-row">
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImagePlacement"
+                        value="top"
+                    >
+                    <span>Center Top</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImagePlacement"
+                        value="front"
+                        checked
+                    >
+                    <span>Front Face</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset
+            id="edibleImageTierTarget"
+            class="edible-image-option-group is-hidden"
+        >
+            <legend>
+                Front-Face Tier
+            </legend>
+
+            <div class="compact-choice-row edible-image-shape-row">
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImageTier"
+                        value="top"
+                    >
+                    <span>Top Tier</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImageTier"
+                        value="bottom"
+                        checked
+                    >
+                    <span>Bottom Tier</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <p
+            id="edibleImagePlacementNote"
+            class="field-note"
+        >
+            The first uploaded image is used as the representative live preview.
+        </p>
+
+        <fieldset class="edible-image-option-group">
+            <legend>
+                Image Shape
+            </legend>
+
+            <div class="compact-choice-row edible-image-shape-row">
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImageShape"
+                        value="original"
+                        checked
+                    >
+                    <span>Original</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImageShape"
+                        value="rectangle"
+                    >
+                    <span>Rectangle</span>
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="edibleImageShape"
+                        value="circle"
+                    >
+                    <span>Circle</span>
+                </label>
+            </div>
+        </fieldset>
+    </div>
 </fieldset>
-
-
+                             
 <fieldset
-    id="edibleImageTierTarget"
-    class="edible-image-option-group is-hidden"
+    id="cakeTopperCustomizer"
+    class="builder-fieldset"
+>
+    <legend>Add a Cake Topper?</legend>
+
+    <p class="fieldset-description">
+        Available for cakes and cupcakes. The topper choice is recorded in your review and is not drawn on the live preview.
+    </p>
+
+    <div class="compact-choice-row">
+        <label>
+            <input
+                type="radio"
+                name="cakeTopperEnabled"
+                value="no"
+                checked
+            >
+            <span>No</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="cakeTopperEnabled"
+                value="yes"
+            >
+            <span>Yes</span>
+        </label>
+    </div>
+</fieldset>
+                        <fieldset
+    id="cakeDetailsCustomizer"
+    class="builder-fieldset"
 >
 
     <legend>
-        Front-Face Tier
+        Cake Details
     </legend>
-
-    <div class="compact-choice-row edible-image-shape-row">
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImageTier"
-                value="top"
-            >
-
-            <span>
-                Top Tier
-            </span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImageTier"
-                value="bottom"
-                checked
-            >
-
-            <span>
-                Bottom Tier
-            </span>
-        </label>
-
-    </div>
-
-</fieldset>
-
-
-<p
-    id="edibleImagePlacementNote"
-    class="field-note"
->
-    Your uploaded image is shown above for reference and will not
-    be placed on the live cake preview.
-</p>
-
-
-<fieldset class="edible-image-option-group">
-
-    <legend>
-        Image Shape
-    </legend>
-
-    <div class="compact-choice-row edible-image-shape-row">
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImageShape"
-                value="original"
-                checked
-            >
-
-            <span>
-                Original
-            </span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImageShape"
-                value="rectangle"
-            >
-
-            <span>
-                Rectangle
-            </span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="edibleImageShape"
-                value="circle"
-            >
-
-            <span>
-                Circle
-            </span>
-        </label>
-
-    </div>
-
-</fieldset>
-
-
-                                <fieldset class="edible-image-option-group">
-
-                                    <legend>Image Shape</legend>
-
-                                    <div class="compact-choice-row edible-image-shape-row">
-
-                                        <label>
-                                            <input type="radio" name="edibleImageShape" value="original" checked>
-                                            <span>Original</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="radio" name="edibleImageShape" value="rectangle">
-                                            <span>Rectangle</span>
-                                        </label>
-
-                                        <label>
-                                            <input type="radio" name="edibleImageShape" value="circle">
-                                            <span>Circle</span>
-                                        </label>
-
-                                    </div>
-
-                                </fieldset>
-
-
-                                <div class="edible-image-adjustments">
-
-                                    
-                                </div>
-
-                           <div class="edible-image-control-footer">
-
-</div>
-
-</div>
-
-</fieldset>     
-
-                        <div id="cupcakeOnlyStudioSlot"></div>
-
-                        <fieldset class="builder-fieldset">
-
-                            <legend>
-                                Cake Details
-                            </legend>
 
                             <div class="decoration-choice-grid">
 
@@ -3840,7 +3914,7 @@
                                     </strong>
 
                                     <small>
-                                        +$8
+                                        +$8 each
                                     </small>
 
                                 </label>
@@ -3865,7 +3939,7 @@
                                     </strong>
 
                                     <small>
-                                        +$10
+                                        +$10 each
                                     </small>
 
                                 </label>
@@ -3875,7 +3949,7 @@
                                     <input
                                         type="checkbox"
                                         data-decoration-id="goldAccentDecoration"
-                                        data-decoration-name="Gold or Silver Accents"
+                                        data-decoration-name="Gold or Silver Leaf"
                                         data-price="15"
                                     >
 
@@ -3886,7 +3960,7 @@
 >
 
                                     <strong>
-                                        Gold or Silver
+                                        Gold or Silver Leaf
                                     </strong>
 
                                     <small>
@@ -3915,7 +3989,7 @@
                                     </strong>
 
                                     <small>
-                                        +$25
+                                        +$25 each
                                     </small>
 
                                 </label>
@@ -3940,35 +4014,12 @@
                                     </strong>
 
                                     <small>
-                                        +$6
+                                        +$6 each
                                     </small>
 
                                 </label>
 
-                                <label class="decoration-choice-card">
-
-                                    <input
-                                        id="topperDecorationOption"
-                                        type="checkbox"
-                                        data-decoration-id="topperDecoration"
-                                        data-decoration-name="Cake Topper"
-                                        data-price="0"
-                                    >
-
-                                    <div class="decoration-text-only-preview">
-    Cake Topper
-</div>
-
-                                    <strong>
-                                        Cake Topper
-                                    </strong>
-
-                                    <small>
-                                        Choose below
-                                    </small>
-
-                                </label>
-
+                                
                             </div>
 
                         </fieldset>
@@ -4017,6 +4068,17 @@
         id="bowColorSwatches"
         class="color-choice-grid"
     ></div>
+   <label class="form-field">
+    <span>Ribbon / Bow Quantity</span>
+
+    <input
+        type="number"
+        min="1"
+        value="1"
+        inputmode="numeric"
+        data-decoration-quantity="ribbonDecoration"
+    >
+</label> 
 
 </div>
 
@@ -4033,6 +4095,17 @@
         id="butterflyColorSwatches"
         class="color-choice-grid"
     ></div>
+  <label class="form-field">
+    <span>Butterfly Quantity</span>
+
+    <input
+        type="number"
+        min="1"
+        value="1"
+        inputmode="numeric"
+        data-decoration-quantity="butterfliesDecoration"
+    >
+</label>  
 
 </div>
 
@@ -4074,6 +4147,17 @@
             </label>
 
         </div>
+        <label class="form-field">
+    <span>Cherry Quantity</span>
+
+    <input
+        type="number"
+        min="1"
+        value="1"
+        inputmode="numeric"
+        data-decoration-quantity="cherriesDecoration"
+    >
+</label>
     </fieldset>
 </div>
 
@@ -4427,8 +4511,7 @@
                     value="Other"
                 >
                 <strong>Other</strong>
-            </label>
-
+           </label>
         </div>
 
     </fieldset>
@@ -4444,7 +4527,17 @@
             type="text"
             placeholder="Tell me which flowers you want"
         >
-    </label>
+    </label> <label class="form-field">
+    <span>Fresh Flower Quantity</span>
+
+    <input
+        type="number"
+        min="1"
+        value="1"
+        inputmode="numeric"
+        data-decoration-quantity="flowersDecoration"
+    >
+</label>
 </div>
                         <div
                             id="flowerSourceOptions"
@@ -4602,7 +4695,91 @@
                             </p>
 
                         </div>
+<fieldset class="builder-fieldset">
+    <legend>Extras</legend>
 
+    <p class="fieldset-description">
+        Choose any quantity. The live preview shows a representative styled arrangement, not the exact count.
+    </p>
+
+    <div class="quantity-product-list">
+        <div
+            class="quantity-product"
+            data-product-name="Macarons"
+            data-unit-price="2.5"
+        >
+            <div class="quantity-product-info">
+                <img
+                    class="quantity-product-image"
+                    src="../images/cake-builder/cards/09-chocolate-treats/TPJ-Card-Treat-Macaron-Single.png"
+                    alt=""
+                >
+
+                <div>
+                    <strong>Macarons</strong>
+                    <span>$2.50 each</span>
+                </div>
+            </div>
+
+            <div class="quantity-control">
+                <button
+                    type="button"
+                    data-quantity-action="decrease"
+                >−</button>
+
+                <input
+                    type="number"
+                    min="0"
+                    value="0"
+                    inputmode="numeric"
+                >
+
+                <button
+                    type="button"
+                    data-quantity-action="increase"
+                >+</button>
+            </div>
+        </div>
+
+        <div
+            class="quantity-product"
+            data-product-name="Mini Disco Balls"
+            data-unit-price="2"
+        >
+            <div class="quantity-product-info">
+                <img
+                    class="quantity-product-image"
+                    src="../images/cake-builder/cards/11-extras/TPJ-Card-Extra-Mini-Disco-Balls.png"
+                    alt=""
+                >
+
+                <div>
+                    <strong>Mini Disco Balls</strong>
+                    <span>$2 each</span>
+                </div>
+            </div>
+
+            <div class="quantity-control">
+                <button
+                    type="button"
+                    data-quantity-action="decrease"
+                >−</button>
+
+                <input
+                    type="number"
+                    min="0"
+                    value="0"
+                    inputmode="numeric"
+                >
+
+                <button
+                    type="button"
+                    data-quantity-action="increase"
+                >+</button>
+            </div>
+        </div>
+    </div>
+</fieldset>
                         <fieldset id="gourmetCupcakeExtras" class="builder-fieldset">
 
                             <legend>
@@ -5079,7 +5256,97 @@
                         </fieldset>
 
                     </section>
+<fieldset class="builder-fieldset">
+    <legend>
+        Add Toy / Figurine Decorations?
+    </legend>
 
+    <div class="compact-choice-row">
+        <label>
+            <input
+                type="radio"
+                name="toyFigurineEnabled"
+                value="no"
+                checked
+            >
+            <span>No</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="toyFigurineEnabled"
+                value="yes"
+            >
+            <span>Yes</span>
+        </label>
+    </div>
+
+    <label
+        id="toyFigurineDetailsField"
+        class="form-field is-hidden"
+    >
+        <span>
+            What toys or figurines would you like?
+        </span>
+
+        <textarea
+            id="toyFigurineDetails"
+            rows="3"
+            placeholder="Describe the toys or figurines"
+        ></textarea>
+    </label>
+
+    <p class="field-note">
+        Quote only · price confirmed after design review and excluded from this estimate.
+    </p>
+</fieldset>
+
+<fieldset class="builder-fieldset">
+    <legend>
+        Add Custom 3D Sculpted Pieces?
+    </legend>
+
+    <div class="compact-choice-row">
+        <label>
+            <input
+                type="radio"
+                name="customSculptedEnabled"
+                value="no"
+                checked
+            >
+            <span>No</span>
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="customSculptedEnabled"
+                value="yes"
+            >
+            <span>Yes</span>
+        </label>
+    </div>
+
+    <label
+        id="customSculptedDetailsField"
+        class="form-field is-hidden"
+    >
+        <span>
+            What would you like sculpted?
+        </span>
+
+        <textarea
+            id="customSculptedDetails"
+            rows="3"
+            placeholder="Describe the custom sculpted pieces"
+        ></textarea>
+    </label>
+
+    <p class="field-note">
+        Quote only · price confirmed after design review and excluded from this estimate.
+    </p>
+</fieldset>
 
                     <!-- =============================
                          STEP 6
@@ -5668,7 +5935,20 @@
                                         <dt>Shape and Height</dt>
                                         <dd id="reviewCakeShape">Round · Standard</dd>
                                     </div>
+<div>
+    <dt>Coverage</dt>
+    <dd id="reviewCoverage">Full</dd>
+</div>
 
+<div
+    id="reviewBentoCupcakesRow"
+    class="is-hidden"
+>
+    <dt>Bento Cupcakes</dt>
+    <dd id="reviewBentoCupcakes">
+        4 cupcakes included
+    </dd>
+</div>
                                     <div>
                                         <dt>Servings</dt>
                                         <dd id="reviewServings">8–12</dd>
@@ -5725,7 +6005,15 @@
                                         <dt>Finish</dt>
                                         <dd id="reviewFinish">Not selected</dd>
                                     </div>
+<div>
+    <dt>Fondant</dt>
+    <dd id="reviewFondant">No</dd>
+</div>
 
+<div>
+    <dt>Edible Image</dt>
+    <dd id="reviewEdibleImage">None</dd>
+</div>
                                     <div>
                                         <dt>Details</dt>
                                         <dd id="reviewDecorations">None selected</dd>
@@ -6094,4 +6382,5 @@
     </div>
 
 <script src="../js/cake-builder.js?v=final-polish-1"></script>
+
 </html>
