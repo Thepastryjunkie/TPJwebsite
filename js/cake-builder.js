@@ -1401,7 +1401,7 @@ function getSurfaceUpcharge(type) {
 
 function getGanacheCoatingPrice() {
     return builderState.buttercreamStyle ===
-        "Ganache Coating"
+        "Ganache"
         ? getSurfaceUpcharge("ganache")
         : 0;
 }
@@ -2054,42 +2054,78 @@ function getNumberLetterPreviewEntries(product) {
 }
 
 
-async function loadNumberLetterStyleAssets(
-    entry
-) {
-    const styleSlug =
-        getNumberLetterStyleSlug();
+function getCoveragePreviewEntry(product) {
+    const coverage =
+        builderState.cakeCoverage;
 
     if (
-        !styleSlug ||
-        !entry.characterType ||
-        !entry.characterValue
+        coverage === "full" ||
+        !cakeSupportsCoverage(product)
     ) {
         return null;
     }
 
-    const prefix =
-        `TPJ-Number-Letter-${styleSlug}-${entry.characterType}-${entry.characterValue}`;
+    const coverageName =
+        coverage === "naked"
+            ? "Naked"
+            : "Semi-Naked";
 
-    const files = [
-        `${prefix}-Accent-1-Strokes.png`,
-        `${prefix}-Accent-1-Mask.png`,
-        `${prefix}-Accent-2-Strokes.png`,
-        `${prefix}-Accent-2-Mask.png`
-    ];
+    if (
+        builderState.cakeProductId ===
+        "heart-5-bento"
+    ) {
+        return {
+            file:
+                `TPJ-Coverage-${coverageName}-Bento-5in-Heart-4-Cupcakes.png`,
+            key: "heart5in"
+        };
+    }
 
-    const images = await Promise.all(
-        files.map(
-            (file) =>
-                loadRealisticImage(
-                    `${finalAssetRoot}/cakes/${file}?v=tpj-number-letter-styles-1`
-                )
-        )
-    );
+    if (
+        builderState.cakeProductId ===
+        "heart-5-tall"
+    ) {
+        return {
+            file:
+                `TPJ-Coverage-${coverageName}-Tall-5in-Heart.png`,
+            key: "tallHeart5in"
+        };
+    }
+
+    if (product.shape === "tier") {
+        const isTallTier =
+            builderState.cakeProductId ===
+            "tier-4-6-tall";
+
+        return {
+            file: isTallTier
+                ? `TPJ-Coverage-${coverageName}-Tall-Two-Tier-4in-6in.png`
+                : `TPJ-Coverage-${coverageName}-Two-Tier-4in-6in.png`,
+
+            key: isTallTier
+                ? "tallTier"
+                : "tier"
+        };
+    }
+
+    const shapeName = {
+        round: "Round",
+        heart: "Heart",
+        star: "Star",
+        square: "Square"
+    }[product.shape];
+
+    if (!shapeName) {
+        return null;
+    }
 
     return {
-        type: "numberLetterPiping",
-        images
+        file:
+            `TPJ-Coverage-${coverageName}-${builderState.isTall ? "Tall-" : ""}${shapeName}.png`,
+
+        key: builderState.isTall
+            ? `tall${shapeName}`
+            : product.shape
     };
 }
 function getCoveragePreviewEntry(product) {
@@ -6285,7 +6321,7 @@ function updateSurfaceOptionAvailability() {
             "full";
 
     const ganacheInput = getElement(
-        'input[name="buttercreamStyle"][value="Ganache Coating"]'
+        'input[name="buttercreamStyle"][value="Ganache"]'
     );
 
     const ganacheCard =
@@ -6306,7 +6342,7 @@ function updateSurfaceOptionAvailability() {
     if (
         !surfaceOptionsAllowed &&
         builderState.buttercreamStyle ===
-            "Ganache Coating"
+            "Ganache"
     ) {
         builderState.buttercreamStyle =
             "";
@@ -6531,7 +6567,7 @@ const cupcakeStudio =
         "#step4Description",
         isCupcakesOnly
             ? "Choose the liner, icing style, icing color, and finishing details."
-            : "Choose the color, buttercream finish, and details that fit the celebration."
+            : "Choose the color, coating finish, and details that fit the celebration."
     );
 
        setText(
@@ -7359,7 +7395,7 @@ function validateStepThree() {
 
     if (!builderState.buttercreamStyle) {
         showValidationMessage(
-            "Choose a buttercream."
+            "Choose a coating."
         );
 
         return false;
@@ -7423,7 +7459,7 @@ function validateStepFour() {
         !builderState.cakeFinish
     ) {
         showValidationMessage(
-            "Choose a buttercream finish."
+            "Choose a finish."
         );
 
         return false;
@@ -8904,7 +8940,7 @@ function populateReview() {
                 "Not selected",
 
         builderState.buttercreamStyle ===
-            "Ganache Coating"
+            "Ganache"
             ? `+${formatCurrency(
                 getGanacheCoatingPrice()
             )}`
