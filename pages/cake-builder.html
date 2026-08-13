@@ -1570,90 +1570,6 @@
 
                         </fieldset>
 
-                       <fieldset
-    id="cakeBoardCustomizer"
-    class="builder-fieldset board-customizer"
->
-
-    <legend>
-        Cake Board
-    </legend>
-
-    <label class="form-field">
-
-        <span>
-            Board Shape
-        </span>
-
-        <select id="cakeBoardStyle">
-
-            <option value="round">
-                Round
-            </option>
-
-            <option value="square">
-                Square
-            </option>
-
-            <option value="rectangleHorizontal">
-                Rectangle
-            </option>
-
-            <option
-                value="letterNumber"
-                hidden
-            >
-                Letter / Number Board
-            </option>
-
-        </select>
-
-    </label>
-
-
-    <p class="fieldset-description">
-        Board Color
-    </p>
-
-    <div
-        id="cakeBoardColorSwatches"
-        class="color-choice-grid"
-    ></div>
-
-
-    <label class="extra-layer-control">
-
-        <input
-            id="matchBoardToCakePalette"
-            type="checkbox"
-        >
-
-        <span class="toggle-track"></span>
-
-        <span class="toggle-copy">
-
-            <strong>
-                Match Drum to Cake Palette
-            </strong>
-
-            <small>
-                Custom Wrapped Drum · +$5
-            </small>
-
-        </span>
-
-    </label>
-
-
-    <p
-        id="cakeBoardNotice"
-        class="field-note"
-    >
-        Standard board colors are subject to availability.
-    </p>
-
-</fieldset>
-
                         <!-- ROUND SIZES -->
 
                         <fieldset
@@ -2368,6 +2284,84 @@
 
                         </fieldset>
 
+                        <fieldset
+                            id="cakeBoardCustomizer"
+                            class="builder-fieldset board-customizer"
+                        >
+
+                            <legend>
+                                Cake Board
+                            </legend>
+
+                            <label class="form-field">
+
+                                <span>
+                                    Board Shape
+                                </span>
+
+                                <select id="cakeBoardStyle">
+
+                                    <option value="round">
+                                        Round
+                                    </option>
+
+                                    <option value="square">
+                                        Square
+                                    </option>
+
+                                    <option value="rectangleHorizontal">
+                                        Rectangle
+                                    </option>
+
+                                    <option value="letterNumber" hidden>
+                                        Letter / Number Board
+                                    </option>
+
+                                </select>
+
+                            </label>
+
+                            <p class="fieldset-description">
+                                Board Color
+                            </p>
+
+                            <div
+                                id="cakeBoardColorSwatches"
+                                class="color-choice-grid"
+                            ></div>
+
+                            <label class="extra-layer-control">
+
+                                <input
+                                    id="matchBoardToCakePalette"
+                                    type="checkbox"
+                                >
+
+                                <span class="toggle-track"></span>
+
+                                <span class="toggle-copy">
+
+                                    <strong>
+                                        Match Drum to Cake Palette
+                                    </strong>
+
+                                    <small>
+                                        Custom Wrapped Drum · +$5
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <p
+                                id="cakeBoardNotice"
+                                class="field-note"
+                            >
+                                Standard board colors are subject to availability.
+                            </p>
+
+                        </fieldset>
+
                     </section>
 
 
@@ -2688,7 +2682,7 @@
                         <label class="form-field cake-only-inside">
 
                             <span>
-                                Coating flavor 
+                                Coating flavor (optional)
                             </span>
 
                             <input
@@ -3803,6 +3797,9 @@
         </label>
     </div>
 </fieldset>
+
+                        <div id="cupcakeOnlyStudioSlot"></div>
+
                         <fieldset
     id="cakeDetailsCustomizer"
     class="builder-fieldset"
@@ -5226,97 +5223,6 @@
                         </fieldset>
 
                     </section>
-<fieldset class="builder-fieldset">
-    <legend>
-        Add Toy / Figurine Decorations?
-    </legend>
-
-    <div class="compact-choice-row">
-        <label>
-            <input
-                type="radio"
-                name="toyFigurineEnabled"
-                value="no"
-                checked
-            >
-            <span>No</span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="toyFigurineEnabled"
-                value="yes"
-            >
-            <span>Yes</span>
-        </label>
-    </div>
-
-    <label
-        id="toyFigurineDetailsField"
-        class="form-field is-hidden"
-    >
-        <span>
-            What toys or figurines would you like?
-        </span>
-
-        <textarea
-            id="toyFigurineDetails"
-            rows="3"
-            placeholder="Describe the toys or figurines"
-        ></textarea>
-    </label>
-
-    <p class="field-note">
-        Quote only · price confirmed after design review and excluded from this estimate.
-    </p>
-</fieldset>
-
-<fieldset class="builder-fieldset">
-    <legend>
-        Add Custom 3D Sculpted Pieces?
-    </legend>
-
-    <div class="compact-choice-row">
-        <label>
-            <input
-                type="radio"
-                name="customSculptedEnabled"
-                value="no"
-                checked
-            >
-            <span>No</span>
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="customSculptedEnabled"
-                value="yes"
-            >
-            <span>Yes</span>
-        </label>
-    </div>
-
-    <label
-        id="customSculptedDetailsField"
-        class="form-field is-hidden"
-    >
-        <span>
-            What would you like sculpted?
-        </span>
-
-        <textarea
-            id="customSculptedDetails"
-            rows="3"
-            placeholder="Describe the custom sculpted pieces"
-        ></textarea>
-    </label>
-
-    <p class="field-note">
-        Quote only · price confirmed after design review and excluded from this estimate.
-    </p>
-</fieldset>
 
                     <!-- =============================
                          STEP 6
@@ -5551,6 +5457,98 @@
                             ></textarea>
 
                         </label>
+
+                        <fieldset class="builder-fieldset">
+                            <legend>
+                                Add Toy / Figurine Decorations?
+                            </legend>
+
+                            <div class="compact-choice-row">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="toyFigurineEnabled"
+                                        value="no"
+                                        checked
+                                    >
+                                    <span>No</span>
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="toyFigurineEnabled"
+                                        value="yes"
+                                    >
+                                    <span>Yes</span>
+                                </label>
+                            </div>
+
+                            <label
+                                id="toyFigurineDetailsField"
+                                class="form-field is-hidden"
+                            >
+                                <span>
+                                    What toys or figurines would you like?
+                                </span>
+
+                                <textarea
+                                    id="toyFigurineDetails"
+                                    rows="3"
+                                    placeholder="Describe the toys or figurines"
+                                ></textarea>
+                            </label>
+
+                            <p class="field-note">
+                                Quote only · price confirmed after design review and excluded from this estimate.
+                            </p>
+                        </fieldset>
+
+                        <fieldset class="builder-fieldset">
+                            <legend>
+                                Add Custom 3D Sculpted Pieces?
+                            </legend>
+
+                            <div class="compact-choice-row">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="customSculptedEnabled"
+                                        value="no"
+                                        checked
+                                    >
+                                    <span>No</span>
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="customSculptedEnabled"
+                                        value="yes"
+                                    >
+                                    <span>Yes</span>
+                                </label>
+                            </div>
+
+                            <label
+                                id="customSculptedDetailsField"
+                                class="form-field is-hidden"
+                            >
+                                <span>
+                                    What would you like sculpted?
+                                </span>
+
+                                <textarea
+                                    id="customSculptedDetails"
+                                    rows="3"
+                                    placeholder="Describe the custom sculpted pieces"
+                                ></textarea>
+                            </label>
+
+                            <p class="field-note">
+                                Quote only · price confirmed after design review and excluded from this estimate.
+                            </p>
+                        </fieldset>
 
                         <fieldset class="builder-fieldset">
 
@@ -6047,6 +6045,11 @@
                                     </div>
 
                                     <div>
+                                        <dt>Quote-Only Details</dt>
+                                        <dd id="reviewQuoteOnlyDetails">None</dd>
+                                    </div>
+
+                                    <div>
                                         <dt>Customer</dt>
                                         <dd id="reviewCustomerName">Not entered</dd>
                                     </div>
@@ -6351,7 +6354,7 @@
 
     </div>
 
-<script src="../js/cake-builder.js?v=final-polish-1"></script>
+<script src="../js/cake-builder.js?v=tpj-complete-fix-20260812"></script>
 
 </body>
 </html>

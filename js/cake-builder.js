@@ -357,7 +357,7 @@ const builderState = {
     customFilling: "",
     premiumFillings: [],
 
- mainCakeColor: "#FFF1DC",
+mainCakeColor: "original",
 customMainColor: "#F7B6D2",
 mainCakeUsesCustomShade: false,
 
@@ -376,11 +376,11 @@ finishAccentTwo: "#D9C2F0",
 cakeFinish: "",
 cakeCoverage: "full",
 
-tierTopColor: "#FFF1DC",
-tierBottomColor: "#FFF1DC",
+tierTopColor: "original",
+tierBottomColor: "original",
 
-characterOneColor: "#FFF1DC",
-characterTwoColor: "#FFF1DC",
+characterOneColor: "original",
+characterTwoColor: "original",
 
 cakeBoardStyle: "round",
 cakeBoardColor: "#FFFFFF",
@@ -389,7 +389,7 @@ matchBoardToCakePalette: false,
 cupcakeLinerStyle: "paper",
 cupcakeFrostingStyle: "",
 cupcakeLinerColor: "#FFFFFF",
-cupcakeFrostingColor: "#FFF1DC",
+cupcakeFrostingColor: "original",
 cupcakeFrostingUsesCustomShade: false,
 customCupcakeFrostingColor: "#F7B6D2",
 
@@ -591,6 +591,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
+const cakeAssetVersion = "?v=tpj-complete-fix-20260812";
 
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
@@ -1171,6 +1172,36 @@ function mixHexColor(
             (target.blue - source.blue) *
                 safeAmount
     );
+}
+
+
+function getDisplayColorName(color) {
+    if (!color || color === "original") {
+        return "Natural / Original";
+    }
+
+    const knownColors = [
+        ...curatedButtercreamPalette,
+        ...boardPalette,
+        ...Object.values(
+            cupcakeLinerPalettes
+        ).flat()
+    ];
+
+    return (
+        knownColors.find(
+            (option) =>
+                option.value.toUpperCase() ===
+                String(color).toUpperCase()
+        )?.name || color
+    );
+}
+
+
+function getRenderableCakeColor(color) {
+    return !color || color === "original"
+        ? "#FFF1DC"
+        : normalizeHexColor(color);
 }
 
 
@@ -1834,31 +1865,20 @@ detailContext.globalCompositeOperation =
     or overpowering the selected color.
 */
 
-layerContext.globalCompositeOperation =
-    "soft-light";
-
-layerContext.globalAlpha =
-    isHeartSimpleTextureAsset
-        ? 0.45
-        : isSimpleTextureAsset
-        ? 0.82
-        : 0.65;
-
-layerContext.drawImage(
-    detailLayer,
-    0,
-    0,
-    layer.width,
-    layer.height
-);
-
+/*
+    Keep only a light multiply detail pass.
+    The former soft-light pass laid a pale,
+    translucent cast over selected colors.
+*/
 layerContext.globalCompositeOperation =
     "multiply";
 
 layerContext.globalAlpha =
     isHeartSimpleTextureAsset
-        ? 0.05
-        : 0.12;
+        ? 0.09
+        : isSimpleTextureAsset
+            ? 0.18
+            : 0.12;
 
 layerContext.drawImage(
     detailLayer,
@@ -2054,80 +2074,45 @@ function getNumberLetterPreviewEntries(product) {
 }
 
 
-function getCoveragePreviewEntry(product) {
-    const coverage =
-        builderState.cakeCoverage;
+async function loadNumberLetterStyleAssets(
+    entry
+) {
+    const styleSlug =
+        getNumberLetterStyleSlug();
 
     if (
-        coverage === "full" ||
-        !cakeSupportsCoverage(product)
+        !styleSlug ||
+        !entry.characterType ||
+        !entry.characterValue
     ) {
         return null;
     }
 
-    const coverageName =
-        coverage === "naked"
-            ? "Naked"
-            : "Semi-Naked";
+    const prefix =
+        `TPJ-Number-Letter-${styleSlug}-${entry.characterType}-${entry.characterValue}`;
 
-    if (
-        builderState.cakeProductId ===
-        "heart-5-bento"
-    ) {
-        return {
-            file:
-                `TPJ-Coverage-${coverageName}-Bento-5in-Heart-4-Cupcakes.png`,
-            key: "heart5in"
-        };
-    }
+    const files = [
+        `${prefix}-Accent-1-Strokes.png`,
+        `${prefix}-Accent-1-Mask.png`,
+        `${prefix}-Accent-2-Strokes.png`,
+        `${prefix}-Accent-2-Mask.png`
+    ];
 
-    if (
-        builderState.cakeProductId ===
-        "heart-5-tall"
-    ) {
-        return {
-            file:
-                `TPJ-Coverage-${coverageName}-Tall-5in-Heart.png`,
-            key: "tallHeart5in"
-        };
-    }
-
-    if (product.shape === "tier") {
-        const isTallTier =
-            builderState.cakeProductId ===
-            "tier-4-6-tall";
-
-        return {
-            file: isTallTier
-                ? `TPJ-Coverage-${coverageName}-Tall-Two-Tier-4in-6in.png`
-                : `TPJ-Coverage-${coverageName}-Two-Tier-4in-6in.png`,
-
-            key: isTallTier
-                ? "tallTier"
-                : "tier"
-        };
-    }
-
-    const shapeName = {
-        round: "Round",
-        heart: "Heart",
-        star: "Star",
-        square: "Square"
-    }[product.shape];
-
-    if (!shapeName) {
-        return null;
-    }
+    const images = await Promise.all(
+        files.map(
+            (file) =>
+                loadRealisticImage(
+                    `${finalAssetRoot}/cakes/${file}?v=tpj-number-letter-styles-1`
+                )
+        )
+    );
 
     return {
-        file:
-            `TPJ-Coverage-${coverageName}-${builderState.isTall ? "Tall-" : ""}${shapeName}.png`,
-
-        key: builderState.isTall
-            ? `tall${shapeName}`
-            : product.shape
+        type: "numberLetterPiping",
+        images
     };
 }
+
 function getCoveragePreviewEntry(product) {
     const coverage =
         builderState.cakeCoverage;
@@ -2533,71 +2518,6 @@ function getBentoCakeMask(image) {
 
     return maskCanvas;
 }
-function drawBentoColorPreview(context, image, canvas) {
-    if (builderState.mainCakeColor !== "original") {
-        context.save();
-        context.beginPath();
-
-        context.moveTo(451, 521);
-
-        context.bezierCurveTo(
-            410, 500,
-            377, 481,
-            334, 483
-        );
-
-        context.bezierCurveTo(
-            268, 486,
-            219, 523,
-            218, 583
-        );
-
-        context.lineTo(218, 720);
-
-        context.bezierCurveTo(
-            218, 789,
-            289, 843,
-            392, 870
-        );
-
-        context.bezierCurveTo(
-            500, 844,
-            636, 791,
-            636, 715
-        );
-
-        context.lineTo(636, 587);
-
-        context.bezierCurveTo(
-            635, 525,
-            592, 503,
-            547, 505
-        );
-
-        context.bezierCurveTo(
-            507, 505,
-            482, 527,
-            451, 521
-        );
-
-        context.closePath();
-        context.clip();
-
-        drawRecoloredAsset(
-            context,
-            image,
-            builderState.cakeCoverage === "full"
-    ? image
-    : getCoverageButtercreamMask(image),
-            builderState.mainCakeColor,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        context.restore();
-    }
 
 function getBentoTransformMap(
     image,
@@ -2788,7 +2708,12 @@ function drawBentoColorPreview(
         drawRecoloredAsset(
             context,
             image,
-            image,
+            builderState.cakeCoverage ===
+                "full"
+                ? image
+                : getCoverageButtercreamMask(
+                    image
+                ),
             builderState.mainCakeColor,
             transform.x,
             transform.y,
@@ -2853,7 +2778,6 @@ function drawBentoColorPreview(
     }
 }
 
-}
 function drawTwoTierColors(
     context,
     image,
@@ -3725,10 +3649,6 @@ function getBorderDrawBox(
     ) {
         scaleY = 0.90;
         offsetY = height * 0.10;
-    } else if (
-        source.includes("-Round-")
-    ) {
-        scaleX = 0.94;
     }
 
     const adjustedWidth =
@@ -4719,14 +4639,24 @@ function drawVintageFinishLayer(
     const drawCentered = (
         scaleX,
         clipTopRatio = 0,
-        clipBottomRatio = 1
+        clipBottomRatio = 1,
+        scaleY = 1,
+        verticalAnchor = 0.5
     ) => {
         const adjustedWidth =
             width * scaleX;
 
+        const adjustedHeight =
+            height * scaleY;
+
         const adjustedX =
             x +
             (width - adjustedWidth) / 2;
+
+        const adjustedY =
+            y +
+            (height - adjustedHeight) *
+                verticalAnchor;
 
         context.save();
         context.beginPath();
@@ -4747,19 +4677,100 @@ function drawVintageFinishLayer(
         context.drawImage(
             layer,
             adjustedX,
-            y,
+            adjustedY,
             adjustedWidth,
-            height
+            adjustedHeight
         );
 
         context.restore();
+    };
+
+    const drawCroppedBand = (
+        sourceTopRatio,
+        sourceBottomRatio,
+        scaleX,
+        scaleY
+    ) => {
+        const sourceWidth =
+            layer.width || width;
+        const sourceHeight =
+            layer.height || height;
+        const sourceY =
+            sourceHeight * sourceTopRatio;
+        const sourceBandHeight =
+            sourceHeight *
+            (sourceBottomRatio - sourceTopRatio);
+        const destinationWidth =
+            width * scaleX;
+        const destinationBandHeight =
+            height *
+            (sourceBottomRatio - sourceTopRatio) *
+            scaleY;
+        const destinationX =
+            x + (width - destinationWidth) / 2;
+        const originalBandY =
+            y + height * sourceTopRatio;
+        const destinationY =
+            originalBandY +
+            (
+                height *
+                    (sourceBottomRatio - sourceTopRatio) -
+                destinationBandHeight
+            ) / 2;
+
+        context.drawImage(
+            layer,
+            0,
+            sourceY,
+            sourceWidth,
+            sourceBandHeight,
+            destinationX,
+            destinationY,
+            destinationWidth,
+            destinationBandHeight
+        );
     };
 
     if (
         source.includes("-Tall-Round-") &&
         builderState.cakeCoverage === "full"
     ) {
-        drawCentered(0.94);
+        /*
+            Accent 1 contains the pink ring/border
+            piping. Narrow that layer only. Accent 2
+            contains the registered swag rows and
+            must stay at the supplied size.
+        */
+        if (source.includes("-Accent-1-")) {
+            drawCroppedBand(
+                0,
+                0.28,
+                0.88,
+                0.75
+            );
+
+            drawCentered(
+                1,
+                0.3,
+                0.75
+            );
+
+            drawCroppedBand(
+                0.75,
+                1,
+                0.88,
+                0.75
+            );
+        } else {
+            context.drawImage(
+                layer,
+                x,
+                y,
+                width,
+                height
+            );
+        }
+
         return;
     }
 
@@ -4930,13 +4941,10 @@ function drawRealisticCakeFinish(
             finishAssets.type ===
             "vintagePiping"
         ) {
-            const source =
-                accentOneStrokes.src || "";
-
             drawVintageFinishLayer(
                 context,
                 accentOneLayer,
-                source,
+                accentOneStrokes.src || "",
                 x,
                 y,
                 width,
@@ -4946,7 +4954,7 @@ function drawRealisticCakeFinish(
             drawVintageFinishLayer(
                 context,
                 accentTwoLayer,
-                source,
+                accentTwoStrokes.src || "",
                 x,
                 y,
                 width,
@@ -4988,10 +4996,8 @@ function getEffectiveBoardColor() {
     if (
         product.shape === "tier"
     ) {
-        return (
-            builderState
-                .tierBottomColor ||
-            "#FFF1DC"
+        return getRenderableCakeColor(
+            builderState.tierBottomColor
         );
     }
 
@@ -4999,16 +5005,13 @@ function getEffectiveBoardColor() {
         product.shape ===
         "numberLetter"
     ) {
-        return (
-            builderState
-                .characterOneColor ||
-            "#FFF1DC"
+        return getRenderableCakeColor(
+            builderState.characterOneColor
         );
     }
 
-    return (
-        builderState.mainCakeColor ||
-        "#FFF1DC"
+    return getRenderableCakeColor(
+        builderState.mainCakeColor
     );
 }
 async function updateRealisticCakePreview() {
@@ -5044,7 +5047,7 @@ async function updateRealisticCakePreview() {
 
     const cakeUrls = previewEntries.map(
         (entry) =>
-            `${finalAssetRoot}/cakes/${entry.file}`
+            `${finalAssetRoot}/cakes/${entry.file}${cakeAssetVersion}`
     );
 
     try {
@@ -5388,7 +5391,7 @@ if (isCoveragePreview) {
 
         drawRecoloredAsset(
             context,
-            coverageMask,
+            cakeImage,
             coverageMask,
             selectedCakeColor,
             x,
@@ -5820,7 +5823,7 @@ function updateCupcakePreview() {
         getSelectedCakeProduct().shape === "cupcakes"
             ? `${getDisplayCakeName()} · preview applies to every cupcake`
             : builderState.cakeProductId === "heart-5-bento"
-            ? "Bento box · preview applies to all four included cupcakes"
+            ? `Bento box · preview applies to all ${builderState.bentoCupcakeCount} included cupcakes`
             : selectedSet
             ? `${selectedSet.name} · preview applies to every cupcake`
             : "Select a 4-, 8-, or 12-count set above."
@@ -5840,7 +5843,7 @@ function updateRendererColors() {
         return;
     }
 
-    const mainColor = normalizeHexColor(
+    const mainColor = getRenderableCakeColor(
         builderState.mainCakeColor
     );
 
@@ -6042,7 +6045,7 @@ function updateCakeHeight() {
 
         if (isBento) {
             bentoLayerNotice.textContent =
-                'The 5" Sweetheart Bento Box includes a one-layer heart cake and cupcakes.';
+                `The 5" Sweetheart Bento Box includes a one-layer heart cake and ${builderState.bentoCupcakeCount} cupcakes.`;
         }
 
         if (isTallFive) {
@@ -6575,7 +6578,7 @@ const cupcakeStudio =
         isCupcakesOnly
             ? `These choices apply to all ${product.cupcakeCount} cupcakes in this order.`
             : isBento
-            ? "These choices apply to all four cupcakes included in the bento box."
+            ? `These choices apply to all ${builderState.bentoCupcakeCount} cupcakes included in the bento box.`
             : "These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above."
     );
 
@@ -7523,32 +7526,6 @@ function validateStepFour() {
     return true;
 }
 function validateStepFive() {
-    if (
-        builderState.toyFigurineEnabled &&
-        !builderState
-            .toyFigurineDetails
-            .trim()
-    ) {
-        showValidationMessage(
-            "Describe the toys or figurines you would like."
-        );
-
-        return false;
-    }
-
-    if (
-        builderState.sculptedPiecesEnabled &&
-        !builderState
-            .sculptedPiecesDetails
-            .trim()
-    ) {
-        showValidationMessage(
-            "Describe what you would like sculpted."
-        );
-
-        return false;
-    }
-
     return true;
 }
 function validateStepSix() {
@@ -7574,6 +7551,28 @@ function validateStepSix() {
 
 
 function validateStepSeven() {
+    if (
+        builderState.toyFigurineEnabled &&
+        !builderState.toyFigurineDetails.trim()
+    ) {
+        showValidationMessage(
+            "Describe the toys or figurines you would like."
+        );
+
+        return false;
+    }
+
+    if (
+        builderState.sculptedPiecesEnabled &&
+        !builderState.sculptedPiecesDetails.trim()
+    ) {
+        showValidationMessage(
+            "Describe what you would like sculpted."
+        );
+
+        return false;
+    }
+
     if (!builderState.customerName.trim()) {
         showValidationMessage(
             "Enter your first and last name."
@@ -7684,7 +7683,7 @@ function validateCurrentStep() {
             return validateStepFour();
 
         case 5:
-    return validateStepFive();
+            return validateStepFive();
 
         case 6:
             return validateStepSix();
@@ -8786,21 +8785,30 @@ function getExtrasSummary() {
         }
     );
 
+    return extras.length
+        ? extras.join(", ")
+        : "No extras selected.";
+}
+
+
+function getQuoteOnlyDetailsSummary() {
+    const details = [];
+
     if (builderState.toyFigurineEnabled) {
-        extras.push(
+        details.push(
             `Toy / Figurine Decorations · ${builderState.toyFigurineDetails.trim()} (quote after design review · excluded from estimate)`
         );
     }
 
     if (builderState.sculptedPiecesEnabled) {
-        extras.push(
+        details.push(
             `Custom 3D Sculpted Pieces · ${builderState.sculptedPiecesDetails.trim()} (quote after design review · excluded from estimate)`
         );
     }
 
-    return extras.length
-        ? extras.join(", ")
-        : "No extras selected.";
+    return details.length
+        ? details.join(", ")
+        : "None";
 }
 
 
@@ -8970,7 +8978,7 @@ function populateReview() {
             ? builderState.premiumFillings
                   .map(
                       (filling) =>
-                          filling.name
+                          `${filling.name} (+${formatCurrency(filling.price)})`
                   )
                   .join(", ")
             : "None"
@@ -8979,14 +8987,14 @@ function populateReview() {
     setText(
         "#reviewColors",
         isCupcakesOnlyProduct()
-            ? `${builderState.cupcakeLinerColor} liner · ${builderState.cupcakeFrostingColor} icing`
+            ? `${getDisplayColorName(builderState.cupcakeLinerColor)} liner · ${getDisplayColorName(builderState.cupcakeFrostingColor)} icing`
             : product.shape === "tier"
-            ? `${builderState.tierTopColor} top tier · ${builderState.tierBottomColor} bottom tier`
+            ? `${getDisplayColorName(builderState.tierTopColor)} top tier · ${getDisplayColorName(builderState.tierBottomColor)} bottom tier`
             : product.shape === "numberLetter"
             ? product.characterCount === 2
-                ? `${builderState.characterOneColor} first character · ${builderState.characterTwoColor} second character`
-                : `${builderState.characterOneColor} character color`
-            : `${builderState.mainCakeColor} main · ${builderState.accentColor} accent`
+                ? `${getDisplayColorName(builderState.characterOneColor)} first character · ${getDisplayColorName(builderState.characterTwoColor)} second character`
+                : `${getDisplayColorName(builderState.characterOneColor)} character color`
+            : `${getDisplayColorName(builderState.mainCakeColor)} main · ${getDisplayColorName(builderState.accentColor)} accent`
     );
 
       setText(
@@ -9092,6 +9100,11 @@ function populateReview() {
     setText(
         "#reviewExtras",
         getExtrasSummary()
+    );
+
+    setText(
+        "#reviewQuoteOnlyDetails",
+        getQuoteOnlyDetailsSummary()
     );
 
     setText(
@@ -9602,6 +9615,7 @@ getElements(
                 input.value;
 
             updateSelectedCardStates();
+            renderCakePreview();
         }
     );
 });
