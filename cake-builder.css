@@ -4924,3 +4924,112 @@ fieldset {
         );
     }
 }
+
+/* =========================================
+   MACARON + DISCO BALL DETAIL CARDS
+========================================= */
+
+/* Keep all Cake Detail cards in three matching columns. */
+#cakeDetailsCustomizer .decoration-choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.macaron-disco-card-group {
+    display: contents;
+}
+
+/* Override the long quantity-row layout only for these two cards. */
+.quantity-decoration-card {
+    min-width: 0;
+    min-height: 0;
+    padding: 9px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 5px;
+
+    border-radius: 16px;
+}
+
+.quantity-card-image-shell {
+    position: relative;
+    width: 100%;
+}
+
+.quantity-decoration-card .decoration-card-image {
+    margin-bottom: 4px;
+}
+
+/* Keep the counter on the image so the cards remain matching heights. */
+.quantity-decoration-card .quantity-card-control {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    z-index: 1;
+
+    width: auto;
+    padding: 3px;
+
+    grid-template-columns: 26px 34px 26px;
+
+    border: 1px solid rgba(90, 42, 30, 0.24);
+    border-radius: 999px;
+
+    background: rgba(255, 248, 242, 0.96);
+
+    transform: translateX(-50%);
+}
+
+.quantity-decoration-card .quantity-card-control button {
+    width: 26px;
+    height: 26px;
+
+    border-width: 1px;
+
+    font-size: 14px;
+}
+
+/* Make these number fields visible despite the shared hidden-input rule. */
+.quantity-decoration-card .quantity-card-control input {
+    position: static;
+
+    width: 34px;
+    height: 26px;
+
+    opacity: 1;
+    pointer-events: auto;
+
+    font-size: 11px;
+}
+
+.quantity-decoration-card > strong {
+    margin-top: auto;
+}
+
+@media (max-width: 720px) {
+    .quantity-decoration-card {
+        padding: 6px;
+        gap: 4px;
+        border-radius: 13px;
+    }
+
+    .quantity-decoration-card .quantity-card-control {
+        bottom: 6px;
+        padding: 2px;
+        grid-template-columns: 22px 28px 22px;
+    }
+
+    .quantity-decoration-card .quantity-card-control button {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+
+    .quantity-decoration-card .quantity-card-control input {
+        width: 28px;
+        height: 22px;
+        font-size: 9px;
+    }
+}

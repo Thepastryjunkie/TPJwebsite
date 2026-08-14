@@ -21,7 +21,7 @@
 
     <link
         rel="stylesheet"
-        href="../cake-builder.css?v=final-polish-1"
+        href="../cake-builder.css?v=tpj-detail-cards-borders-20260814-1"
     >
 </head>
 
@@ -3964,93 +3964,96 @@
                                     </small>
 
                                 </label>
+                            
+                             <label class="decoration-choice-card">
 
-                                
-                            </div>
+    <input
+        type="checkbox"
+        data-decoration-id="macaronsDecoration"
+        data-decoration-name="Macarons"
+        data-price="2.5"
+    >
 
-                            <div
-                                id="macaronDiscoCustomizer"
-                                class="quantity-product-list"
-                            >
-                                <div
-                                    class="quantity-product"
-                                    data-product-name="Macarons"
-                                    data-unit-price="2.5"
-                                >
-                                    <div class="quantity-product-info">
-                                        <img
-                                            class="quantity-product-image"
-                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
-                                            alt=""
-                                        >
+    <img
+        class="decoration-card-image"
+        src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
+        alt=""
+    >
 
-                                        <div>
-                                            <strong>Macarons</strong>
-                                            <span>$2.50 each</span>
-                                        </div>
-                                    </div>
+    <strong>
+        Macarons
+    </strong>
 
-                                    <div class="quantity-control">
-                                        <button
-                                            type="button"
-                                            data-quantity-action="decrease"
-                                        >−</button>
+    <small>
+        +$2.50 each
+    </small>
 
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value="0"
-                                            inputmode="numeric"
-                                        >
+</label>
+ <label class="decoration-choice-card">
 
-                                        <button
-                                            type="button"
-                                            data-quantity-action="increase"
-                                        >+</button>
-                                    </div>
-                                </div>
+    <input
+        type="checkbox"
+        data-decoration-id="discoBallsDecoration"
+        data-decoration-name="Mini Disco Balls"
+        data-price="2"
+    >
 
-                                <div
-                                    class="quantity-product"
-                                    data-product-name="Mini Disco Balls"
-                                    data-unit-price="2"
-                                >
-                                    <div class="quantity-product-info">
-                                        <img
-                                            class="quantity-product-image"
-                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
-                                            alt=""
-                                        >
+    <img
+        class="decoration-card-image"
+        src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
+        alt=""
+    >
 
-                                        <div>
-                                            <strong>Mini Disco Balls</strong>
-                                            <span>$2 each</span>
-                                        </div>
-                                    </div>
+    <strong>
+        Mini Disco Balls
+    </strong>
 
-                                    <div class="quantity-control">
-                                        <button
-                                            type="button"
-                                            data-quantity-action="decrease"
-                                        >−</button>
+    <small>
+        +$2 each
+    </small>
 
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value="0"
-                                            inputmode="numeric"
-                                        >
-
-                                        <button
-                                            type="button"
-                                            data-quantity-action="increase"
-                                        >+</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </fieldset>
+</label> 
+</div>
+</fieldset>
+                            
 <!-- EXTRA DETAIL OPTIONS -->
+ <div
+    id="macaronsDetailOptions"
+    class="conditional-section is-hidden"
+>
+
+    <label class="form-field">
+        <span>Macaron Quantity</span>
+
+        <input
+            type="number"
+            min="1"
+            value="1"
+            inputmode="numeric"
+            data-decoration-quantity="macaronsDecoration"
+        >
+    </label>
+
+</div>
+<div
+    id="discoBallsDetailOptions"
+    class="conditional-section is-hidden"
+>
+
+    <label class="form-field">
+        <span>Mini Disco Ball Quantity</span>
+
+        <input
+            type="number"
+            min="1"
+            value="1"
+            inputmode="numeric"
+            data-decoration-quantity="discoBallsDecoration"
+        >
+    </label>
+
+</div>
+
 <div
     id="metallicLeafDetailOptions"
     class="conditional-section is-hidden"
@@ -6315,7 +6318,7 @@
 
     </div>
 
-<script src="../js/cake-builder.js?v=tpj-only-three-fixes-20260813-2"></script>
+<script src="../js/cake-builder.js?v=tpj-detail-cards-borders-20260814-1"></script>
 
 </body>
 </html>

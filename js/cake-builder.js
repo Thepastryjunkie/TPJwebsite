@@ -399,7 +399,9 @@ decorationQuantities: {
     ribbonDecoration: 1,
     butterfliesDecoration: 1,
     flowersDecoration: 1,
-    cherriesDecoration: 1
+    cherriesDecoration: 1,
+    macaronsDecoration: 1,
+    discoBallsDecoration: 1
 },
 flowerSource: "",
 
@@ -1714,6 +1716,15 @@ const dripTintLayerCache =
 
 let realisticRenderVersion = 0;
 
+const cakePreviewDetailStrength = {
+    smoothCake: 0.10,
+    simpleHeart: 0.12,
+    simpleOther: 0.22,
+    dimensionalFinish: 0.16,
+    border: 0.18,
+    other: 0.07
+};
+
 function loadRealisticImage(url) {
     if (!realisticImageCache.has(url)) {
         realisticImageCache.set(
@@ -1829,14 +1840,27 @@ function makeTintedLayer(
     );
 
 
-    const isSimpleTextureAsset =
-    image.src.includes(
-        "Simple-Texture-Horizontal-Comb"
-    );
+       const source = image.src || "";
 
-const isHeartSimpleTextureAsset =
-    isSimpleTextureAsset &&
-    image.src.includes("-Heart");
+    const isSimpleTextureAsset =
+        source.includes(
+            "Simple-Texture-Horizontal-Comb"
+        );
+
+    const isHeartSimpleTextureAsset =
+        isSimpleTextureAsset &&
+        source.includes("-Heart");
+
+    const isBorderAsset =
+        source.includes("/borders/");
+
+    const isDimensionalFinishAsset =
+        source.includes("TPJ-Finish-") &&
+        !isSimpleTextureAsset;
+
+    const isSmoothCakeAsset =
+        source.includes("/cakes/") &&
+        !source.includes("TPJ-Finish-");
 
 
     /*
@@ -1910,11 +1934,17 @@ layerContext.globalCompositeOperation =
     "multiply";
 
 layerContext.globalAlpha =
-    isHeartSimpleTextureAsset
-        ? 0.09
-        : isSimpleTextureAsset
-            ? 0.18
-            : 0.07;
+    isBorderAsset
+        ? cakePreviewDetailStrength.border
+        : isDimensionalFinishAsset
+            ? cakePreviewDetailStrength.dimensionalFinish
+            : isHeartSimpleTextureAsset
+                ? cakePreviewDetailStrength.simpleHeart
+                : isSimpleTextureAsset
+                    ? cakePreviewDetailStrength.simpleOther
+                    : isSmoothCakeAsset
+                        ? cakePreviewDetailStrength.smoothCake
+                        : cakePreviewDetailStrength.other;
 
 layerContext.drawImage(
     detailLayer,
@@ -3663,11 +3693,6 @@ function getBorderDrawBox(
     let scaleY = 1;
     let offsetY = 0;
 
-    /*
-        Square and regular Two-Tier are
-        intentionally left untouched.
-    */
-
     if (
         source.includes(
             "-Tall-5in-Heart-Bottom-"
@@ -3675,26 +3700,39 @@ function getBorderDrawBox(
     ) {
         scaleX = 0.94;
     } else if (
+        source.includes(
+            "-Tall-Heart-Top-"
+        )
+    ) {
+        scaleX = 1.10;
+    } else if (
         source.includes("-Heart-Top-") &&
         !source.includes("-5in-Heart-") &&
         !source.includes("-Bento-")
     ) {
         scaleX = 1.04;
     } else if (
-        source.includes("-Tall-Star-")
+        source.includes(
+            "-Tall-Star-Top-"
+        )
+    ) {
+        scaleX = 1.08;
+    } else if (
+        source.includes(
+            "-Tall-Star-Bottom-"
+        )
     ) {
         scaleX = 0.97;
     } else if (
         source.includes("-Star-Bottom-")
     ) {
-        scaleX = 0.94;
+        scaleX = 0.89;
     } else if (
         source.includes(
             "-Full-Sheet-Bottom-"
         )
     ) {
-        scaleY = 0.90;
-        offsetY = height * 0.10;
+        offsetY = height * 0.044;
     }
 
     const adjustedWidth =
@@ -3723,12 +3761,12 @@ function drawRegisteredBorderLayer(
     source,
     drawBox
 ) {
-    const isTallTierTop =
+        const isTwoTierTop =
         source.includes(
-            "-Tall-Two-Tier-Top-"
+            "-Two-Tier-Top-"
         );
 
-    if (!isTallTierTop) {
+    if (!isTwoTierTop) {
         context.drawImage(
             layer,
             drawBox.x,
@@ -3925,7 +3963,7 @@ const realisticExtraNameMap = {
     macaronsDecoration:
         "Macarons",
 
-    miniDiscoBallsDecoration:
+    discoBallsDecoration:
         "Mini-Disco-Balls"
 };
 
@@ -3945,48 +3983,19 @@ function getNumberLetterExtraSlug(entry) {
     )}`;
 }
 function getSelectedRealisticExtraIds() {
-    const selectedIds =
-        builderState.decorations
-            .map(
-                (decoration) =>
-                    decoration.id
-            )
-            .filter(
-                (id) =>
-                    Boolean(
-                        realisticExtraNameMap[
-                            id
-                        ]
-                    )
-            );
-
-    if (
-        builderState.quantityExtras.some(
-            (extra) =>
-                extra.name ===
-                    "Macarons" &&
-                extra.quantity > 0
+    return builderState.decorations
+        .map(
+            (decoration) =>
+                decoration.id
         )
-    ) {
-        selectedIds.push(
-            "macaronsDecoration"
+        .filter(
+            (id) =>
+                Boolean(
+                    realisticExtraNameMap[
+                        id
+                    ]
+                )
         );
-    }
-
-    if (
-        builderState.quantityExtras.some(
-            (extra) =>
-                extra.name ===
-                    "Mini Disco Balls" &&
-                extra.quantity > 0
-        )
-    ) {
-        selectedIds.push(
-            "miniDiscoBallsDecoration"
-        );
-    }
-
-    return selectedIds;
 }
 
 async function loadOptionalRealisticImage(url) {
@@ -6405,7 +6414,26 @@ function updateSelectedCardStates() {
             input.checked
         );
     });
-}
+
+    getElements(
+        ".quantity-decoration-card"
+    ).forEach((card) => {
+        const quantity = Math.max(
+            0,
+            Number.parseInt(
+                card.querySelector(
+                    'input[type="number"]'
+                )?.value || "0",
+                10
+            ) || 0
+        );
+
+        card.classList.toggle(
+            "is-selected",
+            quantity > 0
+        );
+    });
+}        
 
 
 /* =========================================
@@ -6604,8 +6632,7 @@ function updateCoverageDesignAvailability() {
     [
         "#edibleImageCustomizer",
         "#cakeTopperCustomizer",
-        "#cakeDetailsCustomizer",
-        "#macaronDiscoCustomizer"
+        "#cakeDetailsCustomizer"
     ].forEach((selector) => {
         getElement(selector)?.classList.toggle(
             "is-hidden",
@@ -6663,12 +6690,6 @@ function updateCoverageDesignAvailability() {
     builderState.topperPrice = 0;
     builderState.decorations = [];
 
-    builderState.quantityExtras =
-        builderState.quantityExtras.filter(
-            (extra) =>
-                extra.name !== "Macarons" &&
-                extra.name !== "Mini Disco Balls"
-        );
 
     [
         "#fondantEnabledToggle",
@@ -6687,27 +6708,23 @@ function updateCoverageDesignAvailability() {
     ).forEach((input) => {
         input.checked = false;
     });
-
-    getElements(
-        '#macaronDiscoCustomizer input[type="number"]'
-    ).forEach((input) => {
-        input.value = "0";
-    });
-
-    [
-        "#finishColorCustomizer",
-        "#topperTypeOptions",
-        "#metallicLeafDetailOptions",
-        "#bowDetailOptions",
-        "#butterflyDetailOptions",
-        "#cherryDetailOptions",
-        "#dripDetailOptions",
-        "#pearlDetailOptions",
-        "#flowerDetailOptions",
-        "#flowerSourceOptions",
-        "#toyFigurineDetailsField",
-        "#customSculptedDetailsField"
-    ].forEach((selector) => {
+[
+    "#finishColorCustomizer",
+    "#topperTypeOptions",
+    "#metallicLeafDetailOptions",
+    "#bowDetailOptions",
+    "#butterflyDetailOptions",
+    "#cherryDetailOptions",
+    "#dripDetailOptions",
+    "#pearlDetailOptions",
+    "#flowerDetailOptions",
+    "#macaronsDetailOptions",
+    "#discoBallsDetailOptions",
+    "#flowerSourceOptions",
+    "#toyFigurineDetailsField",
+    "#customSculptedDetailsField"
+]
+    .forEach((selector) => {
         getElement(selector)?.classList.add(
             "is-hidden"
         );
@@ -8465,13 +8482,30 @@ function updateExtraDetailControlsVisibility() {
     );
 
     getElement(
-        "#flowerDetailOptions"
-    )?.classList.toggle(
-        "is-hidden",
-        !decorationIsSelected(
-            "flowersDecoration"
-        )
-    );
+    "#flowerDetailOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !decorationIsSelected(
+        "flowersDecoration"
+    )
+);
+getElement(
+    "#macaronsDetailOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !decorationIsSelected(
+        "macaronsDecoration"
+    )
+);
+
+getElement(
+    "#discoBallsDetailOptions"
+)?.classList.toggle(
+    "is-hidden",
+    !decorationIsSelected(
+        "discoBallsDecoration"
+    )
+);
 
     getElement(
         "#customFlowerTypeField"
@@ -9088,17 +9122,12 @@ function getExtrasSummary() {
         }
     );
 
- builderState.quantityExtras
-    .filter(
-        (extra) =>
-            extra.name !== "Macarons" &&
-            extra.name !== "Mini Disco Balls"
-    )
+  builderState.quantityExtras
     .forEach((extra) => {
         extras.push(
             `${extra.quantity} × ${extra.name} (${formatCurrency(extra.total)})`
         );
-    });   
+    }); 
 
     return extras.length
         ? extras.join(", ")
@@ -9377,8 +9406,8 @@ function populateReview() {
             "None"
         );
     }
-    const reviewDecorationNames = [
-    ...builderState.decorations.map(
+  const reviewDecorationNames =
+    builderState.decorations.map(
         (decoration) => {
             const quantityLabel =
                 decoration.quantity > 1
@@ -9391,19 +9420,7 @@ function populateReview() {
 
             return `${quantityLabel}${decoration.name} (+${formatCurrency(price)})`;
         }
-    ),
-
-    ...builderState.quantityExtras
-        .filter(
-            (extra) =>
-                extra.name === "Macarons" ||
-                extra.name === "Mini Disco Balls"
-        )
-        .map(
-            (extra) =>
-                `${extra.quantity} × ${extra.name} (+${formatCurrency(extra.total)})`
-        )
-];   
+    );
     
 
     setText(
