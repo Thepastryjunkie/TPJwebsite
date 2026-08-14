@@ -1,0 +1,511 @@
+diff --git a/js/cake-builder.js b/js/cake-builder.js
+index f283798..fb74bfb 100644
+--- a/js/cake-builder.js
++++ b/js/cake-builder.js
+@@ -1205,6 +1205,28 @@ function getRenderableCakeColor(color) {
+ }
+ 
+ 
++function getLightenedCakePreviewColor(color) {
++    if (!color || color === "original") {
++        return color;
++    }
++
++    const normalizedColor =
++        normalizeHexColor(color);
++
++    const isBlackShade = [
++        "#000000",
++        "#111111",
++        "#24201F"
++    ].includes(normalizedColor);
++
++    return mixHexColor(
++        "#FFF1DC",
++        normalizedColor,
++        isBlackShade ? 0.78 : 0.48
++    );
++}
++
++
+ /* =========================================
+    PRODUCT HELPERS
+ ========================================= */
+@@ -1889,9 +1911,9 @@ layerContext.globalCompositeOperation =
+ 
+ layerContext.globalAlpha =
+     isHeartSimpleTextureAsset
+-        ? 0.20
++        ? 0.09
+         : isSimpleTextureAsset
+-            ? 0.28
++            ? 0.18
+             : 0.07;
+ 
+ layerContext.drawImage(
+@@ -2732,7 +2754,9 @@ function drawBentoColorPreview(
+                 : getCoverageButtercreamMask(
+                     image
+                 ),
+-            builderState.mainCakeColor,
++            getLightenedCakePreviewColor(
++                builderState.mainCakeColor
++            ),
+             transform.x,
+             transform.y,
+             transform.width,
+@@ -2835,7 +2859,9 @@ function drawTwoTierColors(
+         context,
+         image,
+         recolorMask,
+-        builderState.tierBottomColor,
++        getLightenedCakePreviewColor(
++            builderState.tierBottomColor
++        ),
+         x,
+         y,
+         width,
+@@ -2904,7 +2930,9 @@ function drawTwoTierColors(
+         context,
+         image,
+         recolorMask,
+-        builderState.tierTopColor,
++        getLightenedCakePreviewColor(
++            builderState.tierTopColor
++        ),
+         x,
+         y,
+         width,
+@@ -5501,7 +5529,9 @@ if (isCoveragePreview) {
+             context,
+             cakeImage,
+             coverageMask,
+-            selectedCakeColor,
++            getLightenedCakePreviewColor(
++                selectedCakeColor
++            ),
+             x,
+             y + boardYOffset,
+             size.width,
+@@ -6435,12 +6465,8 @@ function reorderStepFourControls() {
+         );
+     }
+ 
+-    const designAnchor = getElement(
+-        "#flowerSourceOptions"
+-    );
+-
+-    const macaronDisco = getElement(
+-        "#macaronDiscoCustomizer"
++    const cakeDetails = getElement(
++        "#cakeDetailsCustomizer"
+     );
+ 
+     const toyFigurine = getElement(
+@@ -6451,12 +6477,8 @@ function reorderStepFourControls() {
+         "#customSculptedCustomizer"
+     );
+ 
+-    if (designAnchor && macaronDisco) {
+-        designAnchor.after(macaronDisco);
+-    }
+-
+-    if (macaronDisco && toyFigurine) {
+-        macaronDisco.after(toyFigurine);
++    if (cakeDetails && toyFigurine) {
++        cakeDetails.after(toyFigurine);
+     }
+ 
+     if (toyFigurine && customSculpted) {
+@@ -6608,19 +6630,21 @@ function updateCoverageDesignAvailability() {
+         builderState.sculptedPiecesEnabled =
+             false;
+ 
+-        getElements(
+-            'input[name="toyFigurineEnabled"]'
+-        ).forEach((input) => {
+-            input.checked =
+-                input.value === "no";
+-        });
++        const toyToggle = getElement(
++            "#toyFigurineEnabledToggle"
++        );
+ 
+-        getElements(
+-            'input[name="customSculptedEnabled"]'
+-        ).forEach((input) => {
+-            input.checked =
+-                input.value === "no";
+-        });
++        const sculptedToggle = getElement(
++            "#customSculptedEnabledToggle"
++        );
++
++        if (toyToggle) {
++            toyToggle.checked = false;
++        }
++
++        if (sculptedToggle) {
++            sculptedToggle.checked = false;
++        }
+     }
+ 
+     if (!limitedCoverage) {
+@@ -11110,20 +11134,18 @@ getElements(".quantity-product").forEach(
+         );
+     }
+ );
+-getElements(
+-    'input[name="toyFigurineEnabled"]'
+-).forEach((input) => {
+-    input.addEventListener(
+-        "change",
+-        () => {
+-            builderState.toyFigurineEnabled =
+-                input.value === "yes";
++getElement(
++    "#toyFigurineEnabledToggle"
++)?.addEventListener(
++    "change",
++    (event) => {
++        builderState.toyFigurineEnabled =
++            event.target.checked;
+ 
+-            updateQuoteOnlyExtraVisibility();
+-            renderCakePreview();
+-        }
+-    );
+-});
++        updateQuoteOnlyExtraVisibility();
++        renderCakePreview();
++    }
++);
+ 
+ getElement(
+     "#toyFigurineDetails"
+@@ -11135,20 +11157,18 @@ getElement(
+     }
+ );
+ 
+-getElements(
+-    'input[name="customSculptedEnabled"]'
+-).forEach((input) => {
+-    input.addEventListener(
+-        "change",
+-        () => {
+-            builderState.sculptedPiecesEnabled =
+-                input.value === "yes";
++getElement(
++    "#customSculptedEnabledToggle"
++)?.addEventListener(
++    "change",
++    (event) => {
++        builderState.sculptedPiecesEnabled =
++            event.target.checked;
+ 
+-            updateQuoteOnlyExtraVisibility();
+-            renderCakePreview();
+-        }
+-    );
+-});
++        updateQuoteOnlyExtraVisibility();
++        renderCakePreview();
++    }
++);
+ 
+ getElement(
+     "#customSculptedDetails"
+diff --git a/pages/cake-builder.html b/pages/cake-builder.html
+index e04a4b2..a2d5a25 100644
+--- a/pages/cake-builder.html
++++ b/pages/cake-builder.html
+@@ -3589,7 +3589,6 @@
+         <small>Turn on to upload the image and choose its placement.</small>
+     </span>
+ </label>
+-    </div>
+ 
+     <div
+         id="edibleImageControls"
+@@ -3776,7 +3775,6 @@
+         <small>Turn on to choose the topper type and wording.</small>
+     </span>
+ </label>
+-    </div>
+ </fieldset>
+ 
+                         <div id="cupcakeOnlyStudioSlot"></div>
+@@ -3970,6 +3968,87 @@
+                                 
+                             </div>
+ 
++                            <div
++                                id="macaronDiscoCustomizer"
++                                class="quantity-product-list"
++                            >
++                                <div
++                                    class="quantity-product"
++                                    data-product-name="Macarons"
++                                    data-unit-price="2.5"
++                                >
++                                    <div class="quantity-product-info">
++                                        <img
++                                            class="quantity-product-image"
++                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
++                                            alt=""
++                                        >
++
++                                        <div>
++                                            <strong>Macarons</strong>
++                                            <span>$2.50 each</span>
++                                        </div>
++                                    </div>
++
++                                    <div class="quantity-control">
++                                        <button
++                                            type="button"
++                                            data-quantity-action="decrease"
++                                        >−</button>
++
++                                        <input
++                                            type="number"
++                                            min="0"
++                                            value="0"
++                                            inputmode="numeric"
++                                        >
++
++                                        <button
++                                            type="button"
++                                            data-quantity-action="increase"
++                                        >+</button>
++                                    </div>
++                                </div>
++
++                                <div
++                                    class="quantity-product"
++                                    data-product-name="Mini Disco Balls"
++                                    data-unit-price="2"
++                                >
++                                    <div class="quantity-product-info">
++                                        <img
++                                            class="quantity-product-image"
++                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
++                                            alt=""
++                                        >
++
++                                        <div>
++                                            <strong>Mini Disco Balls</strong>
++                                            <span>$2 each</span>
++                                        </div>
++                                    </div>
++
++                                    <div class="quantity-control">
++                                        <button
++                                            type="button"
++                                            data-quantity-action="decrease"
++                                        >−</button>
++
++                                        <input
++                                            type="number"
++                                            min="0"
++                                            value="0"
++                                            inputmode="numeric"
++                                        >
++
++                                        <button
++                                            type="button"
++                                            data-quantity-action="increase"
++                                        >+</button>
++                                    </div>
++                                </div>
++                            </div>
++
+                         </fieldset>
+ <!-- EXTRA DETAIL OPTIONS -->
+ <div
+@@ -4643,91 +4722,6 @@
+                             </p>
+ 
+                         </div>
+-<fieldset id="macaronDiscoCustomizer" class="builder-fieldset">
+-    <legend>Macarons & Mini Disco Balls</legend>
+-
+-    <p class="fieldset-description">
+-        Choose any quantity. The live preview shows a representative styled arrangement, not the exact count.
+-    </p>
+-
+-    <div class="quantity-product-list">
+-        <div
+-            class="quantity-product"
+-            data-product-name="Macarons"
+-            data-unit-price="2.5"
+-        >
+-            <div class="quantity-product-info">
+-                <img
+-                    class="quantity-product-image"
+-                    src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
+-                    alt=""
+-                >
+-
+-                <div>
+-                    <strong>Macarons</strong>
+-                    <span>$2.50 each</span>
+-                </div>
+-            </div>
+-
+-            <div class="quantity-control">
+-                <button
+-                    type="button"
+-                    data-quantity-action="decrease"
+-                >−</button>
+-
+-                <input
+-                    type="number"
+-                    min="0"
+-                    value="0"
+-                    inputmode="numeric"
+-                >
+-
+-                <button
+-                    type="button"
+-                    data-quantity-action="increase"
+-                >+</button>
+-            </div>
+-        </div>
+-
+-        <div
+-            class="quantity-product"
+-            data-product-name="Mini Disco Balls"
+-            data-unit-price="2"
+-        >
+-            <div class="quantity-product-info">
+-                <img
+-                    class="quantity-product-image"
+-                    src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
+-                    alt=""
+-                >
+-
+-                <div>
+-                    <strong>Mini Disco Balls</strong>
+-                    <span>$2 each</span>
+-                </div>
+-            </div>
+-
+-            <div class="quantity-control">
+-                <button
+-                    type="button"
+-                    data-quantity-action="decrease"
+-                >−</button>
+-
+-                <input
+-                    type="number"
+-                    min="0"
+-                    value="0"
+-                    inputmode="numeric"
+-                >
+-
+-                <button
+-                    type="button"
+-                    data-quantity-action="increase"
+-                >+</button>
+-            </div>
+-        </div>
+-    </div>
+-</fieldset>
+                         <fieldset id="gourmetCupcakeExtras" class="builder-fieldset">
+ 
+                             <legend>
+@@ -5444,26 +5438,19 @@
+                                 Add Toy / Figurine Decorations?
+                             </legend>
+ 
+-                            <div class="compact-choice-row">
+-                                <label>
+-                                    <input
+-                                        type="radio"
+-                                        name="toyFigurineEnabled"
+-                                        value="no"
+-                                        checked
+-                                    >
+-                                    <span>No</span>
+-                                </label>
++                            <label class="extra-layer-control">
++                                <input
++                                    id="toyFigurineEnabledToggle"
++                                    type="checkbox"
++                                >
+ 
+-                                <label>
+-                                    <input
+-                                        type="radio"
+-                                        name="toyFigurineEnabled"
+-                                        value="yes"
+-                                    >
+-                                    <span>Yes</span>
+-                                </label>
+-                            </div>
++                                <span class="toggle-track"></span>
++
++                                <span class="toggle-copy">
++                                    <strong>Add Toy / Figurine Decorations</strong>
++                                    <small>Turn on to describe the toys or figurines you want.</small>
++                                </span>
++                            </label>
+ 
+                             <label
+                                 id="toyFigurineDetailsField"
+@@ -5485,31 +5472,24 @@
+                             </p>
+                         </fieldset>
+ 
+-                        <fieldset id="customSculptedCustomizer" class="builder-fieldset"></fieldset>
++                        <fieldset id="customSculptedCustomizer" class="builder-fieldset">
+                             <legend>
+                                 Add Custom 3D Sculpted Pieces?
+                             </legend>
+ 
+-                            <div class="compact-choice-row">
+-                                <label>
+-                                    <input
+-                                        type="radio"
+-                                        name="customSculptedEnabled"
+-                                        value="no"
+-                                        checked
+-                                    >
+-                                    <span>No</span>
+-                                </label>
++                            <label class="extra-layer-control">
++                                <input
++                                    id="customSculptedEnabledToggle"
++                                    type="checkbox"
++                                >
+ 
+-                                <label>
+-                                    <input
+-                                        type="radio"
+-                                        name="customSculptedEnabled"
+-                                        value="yes"
+-                                    >
+-                                    <span>Yes</span>
+-                                </label>
+-                            </div>
++                                <span class="toggle-track"></span>
++
++                                <span class="toggle-copy">
++                                    <strong>Add Custom 3D Sculpted Pieces</strong>
++                                    <small>Turn on to describe what you want sculpted.</small>
++                                </span>
++                            </label>
+ 
+                             <label
+                                 id="customSculptedDetailsField"
+@@ -6335,7 +6315,7 @@
+ 
+     </div>
+ 
+-<script src="../js/cake-builder.js?v=tpj-surgical-fixes-20260813-1"></script>
++<script src="../js/cake-builder.js?v=tpj-only-three-fixes-20260813-2"></script>
+ 
+ </body>
+ </html>
+

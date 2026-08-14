@@ -591,7 +591,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-complete-fix-20260812";
+const cakeAssetVersion = "?v=tpj-surgical-fixes-20260813-1";
 
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
@@ -1205,6 +1205,28 @@ function getRenderableCakeColor(color) {
 }
 
 
+function getLightenedCakePreviewColor(color) {
+    if (!color || color === "original") {
+        return color;
+    }
+
+    const normalizedColor =
+        normalizeHexColor(color);
+
+    const isBlackShade = [
+        "#000000",
+        "#111111",
+        "#24201F"
+    ].includes(normalizedColor);
+
+    return mixHexColor(
+        "#FFF1DC",
+        normalizedColor,
+        isBlackShade ? 0.78 : 0.48
+    );
+}
+
+
 /* =========================================
    PRODUCT HELPERS
 ========================================= */
@@ -1329,12 +1351,15 @@ function getBentoCupcakeUpgradePrice() {
 function getSurfaceUpcharge(type) {
     const product = getSelectedCakeProduct();
 
-    if (
-        product.shape === "cupcakes" ||
+ if (
+    product.shape === "cupcakes" ||
+    (
+        type === "fondant" &&
         builderState.cakeCoverage !== "full"
-    ) {
-        return 0;
-    }
+    )
+) {
+    return 0;
+}   
 
     const prices = type === "fondant"
         ? {
@@ -1695,8 +1720,19 @@ function loadRealisticImage(url) {
             url,
             new Promise((resolve, reject) => {
                 const image = new Image();
+
                 image.onload = () => resolve(image);
-                image.onerror = () => reject(new Error(`Unable to load ${url}`));
+
+                image.onerror = () => {
+                    realisticImageCache.delete(url);
+
+                    reject(
+                        new Error(
+                            `Unable to load ${url}`
+                        )
+                    );
+                };
+
                 image.src = url;
             })
         );
@@ -1878,7 +1914,7 @@ layerContext.globalAlpha =
         ? 0.09
         : isSimpleTextureAsset
             ? 0.18
-            : 0.12;
+            : 0.07;
 
 layerContext.drawImage(
     detailLayer,
@@ -2101,11 +2137,15 @@ async function loadNumberLetterStyleAssets(
     const images = await Promise.all(
         files.map(
             (file) =>
-                loadRealisticImage(
+                loadOptionalRealisticImage(
                     `${finalAssetRoot}/cakes/${file}?v=tpj-number-letter-styles-1`
                 )
         )
     );
+
+    if (images.some((image) => !image)) {
+        return null;
+    }
 
     return {
         type: "numberLetterPiping",
@@ -2714,7 +2754,9 @@ function drawBentoColorPreview(
                 : getCoverageButtercreamMask(
                     image
                 ),
-            builderState.mainCakeColor,
+            getLightenedCakePreviewColor(
+                builderState.mainCakeColor
+            ),
             transform.x,
             transform.y,
             transform.width,
@@ -2817,7 +2859,9 @@ function drawTwoTierColors(
         context,
         image,
         recolorMask,
-        builderState.tierBottomColor,
+        getLightenedCakePreviewColor(
+            builderState.tierBottomColor
+        ),
         x,
         y,
         width,
@@ -2886,7 +2930,9 @@ function drawTwoTierColors(
         context,
         image,
         recolorMask,
-        builderState.tierTopColor,
+        getLightenedCakePreviewColor(
+            builderState.tierTopColor
+        ),
         x,
         y,
         width,
@@ -4555,18 +4601,24 @@ async function loadRealisticFinishAssets(
     if (!finishDefinition) {
         return null;
     }
-const assetVersion =
-    finishDefinition.type === "vintagePiping"
-        ? "?v=tpj-vintage-piping-complete-1"
-        : "";
+
+    const assetVersion =
+        finishDefinition.type === "vintagePiping"
+            ? "?v=tpj-vintage-piping-20260813-1"
+            : "";
+
     const images = await Promise.all(
         finishDefinition.files.map(
             (file) =>
-                loadRealisticImage(
+                loadOptionalRealisticImage(
                     `${finalAssetRoot}/cakes/${file}${assetVersion}`
                 )
         )
     );
+
+    if (images.some((image) => !image)) {
+        return null;
+    }
 
     return {
         type: finishDefinition.type,
@@ -4686,11 +4738,12 @@ function drawVintageFinishLayer(
     };
 
     const drawCroppedBand = (
-        sourceTopRatio,
-        sourceBottomRatio,
-        scaleX,
-        scaleY
-    ) => {
+    sourceTopRatio,
+    sourceBottomRatio,
+    scaleX,
+    scaleY,
+    offsetYRatio = 0
+) => {
         const sourceWidth =
             layer.width || width;
         const sourceHeight =
@@ -4711,12 +4764,13 @@ function drawVintageFinishLayer(
         const originalBandY =
             y + height * sourceTopRatio;
         const destinationY =
-            originalBandY +
-            (
-                height *
-                    (sourceBottomRatio - sourceTopRatio) -
-                destinationBandHeight
-            ) / 2;
+    originalBandY +
+    (
+        height *
+            (sourceBottomRatio - sourceTopRatio) -
+        destinationBandHeight
+    ) / 2 +
+    height * offsetYRatio;
 
         context.drawImage(
             layer,
@@ -4773,7 +4827,89 @@ function drawVintageFinishLayer(
 
         return;
     }
+if (
+    source.includes("-Tall-Heart-") &&
+    !source.includes("-Tall-5in-Heart-") &&
+    source.includes("-Accent-1-")
+) {
+    drawCroppedBand(
+        0,
+        0.30,
+        1.04,
+        1
+    );
 
+    drawCentered(
+        1,
+        0.30,
+        1
+    );
+
+    return;
+}
+
+if (
+    source.includes("-Star-") &&
+    !source.includes("-Tall-Star-") &&
+    source.includes("-Accent-1-")
+) {
+    drawCentered(
+        1,
+        0,
+        0.70
+    );
+
+    drawCroppedBand(
+        0.70,
+        1,
+        0.94,
+        1
+    );
+
+    return;
+}
+
+if (
+    source.includes("-Half-Sheet-") &&
+    source.includes("-Accent-1-")
+) {
+    drawCentered(
+        1,
+        0,
+        0.68
+    );
+
+    drawCroppedBand(
+        0.68,
+        1,
+        0.97,
+        1,
+        -0.055
+    );
+
+    return;
+}
+
+if (
+    source.includes("-Full-Sheet-") &&
+    source.includes("-Accent-1-")
+) {
+    drawCentered(
+        1,
+        0,
+        0.70
+    );
+
+    drawCroppedBand(
+        0.70,
+        1,
+        1,
+        1,
+        -0.055
+    );
+
+    return;
+}
     if (
         source.includes(
             "-Tall-Two-Tier-"
@@ -5393,7 +5529,9 @@ if (isCoveragePreview) {
             context,
             cakeImage,
             coverageMask,
-            selectedCakeColor,
+            getLightenedCakePreviewColor(
+                selectedCakeColor
+            ),
             x,
             y + boardYOffset,
             size.width,
@@ -5503,12 +5641,29 @@ drawCakeForegroundExtras(
                 );
             });
         }
-    } catch (error) {
-        console.error(
-            "The realistic cake preview could not be rendered.",
-            error
+ } catch (error) {
+    if (
+        renderVersion ===
+        realisticRenderVersion
+    ) {
+        const context =
+            realisticCakeCanvas.getContext(
+                "2d"
+            );
+
+        context.clearRect(
+            0,
+            0,
+            realisticCakeCanvas.width,
+            realisticCakeCanvas.height
         );
     }
+
+    console.error(
+        "The realistic cake preview could not be rendered.",
+        error
+    );
+}   
 }
 
 const cupcakeFoundationMap = {
@@ -6149,17 +6304,15 @@ function updateFinishColorControls() {
         );
 
     const finishUsesTwoColors =
+    builderState.cakeCoverage === "full" &&
+    (
         builderState.cakeFinish ===
             "Watercolor Finish" ||
         builderState.cakeFinish ===
             "Palette Knife Finish" ||
         builderState.cakeFinish ===
             "Vintage Piping" ||
-        numberLetterUsesPipingColors;
-
-    finishColorCustomizer?.classList.toggle(
-        "is-hidden",
-        !finishUsesTwoColors
+        numberLetterUsesPipingColors
     );
 }
 function updateFinishVisibility() {
@@ -6311,6 +6464,26 @@ function reorderStepFourControls() {
             topperOptions
         );
     }
+
+    const cakeDetails = getElement(
+        "#cakeDetailsCustomizer"
+    );
+
+    const toyFigurine = getElement(
+        "#toyFigurineCustomizer"
+    );
+
+    const customSculpted = getElement(
+        "#customSculptedCustomizer"
+    );
+
+    if (cakeDetails && toyFigurine) {
+        cakeDetails.after(toyFigurine);
+    }
+
+    if (toyFigurine && customSculpted) {
+        toyFigurine.after(customSculpted);
+    }
 }
 
 
@@ -6318,8 +6491,11 @@ function updateSurfaceOptionAvailability() {
     const product =
         getSelectedCakeProduct();
 
-    const surfaceOptionsAllowed =
-        product.shape !== "cupcakes" &&
+    const ganacheAllowed =
+        product.shape !== "cupcakes";
+
+    const fondantAllowed =
+        ganacheAllowed &&
         builderState.cakeCoverage ===
             "full";
 
@@ -6334,16 +6510,16 @@ function updateSurfaceOptionAvailability() {
 
     ganacheCard?.classList.toggle(
         "is-hidden",
-        !surfaceOptionsAllowed
+        !ganacheAllowed
     );
 
     if (ganacheInput) {
         ganacheInput.disabled =
-            !surfaceOptionsAllowed;
+            !ganacheAllowed;
     }
 
     if (
-        !surfaceOptionsAllowed &&
+        !ganacheAllowed &&
         builderState.buttercreamStyle ===
             "Ganache"
     ) {
@@ -6357,46 +6533,185 @@ function updateSurfaceOptionAvailability() {
 
     setText(
         "#ganacheCoatingPriceLabel",
-        surfaceOptionsAllowed
+        ganacheAllowed
             ? `+${formatCurrency(
                 getSurfaceUpcharge(
                     "ganache"
                 )
             )}`
-            : "Unavailable for this selection"
+            : "Unavailable for cupcakes"
     );
 
     const fondantFieldset = getElement(
         "#fondantCoverageCustomizer"
     );
 
-    fondantFieldset?.classList.toggle(
-        "is-hidden",
-        !surfaceOptionsAllowed
+    const fondantToggle = getElement(
+        "#fondantEnabledToggle"
     );
 
-    if (!surfaceOptionsAllowed) {
+    fondantFieldset?.classList.toggle(
+        "is-hidden",
+        !fondantAllowed
+    );
+
+    if (!fondantAllowed) {
         builderState.fondantEnabled =
             false;
 
-        getElements(
-            'input[name="fondantEnabled"]'
-        ).forEach((input) => {
-            input.checked =
-                input.value === "no";
-        });
+        if (fondantToggle) {
+            fondantToggle.checked = false;
+        }
     }
 
     setText(
         "#fondantPriceLabel",
-        surfaceOptionsAllowed
-            ? `Yes · +${formatCurrency(
+        fondantAllowed
+            ? `Add for ${formatCurrency(
                 getSurfaceUpcharge(
                     "fondant"
                 )
             )}`
-            : "Yes · unavailable"
+            : "Unavailable for this selection"
     );
+}
+
+
+function updateCoverageDesignAvailability() {
+    const product =
+        getSelectedCakeProduct();
+
+    const isCupcakesOnly =
+        product.shape === "cupcakes";
+
+    const limitedCoverage =
+        cakeSupportsCoverage(product) &&
+        builderState.cakeCoverage !==
+            "full";
+
+    const quoteOnlyUnavailable =
+        limitedCoverage ||
+        isCupcakesOnly;
+
+    getElement(
+        "#cakeFinishCustomizer"
+    )?.classList.toggle(
+        "is-hidden",
+        isCupcakesOnly ||
+        limitedCoverage
+    );
+
+    [
+        "#edibleImageCustomizer",
+        "#cakeTopperCustomizer",
+        "#cakeDetailsCustomizer",
+        "#macaronDiscoCustomizer"
+    ].forEach((selector) => {
+        getElement(selector)?.classList.toggle(
+            "is-hidden",
+            limitedCoverage
+        );
+    });
+
+    [
+        "#toyFigurineCustomizer",
+        "#customSculptedCustomizer"
+    ].forEach((selector) => {
+        getElement(selector)?.classList.toggle(
+            "is-hidden",
+            quoteOnlyUnavailable
+        );
+    });
+
+    if (quoteOnlyUnavailable) {
+        builderState.toyFigurineEnabled =
+            false;
+
+        builderState.sculptedPiecesEnabled =
+            false;
+
+        const toyToggle = getElement(
+            "#toyFigurineEnabledToggle"
+        );
+
+        const sculptedToggle = getElement(
+            "#customSculptedEnabledToggle"
+        );
+
+        if (toyToggle) {
+            toyToggle.checked = false;
+        }
+
+        if (sculptedToggle) {
+            sculptedToggle.checked = false;
+        }
+    }
+
+    if (!limitedCoverage) {
+        updateExtraDetailControlsVisibility();
+        updateFlowerSourceVisibility();
+        updateTopperOptionsVisibility();
+        updateQuoteOnlyExtraVisibility();
+        return;
+    }
+
+    builderState.fondantEnabled = false;
+    builderState.cakeFinish = "";
+    builderState.edibleImageEnabled = false;
+    builderState.cakeTopperEnabled = false;
+    builderState.topperType = "";
+    builderState.topperPrice = 0;
+    builderState.decorations = [];
+
+    builderState.quantityExtras =
+        builderState.quantityExtras.filter(
+            (extra) =>
+                extra.name !== "Macarons" &&
+                extra.name !== "Mini Disco Balls"
+        );
+
+    [
+        "#fondantEnabledToggle",
+        "#edibleImageEnabledToggle",
+        "#cakeTopperEnabledToggle"
+    ].forEach((selector) => {
+        const toggle = getElement(selector);
+
+        if (toggle) {
+            toggle.checked = false;
+        }
+    });
+
+    getElements(
+        'input[name="cakeFinish"], input[name="topperType"], [data-decoration-id]'
+    ).forEach((input) => {
+        input.checked = false;
+    });
+
+    getElements(
+        '#macaronDiscoCustomizer input[type="number"]'
+    ).forEach((input) => {
+        input.value = "0";
+    });
+
+    [
+        "#finishColorCustomizer",
+        "#topperTypeOptions",
+        "#metallicLeafDetailOptions",
+        "#bowDetailOptions",
+        "#butterflyDetailOptions",
+        "#cherryDetailOptions",
+        "#dripDetailOptions",
+        "#pearlDetailOptions",
+        "#flowerDetailOptions",
+        "#flowerSourceOptions",
+        "#toyFigurineDetailsField",
+        "#customSculptedDetailsField"
+    ].forEach((selector) => {
+        getElement(selector)?.classList.add(
+            "is-hidden"
+        );
+    });
 }
 
 function updateProductModeUI() {
@@ -6918,18 +7233,14 @@ function updateEdibleImageControls() {
         });
     }
 
-    getElements(
-        'input[name="edibleImageEnabled"]'
-    ).forEach((input) => {
-        input.checked =
-            input.value ===
-            (
-                builderState
-                    .edibleImageEnabled
-                    ? "yes"
-                    : "no"
-            );
-    });
+   const edibleImageToggle = getElement(
+    "#edibleImageEnabledToggle"
+);
+
+if (edibleImageToggle) {
+    edibleImageToggle.checked =
+        builderState.edibleImageEnabled;
+} 
 
     controls?.classList.toggle(
         "is-hidden",
@@ -7089,6 +7400,8 @@ function renderCakePreview() {
 
 function performCakePreviewRender() {
     updateProductModeUI();
+
+    updateCoverageDesignAvailability();
 
     updateFinishAvailability();
 
@@ -7457,10 +7770,11 @@ function validateStepFour() {
 
             return false;
         }
-    } else if (
-        product.shape !== "numberLetter" &&
-        !builderState.cakeFinish
-    ) {
+   } else if (
+    builderState.cakeCoverage === "full" &&
+    product.shape !== "numberLetter" &&
+    !builderState.cakeFinish
+) {
         showValidationMessage(
             "Choose a finish."
         );
@@ -7522,7 +7836,27 @@ function validateStepFour() {
 
         return false;
     }
+if (
+    builderState.toyFigurineEnabled &&
+    !builderState.toyFigurineDetails.trim()
+) {
+    showValidationMessage(
+        "Describe the toys or figurines you would like."
+    );
 
+    return false;
+}
+
+if (
+    builderState.sculptedPiecesEnabled &&
+    !builderState.sculptedPiecesDetails.trim()
+) {
+    showValidationMessage(
+        "Describe what you would like sculpted."
+    );
+
+    return false;
+}
     return true;
 }
 function validateStepFive() {
@@ -7551,28 +7885,7 @@ function validateStepSix() {
 
 
 function validateStepSeven() {
-    if (
-        builderState.toyFigurineEnabled &&
-        !builderState.toyFigurineDetails.trim()
-    ) {
-        showValidationMessage(
-            "Describe the toys or figurines you would like."
-        );
-
-        return false;
-    }
-
-    if (
-        builderState.sculptedPiecesEnabled &&
-        !builderState.sculptedPiecesDetails.trim()
-    ) {
-        showValidationMessage(
-            "Describe what you would like sculpted."
-        );
-
-        return false;
-    }
-
+    
     if (!builderState.customerName.trim()) {
         showValidationMessage(
             "Enter your first and last name."
@@ -8239,20 +8552,18 @@ function updateTopperOptionsVisibility() {
         !builderState.cakeTopperEnabled
     );
 }
-getElements(
-    'input[name="cakeTopperEnabled"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.cakeTopperEnabled =
-                input.value === "yes";
+getElement(
+    "#cakeTopperEnabledToggle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.cakeTopperEnabled =
+            event.target.checked;
 
-            updateTopperOptionsVisibility();
-            renderCakePreview();
-        }
-    );
-});
+        updateTopperOptionsVisibility();
+        renderCakePreview();
+    }
+);
 
 
 /* =========================================
@@ -8777,13 +9088,17 @@ function getExtrasSummary() {
         }
     );
 
-    builderState.quantityExtras.forEach(
-        (extra) => {
-            extras.push(
-                `${extra.quantity} × ${extra.name} (${formatCurrency(extra.total)})`
-            );
-        }
-    );
+ builderState.quantityExtras
+    .filter(
+        (extra) =>
+            extra.name !== "Macarons" &&
+            extra.name !== "Mini Disco Balls"
+    )
+    .forEach((extra) => {
+        extras.push(
+            `${extra.quantity} × ${extra.name} (${formatCurrency(extra.total)})`
+        );
+    });   
 
     return extras.length
         ? extras.join(", ")
@@ -9062,21 +9377,33 @@ function populateReview() {
             "None"
         );
     }
-        const reviewDecorationNames =
-        builderState.decorations.map(
-            (decoration) => {
-                const quantityLabel =
-                    decoration.quantity > 1
-                        ? `${decoration.quantity} × `
-                        : "";
+    const reviewDecorationNames = [
+    ...builderState.decorations.map(
+        (decoration) => {
+            const quantityLabel =
+                decoration.quantity > 1
+                    ? `${decoration.quantity} × `
+                    : "";
 
-                const price =
-                    decoration.total ??
-                    decoration.price;
+            const price =
+                decoration.total ??
+                decoration.price;
 
-                return `${quantityLabel}${decoration.name} (+${formatCurrency(price)})`;
-            }
-        );
+            return `${quantityLabel}${decoration.name} (+${formatCurrency(price)})`;
+        }
+    ),
+
+    ...builderState.quantityExtras
+        .filter(
+            (extra) =>
+                extra.name === "Macarons" ||
+                extra.name === "Mini Disco Balls"
+        )
+        .map(
+            (extra) =>
+                `${extra.quantity} × ${extra.name} (+${formatCurrency(extra.total)})`
+        )
+];   
     
 
     setText(
@@ -10807,20 +11134,18 @@ getElements(".quantity-product").forEach(
         );
     }
 );
-getElements(
-    'input[name="toyFigurineEnabled"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.toyFigurineEnabled =
-                input.value === "yes";
+getElement(
+    "#toyFigurineEnabledToggle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.toyFigurineEnabled =
+            event.target.checked;
 
-            updateQuoteOnlyExtraVisibility();
-            renderCakePreview();
-        }
-    );
-});
+        updateQuoteOnlyExtraVisibility();
+        renderCakePreview();
+    }
+);
 
 getElement(
     "#toyFigurineDetails"
@@ -10832,20 +11157,18 @@ getElement(
     }
 );
 
-getElements(
-    'input[name="customSculptedEnabled"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.sculptedPiecesEnabled =
-                input.value === "yes";
+getElement(
+    "#customSculptedEnabledToggle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.sculptedPiecesEnabled =
+            event.target.checked;
 
-            updateQuoteOnlyExtraVisibility();
-            renderCakePreview();
-        }
-    );
-});
+        updateQuoteOnlyExtraVisibility();
+        renderCakePreview();
+    }
+);
 
 getElement(
     "#customSculptedDetails"
@@ -11071,19 +11394,17 @@ function setEdibleImageQuantity(
 }
 
 
-getElements(
-    'input[name="edibleImageEnabled"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.edibleImageEnabled =
-                input.value === "yes";
+getElement(
+    "#edibleImageEnabledToggle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.edibleImageEnabled =
+            event.target.checked;
 
-            renderCakePreview();
-        }
-    );
-});
+        renderCakePreview();
+    }
+);
 
 
 getElement(
@@ -11352,19 +11673,17 @@ getElements(
         }
     );
 });
-getElements(
-    'input[name="fondantEnabled"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.fondantEnabled =
-                input.value === "yes";
+getElement(
+    "#fondantEnabledToggle"
+)?.addEventListener(
+    "change",
+    (event) => {
+        builderState.fondantEnabled =
+            event.target.checked;
 
-            renderCakePreview();
-        }
-    );
-});
+        renderCakePreview();
+    }
+);
 
 /* =========================================
    SUMMARY, RESET, SUBMIT

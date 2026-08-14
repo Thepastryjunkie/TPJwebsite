@@ -3195,28 +3195,21 @@
         Fondant is added over the selected coating. The coating and fondant charges stack.
     </p>
 
-    <div class="compact-choice-row">
-        <label>
-            <input
-                type="radio"
-                name="fondantEnabled"
-                value="no"
-                checked
-            >
-            <span>No</span>
-        </label>
+    <label class="extra-layer-control">
+        <input
+            id="fondantEnabledToggle"
+            type="checkbox"
+        >
 
-        <label>
-            <input
-                type="radio"
-                name="fondantEnabled"
-                value="yes"
-            >
-            <span id="fondantPriceLabel">
-                Yes · priced by cake size
-            </span>
-        </label>
-    </div>
+        <span class="toggle-track"></span>
+
+        <span class="toggle-copy">
+            <strong>Add Fondant</strong>
+            <small id="fondantPriceLabel">
+                Priced by cake size
+            </small>
+        </span>
+    </label>
 </fieldset>
               <fieldset
     id="cakeBorderCustomizer"
@@ -3583,26 +3576,19 @@
         Add a photo, logo, or printed design without replacing your coating finish or other decorations.
     </p>
 
-    <div class="compact-choice-row">
-        <label>
-            <input
-                type="radio"
-                name="edibleImageEnabled"
-                value="no"
-                checked
-            >
-            <span>No</span>
-        </label>
+    <label class="extra-layer-control">
+    <input
+        id="edibleImageEnabledToggle"
+        type="checkbox"
+    >
 
-        <label>
-            <input
-                type="radio"
-                name="edibleImageEnabled"
-                value="yes"
-            >
-            <span>Yes</span>
-        </label>
-    </div>
+    <span class="toggle-track"></span>
+
+    <span class="toggle-copy">
+        <strong>Add an Edible Image</strong>
+        <small>Turn on to upload the image and choose its placement.</small>
+    </span>
+</label>
 
     <div
         id="edibleImageControls"
@@ -3776,26 +3762,19 @@
         Available for cakes and cupcakes. The topper choice is recorded in your review and is not drawn on the live preview.
     </p>
 
-    <div class="compact-choice-row">
-        <label>
-            <input
-                type="radio"
-                name="cakeTopperEnabled"
-                value="no"
-                checked
-            >
-            <span>No</span>
-        </label>
+    <label class="extra-layer-control">
+    <input
+        id="cakeTopperEnabledToggle"
+        type="checkbox"
+    >
 
-        <label>
-            <input
-                type="radio"
-                name="cakeTopperEnabled"
-                value="yes"
-            >
-            <span>Yes</span>
-        </label>
-    </div>
+    <span class="toggle-track"></span>
+
+    <span class="toggle-copy">
+        <strong>Add a Cake Topper</strong>
+        <small>Turn on to choose the topper type and wording.</small>
+    </span>
+</label>
 </fieldset>
 
                         <div id="cupcakeOnlyStudioSlot"></div>
@@ -3987,6 +3966,87 @@
                                 </label>
 
                                 
+                            </div>
+
+                            <div
+                                id="macaronDiscoCustomizer"
+                                class="quantity-product-list"
+                            >
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Macarons"
+                                    data-unit-price="2.5"
+                                >
+                                    <div class="quantity-product-info">
+                                        <img
+                                            class="quantity-product-image"
+                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
+                                            alt=""
+                                        >
+
+                                        <div>
+                                            <strong>Macarons</strong>
+                                            <span>$2.50 each</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="quantity-control">
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                        >−</button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="quantity-product"
+                                    data-product-name="Mini Disco Balls"
+                                    data-unit-price="2"
+                                >
+                                    <div class="quantity-product-info">
+                                        <img
+                                            class="quantity-product-image"
+                                            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
+                                            alt=""
+                                        >
+
+                                        <div>
+                                            <strong>Mini Disco Balls</strong>
+                                            <span>$2 each</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="quantity-control">
+                                        <button
+                                            type="button"
+                                            data-quantity-action="decrease"
+                                        >−</button>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value="0"
+                                            inputmode="numeric"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-quantity-action="increase"
+                                        >+</button>
+                                    </div>
+                                </div>
                             </div>
 
                         </fieldset>
@@ -4662,91 +4722,6 @@
                             </p>
 
                         </div>
-<fieldset class="builder-fieldset">
-    <legend>Extras</legend>
-
-    <p class="fieldset-description">
-        Choose any quantity. The live preview shows a representative styled arrangement, not the exact count.
-    </p>
-
-    <div class="quantity-product-list">
-        <div
-            class="quantity-product"
-            data-product-name="Macarons"
-            data-unit-price="2.5"
-        >
-            <div class="quantity-product-info">
-                <img
-                    class="quantity-product-image"
-                    src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Macaron-Single.png"
-                    alt=""
-                >
-
-                <div>
-                    <strong>Macarons</strong>
-                    <span>$2.50 each</span>
-                </div>
-            </div>
-
-            <div class="quantity-control">
-                <button
-                    type="button"
-                    data-quantity-action="decrease"
-                >−</button>
-
-                <input
-                    type="number"
-                    min="0"
-                    value="0"
-                    inputmode="numeric"
-                >
-
-                <button
-                    type="button"
-                    data-quantity-action="increase"
-                >+</button>
-            </div>
-        </div>
-
-        <div
-            class="quantity-product"
-            data-product-name="Mini Disco Balls"
-            data-unit-price="2"
-        >
-            <div class="quantity-product-info">
-                <img
-                    class="quantity-product-image"
-                    src="../images/cake-builder/cards/11-decorations/TPJ-Card-Decoration-Mini-Disco-Balls.png"
-                    alt=""
-                >
-
-                <div>
-                    <strong>Mini Disco Balls</strong>
-                    <span>$2 each</span>
-                </div>
-            </div>
-
-            <div class="quantity-control">
-                <button
-                    type="button"
-                    data-quantity-action="decrease"
-                >−</button>
-
-                <input
-                    type="number"
-                    min="0"
-                    value="0"
-                    inputmode="numeric"
-                >
-
-                <button
-                    type="button"
-                    data-quantity-action="increase"
-                >+</button>
-            </div>
-        </div>
-    </div>
-</fieldset>
                         <fieldset id="gourmetCupcakeExtras" class="builder-fieldset">
 
                             <legend>
@@ -5458,31 +5433,24 @@
 
                         </label>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset id="toyFigurineCustomizer" class="builder-fieldset">
                             <legend>
                                 Add Toy / Figurine Decorations?
                             </legend>
 
-                            <div class="compact-choice-row">
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="toyFigurineEnabled"
-                                        value="no"
-                                        checked
-                                    >
-                                    <span>No</span>
-                                </label>
+                            <label class="extra-layer-control">
+                                <input
+                                    id="toyFigurineEnabledToggle"
+                                    type="checkbox"
+                                >
 
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="toyFigurineEnabled"
-                                        value="yes"
-                                    >
-                                    <span>Yes</span>
-                                </label>
-                            </div>
+                                <span class="toggle-track"></span>
+
+                                <span class="toggle-copy">
+                                    <strong>Add Toy / Figurine Decorations</strong>
+                                    <small>Turn on to describe the toys or figurines you want.</small>
+                                </span>
+                            </label>
 
                             <label
                                 id="toyFigurineDetailsField"
@@ -5504,31 +5472,24 @@
                             </p>
                         </fieldset>
 
-                        <fieldset class="builder-fieldset">
+                        <fieldset id="customSculptedCustomizer" class="builder-fieldset">
                             <legend>
                                 Add Custom 3D Sculpted Pieces?
                             </legend>
 
-                            <div class="compact-choice-row">
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="customSculptedEnabled"
-                                        value="no"
-                                        checked
-                                    >
-                                    <span>No</span>
-                                </label>
+                            <label class="extra-layer-control">
+                                <input
+                                    id="customSculptedEnabledToggle"
+                                    type="checkbox"
+                                >
 
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="customSculptedEnabled"
-                                        value="yes"
-                                    >
-                                    <span>Yes</span>
-                                </label>
-                            </div>
+                                <span class="toggle-track"></span>
+
+                                <span class="toggle-copy">
+                                    <strong>Add Custom 3D Sculpted Pieces</strong>
+                                    <small>Turn on to describe what you want sculpted.</small>
+                                </span>
+                            </label>
 
                             <label
                                 id="customSculptedDetailsField"
@@ -6354,7 +6315,7 @@
 
     </div>
 
-<script src="../js/cake-builder.js?v=tpj-complete-fix-20260812"></script>
+<script src="../js/cake-builder.js?v=tpj-only-three-fixes-20260813-2"></script>
 
 </body>
 </html>
