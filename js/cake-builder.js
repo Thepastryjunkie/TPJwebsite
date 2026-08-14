@@ -593,7 +593,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-surgical-fixes-20260813-1";
+const cakeAssetVersion = "?v=tpj-definition-borders-20260814-2"; "?v=tpj-surgical-fixes-20260813-1";
 
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
@@ -1717,12 +1717,15 @@ const dripTintLayerCache =
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.10,
-    simpleHeart: 0.12,
-    simpleOther: 0.22,
-    dimensionalFinish: 0.16,
-    border: 0.18,
-    other: 0.07
+    smoothCake: 0.30,
+    simpleHeart: 0.44,
+    simpleOther: 0.42,
+    dimensionalFinish: 0.40,
+    border: 0.38,
+    numberLetterBase: 0.32,
+    numberLetterPiping: 0.44,
+    cupcakeFrosting: 0.48,
+    other: 0.12
 };
 
 function loadRealisticImage(url) {
@@ -1851,8 +1854,24 @@ function makeTintedLayer(
         isSimpleTextureAsset &&
         source.includes("-Heart");
 
-    const isBorderAsset =
+       const isBorderAsset =
         source.includes("/borders/");
+
+    const isNumberLetterAsset =
+        source.includes("TPJ-Number-Letter-");
+
+    const isNumberLetterBaseAsset =
+        isNumberLetterAsset &&
+        source.includes("-Base");
+
+    const isNumberLetterPipingAsset =
+        isNumberLetterAsset &&
+        source.includes("-Accent-");
+
+    const isCupcakeFrostingAsset =
+        source.includes("/cupcakes/frosting/") &&
+        source.includes("-Frosting") &&
+        !source.includes("Foundation");
 
     const isDimensionalFinishAsset =
         source.includes("TPJ-Finish-") &&
@@ -1860,8 +1879,8 @@ function makeTintedLayer(
 
     const isSmoothCakeAsset =
         source.includes("/cakes/") &&
-        !source.includes("TPJ-Finish-");
-
+        !source.includes("TPJ-Finish-") &&
+        !isNumberLetterAsset;
 
     /*
     Preserve the selected color while using
@@ -1936,15 +1955,21 @@ layerContext.globalCompositeOperation =
 layerContext.globalAlpha =
     isBorderAsset
         ? cakePreviewDetailStrength.border
-        : isDimensionalFinishAsset
-            ? cakePreviewDetailStrength.dimensionalFinish
-            : isHeartSimpleTextureAsset
-                ? cakePreviewDetailStrength.simpleHeart
-                : isSimpleTextureAsset
-                    ? cakePreviewDetailStrength.simpleOther
-                    : isSmoothCakeAsset
-                        ? cakePreviewDetailStrength.smoothCake
-                        : cakePreviewDetailStrength.other;
+        : isNumberLetterPipingAsset
+            ? cakePreviewDetailStrength.numberLetterPiping
+            : isNumberLetterBaseAsset
+                ? cakePreviewDetailStrength.numberLetterBase
+                : isCupcakeFrostingAsset
+                    ? cakePreviewDetailStrength.cupcakeFrosting
+                    : isDimensionalFinishAsset
+                        ? cakePreviewDetailStrength.dimensionalFinish
+                        : isHeartSimpleTextureAsset
+                            ? cakePreviewDetailStrength.simpleHeart
+                            : isSimpleTextureAsset
+                                ? cakePreviewDetailStrength.simpleOther
+                                : isSmoothCakeAsset
+                                    ? cakePreviewDetailStrength.smoothCake
+                                    : cakePreviewDetailStrength.other;
 
 layerContext.drawImage(
     detailLayer,
@@ -3044,7 +3069,7 @@ function drawTwoTierSimpleTexture(
                 );
 
                 layerContext.strokeStyle =
-                    "rgba(86, 50, 34, 0.15)";
+                    "rgba(86, 50, 34, 0.28)";
 
                 layerContext.lineWidth =
                     Math.max(
@@ -3065,7 +3090,7 @@ function drawTwoTierSimpleTexture(
                 );
 
                 layerContext.strokeStyle =
-                    "rgba(255, 255, 255, 0.18)";
+                    "rgba(255, 255, 255, 0.20)";
 
                 layerContext.lineWidth =
                     Math.max(
@@ -3100,7 +3125,220 @@ function drawTwoTierSimpleTexture(
         height
     );
 }
+const sheetTextureBoundsCache =
+    new WeakMap();
 
+function getSheetTextureBounds(mask) {
+    if (
+        sheetTextureBoundsCache.has(mask)
+    ) {
+        return sheetTextureBoundsCache.get(mask);
+    }
+
+    const width =
+        mask.naturalWidth || mask.width;
+
+    const height =
+        mask.naturalHeight || mask.height;
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const context =
+        canvas.getContext("2d", {
+            willReadFrequently: true
+        });
+
+    context.drawImage(
+        mask,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const pixels =
+        context.getImageData(
+            0,
+            0,
+            width,
+            height
+        ).data;
+
+    let minX = width;
+    let minY = height;
+    let maxX = 0;
+    let maxY = 0;
+
+    for (let y = 0; y < height; y += 2) {
+        for (let x = 0; x < width; x += 2) {
+            const alpha =
+                pixels[(y * width + x) * 4 + 3];
+
+            if (alpha <= 20) {
+                continue;
+            }
+
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+        }
+    }
+
+    const bounds =
+        maxX > minX && maxY > minY
+            ? {
+                minX,
+                minY,
+                maxX,
+                maxY,
+                width: maxX - minX,
+                height: maxY - minY
+            }
+            : {
+                minX: 0,
+                minY: 0,
+                maxX: width,
+                maxY: height,
+                width,
+                height
+            };
+
+    sheetTextureBoundsCache.set(
+        mask,
+        bounds
+    );
+
+    return bounds;
+}
+
+function drawSheetSimpleTexture(
+    context,
+    image,
+    x,
+    y,
+    width,
+    height
+) {
+    if (
+        builderState.cakeFinish !==
+            "Simple Texture"
+    ) {
+        return;
+    }
+
+    const textureMask =
+        getCoverageButtercreamMask(image);
+
+    const sourceWidth =
+        image.naturalWidth || image.width;
+
+    const sourceHeight =
+        image.naturalHeight || image.height;
+
+    const bounds =
+        getSheetTextureBounds(
+            textureMask
+        );
+
+    const layer =
+        document.createElement("canvas");
+
+    layer.width = sourceWidth;
+    layer.height = sourceHeight;
+
+    const layerContext =
+        layer.getContext("2d");
+
+    const startY =
+        bounds.minY +
+        bounds.height * 0.52;
+
+    const endY =
+        bounds.minY +
+        bounds.height * 0.90;
+
+    const rowGap = Math.max(
+        7,
+        Math.round(
+            bounds.height * 0.055
+        )
+    );
+
+    for (
+        let rowY = startY;
+        rowY <= endY;
+        rowY += rowGap
+    ) {
+        layerContext.beginPath();
+        layerContext.moveTo(
+            bounds.minX,
+            rowY
+        );
+        layerContext.lineTo(
+            bounds.maxX,
+            rowY
+        );
+
+        layerContext.strokeStyle =
+            "rgba(86, 50, 34, 0.30)";
+
+        layerContext.lineWidth =
+            Math.max(
+                1,
+                bounds.height * 0.012
+            );
+
+        layerContext.stroke();
+
+        layerContext.beginPath();
+        layerContext.moveTo(
+            bounds.minX,
+            rowY - 2
+        );
+        layerContext.lineTo(
+            bounds.maxX,
+            rowY - 2
+        );
+
+        layerContext.strokeStyle =
+            "rgba(255, 255, 255, 0.18)";
+
+        layerContext.lineWidth =
+            Math.max(
+                1,
+                bounds.height * 0.006
+            );
+
+        layerContext.stroke();
+    }
+
+    layerContext.globalCompositeOperation =
+        "destination-in";
+
+    layerContext.drawImage(
+        textureMask,
+        0,
+        0,
+        sourceWidth,
+        sourceHeight
+    );
+
+    layerContext.globalCompositeOperation =
+        "source-over";
+
+    context.drawImage(
+        layer,
+        x,
+        y,
+        width,
+        height
+    );
+}
 /* =========================================
    EDIBLE IMAGE CANVAS LAYER
 ========================================= */
@@ -3649,22 +3887,22 @@ async function loadBorderAssets(
     const borderRoot =
         `${finalAssetRoot}/borders`;
 
-    const [
+        const [
         strokes,
         mask,
         sprinkles
     ] = await Promise.all([
         loadOptionalRealisticImage(
-            `${borderRoot}/${files.strokes}`
+            `${borderRoot}/${files.strokes}${cakeAssetVersion}`
         ),
 
         loadOptionalRealisticImage(
-            `${borderRoot}/${files.mask}`
+            `${borderRoot}/${files.mask}${cakeAssetVersion}`
         ),
 
         builderState.cakeBorderSprinkles
             ? loadOptionalRealisticImage(
-                `${borderRoot}/${files.sprinkles}`
+                `${borderRoot}/${files.sprinkles}${cakeAssetVersion}`
             )
             : Promise.resolve(null)
     ]);
@@ -3693,6 +3931,12 @@ function getBorderDrawBox(
     let scaleY = 1;
     let offsetY = 0;
 
+    /*
+        Square standard and tall are the
+        benchmark, so Square is intentionally
+        not changed here.
+    */
+
     if (
         source.includes(
             "-Tall-5in-Heart-Bottom-"
@@ -3704,35 +3948,49 @@ function getBorderDrawBox(
             "-Tall-Heart-Top-"
         )
     ) {
-        scaleX = 1.10;
+        scaleX = 1.16;
     } else if (
         source.includes("-Heart-Top-") &&
+        !source.includes("-Tall-Heart-") &&
         !source.includes("-5in-Heart-") &&
         !source.includes("-Bento-")
     ) {
-        scaleX = 1.04;
+        scaleX = 1.10;
+    } else if (
+        source.includes(
+            "-Tall-Round-Bottom-"
+        )
+    ) {
+        scaleX = 0.91;
     } else if (
         source.includes(
             "-Tall-Star-Top-"
         )
     ) {
-        scaleX = 1.08;
+        scaleX = 0.94;
     } else if (
         source.includes(
             "-Tall-Star-Bottom-"
         )
     ) {
-        scaleX = 0.97;
+        scaleX = 0.94;
     } else if (
-        source.includes("-Star-Bottom-")
+        source.includes("-Star-Top-") &&
+        !source.includes("-Tall-Star-")
     ) {
-        scaleX = 0.89;
+        scaleX = 0.95;
+    } else if (
+        source.includes("-Star-Bottom-") &&
+        !source.includes("-Tall-Star-")
+    ) {
+        scaleX = 0.84;
     } else if (
         source.includes(
             "-Full-Sheet-Bottom-"
         )
     ) {
-        offsetY = height * 0.044;
+        scaleY = 0.90;
+        offsetY = height * 0.10;
     }
 
     const adjustedWidth =
@@ -3761,12 +4019,12 @@ function drawRegisteredBorderLayer(
     source,
     drawBox
 ) {
-        const isTwoTierTop =
+    const isTallTierTop =
         source.includes(
-            "-Two-Tier-Top-"
+            "-Tall-Two-Tier-Top-"
         );
 
-    if (!isTwoTierTop) {
+    if (!isTallTierTop) {
         context.drawImage(
             layer,
             drawBox.x,
@@ -3778,58 +4036,45 @@ function drawRegisteredBorderLayer(
         return;
     }
 
-    /*
-        Preserve the top rim.
-    */
+    const sourceWidth =
+        layer.width;
 
-    context.save();
-    context.beginPath();
-    context.rect(
-        drawBox.x,
-        drawBox.y,
-        drawBox.width,
-        drawBox.height * 0.30
-    );
-    context.clip();
+    const sourceHeight =
+        layer.height;
+
+    /*
+        Draw the top rim without moving it.
+    */
 
     context.drawImage(
         layer,
+        0,
+        0,
+        sourceWidth,
+        sourceHeight * 0.28,
         drawBox.x,
         drawBox.y,
         drawBox.width,
-        drawBox.height
+        drawBox.height * 0.28
     );
 
-    context.restore();
-
     /*
-        Lower only the broken middle band.
+        Draw a larger middle slice so the band
+        is no longer cut off at the upper-tier base.
     */
 
-    const middleOffset =
-        drawBox.height * 0.018;
-
-    context.save();
-    context.beginPath();
-    context.rect(
+    context.drawImage(
+        layer,
+        0,
+        sourceHeight * 0.28,
+        sourceWidth,
+        sourceHeight * 0.42,
         drawBox.x,
         drawBox.y +
-            drawBox.height * 0.30 +
-            middleOffset,
+            drawBox.height * 0.28,
         drawBox.width,
-        drawBox.height * 0.34
+        drawBox.height * 0.44
     );
-    context.clip();
-
-    context.drawImage(
-        layer,
-        drawBox.x,
-        drawBox.y + middleOffset,
-        drawBox.width,
-        drawBox.height
-    );
-
-    context.restore();
 }
 
 function drawCakeBorder(
@@ -4747,39 +4992,57 @@ function drawVintageFinishLayer(
     };
 
     const drawCroppedBand = (
-    sourceTopRatio,
-    sourceBottomRatio,
-    scaleX,
-    scaleY,
-    offsetYRatio = 0
-) => {
+        sourceTopRatio,
+        sourceBottomRatio,
+        scaleX,
+        scaleY,
+        offsetYRatio = 0
+    ) => {
         const sourceWidth =
             layer.width || width;
+
         const sourceHeight =
             layer.height || height;
+
         const sourceY =
             sourceHeight * sourceTopRatio;
+
         const sourceBandHeight =
             sourceHeight *
-            (sourceBottomRatio - sourceTopRatio);
+            (
+                sourceBottomRatio -
+                sourceTopRatio
+            );
+
         const destinationWidth =
             width * scaleX;
+
         const destinationBandHeight =
             height *
-            (sourceBottomRatio - sourceTopRatio) *
+            (
+                sourceBottomRatio -
+                sourceTopRatio
+            ) *
             scaleY;
+
         const destinationX =
-            x + (width - destinationWidth) / 2;
+            x +
+            (width - destinationWidth) / 2;
+
         const originalBandY =
             y + height * sourceTopRatio;
+
         const destinationY =
-    originalBandY +
-    (
-        height *
-            (sourceBottomRatio - sourceTopRatio) -
-        destinationBandHeight
-    ) / 2 +
-    height * offsetYRatio;
+            originalBandY +
+            (
+                height *
+                    (
+                        sourceBottomRatio -
+                        sourceTopRatio
+                    ) -
+                destinationBandHeight
+            ) / 2 +
+            height * offsetYRatio;
 
         context.drawImage(
             layer,
@@ -4794,17 +5057,20 @@ function drawVintageFinishLayer(
         );
     };
 
+    /*
+        TALL ROUND
+        Accent 1 keeps the corrected rings.
+        Accent 2 contains the swags, so only
+        the swag layer is narrowed.
+    */
+
     if (
         source.includes("-Tall-Round-") &&
         builderState.cakeCoverage === "full"
     ) {
-        /*
-            Accent 1 contains the pink ring/border
-            piping. Narrow that layer only. Accent 2
-            contains the registered swag rows and
-            must stay at the supplied size.
-        */
-        if (source.includes("-Accent-1-")) {
+        if (
+            source.includes("-Accent-1-")
+        ) {
             drawCroppedBand(
                 0,
                 0.28,
@@ -4814,7 +5080,7 @@ function drawVintageFinishLayer(
 
             drawCentered(
                 1,
-                0.3,
+                0.30,
                 0.75
             );
 
@@ -4825,100 +5091,151 @@ function drawVintageFinishLayer(
                 0.75
             );
         } else {
-            context.drawImage(
-                layer,
-                x,
-                y,
-                width,
-                height
+            drawCentered(
+                0.90
             );
         }
 
         return;
     }
-if (
-    source.includes("-Tall-Heart-") &&
-    !source.includes("-Tall-5in-Heart-") &&
-    source.includes("-Accent-1-")
-) {
-    drawCroppedBand(
-        0,
-        0.30,
-        1.04,
-        1
-    );
 
-    drawCentered(
-        1,
-        0.30,
-        1
-    );
+    /*
+        TALL HEART
+        Grow only the upper piping area.
+    */
 
-    return;
-}
+    if (
+        source.includes("-Tall-Heart-") &&
+        !source.includes(
+            "-Tall-5in-Heart-"
+        ) &&
+        source.includes("-Accent-1-")
+    ) {
+        drawCroppedBand(
+            0,
+            0.30,
+            1.12,
+            1
+        );
 
-if (
-    source.includes("-Star-") &&
-    !source.includes("-Tall-Star-") &&
-    source.includes("-Accent-1-")
-) {
-    drawCentered(
-        1,
-        0,
-        0.70
-    );
+        drawCentered(
+            1,
+            0.30,
+            1
+        );
 
-    drawCroppedBand(
-        0.70,
-        1,
-        0.94,
-        1
-    );
+        return;
+    }
 
-    return;
-}
+    /*
+        STANDARD HEART
+        Grow only the upper piping area.
+    */
 
-if (
-    source.includes("-Half-Sheet-") &&
-    source.includes("-Accent-1-")
-) {
-    drawCentered(
-        1,
-        0,
-        0.68
-    );
+    if (
+        source.includes("-Heart-") &&
+        !source.includes("-Tall-Heart-") &&
+        !source.includes("-5in-Heart-") &&
+        !source.includes("-Bento-") &&
+        source.includes("-Accent-1-")
+    ) {
+        drawCroppedBand(
+            0,
+            0.30,
+            1.10,
+            1
+        );
 
-    drawCroppedBand(
-        0.68,
-        1,
-        0.97,
-        1,
-        -0.055
-    );
+        drawCentered(
+            1,
+            0.30,
+            1
+        );
 
-    return;
-}
+        return;
+    }
 
-if (
-    source.includes("-Full-Sheet-") &&
-    source.includes("-Accent-1-")
-) {
-    drawCentered(
-        1,
-        0,
-        0.70
-    );
+    /*
+        STANDARD STAR
+        Keep the upper artwork full-sized and
+        narrow only the lower piping.
+    */
 
-    drawCroppedBand(
-        0.70,
-        1,
-        1,
-        1,
-        -0.055
-    );
+    if (
+        source.includes("-Star-") &&
+        !source.includes("-Tall-Star-") &&
+        source.includes("-Accent-1-")
+    ) {
+        drawCentered(
+            1,
+            0,
+            0.70
+        );
 
-    return;
-}
+        drawCroppedBand(
+            0.70,
+            1,
+            0.86,
+            1
+        );
+
+        return;
+    }
+
+    /*
+        HALF SHEET
+    */
+
+    if (
+        source.includes("-Half-Sheet-") &&
+        source.includes("-Accent-1-")
+    ) {
+        drawCentered(
+            1,
+            0,
+            0.68
+        );
+
+        drawCroppedBand(
+            0.68,
+            1,
+            0.97,
+            1,
+            -0.055
+        );
+
+        return;
+    }
+
+    /*
+        FULL SHEET
+    */
+
+    if (
+        source.includes("-Full-Sheet-") &&
+        source.includes("-Accent-1-")
+    ) {
+        drawCentered(
+            1,
+            0,
+            0.70
+        );
+
+        drawCroppedBand(
+            0.70,
+            1,
+            1,
+            1,
+            -0.055
+        );
+
+        return;
+    }
+
+    /*
+        TALL TWO-TIER
+    */
+
     if (
         source.includes(
             "-Tall-Two-Tier-"
@@ -4939,9 +5256,22 @@ if (
         return;
     }
 
+    /*
+        STANDARD TWO-TIER
+        Move the complete decoration slightly
+        left without moving or resizing the cake.
+    */
+
     if (
         source.includes("-Two-Tier-")
     ) {
+        context.save();
+
+        context.translate(
+            -width * 0.035,
+            0
+        );
+
         drawCentered(
             0.94,
             0,
@@ -4954,8 +5284,16 @@ if (
             1
         );
 
+        context.restore();
+
         return;
     }
+
+    /*
+        Everything not explicitly listed,
+        including Square, stays exactly at
+        its exported registration.
+    */
 
     context.drawImage(
         layer,
@@ -5534,7 +5872,7 @@ if (isCoveragePreview) {
                     : builderState.characterTwoColor
                 : builderState.mainCakeColor;
 
-        drawRecoloredAsset(
+         drawRecoloredAsset(
             context,
             cakeImage,
             coverageMask,
@@ -5547,7 +5885,22 @@ if (isCoveragePreview) {
             size.height
         );
     }
+
+    if (product.shape === "sheet") {
+        drawSheetSimpleTexture(
+            context,
+            cakeImage,
+            x,
+            y + boardYOffset,
+            size.width,
+            size.height
+        );
+    }
 }
+    
+
+    /*
+        This MUST remain inside the loop because      
     
 
     /*
