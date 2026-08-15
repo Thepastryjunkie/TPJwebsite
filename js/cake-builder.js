@@ -593,8 +593,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-definition-borders-20260814-2"; "?v=tpj-surgical-fixes-20260813-1";
-
+const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260814-3";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -1717,11 +1716,11 @@ const dripTintLayerCache =
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.30,
-    simpleHeart: 0.44,
-    simpleOther: 0.42,
-    dimensionalFinish: 0.40,
-    border: 0.38,
+    smoothCake: 0.32,
+    simpleHeart: 0.46,
+    simpleOther: 0.44,
+    dimensionalFinish: 0.42,
+    border: 0.40,
     numberLetterBase: 0.32,
     numberLetterPiping: 0.44,
     cupcakeFrosting: 0.48,
@@ -1982,7 +1981,7 @@ layerContext.drawImage(
     /*
         Final clip back to the original mask.
     */
-
+if (!isSimpleTextureAsset) {
     layerContext.globalCompositeOperation =
         "destination-in";
 
@@ -1995,10 +1994,11 @@ layerContext.drawImage(
         layer.width,
         layer.height
     );
+}
 
 
-    layerContext.globalCompositeOperation =
-        "source-over";
+layerContext.globalCompositeOperation =
+    "source-over";
 
     layerContext.globalAlpha = 1;
 
@@ -2305,7 +2305,60 @@ function getCakePreviewEntries(product) {
 if (coverageEntry) {
     return [coverageEntry];
 }
+/*
+    REAL SIMPLE TEXTURE ASSETS
+    for sheets and two-tier cakes.
+*/
 
+if (
+    builderState.cakeFinish ===
+        "Simple Texture" &&
+    builderState.cakeCoverage === "full"
+) {
+    if (
+        builderState.cakeProductId ===
+        "sheet-half"
+    ) {
+        return [{
+            file:
+                "TPJ-Finish-Simple-Texture-Horizontal-Comb-Half-Sheet.png",
+            key: "halfSheet"
+        }];
+    }
+
+    if (
+        builderState.cakeProductId ===
+        "sheet-full"
+    ) {
+        return [{
+            file:
+                "TPJ-Finish-Simple-Texture-Horizontal-Comb-Full-Sheet.png",
+            key: "fullSheet"
+        }];
+    }
+
+    if (
+        builderState.cakeProductId ===
+        "tier-4-6-standard"
+    ) {
+        return [{
+            file:
+                "TPJ-Finish-Simple-Texture-Horizontal-Comb-Two-Tier.png",
+            key: "tier"
+        }];
+    }
+
+    if (
+        builderState.cakeProductId ===
+        "tier-4-6-tall"
+    ) {
+        return [{
+            file:
+                "TPJ-Finish-Simple-Texture-Horizontal-Comb-Tall-Two-Tier.png",
+            key: "tallTier"
+        }];
+    }
+}
 if (
     builderState.cakeProductId ===
     "heart-5-bento"
@@ -2821,10 +2874,6 @@ function drawBentoColorPreview(
         context.restore();
     }
 
-    drawBentoSimpleTexture(
-        context,
-        map
-    );
 
     if (
         builderState.cupcakeFrostingColor !==
@@ -2874,7 +2923,27 @@ function drawBentoColorPreview(
         context.restore();
     }
 }
+function getBentoBorderDrawBox(
+    standaloneImage,
+    transform
+) {
+    const map =
+        getBentoTransformMap(
+            standaloneImage,
+            transform
+        );
 
+    return {
+        x: map.x(190),
+        y: map.y(455),
+        width:
+            map.x(665) -
+            map.x(190),
+        height:
+            map.y(900) -
+            map.y(455)
+    };
+}
 function drawTwoTierColors(
     context,
     image,
@@ -3932,9 +4001,8 @@ function getBorderDrawBox(
     let offsetY = 0;
 
     /*
-        Square standard and tall are the
-        benchmark, so Square is intentionally
-        not changed here.
+        Square standard and tall remain the
+        benchmark and are intentionally untouched.
     */
 
     if (
@@ -3948,7 +4016,7 @@ function getBorderDrawBox(
             "-Tall-Heart-Top-"
         )
     ) {
-        scaleX = 1.16;
+        scaleX = 1.20;
     } else if (
         source.includes("-Heart-Top-") &&
         !source.includes("-Tall-Heart-") &&
@@ -3956,6 +4024,12 @@ function getBorderDrawBox(
         !source.includes("-Bento-")
     ) {
         scaleX = 1.10;
+    } else if (
+        source.includes(
+            "-Tall-Round-Top-"
+        )
+    ) {
+        scaleX = 1.03;
     } else if (
         source.includes(
             "-Tall-Round-Bottom-"
@@ -3983,14 +4057,14 @@ function getBorderDrawBox(
         source.includes("-Star-Bottom-") &&
         !source.includes("-Tall-Star-")
     ) {
-        scaleX = 0.84;
+        scaleX = 0.80;
     } else if (
         source.includes(
             "-Full-Sheet-Bottom-"
         )
     ) {
-        scaleY = 0.90;
-        offsetY = height * 0.10;
+        scaleY = 0.86;
+        offsetY = height * 0.14;
     }
 
     const adjustedWidth =
@@ -4043,7 +4117,7 @@ function drawRegisteredBorderLayer(
         layer.height;
 
     /*
-        Draw the top rim without moving it.
+        Keep the upper rim in its original place.
     */
 
     context.drawImage(
@@ -4051,29 +4125,29 @@ function drawRegisteredBorderLayer(
         0,
         0,
         sourceWidth,
-        sourceHeight * 0.28,
+        sourceHeight * 0.24,
         drawBox.x,
         drawBox.y,
         drawBox.width,
-        drawBox.height * 0.28
+        drawBox.height * 0.24
     );
 
     /*
-        Draw a larger middle slice so the band
-        is no longer cut off at the upper-tier base.
+        Give the upper-tier base band a taller
+        slice and lower it so it is fully visible.
     */
 
     context.drawImage(
         layer,
         0,
-        sourceHeight * 0.28,
+        sourceHeight * 0.24,
         sourceWidth,
-        sourceHeight * 0.42,
+        sourceHeight * 0.56,
         drawBox.x,
         drawBox.y +
-            drawBox.height * 0.28,
+            drawBox.height * 0.27,
         drawBox.width,
-        drawBox.height * 0.44
+        drawBox.height * 0.56
     );
 }
 
@@ -5071,12 +5145,12 @@ function drawVintageFinishLayer(
         if (
             source.includes("-Accent-1-")
         ) {
-            drawCroppedBand(
-                0,
-                0.28,
-                0.88,
-                0.75
-            );
+           drawCroppedBand(
+    0,
+    0.28,
+    0.94,
+    0.78
+); 
 
             drawCentered(
                 1,
@@ -5084,17 +5158,30 @@ function drawVintageFinishLayer(
                 0.75
             );
 
-            drawCroppedBand(
-                0.75,
-                1,
-                0.88,
-                0.75
-            );
-        } else {
-            drawCentered(
-                0.90
-            );
-        }
+         drawCroppedBand(
+    0.75,
+    1,
+    0.88,
+    0.75,
+    0.025
+);   
+     } else {
+    context.save();
+    context.beginPath();
+    context.rect(
+        x + width * 0.05,
+        y,
+        width * 0.90,
+        height
+    );
+    context.clip();
+
+    drawCentered(
+        0.86
+    );
+
+    context.restore();
+}  
 
         return;
     }
@@ -5111,12 +5198,12 @@ function drawVintageFinishLayer(
         ) &&
         source.includes("-Accent-1-")
     ) {
-        drawCroppedBand(
-            0,
-            0.30,
-            1.12,
-            1
-        );
+     drawCroppedBand(
+    0,
+    0.30,
+    1.18,
+    1
+);   
 
         drawCentered(
             1,
@@ -5172,12 +5259,12 @@ function drawVintageFinishLayer(
             0.70
         );
 
-        drawCroppedBand(
-            0.70,
-            1,
-            0.86,
-            1
-        );
+       drawCroppedBand(
+    0.70,
+    1,
+    0.80,
+    1
+); 
 
         return;
     }
@@ -5221,13 +5308,13 @@ function drawVintageFinishLayer(
             0.70
         );
 
-        drawCroppedBand(
-            0.70,
-            1,
-            1,
-            1,
-            -0.055
-        );
+       drawCroppedBand(
+    0.70,
+    1,
+    1,
+    1,
+    0.02
+);
 
         return;
     }
@@ -5541,8 +5628,9 @@ async function updateRealisticCakePreview() {
     edibleImage,
     standaloneFinishAssets,
     standaloneBorderAssets,
-    standaloneExtraAssets
-] = await Promise.all([    
+    standaloneExtraAssets,
+    bentoSimpleTextureImage
+] = await Promise.all([  
     loadRealisticImage(
         cakeUrls[0]
     ),
@@ -5576,7 +5664,16 @@ isBento
         "heart5in",
         true
     )
-    : Promise.resolve([])
+    : Promise.resolve([]),
+
+isBento &&
+builderState.cakeFinish ===
+    "Simple Texture" &&
+builderState.cakeCoverage === "full"
+    ? loadRealisticImage(
+        `${finalAssetRoot}/cakes/TPJ-Finish-Simple-Texture-Horizontal-Comb-Bento-Heart.png${cakeAssetVersion}`
+    )
+    : Promise.resolve(null)
 ]);
             if (renderVersion !== realisticRenderVersion) return;
 
@@ -5613,6 +5710,12 @@ isBento
                     standaloneImage,
                     transform
                 );
+   drawBentoSimpleTextureAsset(
+    context,
+    bentoSimpleTextureImage,
+    standaloneImage,
+    transform
+);             
  drawRealisticCakeFinish(
     context,
     standaloneFinishAssets,
@@ -5637,14 +5740,20 @@ drawCakeDripExtra(
 );
 
 
+const bentoBorderBox =
+    getBentoBorderDrawBox(
+        standaloneImage,
+        transform
+    );
+
 if (standaloneBorderAssets?.bottom) {
     drawCakeBorder(
         context,
         standaloneBorderAssets.bottom,
-        transform.x,
-        transform.y,
-        transform.width,
-        transform.height
+        bentoBorderBox.x,
+        bentoBorderBox.y,
+        bentoBorderBox.width,
+        bentoBorderBox.height
     );
 }
 
@@ -5652,10 +5761,10 @@ if (standaloneBorderAssets?.top) {
     drawCakeBorder(
         context,
         standaloneBorderAssets.top,
-        transform.x,
-        transform.y,
-        transform.width,
-        transform.height
+        bentoBorderBox.x,
+        bentoBorderBox.y,
+        bentoBorderBox.width,
+        bentoBorderBox.height
     );
 }
 
@@ -5835,15 +5944,7 @@ if (isCoveragePreview) {
         
     );
 
-    drawTwoTierSimpleTexture(
-        context,
-        cakeImage,
-        x,
-        y + boardYOffset,
-        size.width,
-        size.height,
-        coverageMask
-    );
+   
 } else {
     const isLayeredNumberLetter =
         product.shape === "numberLetter" &&
@@ -5886,16 +5987,7 @@ if (isCoveragePreview) {
         );
     }
 
-    if (product.shape === "sheet") {
-        drawSheetSimpleTexture(
-            context,
-            cakeImage,
-            x,
-            y + boardYOffset,
-            size.width,
-            size.height
-        );
-    }
+   
 }
     
 
