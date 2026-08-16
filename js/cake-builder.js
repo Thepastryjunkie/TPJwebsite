@@ -593,7 +593,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260814-3";
+const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260816-4";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -4016,7 +4016,14 @@ function getBorderDrawBox(
             "-Tall-Heart-Top-"
         )
     ) {
-        scaleX = 1.20;
+        /*
+            Keep the accepted width, but extend
+            the complete border downward so the
+            front Heart point reaches its corner.
+        */
+scaleX = 1.20;
+scaleY = 1.08;
+offsetY = -height * 0.02;
     } else if (
         source.includes("-Heart-Top-") &&
         !source.includes("-Tall-Heart-") &&
@@ -4052,20 +4059,25 @@ function getBorderDrawBox(
         source.includes("-Star-Top-") &&
         !source.includes("-Tall-Star-")
     ) {
-        scaleX = 0.95;
-    } else if (
-        source.includes("-Star-Bottom-") &&
-        !source.includes("-Tall-Star-")
-    ) {
-        scaleX = 0.80;
-    } else if (
-        source.includes(
-            "-Full-Sheet-Bottom-"
-        )
-    ) {
-        scaleY = 0.86;
-        offsetY = height * 0.14;
-    }
+        /*
+            Use the complete registered Standard
+            Star artwork instead of shrinking it.
+        */
+        scaleX = 1;
+  } else if (
+    source.includes("-Star-Bottom-") &&
+    !source.includes("-Tall-Star-")
+) {
+    scaleX = 1;
+    offsetY = -height * 0.02;
+  } else if (
+    source.includes(
+        "-Full-Sheet-Bottom-"
+    )
+) {
+    scaleY = 0.86;
+    offsetY = height * 0.17;
+}
 
     const adjustedWidth =
         width * scaleX;
@@ -4093,6 +4105,46 @@ function drawRegisteredBorderLayer(
     source,
     drawBox
 ) {
+    const isFullSheetBottom =
+        source.includes(
+            "-Full-Sheet-Bottom-"
+        );
+
+    if (isFullSheetBottom) {
+        const centerX =
+            drawBox.x +
+            drawBox.width / 2;
+
+        const centerY =
+            drawBox.y +
+            drawBox.height / 2;
+
+        context.save();
+
+        context.translate(
+            centerX,
+            centerY
+        );
+
+        /*
+            Straighten the supplied Full Sheet
+            bottom border artwork.
+        */
+
+        context.rotate(0.025);
+
+        context.drawImage(
+            layer,
+            -drawBox.width / 2,
+            -drawBox.height / 2,
+            drawBox.width,
+            drawBox.height
+        );
+
+        context.restore();
+        return;
+    }
+
     const isTallTierTop =
         source.includes(
             "-Tall-Two-Tier-Top-"
@@ -4117,7 +4169,7 @@ function drawRegisteredBorderLayer(
         layer.height;
 
     /*
-        Keep the upper rim in its original place.
+        Tall Two-Tier upper rim.
     */
 
     context.drawImage(
@@ -4133,22 +4185,61 @@ function drawRegisteredBorderLayer(
     );
 
     /*
-        Give the upper-tier base band a taller
-        slice and lower it so it is fully visible.
+        Crop around the actual middle piping
+        pixels and enlarge that section.
     */
 
-    context.drawImage(
-        layer,
-        0,
-        sourceHeight * 0.24,
-        sourceWidth,
-        sourceHeight * 0.56,
-        drawBox.x,
-        drawBox.y +
-            drawBox.height * 0.27,
-        drawBox.width,
-        drawBox.height * 0.56
+context.drawImage(
+    layer,
+    0,
+    sourceHeight * 0.534,
+    sourceWidth,
+    sourceHeight * 0.034,
+    drawBox.x,
+    drawBox.y +
+        drawBox.height * 0.525,
+    drawBox.width,
+    drawBox.height * 0.07
+);
+}
+function drawEnlargedSprinkleLayer(
+    context,
+    layer,
+    source,
+    drawBox
+) {
+    const spread = Math.max(
+        1,
+        Math.min(
+            drawBox.width,
+            drawBox.height
+        ) * 0.0035
     );
+
+    const offsets = [
+        [-spread, -spread],
+        [0, -spread],
+        [spread, -spread],
+        [-spread, 0],
+        [0, 0],
+        [spread, 0],
+        [-spread, spread],
+        [0, spread],
+        [spread, spread]
+    ];
+
+    offsets.forEach(([offsetX, offsetY]) => {
+        drawRegisteredBorderLayer(
+            context,
+            layer,
+            source,
+            {
+                ...drawBox,
+                x: drawBox.x + offsetX,
+                y: drawBox.y + offsetY
+            }
+        );
+    });
 }
 
 function drawCakeBorder(
@@ -4199,18 +4290,17 @@ function drawCakeBorder(
         source,
         drawBox
     );
-
-    if (
-        builderState.cakeBorderSprinkles &&
-        assets.sprinkles
-    ) {
-        drawRegisteredBorderLayer(
-            context,
-            assets.sprinkles,
-            source,
-            drawBox
-        );
-    }
+if (
+    builderState.cakeBorderSprinkles &&
+    assets.sprinkles
+) {
+    drawEnlargedSprinkleLayer(
+        context,
+        assets.sprinkles,
+        source,
+        drawBox
+    );
+}
 
     context.restore();
 }
@@ -5186,33 +5276,62 @@ function drawVintageFinishLayer(
         return;
     }
 
+/*
+    TALL HEART
+
+    The upper 30% controls the wide back and side
+    sections of the border.
+
+    The next section contains the front Heart point,
+    so it receives vertical scaling instead of
+    another small horizontal adjustment.
+
+    Everything below 60% remains registered at the
+    original supplied size.
+*/
+
+if (
+    source.includes("-Tall-Heart-") &&
+    !source.includes(
+        "-Tall-5in-Heart-"
+    ) &&
+    source.includes("-Accent-1-")
+) {
     /*
-        TALL HEART
-        Grow only the upper piping area.
+        Keep the accepted upper width.
     */
 
-    if (
-        source.includes("-Tall-Heart-") &&
-        !source.includes(
-            "-Tall-5in-Heart-"
-        ) &&
-        source.includes("-Accent-1-")
-    ) {
-     drawCroppedBand(
+   context.save();
+
+context.translate(
     0,
-    0.30,
+    -height * 0.02
+);
+
+drawCentered(
     1.18,
+    0,
+    0.30
+);
+
+drawCentered(
+    1,
+    0.30,
+    0.60,
+    1.10,
+    0
+);
+
+context.restore();
+
+drawCentered(
+    1,
+    0.60,
     1
-);   
+);
 
-        drawCentered(
-            1,
-            0.30,
-            1
-        );
-
-        return;
-    }
+    return;
+}
 
     /*
         STANDARD HEART
@@ -5242,32 +5361,35 @@ function drawVintageFinishLayer(
         return;
     }
 
-    /*
-        STANDARD STAR
-        Keep the upper artwork full-sized and
-        narrow only the lower piping.
-    */
+/*
+    STANDARD STAR
 
-    if (
-        source.includes("-Star-") &&
-        !source.includes("-Tall-Star-") &&
-        source.includes("-Accent-1-")
-    ) {
-        drawCentered(
-            1,
-            0,
-            0.70
-        );
+    Draw the complete registered Accent 1 asset.
+    The previous 70% split cut through the bottom
+    border and resized only part of it.
+*/
 
-       drawCroppedBand(
-    0.70,
+if (
+    source.includes("-Star-") &&
+    !source.includes("-Tall-Star-") &&
+    source.includes("-Accent-1-")
+) {
+  drawCentered(
     1,
-    0.80,
-    1
-); 
+    0,
+    0.60
+);
 
-        return;
-    }
+drawCroppedBand(
+    0.60,
+    1,
+    1,
+    1,
+    -0.02
+);
+
+return;
+}
 
     /*
         HALF SHEET
@@ -5298,50 +5420,55 @@ function drawVintageFinishLayer(
         FULL SHEET
     */
 
-    if (
-        source.includes("-Full-Sheet-") &&
-        source.includes("-Accent-1-")
-    ) {
-        drawCentered(
-            1,
-            0,
-            0.70
-        );
+if (
+    source.includes("-Full-Sheet-") &&
+    source.includes("-Accent-1-")
+) {
+    drawCentered(
+        1,
+        0,
+        0.674
+    );
 
-       drawCroppedBand(
-    0.70,
-    1,
-    1,
-    1,
-    0.02
-);
+    drawCroppedBand(
+        0.674,
+        1,
+        1,
+        1,
+        -0.01
+    );
 
-        return;
-    }
+    return;
+}
 
     /*
         TALL TWO-TIER
     */
 
-    if (
-        source.includes(
-            "-Tall-Two-Tier-"
-        )
-    ) {
-        drawCentered(
-            0.94,
-            0,
-            0.56
-        );
+if (
+    source.includes(
+        "-Tall-Two-Tier-"
+    )
+) {
+    const splitRatio =
+        source.includes("-Accent-1-")
+            ? 0.69
+            : 0.56;
 
-        drawCentered(
-            1,
-            0.56,
-            1
-        );
+    drawCentered(
+        0.94,
+        0,
+        splitRatio
+    );
 
-        return;
-    }
+    drawCentered(
+        1,
+        splitRatio,
+        1
+    );
+
+    return;
+}
 
     /*
         STANDARD TWO-TIER
