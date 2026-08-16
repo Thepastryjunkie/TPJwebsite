@@ -593,7 +593,8 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260816-5";
+const cakeAssetVersion =
+    "?v=tpj-final-visual-calibration-20260816-6";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -2830,7 +2831,57 @@ function drawBentoSimpleTexture(
 
     context.restore();
 }
+function drawBentoSimpleTextureAsset(
+    context,
+    textureImage,
+    standaloneImage,
+    transform
+) {
+    if (
+        !textureImage ||
+        builderState.cakeFinish !==
+            "Simple Texture" ||
+        builderState.cakeCoverage !== "full"
+    ) {
+        return;
+    }
 
+    const map =
+        getBentoTransformMap(
+            standaloneImage,
+            transform
+        );
+
+    const textureColor =
+        builderState.mainCakeColor ===
+            "original"
+            ? "original"
+            : getLightenedCakePreviewColor(
+                builderState.mainCakeColor
+            );
+
+    context.save();
+
+    traceBentoCakePath(
+        context,
+        map
+    );
+
+    context.clip();
+
+    drawRecoloredAsset(
+        context,
+        textureImage,
+        textureImage,
+        textureColor,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+
+    context.restore();
+}
 function drawBentoColorPreview(
     context,
     image,
