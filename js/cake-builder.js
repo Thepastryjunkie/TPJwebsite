@@ -593,7 +593,7 @@ const bentoLayerNotice = getElement(
 const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
-const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260816-4";
+const cakeAssetVersion = "?v=tpj-final-visual-calibration-20260816-5";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -4076,7 +4076,7 @@ offsetY = -height * 0.02;
     )
 ) {
     scaleY = 0.86;
-    offsetY = height * 0.17;
+    offsetY = height * 0.18;
 }
 
     const adjustedWidth =
@@ -4099,109 +4099,8 @@ offsetY = -height * 0.02;
     };
 }
 
-function drawRegisteredBorderLayer(
-    context,
-    layer,
-    source,
-    drawBox
-) {
-    const isFullSheetBottom =
-        source.includes(
-            "-Full-Sheet-Bottom-"
-        );
+function drawRegisteredBorderLayer( context, layer, source, drawBox ) { const isFullSheetBottom = source.includes( "-Full-Sheet-Bottom-" ); if (isFullSheetBottom) { const centerX = drawBox.x + drawBox.width / 2; const centerY = drawBox.y + drawBox.height / 2; context.save(); context.translate( centerX, centerY ); context.rotate(0.025); context.drawImage( layer, -drawBox.width / 2, -drawBox.height / 2, drawBox.width, drawBox.height ); context.restore(); return; } const isTallTierTop = source.includes( "-Tall-Two-Tier-Top-" ); if (!isTallTierTop) { context.drawImage( layer, drawBox.x, drawBox.y, drawBox.width, drawBox.height ); return; } const sourceWidth = layer.width; const sourceHeight = layer.height; /* Draw only the Tall Two-Tier upper rim from this asset. Its middle border is incomplete. */ context.drawImage( layer, 0, 0, sourceWidth, sourceHeight * 0.24, drawBox.x, drawBox.y, drawBox.width, drawBox.height * 0.24 ); } function drawTallTierMiddleLayer( context, layer, drawBox ) { const sourceWidth = layer.width; const sourceHeight = layer.height; context.drawImage( layer, 0, sourceHeight * 0.47, sourceWidth, sourceHeight * 0.10, drawBox.x, drawBox.y + drawBox.height * 0.495, drawBox.width, drawBox.height * 0.10 ); } function drawTallTierMiddleBorder( context, assets, x, y, width, height ) { if (!assets) { return; } const borderColor = builderState.cakeBorderColor || "#FF4FA3"; const tintedBorder = makeTintedLayer( assets.strokes, assets.mask, borderColor ); const drawBox = { x, y, width, height }; context.save(); context.globalCompositeOperation = "source-over"; context.globalAlpha = 1; drawTallTierMiddleLayer( context, tintedBorder, drawBox ); if ( builderState.cakeBorderSprinkles && assets.sprinkles ) { const spread = Math.max( 1, Math.min(width, height) * 0.0035 ); [ [-spread, -spread], [0, -spread], [spread, -spread], [-spread, 0], [0, 0], [spread, 0], [-spread, spread], [0, spread], [spread, spread] ].forEach( ([offsetX, offsetY]) => { drawTallTierMiddleLayer( context, assets.sprinkles, { ...drawBox, x: drawBox.x + offsetX, y: drawBox.y + offsetY } ); } ); } context.restore(); }
 
-    if (isFullSheetBottom) {
-        const centerX =
-            drawBox.x +
-            drawBox.width / 2;
-
-        const centerY =
-            drawBox.y +
-            drawBox.height / 2;
-
-        context.save();
-
-        context.translate(
-            centerX,
-            centerY
-        );
-
-        /*
-            Straighten the supplied Full Sheet
-            bottom border artwork.
-        */
-
-        context.rotate(0.025);
-
-        context.drawImage(
-            layer,
-            -drawBox.width / 2,
-            -drawBox.height / 2,
-            drawBox.width,
-            drawBox.height
-        );
-
-        context.restore();
-        return;
-    }
-
-    const isTallTierTop =
-        source.includes(
-            "-Tall-Two-Tier-Top-"
-        );
-
-    if (!isTallTierTop) {
-        context.drawImage(
-            layer,
-            drawBox.x,
-            drawBox.y,
-            drawBox.width,
-            drawBox.height
-        );
-
-        return;
-    }
-
-    const sourceWidth =
-        layer.width;
-
-    const sourceHeight =
-        layer.height;
-
-    /*
-        Tall Two-Tier upper rim.
-    */
-
-    context.drawImage(
-        layer,
-        0,
-        0,
-        sourceWidth,
-        sourceHeight * 0.24,
-        drawBox.x,
-        drawBox.y,
-        drawBox.width,
-        drawBox.height * 0.24
-    );
-
-    /*
-        Crop around the actual middle piping
-        pixels and enlarge that section.
-    */
-
-context.drawImage(
-    layer,
-    0,
-    sourceHeight * 0.534,
-    sourceWidth,
-    sourceHeight * 0.034,
-    drawBox.x,
-    drawBox.y +
-        drawBox.height * 0.525,
-    drawBox.width,
-    drawBox.height * 0.07
-);
-}
 function drawEnlargedSprinkleLayer(
     context,
     layer,
@@ -4313,10 +4212,12 @@ async function loadSelectedBorderAssets(
     ) {
         return {
             top: null,
-            bottom: null
+            bottom: null,
+            middle: null
         };
     }
-     const placement =
+
+    const placement =
         builderState.cakeBorderPlacement;
 
     const needsTop =
@@ -4329,7 +4230,8 @@ async function loadSelectedBorderAssets(
 
     const [
         top,
-        bottom
+        bottom,
+        middle
     ] = await Promise.all([
         needsTop
             ? loadBorderAssets(
@@ -4345,12 +4247,27 @@ async function loadSelectedBorderAssets(
                 "bottom",
                 isBento
             )
+            : Promise.resolve(null),
+
+        /*
+            For Tall Two-Tier only:
+            load the matching Standard Two-Tier
+            top artwork for its complete middle seam.
+        */
+
+        entryKey === "tallTier" &&
+        needsTop
+            ? loadBorderAssets(
+                "tier",
+                "top"
+            )
             : Promise.resolve(null)
     ]);
 
     return {
         top,
-        bottom
+        bottom,
+        middle
     };
 }
 /* =========================================
@@ -5762,7 +5679,15 @@ async function updateRealisticCakePreview() {
         cakeUrls[0]
     ),
 
-    renderCupcakeDesignCanvas(),
+   renderCupcakeDesignCanvas()
+    .catch((error) => {
+        console.warn(
+            "Cupcake overlay unavailable; using the complete Bento base image.",
+            error
+        );
+
+        return null;
+    }),
 
     edibleImageIsReady()
         ? loadRealisticImage(
@@ -6176,7 +6101,16 @@ if (borderAssets?.top) {
         size.height
     );
 }
-
+if (borderAssets?.middle) {
+    drawTallTierMiddleBorder(
+        context,
+        borderAssets.middle,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 
 /*
     Bows, butterflies, cherries,
