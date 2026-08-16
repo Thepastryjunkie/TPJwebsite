@@ -594,7 +594,7 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-number-letter-borders-20260816-2";
+    "?v=tpj-number-letter-borders-20260816-3";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -2975,24 +2975,50 @@ function drawBentoColorPreview(
     }
 }
 function getBentoBorderDrawBox(
-    standaloneImage,
-    transform
+    transform,
+    placement
 ) {
-    const map =
-        getBentoTransformMap(
-            standaloneImage,
-            transform
-        );
+    /*
+        The normal Bento top-border assets were
+        exported in a different vertical registration
+        than the correctly fitted Vintage Piping asset.
+
+        These values map the normal top border's
+        visible bounds directly onto the Vintage
+        Piping top-border bounds.
+    */
+
+    if (placement === "top") {
+        const scaleX = 449 / 448;
+        const scaleY = 322 / 267;
+
+        return {
+            x:
+                transform.x -
+                transform.width * 0.003551136,
+
+            y:
+                transform.y -
+                transform.height * 0.037142567,
+
+            width:
+                transform.width * scaleX,
+
+            height:
+                transform.height * scaleY
+        };
+    }
+
+    /*
+        The Bento bottom-border assets are already
+        registered correctly. Do not resize or shift them.
+    */
 
     return {
-        x: map.x(190),
-        y: map.y(455),
-        width:
-            map.x(665) -
-            map.x(190),
-        height:
-            map.y(900) -
-            map.y(455)
+        x: transform.x,
+        y: transform.y,
+        width: transform.width,
+        height: transform.height
     };
 }
 function drawTwoTierColors(
@@ -4388,48 +4414,80 @@ function getCakeExtraShapeName(entryKey, isBento = false) {
     return getBorderShapeName(entryKey, isBento);
 }
 
-async function loadCakeExtraAssets(entryKey, isBento = false) {
-    const shapeName = getCakeExtraShapeName(entryKey, isBento);
+async function loadCakeExtraAssets(
+    entryKey,
+    isBento = false
+) {
+    const shapeName =
+        getCakeExtraShapeName(
+            entryKey,
+            isBento
+        );
 
     if (!shapeName) {
         return [];
     }
 
-    const extraRoot = `${finalAssetRoot}/extras`;
-    const selectedExtraIds = getSelectedRealisticExtraIds();
+    const extraRoot =
+        `${finalAssetRoot}/extras`;
 
-    const loadedAssets = await Promise.all(
-        selectedExtraIds.map(async (id) => {
-            const styleName =
-    id === "goldAccentDecoration"
-        ? builderState.metallicLeafType === "Silver"
-            ? "Metallic-Leaf-Silver"
-            : "Metallic-Leaf-Gold"
-        : realisticExtraNameMap[id];
+    const selectedExtraIds =
+        getSelectedRealisticExtraIds();
 
-            if (!styleName) {
-                return null;
-            }
+    /*
+        Bento assets must use the same cache
+        version as the Bento cake and borders.
+    */
+    const extraAssetVersion =
+        isBento
+            ? cakeAssetVersion
+            : "";
 
-            const strokes = await loadOptionalRealisticImage(
-                `${extraRoot}/TPJ-Extra-${styleName}-${shapeName}-Strokes.png`
-            );
+    const loadedAssets =
+        await Promise.all(
+            selectedExtraIds.map(
+                async (id) => {
+                    const styleName =
+                        id ===
+                        "goldAccentDecoration"
+                            ? builderState
+                                .metallicLeafType ===
+                                "Silver"
+                                ? "Metallic-Leaf-Silver"
+                                : "Metallic-Leaf-Gold"
+                            : realisticExtraNameMap[
+                                id
+                            ];
 
-            const mask = await loadOptionalRealisticImage(
-                `${extraRoot}/TPJ-Extra-${styleName}-${shapeName}-Mask.png`
-            );
+                    if (!styleName) {
+                        return null;
+                    }
 
-            if (!strokes) {
-                return null;
-            }
+                    const prefix =
+                        `TPJ-Extra-${styleName}-${shapeName}`;
 
-            return {
-                id,
-                strokes,
-                mask
-            };
-        })
-    );
+                    const strokes =
+                        await loadOptionalRealisticImage(
+                            `${extraRoot}/${prefix}-Strokes.png${extraAssetVersion}`
+                        );
+
+                    const mask =
+                        await loadOptionalRealisticImage(
+                            `${extraRoot}/${prefix}-Mask.png${extraAssetVersion}`
+                        );
+
+                    if (!strokes) {
+                        return null;
+                    }
+
+                    return {
+                        id,
+                        strokes,
+                        mask
+                    };
+                }
+            )
+        );
 
     return loadedAssets.filter(Boolean);
 }
@@ -5830,7 +5888,25 @@ builderState.cakeCoverage === "full"
 
 
 /*
-    Drip first.
+    The Bento top and bottom borders require
+    separate registration boxes.
+*/
+
+const bentoTopBorderBox =
+    getBentoBorderDrawBox(
+        transform,
+        "top"
+    );
+
+const bentoBottomBorderBox =
+    getBentoBorderDrawBox(
+        transform,
+        "bottom"
+    );
+
+
+/*
+    Drip uses the full Bento canvas.
 */
 
 drawCakeDripExtra(
@@ -5843,37 +5919,32 @@ drawCakeDripExtra(
 );
 
 
-const bentoBorderBox =
-    getBentoBorderDrawBox(
-        standaloneImage,
-        transform
-    );
-
 if (standaloneBorderAssets?.bottom) {
     drawCakeBorder(
         context,
         standaloneBorderAssets.bottom,
-        bentoBorderBox.x,
-        bentoBorderBox.y,
-        bentoBorderBox.width,
-        bentoBorderBox.height
+        bentoBottomBorderBox.x,
+        bentoBottomBorderBox.y,
+        bentoBottomBorderBox.width,
+        bentoBottomBorderBox.height
     );
 }
+
 
 if (standaloneBorderAssets?.top) {
     drawCakeBorder(
         context,
         standaloneBorderAssets.top,
-        bentoBorderBox.x,
-        bentoBorderBox.y,
-        bentoBorderBox.width,
-        bentoBorderBox.height
+        bentoTopBorderBox.x,
+        bentoTopBorderBox.y,
+        bentoTopBorderBox.width,
+        bentoTopBorderBox.height
     );
 }
 
 
 /*
-    Remaining extras last.
+    Extras also use the full Bento canvas.
 */
 
 drawCakeForegroundExtras(
