@@ -4916,14 +4916,9 @@ const donorShapeName =
     id ===
         "chocolateDripDecoration" &&
     entryKey ===
-        "tallRound"
-        ? "Round"
-        : id ===
-                "chocolateDripDecoration" &&
-            entryKey ===
-                "tier"
-            ? "Tall-Two-Tier"
-            : "";
+        "tier"
+        ? "Tall-Two-Tier"
+        : "";
 
 if (
     donorShapeName &&
@@ -5309,12 +5304,16 @@ function getDripDrawBox(
     let scaleY = 1;
     let offsetY = 0;
 
-    if (
-        source.includes("-Tall-Square-")
-    ) {
-        scaleX = 0.96;
-        scaleY = 0.98;
-        offsetY = 5;
+  if (
+    source.includes("-Tall-Round-")
+) {
+    scaleX = 1.025;
+} else if (
+    source.includes("-Tall-Square-")
+) {
+    scaleX = 0.96;
+    scaleY = 0.98;
+    offsetY = 5;
     } else if (
         source.includes("-Square-")
     ) {
@@ -5461,7 +5460,8 @@ function drawCakeForegroundExtras(
     x,
     y,
     width,
-    height
+    height,
+    preserveRegistration = false
 ) {
     if (!assets?.length) {
         return;
@@ -5474,8 +5474,9 @@ function drawCakeForegroundExtras(
                 "chocolateDripDecoration"
         );
 
-    const shouldStagger =
-        foregroundAssets.length > 1;
+const shouldStagger =
+    !preserveRegistration &&
+    foregroundAssets.length > 1;
 
     foregroundAssets.forEach((asset) => {
         const drawBox =
@@ -5506,12 +5507,15 @@ function getCupcakeExtraStyleName() {
     switch (builderState.cupcakeFrostingStyle) {
         case "low-piped-edible-image":
             return "Flat";
+
         case "true-rosette":
             return "Rosette";
+
         case "classic-tall-swirl":
             return "Swirl";
+
         default:
-            return null;
+            return "Flat";
     }
 }
 
@@ -6564,7 +6568,8 @@ drawCakeForegroundExtras(
     transform.x,
     transform.y,
     transform.width,
-    transform.height
+    transform.height,
+    true
 );
 
                 drawBentoEdibleImage(
@@ -7040,18 +7045,23 @@ async function renderCupcakeDesignCanvas() {
             );
         }
 
-      const cupcakeExtraAssets =
-    await loadCupcakeExtraAssets();
+    }
 
-drawCupcakeExtraAssets(
-    context,
-    cupcakeExtraAssets,
-    canvas.width,
-    canvas.height
-);
-}
+    /*
+        The selected Cake Details are drawn even
+        before an icing style is selected.
+    */
+    const cupcakeExtraAssets =
+        await loadCupcakeExtraAssets();
 
-return canvas;
+    drawCupcakeExtraAssets(
+        context,
+        cupcakeExtraAssets,
+        canvas.width,
+        canvas.height
+    );
+
+    return canvas;
 }
 
 const cupcakeSetLayouts = {
@@ -7098,40 +7108,118 @@ function drawCupcakeSetPreview(
     transform,
     sourceImage
 ) {
-    const layout = cupcakeSetLayouts[layoutKey];
+    const layout =
+        cupcakeSetLayouts[layoutKey];
 
     if (!layout || !cupcakeDesign) {
         return;
     }
 
-    context.save();
-    context.translate(transform.x, transform.y);
-    context.scale(
-        transform.width / sourceImage.naturalWidth,
-        transform.height / sourceImage.naturalHeight
-    );
-
-    layout.slots.forEach(([centerX, centerY, size, rotation]) => {
-        context.save();
-        context.translate(centerX, centerY);
-        context.rotate(rotation);
-
-        /* Crop away the transparent single-cupcake padding. The liner/body
-           remains underneath; frosting and decorations stay on top. */
-        context.drawImage(
-            cupcakeDesign,
-            60,
-            100,
-            cupcakeDesign.width - 120,
-            cupcakeDesign.height - 170,
-            -size / 2,
-            -size * 0.48,
-            size,
-            size * 0.92
+    /*
+        getOpaqueImageBounds already exists in
+        your file. Do not add another copy.
+    */
+    const visibleBounds =
+        getOpaqueImageBounds(
+            cupcakeDesign
         );
 
-        context.restore();
-    });
+    const sourcePadding = Math.max(
+        8,
+        Math.round(
+            cupcakeDesign.width * 0.015
+        )
+    );
+
+    const sourceX = visibleBounds
+        ? Math.max(
+            0,
+            visibleBounds.left -
+                sourcePadding
+        )
+        : 60;
+
+    const sourceY = visibleBounds
+        ? Math.max(
+            0,
+            visibleBounds.top -
+                sourcePadding
+        )
+        : 100;
+
+    const sourceRight = visibleBounds
+        ? Math.min(
+            cupcakeDesign.width,
+            visibleBounds.right +
+                sourcePadding + 1
+        )
+        : cupcakeDesign.width - 60;
+
+    const sourceBottom = visibleBounds
+        ? Math.min(
+            cupcakeDesign.height,
+            visibleBounds.bottom +
+                sourcePadding + 1
+        )
+        : cupcakeDesign.height - 70;
+
+    const sourceWidth =
+        sourceRight - sourceX;
+
+    const sourceHeight =
+        sourceBottom - sourceY;
+
+    const sourceAspect =
+        sourceHeight / sourceWidth;
+
+    context.save();
+
+    context.translate(
+        transform.x,
+        transform.y
+    );
+
+    context.scale(
+        transform.width /
+            sourceImage.naturalWidth,
+        transform.height /
+            sourceImage.naturalHeight
+    );
+
+    layout.slots.forEach(
+        ([
+            centerX,
+            centerY,
+            size,
+            rotation
+        ]) => {
+            context.save();
+
+            context.translate(
+                centerX,
+                centerY
+            );
+
+            context.rotate(rotation);
+
+            const destinationHeight =
+                size * sourceAspect;
+
+            context.drawImage(
+                cupcakeDesign,
+                sourceX,
+                sourceY,
+                sourceWidth,
+                sourceHeight,
+                -size / 2,
+                -destinationHeight * 0.52,
+                size,
+                destinationHeight
+            );
+
+            context.restore();
+        }
+    );
 
     context.restore();
 }
@@ -7776,19 +7864,14 @@ function reorderStepFourControls() {
         );
     }
 
-    const finalDetailsControl =
-        customSculpted ||
-        toyFigurine ||
-        cakeDetails;
-
-    if (
-        finalDetailsControl &&
+if (
+    cupcakeSlot &&
+    cakeDetails
+) {
+    cakeDetails.before(
         cupcakeSlot
-    ) {
-        finalDetailsControl.after(
-            cupcakeSlot
-        );
-    }
+    );
+}
 }
 
 
@@ -8138,6 +8221,10 @@ const cupcakeStudio =
     getElement(
         "#cupcakeStudio"
     ); 
+    cupcakeStudio?.classList.toggle(
+    "is-product-cupcake-studio",
+    usesCupcakeStudio
+);
     const targetSlot = getElement(
         usesCupcakeStudio
             ? "#cupcakeOnlyStudioSlot"

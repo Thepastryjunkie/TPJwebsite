@@ -5067,3 +5067,25 @@ fieldset {
         font-size: 9px;
     }
 }
+/*
+    BENTO AND CUPCAKE-ONLY DESIGN FLOW
+*/
+
+#cupcakeStudio.is-product-cupcake-studio
+.cupcake-studio-layout {
+    grid-template-columns:
+        minmax(0, 1fr);
+
+    gap: 18px;
+    align-items: start;
+}
+
+#cupcakeStudio.is-product-cupcake-studio
+.cupcake-live-preview {
+    display: none;
+}
+
+#cupcakeStudio.is-product-cupcake-studio
+.cupcake-swatch-section {
+    margin-top: 0;
+}
