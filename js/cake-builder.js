@@ -1635,7 +1635,7 @@ function getFlowerUnitPrice() {
 
     return builderState.flowerMaterial ===
         "Artificial Flowers"
-        ? 5
+        ? 15
         : builderState.flowerMaterial ===
             "Fresh Flowers"
             ? 25
@@ -1687,7 +1687,7 @@ function updateFlowerPriceDisplay() {
             "Artificial Flowers"
     ) {
         priceDisplay.textContent =
-            "+$5 each";
+            "+$15 per bundle of up to 6";
         return;
     }
 
@@ -1698,12 +1698,12 @@ function updateFlowerPriceDisplay() {
             "Fresh Flowers"
     ) {
         priceDisplay.textContent =
-            "+$25 each";
+            "+$25 per bundle of up to 6";
         return;
     }
 
     priceDisplay.textContent =
-        "Fresh +$25 each · Artificial +$5 each · Customer supplied $0";
+        "Starting at $15";
 }
 
 
@@ -1860,6 +1860,11 @@ const tintedLayerCache =
     new WeakMap();
 
 const dripTintLayerCache =
+    new WeakMap();
+    const registeredExtraArtworkCache =
+    new WeakMap();
+
+const softTintLayerCache =
     new WeakMap();
 
 let realisticRenderVersion = 0;
@@ -4451,8 +4456,10 @@ function drawTallTierMiddleBorder(
     };
 
     context.save();
+
     context.globalCompositeOperation =
         "source-over";
+
     context.globalAlpha = 1;
 
     drawTallTierMiddleLayer(
@@ -4465,83 +4472,17 @@ function drawTallTierMiddleBorder(
         builderState.cakeBorderSprinkles &&
         assets.sprinkles
     ) {
-        const spread = Math.max(
-            2,
-            Math.min(width, height) *
-                0.007
-        );
-
-        [
-            [-spread, -spread],
-            [0, -spread],
-            [spread, -spread],
-            [-spread, 0],
-            [0, 0],
-            [spread, 0],
-            [-spread, spread],
-            [0, spread],
-            [spread, spread]
-        ].forEach(
-            ([offsetX, offsetY]) => {
-                drawTallTierMiddleLayer(
-                    context,
-                    assets.sprinkles,
-                    {
-                        ...drawBox,
-                        x:
-                            drawBox.x +
-                            offsetX,
-                        y:
-                            drawBox.y +
-                            offsetY
-                    }
-                );
-            }
+        drawTallTierMiddleLayer(
+            context,
+            assets.sprinkles,
+            drawBox
         );
     }
 
     context.restore();
 }
 
-function drawEnlargedSprinkleLayer(
-    context,
-    layer,
-    source,
-    drawBox
-) {
-    const spread = Math.max(
-        2,
-        Math.min(
-            drawBox.width,
-            drawBox.height
-        ) * 0.007
-    );
 
-    const offsets = [
-        [-spread, -spread],
-        [0, -spread],
-        [spread, -spread],
-        [-spread, 0],
-        [0, 0],
-        [spread, 0],
-        [-spread, spread],
-        [0, spread],
-        [spread, spread]
-    ];
-
-    offsets.forEach(([offsetX, offsetY]) => {
-        drawRegisteredBorderLayer(
-            context,
-            layer,
-            source,
-            {
-                ...drawBox,
-                x: drawBox.x + offsetX,
-                y: drawBox.y + offsetY
-            }
-        );
-    });
-}
 
 function drawCakeBorder(
     context,
@@ -4593,7 +4534,7 @@ if (
     builderState.cakeBorderSprinkles &&
     assets.sprinkles
 ) {
-    drawEnlargedSprinkleLayer(
+  drawRegisteredBorderLayer(
         context,
         assets.sprinkles,
         source,
@@ -4732,7 +4673,180 @@ async function loadOptionalRealisticImage(url) {
         return null;
     }
 }
+function getOpaqueImageBounds(image) {
+    const width =
+        image.naturalWidth ||
+        image.width;
 
+    const height =
+        image.naturalHeight ||
+        image.height;
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const context =
+        canvas.getContext(
+            "2d",
+            { willReadFrequently: true }
+        );
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const pixels =
+        context.getImageData(
+            0,
+            0,
+            width,
+            height
+        ).data;
+
+    let left = width;
+    let top = height;
+    let right = -1;
+    let bottom = -1;
+
+    for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+            const alpha =
+                pixels[
+                    (y * width + x) * 4 + 3
+                ];
+
+            if (alpha <= 8) {
+                continue;
+            }
+
+            left = Math.min(left, x);
+            top = Math.min(top, y);
+            right = Math.max(right, x);
+            bottom = Math.max(bottom, y);
+        }
+    }
+
+    if (right < left || bottom < top) {
+        return null;
+    }
+
+    return {
+        left,
+        top,
+        right,
+        bottom,
+        width: right - left + 1,
+        height: bottom - top + 1
+    };
+}
+
+function registerExtraArtworkToReference(
+    artwork,
+    reference
+) {
+    let referenceCache =
+        registeredExtraArtworkCache.get(
+            artwork
+        );
+
+    if (!referenceCache) {
+        referenceCache = new WeakMap();
+
+        registeredExtraArtworkCache.set(
+            artwork,
+            referenceCache
+        );
+    }
+
+    if (referenceCache.has(reference)) {
+        return referenceCache.get(
+            reference
+        );
+    }
+
+    const artworkWidth =
+        artwork.naturalWidth ||
+        artwork.width;
+
+    const artworkHeight =
+        artwork.naturalHeight ||
+        artwork.height;
+
+    const referenceWidth =
+        reference.naturalWidth ||
+        reference.width;
+
+    const referenceHeight =
+        reference.naturalHeight ||
+        reference.height;
+
+    const artworkBounds =
+        getOpaqueImageBounds(artwork);
+
+    const referenceBounds =
+        getOpaqueImageBounds(reference);
+
+    if (!artworkBounds || !referenceBounds) {
+        return artwork;
+    }
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = referenceWidth;
+    canvas.height = referenceHeight;
+
+    const context =
+        canvas.getContext("2d");
+
+    const artworkScale = Math.min(
+        referenceWidth / artworkWidth,
+        referenceHeight / artworkHeight
+    );
+
+    const artworkCenterX =
+        (
+            artworkBounds.left +
+            artworkBounds.right
+        ) / 2 * artworkScale;
+
+    const referenceCenterX =
+        (
+            referenceBounds.left +
+            referenceBounds.right
+        ) / 2;
+
+    const offsetX =
+        referenceCenterX -
+        artworkCenterX;
+
+    const offsetY =
+        referenceBounds.top -
+        artworkBounds.top *
+            artworkScale;
+
+    context.drawImage(
+        artwork,
+        offsetX,
+        offsetY,
+        artworkWidth * artworkScale,
+        artworkHeight * artworkScale
+    );
+
+    referenceCache.set(
+        reference,
+        canvas
+    );
+
+    return canvas;
+}
 function getCakeExtraShapeName(entryKey, isBento = false) {
     return getBorderShapeName(entryKey, isBento);
 }
@@ -4789,7 +4903,7 @@ async function loadCakeExtraAssets(
                     const prefix =
                         `TPJ-Extra-${styleName}-${shapeName}`;
 
-                    const strokes =
+                    let strokes =
                         await loadOptionalRealisticImage(
                             `${extraRoot}/${prefix}-Strokes.png${extraAssetVersion}`
                         );
@@ -4798,7 +4912,36 @@ async function loadCakeExtraAssets(
                         await loadOptionalRealisticImage(
                             `${extraRoot}/${prefix}-Mask.png${extraAssetVersion}`
                         );
+const donorShapeName =
+    id ===
+        "chocolateDripDecoration" &&
+    entryKey ===
+        "tallRound"
+        ? "Round"
+        : id ===
+                "chocolateDripDecoration" &&
+            entryKey ===
+                "tier"
+            ? "Tall-Two-Tier"
+            : "";
 
+if (
+    donorShapeName &&
+    strokes
+) {
+    const donorStrokes =
+        await loadOptionalRealisticImage(
+            `${extraRoot}/TPJ-Extra-${styleName}-${donorShapeName}-Strokes.png${extraAssetVersion}`
+        );
+
+    if (donorStrokes) {
+        strokes =
+            registerExtraArtworkToReference(
+                donorStrokes,
+                strokes
+            );
+    }
+}
                     if (!strokes) {
                         return null;
                     }
@@ -5011,41 +5154,139 @@ function makeDripTintedLayer(
 
     return layer;
 }
+function makeSoftTintedExtraLayer(
+    image,
+    mask,
+    color
+) {
+    const normalizedColor =
+        normalizeHexColor(color);
+
+    let colorCache =
+        softTintLayerCache.get(image);
+
+    if (!colorCache) {
+        colorCache = new Map();
+
+        softTintLayerCache.set(
+            image,
+            colorCache
+        );
+    }
+
+    if (colorCache.has(normalizedColor)) {
+        return colorCache.get(
+            normalizedColor
+        );
+    }
+
+    const width =
+        image.naturalWidth ||
+        image.width;
+
+    const height =
+        image.naturalHeight ||
+        image.height;
+
+    const layer =
+        document.createElement("canvas");
+
+    layer.width = width;
+    layer.height = height;
+
+    const context =
+        layer.getContext("2d");
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const tintLayer =
+        document.createElement("canvas");
+
+    tintLayer.width = width;
+    tintLayer.height = height;
+
+    const tintContext =
+        tintLayer.getContext("2d");
+
+    tintContext.drawImage(
+        mask,
+        0,
+        0,
+        width,
+        height
+    );
+
+    tintContext.globalCompositeOperation =
+        "source-in";
+
+    tintContext.fillStyle =
+        normalizedColor;
+
+    tintContext.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    context.globalAlpha = 0.38;
+
+    context.drawImage(
+        tintLayer,
+        0,
+        0,
+        width,
+        height
+    );
+
+    context.globalAlpha = 1;
+
+    colorCache.set(
+        normalizedColor,
+        layer
+    );
+
+    return layer;
+}
 function getRenderedExtraLayer(asset) {
     const selectedColor =
         getRealisticExtraColor(
             asset.id
         );
 
-    /*
-        Metallic leaf keeps its
-        original artwork.
-    */
     if (!selectedColor) {
         return asset.strokes;
     }
 
-    /*
-        Chocolate Drip:
-        use the visible drip artwork itself
-        as the recolor mask.
-
-        This prevents light colors like
-        white chocolate from tinting the
-        transparent canvas around the drip.
-    */
     if (
         asset.id ===
         "chocolateDripDecoration"
     ) {
-       return makeDripTintedLayer(
-    asset.strokes,
-    selectedColor
-);
+        return makeDripTintedLayer(
+            asset.strokes,
+            selectedColor
+        );
     }
 
     if (!asset.mask) {
         return asset.strokes;
+    }
+
+    if (
+        asset.id ===
+        "flowersDecoration"
+    ) {
+        return makeSoftTintedExtraLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor
+        );
     }
 
     return makeTintedLayer(
@@ -5069,35 +5310,6 @@ function getDripDrawBox(
     let offsetY = 0;
 
     if (
-        source.includes(
-            "-Tall-Round-"
-        )
-    ) {
-        /*
-            Expand the drip across the complete
-            Tall Round top without moving it to
-            the cake's lower edge.
-        */
-        scaleX = 1.10;
-        scaleY = 1.04;
-        offsetY = -height * 0.012;
-    } else if (
-        source.includes(
-            "-Two-Tier-"
-        ) &&
-        !source.includes(
-            "-Tall-Two-Tier-"
-        )
-    ) {
-        /*
-            Standard Two-Tier drip remains on the
-            upper tier only; this corrects the small
-            uncovered edge on that tier.
-        */
-        scaleX = 1.08;
-        scaleY = 1.03;
-        offsetY = -height * 0.008;
-    } else if (
         source.includes("-Tall-Square-")
     ) {
         scaleX = 0.96;
@@ -5118,11 +5330,6 @@ function getDripDrawBox(
         scaleY = 0.98;
         offsetY = 5;
     }
-
-    /*
-        Standard Two-Tier and Number/Letter
-        exports use their exact 1:1 boxes.
-    */
 
     const adjustedWidth =
         width * scaleX;
@@ -5205,8 +5412,8 @@ const cakeExtraStaggerMap = {
     goldAccentDecoration: [0.020, 0.012],
     flowersDecoration: [0, -0.022],
     cherriesDecoration: [0, 0.022],
-    macaronsDecoration: [-0.024, 0.020],
-    discoBallsDecoration: [0.024, 0.020]
+    macaronsDecoration: [0.0, 0.0],
+    discoBallsDecoration: [0.0, 0.0]
 };
 
 
@@ -5218,19 +5425,7 @@ function getCakeForegroundExtraDrawBox(
     height,
     shouldStagger
 ) {
-    const isMacaron =
-        asset.id ===
-        "macaronsDecoration";
-
-    const isDiscoBall =
-        asset.id ===
-        "discoBallsDecoration";
-
-    const scale = isDiscoBall
-        ? 1.22
-        : isMacaron
-            ? 1.20
-            : 1;
+const scale = 1;
 
     const [offsetX, offsetY] =
         shouldStagger
@@ -6167,19 +6362,12 @@ async function updateRealisticCakePreview() {
     const isCupcakesOnly = product.shape === "cupcakes";
     const isStandalonePreview = isBento || isCupcakesOnly;
 
-    let boardKey = builderState.cakeBoardStyle;
+ let boardKey =
+    builderState.cakeBoardStyle;
 
-    if (product.shape === "sheet") {
-        boardKey = "rectangleHorizontal";
-    }
-
-    if (product.shape === "numberLetter") {
-        boardKey = "letterNumber";
-    }
-
-    if (product.shape === "square" && boardKey === "round") {
-        boardKey = "square";
-    }
+if (product.shape === "numberLetter") {
+    boardKey = "letterNumber";
+}  
 
     const boardAssets =
         boardAssetMap[boardKey] ||
@@ -7508,14 +7696,6 @@ function reorderStepFourControls() {
         "#cupcakeOnlyStudioSlot"
     );
 
-    const fondant = getElement(
-        "#fondantCoverageCustomizer"
-    );
-
-    if (cupcakeSlot && fondant) {
-        fondant.before(cupcakeSlot);
-    }
-
     const finish = getElement(
         "#cakeFinishCustomizer"
     );
@@ -7565,12 +7745,49 @@ function reorderStepFourControls() {
         "#customSculptedCustomizer"
     );
 
-    if (cakeDetails && toyFigurine) {
-        cakeDetails.after(toyFigurine);
+    const detailsAnchor =
+        topperOptions ||
+        topperQuestion;
+
+    if (
+        detailsAnchor &&
+        cakeDetails
+    ) {
+        detailsAnchor.after(
+            cakeDetails
+        );
     }
 
-    if (toyFigurine && customSculpted) {
-        toyFigurine.after(customSculpted);
+    if (
+        cakeDetails &&
+        toyFigurine
+    ) {
+        cakeDetails.after(
+            toyFigurine
+        );
+    }
+
+    if (
+        toyFigurine &&
+        customSculpted
+    ) {
+        toyFigurine.after(
+            customSculpted
+        );
+    }
+
+    const finalDetailsControl =
+        customSculpted ||
+        toyFigurine ||
+        cakeDetails;
+
+    if (
+        finalDetailsControl &&
+        cupcakeSlot
+    ) {
+        finalDetailsControl.after(
+            cupcakeSlot
+        );
     }
 }
 
@@ -9306,54 +9523,68 @@ function updateCakeBoardControls() {
         return;
     }
 
-    const product = getSelectedCakeProduct();
+    const product =
+        getSelectedCakeProduct();
 
-    if (product.shape === "cupcakes") {
+    const isBento =
+        builderState.cakeProductId ===
+        "heart-5-bento";
+
+    if (
+        product.shape === "cupcakes" ||
+        isBento
+    ) {
         boardSelect.disabled = true;
         return;
     }
 
-    const allowedBoards = {
-        square: ["square"],
-        sheet: ["rectangleHorizontal"],
-        numberLetter: ["letterNumber"]
-    }[product.shape] || [
-        "round",
-        "square"
-    ];
+    const allowedBoards =
+        product.shape === "numberLetter"
+            ? ["letterNumber"]
+            : [
+                "round",
+                "square",
+                "rectangleHorizontal"
+            ];
 
-    if (!allowedBoards.includes(builderState.cakeBoardStyle)) {
-        builderState.cakeBoardStyle = allowedBoards[0];
+    if (
+        !allowedBoards.includes(
+            builderState.cakeBoardStyle
+        )
+    ) {
+        builderState.cakeBoardStyle =
+            allowedBoards[0];
     }
 
     getElements(
         "#cakeBoardStyle option"
     ).forEach((option) => {
-        option.hidden = !allowedBoards.includes(
-            option.value
-        );
+        option.hidden =
+            !allowedBoards.includes(
+                option.value
+            );
     });
 
-    boardSelect.value = builderState.cakeBoardStyle;
-    boardSelect.disabled = allowedBoards.length === 1;
+    boardSelect.value =
+        builderState.cakeBoardStyle;
+
+    boardSelect.disabled =
+        allowedBoards.length === 1;
 
     const boardNotice = getElement(
         "#cakeBoardNotice"
     );
 
     if (boardNotice) {
-        if (product.shape === "sheet") {
-            boardNotice.textContent =
-                "Sheet cakes use the horizontal rectangle board. You can still choose its color.";
-        } else if (product.shape === "numberLetter") {
+        if (
+            product.shape ===
+            "numberLetter"
+        ) {
             boardNotice.textContent =
                 "Number and letter cakes use their dedicated board. You can still choose its color.";
-        } else if (product.shape === "square") {
-            boardNotice.textContent =
-                "Square cakes use the square board. You can still choose its color.";
         } else {
             boardNotice.textContent =
-                "Choose a round or square board. Rectangle and letter / number boards are reserved for the cakes that require them.";
+                "Choose a round, square, or rectangle board. The letter / number board is reserved for number and letter cakes.";
         }
     }
 }
