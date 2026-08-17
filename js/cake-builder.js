@@ -368,6 +368,9 @@ cakeBorderPlacement: "both",
 cakeBorderColor: "#F7B6D2",
 cakeBorderUsesCustomShade: false,
 customCakeBorderColor: "#F7B6D2",
+cakeBorderBottomColor: "#F7B6D2",
+cakeBorderBottomUsesCustomShade: false,
+customCakeBorderBottomColor: "#F7B6D2",
 cakeBorderSprinkles: false,
 
 finishAccentOne: "#F7B6D2",
@@ -385,6 +388,9 @@ characterTwoColor: "original",
 cakeBoardStyle: "round",
 cakeBoardColor: "#FFFFFF",
 matchBoardToCakePalette: false,
+matchedBoardColor: "#F7B6D2",
+matchedBoardUsesCustomShade: false,
+customMatchedBoardColor: "#F7B6D2",
 
 cupcakeLinerStyle: "paper",
 cupcakeFrostingStyle: "",
@@ -404,6 +410,7 @@ decorationQuantities: {
     discoBallsDecoration: 1
 },
 flowerSource: "",
+flowerMaterial: "",
 
 bowColor: "#F7B6D2",
 butterflyColor: "#F7B6D2",
@@ -1611,6 +1618,142 @@ function calculatePremiumFillingTotal() {
 }
 
 
+function getFlowerUnitPrice() {
+    if (
+        builderState.flowerSource ===
+        "Customer Supplied"
+    ) {
+        return 0;
+    }
+
+    if (
+        builderState.flowerSource !==
+        "Supplied by The Pastry Junkie"
+    ) {
+        return 0;
+    }
+
+    return builderState.flowerMaterial ===
+        "Artificial Flowers"
+        ? 5
+        : builderState.flowerMaterial ===
+            "Fresh Flowers"
+            ? 25
+            : 0;
+}
+
+
+function getDecorationUnitPrice(
+    decorationInput,
+    decorationId
+) {
+    if (
+        decorationId ===
+        "flowersDecoration"
+    ) {
+        return getFlowerUnitPrice();
+    }
+
+    return (
+        Number(
+            decorationInput.dataset.price
+        ) || 0
+    );
+}
+
+
+function updateFlowerPriceDisplay() {
+    const priceDisplay = getElement(
+        "#flowerPriceDisplay"
+    );
+
+    if (!priceDisplay) {
+        return;
+    }
+
+    if (
+        builderState.flowerSource ===
+        "Customer Supplied"
+    ) {
+        priceDisplay.textContent =
+            "Customer supplied · $0";
+        return;
+    }
+
+    if (
+        builderState.flowerSource ===
+            "Supplied by The Pastry Junkie" &&
+        builderState.flowerMaterial ===
+            "Artificial Flowers"
+    ) {
+        priceDisplay.textContent =
+            "+$5 each";
+        return;
+    }
+
+    if (
+        builderState.flowerSource ===
+            "Supplied by The Pastry Junkie" &&
+        builderState.flowerMaterial ===
+            "Fresh Flowers"
+    ) {
+        priceDisplay.textContent =
+            "+$25 each";
+        return;
+    }
+
+    priceDisplay.textContent =
+        "Fresh +$25 each · Artificial +$5 each · Customer supplied $0";
+}
+
+
+function syncSelectedDecorationsFromInputs() {
+    builderState.decorations =
+        getElements(
+            "[data-decoration-id]"
+        )
+            .filter(
+                (decorationInput) =>
+                    decorationInput.checked
+            )
+            .filter(
+                (decorationInput) =>
+                    decorationInput.dataset
+                        .decorationId !==
+                    "topperDecoration"
+            )
+            .map((decorationInput) => {
+                const id =
+                    decorationInput.dataset
+                        .decorationId;
+
+                const price =
+                    getDecorationUnitPrice(
+                        decorationInput,
+                        id
+                    );
+
+                const quantity =
+                    builderState
+                        .decorationQuantities[
+                            id
+                        ] || 1;
+
+                return {
+                    id,
+                    name:
+                        decorationInput.dataset
+                            .decorationName,
+                    price,
+                    quantity,
+                    total: price * quantity
+                };
+            });
+
+    updateFlowerPriceDisplay();
+}
+
+
 function calculateDecorationTotal() {
     return builderState.decorations.reduce(
         (total, decoration) =>
@@ -1670,8 +1813,13 @@ function calculateCakeSubtotal() {
         getSelectedCakeProduct()
             .shape === "cupcakes";
 
+    const isBento =
+        builderState.cakeProductId ===
+        "heart-5-bento";
+
     const customBoardFee =
     !isCupcakesOnly &&
+    !isBento &&
     builderState.matchBoardToCakePalette
         ? 5
         : 0;
@@ -4176,7 +4324,184 @@ offsetY = -height * 0.02;
     };
 }
 
-function drawRegisteredBorderLayer( context, layer, source, drawBox ) { const isFullSheetBottom = source.includes( "-Full-Sheet-Bottom-" ); if (isFullSheetBottom) { const centerX = drawBox.x + drawBox.width / 2; const centerY = drawBox.y + drawBox.height / 2; context.save(); context.translate( centerX, centerY ); context.rotate(0.025); context.drawImage( layer, -drawBox.width / 2, -drawBox.height / 2, drawBox.width, drawBox.height ); context.restore(); return; } const isTallTierTop = source.includes( "-Tall-Two-Tier-Top-" ); if (!isTallTierTop) { context.drawImage( layer, drawBox.x, drawBox.y, drawBox.width, drawBox.height ); return; } const sourceWidth = layer.width; const sourceHeight = layer.height; /* Draw only the Tall Two-Tier upper rim from this asset. Its middle border is incomplete. */ context.drawImage( layer, 0, 0, sourceWidth, sourceHeight * 0.24, drawBox.x, drawBox.y, drawBox.width, drawBox.height * 0.24 ); } function drawTallTierMiddleLayer( context, layer, drawBox ) { const sourceWidth = layer.width; const sourceHeight = layer.height; context.drawImage( layer, 0, sourceHeight * 0.47, sourceWidth, sourceHeight * 0.10, drawBox.x, drawBox.y + drawBox.height * 0.495, drawBox.width, drawBox.height * 0.10 ); } function drawTallTierMiddleBorder( context, assets, x, y, width, height ) { if (!assets) { return; } const borderColor = builderState.cakeBorderColor || "#FF4FA3"; const tintedBorder = makeTintedLayer( assets.strokes, assets.mask, borderColor ); const drawBox = { x, y, width, height }; context.save(); context.globalCompositeOperation = "source-over"; context.globalAlpha = 1; drawTallTierMiddleLayer( context, tintedBorder, drawBox ); if ( builderState.cakeBorderSprinkles && assets.sprinkles ) { const spread = Math.max( 1, Math.min(width, height) * 0.0035 ); [ [-spread, -spread], [0, -spread], [spread, -spread], [-spread, 0], [0, 0], [spread, 0], [-spread, spread], [0, spread], [spread, spread] ].forEach( ([offsetX, offsetY]) => { drawTallTierMiddleLayer( context, assets.sprinkles, { ...drawBox, x: drawBox.x + offsetX, y: drawBox.y + offsetY } ); } ); } context.restore(); }
+function drawRegisteredBorderLayer(
+    context,
+    layer,
+    source,
+    drawBox
+) {
+    const isFullSheetBottom =
+        source.includes(
+            "-Full-Sheet-Bottom-"
+        );
+
+    if (isFullSheetBottom) {
+        const centerX =
+            drawBox.x +
+            drawBox.width / 2;
+
+        const centerY =
+            drawBox.y +
+            drawBox.height / 2;
+
+        context.save();
+        context.translate(
+            centerX,
+            centerY
+        );
+        context.rotate(0.025);
+        context.drawImage(
+            layer,
+            -drawBox.width / 2,
+            -drawBox.height / 2,
+            drawBox.width,
+            drawBox.height
+        );
+        context.restore();
+        return;
+    }
+
+    const isTallTierTop =
+        source.includes(
+            "-Tall-Two-Tier-Top-"
+        );
+
+    if (!isTallTierTop) {
+        context.drawImage(
+            layer,
+            drawBox.x,
+            drawBox.y,
+            drawBox.width,
+            drawBox.height
+        );
+        return;
+    }
+
+    const sourceWidth = layer.width;
+    const sourceHeight = layer.height;
+
+    /*
+        Draw only the Tall Two-Tier upper rim
+        from this asset. Its middle border is
+        supplied by the Standard Two-Tier art.
+    */
+    context.drawImage(
+        layer,
+        0,
+        0,
+        sourceWidth,
+        sourceHeight * 0.24,
+        drawBox.x,
+        drawBox.y,
+        drawBox.width,
+        drawBox.height * 0.24
+    );
+}
+
+
+function drawTallTierMiddleLayer(
+    context,
+    layer,
+    drawBox
+) {
+    const sourceWidth = layer.width;
+    const sourceHeight = layer.height;
+
+    context.drawImage(
+        layer,
+        0,
+        sourceHeight * 0.47,
+        sourceWidth,
+        sourceHeight * 0.10,
+        drawBox.x,
+        drawBox.y +
+            drawBox.height * 0.495,
+        drawBox.width,
+        drawBox.height * 0.10
+    );
+}
+
+
+function drawTallTierMiddleBorder(
+    context,
+    assets,
+    x,
+    y,
+    width,
+    height,
+    borderColor =
+        builderState.cakeBorderColor
+) {
+    if (!assets) {
+        return;
+    }
+
+    const tintedBorder =
+        makeTintedLayer(
+            assets.strokes,
+            assets.mask,
+            borderColor || "#FF4FA3"
+        );
+
+    const drawBox = {
+        x,
+        y,
+        width,
+        height
+    };
+
+    context.save();
+    context.globalCompositeOperation =
+        "source-over";
+    context.globalAlpha = 1;
+
+    drawTallTierMiddleLayer(
+        context,
+        tintedBorder,
+        drawBox
+    );
+
+    if (
+        builderState.cakeBorderSprinkles &&
+        assets.sprinkles
+    ) {
+        const spread = Math.max(
+            2,
+            Math.min(width, height) *
+                0.007
+        );
+
+        [
+            [-spread, -spread],
+            [0, -spread],
+            [spread, -spread],
+            [-spread, 0],
+            [0, 0],
+            [spread, 0],
+            [-spread, spread],
+            [0, spread],
+            [spread, spread]
+        ].forEach(
+            ([offsetX, offsetY]) => {
+                drawTallTierMiddleLayer(
+                    context,
+                    assets.sprinkles,
+                    {
+                        ...drawBox,
+                        x:
+                            drawBox.x +
+                            offsetX,
+                        y:
+                            drawBox.y +
+                            offsetY
+                    }
+                );
+            }
+        );
+    }
+
+    context.restore();
+}
 
 function drawEnlargedSprinkleLayer(
     context,
@@ -4185,11 +4510,11 @@ function drawEnlargedSprinkleLayer(
     drawBox
 ) {
     const spread = Math.max(
-        1,
+        2,
         Math.min(
             drawBox.width,
             drawBox.height
-        ) * 0.0035
+        ) * 0.007
     );
 
     const offsets = [
@@ -4224,21 +4549,19 @@ function drawCakeBorder(
     x,
     y,
     width,
-    height
+    height,
+    borderColor =
+        builderState.cakeBorderColor
 ) {
     if (!assets) {
         return;
     }
 
-    const borderColor =
-        builderState.cakeBorderColor ||
-        "#FF4FA3";
-
     const tintedBorder =
         makeTintedLayer(
             assets.strokes,
             assets.mask,
-            borderColor
+            borderColor || "#FF4FA3"
         );
 
     const drawBox =
@@ -4746,6 +5069,35 @@ function getDripDrawBox(
     let offsetY = 0;
 
     if (
+        source.includes(
+            "-Tall-Round-"
+        )
+    ) {
+        /*
+            Expand the drip across the complete
+            Tall Round top without moving it to
+            the cake's lower edge.
+        */
+        scaleX = 1.10;
+        scaleY = 1.04;
+        offsetY = -height * 0.012;
+    } else if (
+        source.includes(
+            "-Two-Tier-"
+        ) &&
+        !source.includes(
+            "-Tall-Two-Tier-"
+        )
+    ) {
+        /*
+            Standard Two-Tier drip remains on the
+            upper tier only; this corrects the small
+            uncovered edge on that tier.
+        */
+        scaleX = 1.08;
+        scaleY = 1.03;
+        offsetY = -height * 0.008;
+    } else if (
         source.includes("-Tall-Square-")
     ) {
         scaleX = 0.96;
@@ -4846,6 +5198,68 @@ function drawCakeDripExtra(
 }
 
 
+const cakeExtraStaggerMap = {
+    pearlsDecoration: [-0.018, -0.012],
+    ribbonDecoration: [0.018, -0.014],
+    butterfliesDecoration: [-0.020, 0.012],
+    goldAccentDecoration: [0.020, 0.012],
+    flowersDecoration: [0, -0.022],
+    cherriesDecoration: [0, 0.022],
+    macaronsDecoration: [-0.024, 0.020],
+    discoBallsDecoration: [0.024, 0.020]
+};
+
+
+function getCakeForegroundExtraDrawBox(
+    asset,
+    x,
+    y,
+    width,
+    height,
+    shouldStagger
+) {
+    const isMacaron =
+        asset.id ===
+        "macaronsDecoration";
+
+    const isDiscoBall =
+        asset.id ===
+        "discoBallsDecoration";
+
+    const scale = isDiscoBall
+        ? 1.22
+        : isMacaron
+            ? 1.20
+            : 1;
+
+    const [offsetX, offsetY] =
+        shouldStagger
+            ? cakeExtraStaggerMap[
+                asset.id
+            ] || [0, 0]
+            : [0, 0];
+
+    const adjustedWidth =
+        width * scale;
+
+    const adjustedHeight =
+        height * scale;
+
+    return {
+        x:
+            x +
+            (width - adjustedWidth) / 2 +
+            width * offsetX,
+        y:
+            y +
+            (height - adjustedHeight) / 2 +
+            height * offsetY,
+        width: adjustedWidth,
+        height: adjustedHeight
+    };
+}
+
+
 function drawCakeForegroundExtras(
     context,
     assets,
@@ -4858,25 +5272,39 @@ function drawCakeForegroundExtras(
         return;
     }
 
-    assets
-        .filter(
+    const foregroundAssets =
+        assets.filter(
             (asset) =>
                 asset.id !==
                 "chocolateDripDecoration"
-        )
-        .forEach((asset) => {
-            context.save();
+        );
 
-            context.drawImage(
-                getRenderedExtraLayer(asset), 
+    const shouldStagger =
+        foregroundAssets.length > 1;
+
+    foregroundAssets.forEach((asset) => {
+        const drawBox =
+            getCakeForegroundExtraDrawBox(
+                asset,
                 x,
                 y,
                 width,
-                height
+                height,
+                shouldStagger
             );
 
-            context.restore();
-        });
+        context.save();
+
+        context.drawImage(
+            getRenderedExtraLayer(asset),
+            drawBox.x,
+            drawBox.y,
+            drawBox.width,
+            drawBox.height
+        );
+
+        context.restore();
+    });
 }
 
 function getCupcakeExtraStyleName() {
@@ -4953,15 +5381,28 @@ function drawCupcakeExtraAssets(
         return;
     }
 
+    const shouldStagger =
+        assets.length > 1;
+
     assets.forEach((asset) => {
+        const drawBox =
+            getCakeForegroundExtraDrawBox(
+                asset,
+                0,
+                0,
+                width,
+                height,
+                shouldStagger
+            );
+
         context.save();
 
         context.drawImage(
             getRenderedExtraLayer(asset),
-            0,
-            0,
-            width,
-            height
+            drawBox.x,
+            drawBox.y,
+            drawBox.width,
+            drawBox.height
         );
 
         context.restore();
@@ -5713,29 +6154,8 @@ function getEffectiveBoardColor() {
             .cakeBoardColor;
     }
 
-    const product =
-        getSelectedCakeProduct();
-
-    if (
-        product.shape === "tier"
-    ) {
-        return getRenderableCakeColor(
-            builderState.tierBottomColor
-        );
-    }
-
-    if (
-        product.shape ===
-        "numberLetter"
-    ) {
-        return getRenderableCakeColor(
-            builderState.characterOneColor
-        );
-    }
-
-    return getRenderableCakeColor(
-        builderState.mainCakeColor
-    );
+    return builderState
+        .matchedBoardColor;
 }
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
@@ -5926,7 +6346,9 @@ if (standaloneBorderAssets?.bottom) {
         bentoBottomBorderBox.x,
         bentoBottomBorderBox.y,
         bentoBottomBorderBox.width,
-        bentoBottomBorderBox.height
+        bentoBottomBorderBox.height,
+        builderState
+            .cakeBorderBottomColor
     );
 }
 
@@ -5938,7 +6360,8 @@ if (standaloneBorderAssets?.top) {
         bentoTopBorderBox.x,
         bentoTopBorderBox.y,
         bentoTopBorderBox.width,
-        bentoTopBorderBox.height
+        bentoTopBorderBox.height,
+        builderState.cakeBorderColor
     );
 }
 
@@ -6209,7 +6632,9 @@ if (borderAssets?.bottom) {
         x,
         y + boardYOffset,
         size.width,
-        size.height
+        size.height,
+        builderState
+            .cakeBorderBottomColor
     );
 }
 
@@ -6220,7 +6645,8 @@ if (borderAssets?.top) {
         x,
         y + boardYOffset,
         size.width,
-        size.height
+        size.height,
+        builderState.cakeBorderColor
     );
 }
 if (borderAssets?.middle) {
@@ -6230,7 +6656,8 @@ if (borderAssets?.middle) {
         x,
         y + boardYOffset,
         size.width,
-        size.height
+        size.height,
+        builderState.cakeBorderColor
     );
 }
 
@@ -6951,6 +7378,11 @@ function updateFinishColorControls() {
             "Vintage Piping" ||
         numberLetterUsesPipingColors
     );
+
+    finishColorCustomizer?.classList.toggle(
+        "is-hidden",
+        !finishUsesTwoColors
+    );
 }
 function updateFinishVisibility() {
     /*
@@ -7380,7 +7812,7 @@ function updateProductModeUI() {
 
     getElement("#cakeBoardCustomizer")?.classList.toggle(
         "is-hidden",
-        isCupcakesOnly
+        isCupcakesOnly || isBento
     );
 
     getElements(
@@ -7553,6 +7985,10 @@ function normalizeProductSpecificState(
         product.shape ===
         "cupcakes";
 
+    const isBento =
+        builderState.cakeProductId ===
+        "heart-5-bento";
+
     const supportsCoverage =
         cakeSupportsCoverage(product);
 
@@ -7566,6 +8002,29 @@ function normalizeProductSpecificState(
             input.checked =
                 input.value === "full";
         });
+    }
+
+
+    /*
+        Cupcakes and the Bento Box do not
+        offer a separate cake board.
+    */
+    if (isCupcakesOnly || isBento) {
+        builderState
+            .matchBoardToCakePalette =
+            false;
+
+        const matchBoardInput =
+            getElement(
+                "#matchBoardToCakePalette"
+            );
+
+        if (matchBoardInput) {
+            matchBoardInput.checked =
+                false;
+        }
+
+        updateMatchedBoardColorControls();
     }
 
 
@@ -7596,25 +8055,6 @@ function normalizeProductSpecificState(
 
     builderState.cakeFinish =
         "";
-
-
-    /*
-        Cupcakes do not use cake boards.
-    */
-
-    builderState
-        .matchBoardToCakePalette =
-        false;
-
-    const matchBoardInput =
-        getElement(
-            "#matchBoardToCakePalette"
-        );
-
-    if (matchBoardInput) {
-        matchBoardInput.checked =
-            false;
-    }
 
 
     /*
@@ -8461,10 +8901,21 @@ function validateStepFour() {
 
     if (
         flowersSelected &&
+        !builderState.flowerMaterial
+    ) {
+        showValidationMessage(
+            "Choose fresh or artificial flowers."
+        );
+
+        return false;
+    }
+
+    if (
+        flowersSelected &&
         !builderState.flowerSource
     ) {
         showValidationMessage(
-            "Choose who will supply the fresh flowers."
+            "Choose who will supply the flowers."
         );
 
         return false;
@@ -8863,13 +9314,12 @@ function updateCakeBoardControls() {
     }
 
     const allowedBoards = {
-        square: ["square", "rectangleHorizontal"],
+        square: ["square"],
         sheet: ["rectangleHorizontal"],
         numberLetter: ["letterNumber"]
     }[product.shape] || [
         "round",
-        "square",
-        "rectangleHorizontal"
+        "square"
     ];
 
     if (!allowedBoards.includes(builderState.cakeBoardStyle)) {
@@ -8900,12 +9350,47 @@ function updateCakeBoardControls() {
                 "Number and letter cakes use their dedicated board. You can still choose its color.";
         } else if (product.shape === "square") {
             boardNotice.textContent =
-                "Square cakes can use a square or horizontal rectangle board. Board choices do not change pricing.";
+                "Square cakes use the square board. You can still choose its color.";
         } else {
             boardNotice.textContent =
-                "Board choices update the realistic preview only and do not change pricing.";
+                "Choose a round or square board. Rectangle and letter / number boards are reserved for the cakes that require them.";
         }
     }
+}
+
+
+function updateMatchedBoardColorControls() {
+    const options = getElement(
+        "#matchedBoardColorOptions"
+    );
+
+    const select = getElement(
+        "#matchedBoardColor"
+    );
+
+    options?.classList.toggle(
+        "is-hidden",
+        !builderState
+            .matchBoardToCakePalette
+    );
+
+    if (select) {
+        select.value =
+            builderState
+                .matchedBoardUsesCustomShade
+                ? "custom"
+                : builderState
+                    .matchedBoardColor;
+    }
+
+    showCustomShadeControls(
+        "#customMatchedBoardColorField",
+        "#customMatchedBoardColorNote",
+        builderState
+            .matchBoardToCakePalette &&
+        builderState
+            .matchedBoardUsesCustomShade
+    );
 }
 
 
@@ -9196,13 +9681,16 @@ function updateFlowerSourceVisibility() {
 
     if (!flowersSelected) {
         builderState.flowerSource = "";
+        builderState.flowerMaterial = "";
 
         getElements(
-            'input[name="flowerSource"]'
+            'input[name="flowerSource"], input[name="flowerMaterial"]'
         ).forEach((input) => {
             input.checked = false;
         });
     }
+
+    updateFlowerPriceDisplay();
 }
 
 
@@ -9768,13 +10256,13 @@ function getQuoteOnlyDetailsSummary() {
 
     if (builderState.toyFigurineEnabled) {
         details.push(
-            `Toy / Figurine Decorations · ${builderState.toyFigurineDetails.trim()} (quote after design review · excluded from estimate)`
+            `Toy / Figurine Decorations · ${builderState.toyFigurineDetails.trim()} (price confirmed after design review · excluded from estimate)`
         );
     }
 
     if (builderState.sculptedPiecesEnabled) {
         details.push(
-            `Custom 3D Sculpted Pieces · ${builderState.sculptedPiecesDetails.trim()} (quote after design review · excluded from estimate)`
+            `Custom 3D Sculpted Pieces · ${builderState.sculptedPiecesDetails.trim()} (price confirmed after design review · excluded from estimate)`
         );
     }
 
@@ -10046,7 +10534,18 @@ function populateReview() {
                 decoration.total ??
                 decoration.price;
 
-            return `${quantityLabel}${decoration.name} (+${formatCurrency(price)})`;
+            const flowerDetails =
+                decoration.id ===
+                    "flowersDecoration"
+                    ? ` · ${builderState.flowerMaterial || "Flower material not selected"} · ${builderState.flowerSource || "Source not selected"}`
+                    : "";
+
+            const priceLabel =
+                price > 0
+                    ? `+${formatCurrency(price)}`
+                    : formatCurrency(0);
+
+            return `${quantityLabel}${decoration.name}${flowerDetails} (${priceLabel})`;
         }
     );
     
@@ -10708,6 +11207,50 @@ getElement(
 
 
 getElement(
+    "#customCakeBorderBottomColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState
+            .customCakeBorderBottomColor =
+            event.target.value;
+
+        builderState
+            .cakeBorderBottomColor =
+            event.target.value;
+
+        builderState
+            .cakeBorderBottomUsesCustomShade =
+            true;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#customMatchedBoardColor"
+)?.addEventListener(
+    "input",
+    (event) => {
+        builderState
+            .customMatchedBoardColor =
+            event.target.value;
+
+        builderState
+            .matchedBoardColor =
+            event.target.value;
+
+        builderState
+            .matchedBoardUsesCustomShade =
+            true;
+
+        renderCakePreview();
+    }
+);
+
+
+getElement(
     "#customCupcakeFrostingColor"
 )?.addEventListener(
     "input",
@@ -10734,6 +11277,31 @@ function updateBorderControlsVisibility() {
     controls?.classList.toggle(
         "is-hidden",
         !builderState.cakeBorderStyle
+    );
+
+    const placement =
+        builderState.cakeBorderPlacement;
+
+    const showTopColor =
+        placement === "top" ||
+        placement === "both";
+
+    const showBottomColor =
+        placement === "bottom" ||
+        placement === "both";
+
+    getElement(
+        "#cakeBorderTopColorControls"
+    )?.classList.toggle(
+        "is-hidden",
+        !showTopColor
+    );
+
+    getElement(
+        "#cakeBorderBottomColorControls"
+    )?.classList.toggle(
+        "is-hidden",
+        !showBottomColor
     );
 }
 function showCustomShadeControls(
@@ -10920,6 +11488,57 @@ function buildBuilderColorControls() {
                 showCustomShadeControls(
                     "#customCakeBorderColorField",
                     "#customCakeBorderColorNote",
+                    true
+                );
+
+                renderCakePreview();
+            }
+        }
+    );
+
+
+    buildColorSwatches(
+        "#cakeBorderBottomColorSwatches",
+        "cakeBorderBottomColorChoice",
+        curatedButtercreamPalette,
+        builderState.cakeBorderBottomColor,
+        (value) => {
+            builderState
+                .cakeBorderBottomColor =
+                value;
+
+            builderState
+                .cakeBorderBottomUsesCustomShade =
+                false;
+
+            showCustomShadeControls(
+                "#customCakeBorderBottomColorField",
+                "#customCakeBorderBottomColorNote",
+                false
+            );
+
+            renderCakePreview();
+        },
+        {
+            allowCustom: true,
+
+            customSelected:
+                builderState
+                    .cakeBorderBottomUsesCustomShade,
+
+            onCustomSelected: () => {
+                builderState
+                    .cakeBorderBottomUsesCustomShade =
+                    true;
+
+                builderState
+                    .cakeBorderBottomColor =
+                    builderState
+                        .customCakeBorderBottomColor;
+
+                showCustomShadeControls(
+                    "#customCakeBorderBottomColorField",
+                    "#customCakeBorderBottomColorNote",
                     true
                 );
 
@@ -11241,6 +11860,7 @@ getElements(
             builderState.cakeBorderPlacement =
                 input.value;
 
+            updateBorderControlsVisibility();
             renderCakePreview();
         }
     );
@@ -11267,57 +11887,8 @@ getElements(
     input.addEventListener(
         "change",
         () => {
-                        builderState.decorations =
-                getElements(
-                    "[data-decoration-id]"
-                )
-                    .filter(
-                        (decorationInput) =>
-                            decorationInput.checked
-                    )
-                    .filter(
-                        (decorationInput) =>
-                            decorationInput
-                                .dataset
-                                .decorationId !==
-                            "topperDecoration"
-                    )
-                    .map(
-                        (decorationInput) => {
-                            const id =
-                                decorationInput
-                                    .dataset
-                                    .decorationId;
+            syncSelectedDecorationsFromInputs();
 
-                            const price =
-                                Number(
-                                    decorationInput
-                                        .dataset
-                                        .price
-                                ) || 0;
-
-                            const quantity =
-                                builderState
-                                    .decorationQuantities[
-                                        id
-                                    ] || 1;
-
-                            return {
-                                id,
-
-                                name:
-                                    decorationInput
-                                        .dataset
-                                        .decorationName,
-
-                                price,
-                                quantity,
-                                total:
-                                    price *
-                                    quantity
-                            };
-                        }
-                    );
                     const dripStillSelected =
     builderState.decorations.some(
         (decoration) =>
@@ -11413,7 +11984,25 @@ getElements(
             builderState.flowerSource =
                 input.value;
 
+            syncSelectedDecorationsFromInputs();
             updateSelectedCardStates();
+            renderCakePreview();
+        }
+    );
+});
+
+getElements(
+    'input[name="flowerMaterial"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState.flowerMaterial =
+                input.value;
+
+            syncSelectedDecorationsFromInputs();
+            updateSelectedCardStates();
+            renderCakePreview();
         }
     );
 });
@@ -11661,6 +12250,37 @@ getElement(
             .matchBoardToCakePalette =
             event.target.checked;
 
+        updateMatchedBoardColorControls();
+        renderCakePreview();
+    }
+);
+
+
+getElement(
+    "#matchedBoardColor"
+)?.addEventListener(
+    "change",
+    (event) => {
+        if (event.target.value === "custom") {
+            builderState
+                .matchedBoardUsesCustomShade =
+                true;
+
+            builderState
+                .matchedBoardColor =
+                builderState
+                    .customMatchedBoardColor;
+        } else {
+            builderState
+                .matchedBoardUsesCustomShade =
+                false;
+
+            builderState
+                .matchedBoardColor =
+                event.target.value;
+        }
+
+        updateMatchedBoardColorControls();
         renderCakePreview();
     }
 );
@@ -12393,6 +13013,13 @@ showCustomShadeControls(
 );
 
 showCustomShadeControls(
+    "#customCakeBorderBottomColorField",
+    "#customCakeBorderBottomColorNote",
+    builderState
+        .cakeBorderBottomUsesCustomShade
+);
+
+showCustomShadeControls(
     "#customCupcakeFrostingColorField",
     "#customCupcakeFrostingColorNote",
     builderState
@@ -12400,6 +13027,7 @@ showCustomShadeControls(
 );
     showCakeSizeGroup("round");
     updateCakeBoardControls();
+    updateMatchedBoardColorControls();
     updateNumberLetterControls();
     updateBorderControlsVisibility();
 
@@ -12407,6 +13035,7 @@ showCustomShadeControls(
     updateCustomCakeFlavorVisibility();
     updateCustomFillingVisibility();
     updateFlowerSourceVisibility();
+    updateFlowerPriceDisplay();
     updateDripColorFromSelection();
     const defaultDripType =
     getElement(
@@ -12579,20 +13208,46 @@ function applyTpjImageBackground(
 
         try {
             if (isHeroPhoto) {
-                const heroColor =
+                const leftColor =
                     getTpjImageEdgeColor(
                         image,
-                        "corners"
+                        "left"
                     );
 
-                image.style.backgroundColor =
-                    heroColor;
+                const rightColor =
+                    getTpjImageEdgeColor(
+                        image,
+                        "right"
+                    );
 
-                image.closest(
-                    ".builder-basics-hero"
-                )?.style.setProperty(
+                const heroBackground =
+                    `linear-gradient(
+                        90deg,
+                        ${leftColor} 0%,
+                        ${leftColor} 50%,
+                        ${rightColor} 50%,
+                        ${rightColor} 100%
+                    )`;
+
+                image.style.backgroundColor =
+                    leftColor;
+
+                image.style.backgroundImage =
+                    heroBackground;
+
+                const heroContainer =
+                    image.closest(
+                        ".builder-basics-hero"
+                    );
+
+                heroContainer?.style.setProperty(
                     "background-color",
-                    heroColor
+                    leftColor
+                );
+
+                heroContainer?.style.setProperty(
+                    "background-image",
+                    heroBackground
                 );
 
                 return;
