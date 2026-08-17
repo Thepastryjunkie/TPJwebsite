@@ -601,7 +601,7 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-border-calibration-20260817-1";
+    "?v=tpj-macaron-round-20260817-1";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -4875,10 +4875,8 @@ async function loadCakeExtraAssets(
         Bento assets must use the same cache
         version as the Bento cake and borders.
     */
-    const extraAssetVersion =
-        isBento
-            ? cakeAssetVersion
-            : "";
+const extraAssetVersion =
+    cakeAssetVersion;
 
     const loadedAssets =
         await Promise.all(
