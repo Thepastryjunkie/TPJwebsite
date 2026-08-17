@@ -5412,7 +5412,15 @@ const cakeExtraStaggerMap = {
     macaronsDecoration: [0.0, 0.0],
     discoBallsDecoration: [0.0, 0.0]
 };
+const cakeExtraScaleMap = {
+    halfSheet: {
+        macaronsDecoration: 1.28
+    },
 
+    fullSheet: {
+        macaronsDecoration: 1.28
+    }
+};
 
 function getCakeForegroundExtraDrawBox(
     asset,
@@ -5420,9 +5428,11 @@ function getCakeForegroundExtraDrawBox(
     y,
     width,
     height,
-    shouldStagger
+    shouldStagger,
+    entryKey = ""
 ) {
-const scale = 1;
+    const scale =
+        cakeExtraScaleMap[entryKey]?.[asset.id] || 1;
 
     const [offsetX, offsetY] =
         shouldStagger
@@ -5459,7 +5469,8 @@ function drawCakeForegroundExtras(
     y,
     width,
     height,
-    preserveRegistration = false
+    preserveRegistration = false,
+    entryKey = ""
 ) {
     if (!assets?.length) {
         return;
@@ -5478,14 +5489,15 @@ const shouldStagger =
 
     foregroundAssets.forEach((asset) => {
         const drawBox =
-            getCakeForegroundExtraDrawBox(
-                asset,
-                x,
-                y,
-                width,
-                height,
-                shouldStagger
-            );
+getCakeForegroundExtraDrawBox(
+    asset,
+    x,
+    y,
+    width,
+    height,
+    shouldStagger,
+    entryKey
+);
 
         context.save();
 
@@ -6864,7 +6876,9 @@ drawCakeForegroundExtras(
     x,
     y + boardYOffset,
     size.width,
-    size.height
+    size.height,
+    false,
+    entry.key
 );
 
 });
