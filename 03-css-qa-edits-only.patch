@@ -1,0 +1,60 @@
+--- a/cake-builder.css
++++ b/cake-builder.css
+@@ -3255,13 +3255,47 @@
+     font-weight: 700;
+ }
+ 
+-@media (max-width: 720px) {
++@media (max-width: 720px) {
+     .compact-choice-row,
+     .cupcake-control-grid,
+     .cupcake-studio-layout {
+         grid-template-columns: 1fr;
+-    }
+-}
++    }
++}
++
++/* =========================================
++   QA CONTROL POLISH
++========================================= */
++
++.builder-basics-hero,
++.builder-basics-hero img {
++    background-repeat: no-repeat;
++    background-size: 100% 100%;
++}
++
++.board-match-color-options {
++    margin: 14px 0 18px;
++}
++
++#cakeBorderTopColorControls,
++#cakeBorderBottomColorControls {
++    margin-bottom: 18px;
++}
++
++#flowerPriceDisplay {
++    line-height: 1.35;
++}
++
++@media (max-width: 720px) {
++    .board-match-color-options {
++        margin: 10px 0 12px;
++    }
++
++    #cakeBorderTopColorControls,
++    #cakeBorderBottomColorControls {
++        margin-bottom: 12px;
++    }
++}
+ 
+ 
+ /* =========================================
+@@ -5032,4 +5066,4 @@
+         height: 22px;
+         font-size: 9px;
+     }
+-}
+\ No newline at end of file
++}

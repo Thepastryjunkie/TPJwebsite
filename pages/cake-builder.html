@@ -2352,7 +2352,58 @@
                                 </span>
 
                             </label>
+<div
+    id="matchedBoardColorOptions"
+    class="conditional-section board-match-color-options is-hidden"
+>
 
+    <label class="form-field">
+
+        <span>
+            What color should the cake drum match?
+        </span>
+
+        <select id="matchedBoardColor">
+
+            <option value="#F7B6D2">Soft Pink</option>
+            <option value="#E95A9D">Hot Pink</option>
+            <option value="#84563C">Chocolate</option>
+            <option value="#F3E2C7">Cream</option>
+            <option value="#FFFDFC">White</option>
+            <option value="#24201F">Black</option>
+            <option value="#D4C0E8">Lavender</option>
+            <option value="#BDD5E8">Baby Blue</option>
+            <option value="#B9C8AE">Sage</option>
+            <option value="#F1D77D">Yellow</option>
+            <option value="custom">Custom Shade</option>
+
+        </select>
+
+    </label>
+
+    <div
+        id="customMatchedBoardColorField"
+        class="custom-color-field is-hidden"
+    >
+
+        <span>Custom Drum Shade</span>
+
+        <input
+            id="customMatchedBoardColor"
+            type="color"
+            value="#F7B6D2"
+        >
+
+    </div>
+
+    <p
+        id="customMatchedBoardColorNote"
+        class="field-note is-hidden"
+    >
+        We match the wrapped drum shade as closely as possible to the color selected here.
+    </p>
+
+</div>
                             <p
                                 id="cakeBoardNotice"
                                 class="field-note"
@@ -3323,10 +3374,13 @@
         </fieldset>
 
 
-       <fieldset class="builder-fieldset">
+<fieldset
+    id="cakeBorderTopColorControls"
+    class="builder-fieldset"
+>
 
     <legend>
-        Border Color
+        Top Border Color
     </legend>
 
     <div
@@ -3339,10 +3393,9 @@
         id="customCakeBorderColorField"
         class="custom-color-field is-hidden"
     >
-
-        <span>
-            Custom Border Shade
-        </span>
+<span>
+    Custom Top Border Shade
+</span>
 
         <input
             id="customCakeBorderColor"
@@ -3361,7 +3414,45 @@
     </p>
 
 </fieldset> 
+<fieldset
+    id="cakeBorderBottomColorControls"
+    class="builder-fieldset"
+>
 
+    <legend>
+        Bottom Border Color
+    </legend>
+
+    <div
+        id="cakeBorderBottomColorSwatches"
+        class="color-choice-grid"
+    ></div>
+
+    <div
+        id="customCakeBorderBottomColorField"
+        class="custom-color-field is-hidden"
+    >
+
+        <span>
+            Custom Bottom Border Shade
+        </span>
+
+        <input
+            id="customCakeBorderBottomColor"
+            type="color"
+            value="#F7B6D2"
+        >
+
+    </div>
+
+    <p
+        id="customCakeBorderBottomColorNote"
+        class="field-note is-hidden"
+    >
+        We match custom buttercream shades as closely as possible using food-safe gel dyes.
+    </p>
+
+</fieldset>
 
         <label class="extra-layer-control">
 
@@ -3920,7 +4011,7 @@
                                     <input
                                         type="checkbox"
                                         data-decoration-id="flowersDecoration"
-                                        data-decoration-name="Fresh Flowers"
+                                        data-decoration-name="Flowers"
                                         data-price="25"
                                     >
 
@@ -3931,13 +4022,12 @@
 >
 
                                     <strong>
-                                        Fresh Flowers
+                                        Flowers
                                     </strong>
 
-                                    <small>
-                                        +$25 each
-                                    </small>
-
+                                  <small id="flowerPriceDisplay">
+    Fresh +$25 each · Artificial +$5 each · Customer supplied $0
+</small>
                                 </label>
 
                                 <label class="decoration-choice-card">
@@ -4470,9 +4560,48 @@
     id="flowerDetailOptions"
     class="conditional-section is-hidden"
 >
+
+    <fieldset class="builder-fieldset">
+
+        <legend>Flower Material</legend>
+
+        <div class="description-choice-grid">
+
+            <label class="description-choice-card">
+                <input
+                    type="radio"
+                    name="flowerMaterial"
+                    value="Fresh Flowers"
+                >
+
+                <strong>Fresh Flowers</strong>
+
+                <span>
+                    +$25 each when supplied by The Pastry Junkie
+                </span>
+            </label>
+
+            <label class="description-choice-card">
+                <input
+                    type="radio"
+                    name="flowerMaterial"
+                    value="Artificial Flowers"
+                >
+
+                <strong>Artificial Flowers</strong>
+
+                <span>
+                    +$5 each when supplied by The Pastry Junkie
+                </span>
+            </label>
+
+        </div>
+
+    </fieldset>
+
     <p class="fieldset-description">
-    Flower Color Family
-</p>
+        Flower Color Family
+    </p>
 
 <div
     id="flowerColorSwatches"
@@ -4480,12 +4609,12 @@
 ></div>
 
 <p class="field-note">
-    Accent colors are matched to available physical inventory and seasonal flower availability.
+   Accent colors are matched to available physical inventory. Fresh choices also depend on seasonal availability.
 </p>
 
     <fieldset class="builder-fieldset">
 
-        <legend>Flower Type</legend>
+        <legend>Flower Variety</legend>
 
         <div class="description-choice-grid">
 
@@ -4558,7 +4687,7 @@
             placeholder="Tell me which flowers you want"
         >
     </label> <label class="form-field">
-    <span>Fresh Flower Quantity</span>
+    <span>Flower Quantity</span>
 
     <input
         type="number"
@@ -4577,7 +4706,7 @@
                             <fieldset class="builder-fieldset">
 
                                 <legend>
-                                    Fresh Flower Source
+                                  Who Will Provide the Flowers?  
                                 </legend>
 
                                 <div class="description-choice-grid">
@@ -5471,7 +5600,7 @@
                             </label>
 
                             <p class="field-note">
-                                Quote only · price confirmed after design review and excluded from this estimate.
+                                Price confirmed after design review and excluded from this estimate.
                             </p>
                         </fieldset>
 
@@ -5510,7 +5639,7 @@
                             </label>
 
                             <p class="field-note">
-                                Quote only · price confirmed after design review and excluded from this estimate.
+                                Price confirmed after design review and excluded from this estimate.
                             </p>
                         </fieldset>
 
@@ -6009,7 +6138,7 @@
                                     </div>
 
                                     <div>
-                                        <dt>Quote-Only Details</dt>
+                                        <dt>Design-Review Details</dt>
                                         <dd id="reviewQuoteOnlyDetails">None</dd>
                                     </div>
 

@@ -3263,6 +3263,40 @@ fieldset {
     }
 }
 
+/* =========================================
+   QA CONTROL POLISH
+========================================= */
+
+.builder-basics-hero,
+.builder-basics-hero img {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.board-match-color-options {
+    margin: 14px 0 18px;
+}
+
+#cakeBorderTopColorControls,
+#cakeBorderBottomColorControls {
+    margin-bottom: 18px;
+}
+
+#flowerPriceDisplay {
+    line-height: 1.35;
+}
+
+@media (max-width: 720px) {
+    .board-match-color-options {
+        margin: 10px 0 12px;
+    }
+
+    #cakeBorderTopColorControls,
+    #cakeBorderBottomColorControls {
+        margin-bottom: 12px;
+    }
+}
+
 
 /* =========================================
    UPLOAD
