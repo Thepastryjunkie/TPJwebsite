@@ -6681,10 +6681,21 @@ Promise.all(
             realisticCakeCanvas.height
         );
 
-        const boardYOffset =
-            boardKey === "rectangleHorizontal"
-                ? 260
-                : 0;
+const tallRoundSceneYOffset =
+    previewEntries.some(
+        (entry) =>
+            entry.key === "tallRound"
+    )
+        ? 40
+        : 0;
+
+const boardYOffset =
+    (
+        boardKey === "rectangleHorizontal"
+            ? 260
+            : 0
+    ) +
+    tallRoundSceneYOffset;
 
         drawRecoloredAsset(
             context,
