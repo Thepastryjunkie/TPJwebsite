@@ -6686,7 +6686,7 @@ const tallRoundSceneYOffset =
         (entry) =>
             entry.key === "tallRound"
     )
-        ? 40
+        ? 50
         : 0;
 
 const boardYOffset =
