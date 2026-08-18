@@ -8856,13 +8856,54 @@ function performCakePreviewRender() {
 /* =========================================
    STEP NAVIGATION
 ========================================= */
+const stepResetSnapshots = new Map();
 
+
+function captureStepResetSnapshot(stepNumber) {
+    const stepElement = getElement(
+        `.builder-step[data-step="${stepNumber}"]`
+    );
+
+    if (!stepElement) {
+        return;
+    }
+
+    const controls = Array.from(
+        stepElement.querySelectorAll(
+            "input, select, textarea"
+        )
+    ).map((control) => ({
+        control,
+        value: control.value,
+        checked:
+            typeof control.checked === "boolean"
+                ? control.checked
+                : null
+    }));
+
+    stepResetSnapshots.set(
+        stepNumber,
+        {
+            state: structuredClone(builderState),
+            controls
+        }
+    );
+}
 function showStep(stepNumber) {
     const safeStep = clampNumber(
         Number(stepNumber),
         1,
         8
     );
+
+    const previousStep =
+        builderState.currentStep;
+
+    const enteredNewStep =
+        previousStep !== safeStep ||
+        !stepResetSnapshots.has(safeStep);
+
+    builderState.currentStep = safeStep;
 
     builderState.currentStep = safeStep;
     const basicsHero =
@@ -8998,6 +9039,12 @@ if (
         left: Math.max(0, centeredLeft),
         behavior: "smooth"
     });
+}
+
+if (enteredNewStep) {
+    captureStepResetSnapshot(
+        safeStep
+    );
 }
 
 window.scrollTo({
@@ -11117,19 +11164,248 @@ function submitCakeVision() {
    RESET
 ========================================= */
 function resetBuilder() {
+    const stepNumber =
+        builderState.currentStep;
+
+    const snapshot =
+        stepResetSnapshots.get(
+            stepNumber
+        );
+
+    if (!snapshot) {
+        return;
+    }
+
     const confirmed = window.confirm(
-        "Reset the entire cake builder?"
+        "Reset the choices on this page? Your choices from the other pages will stay saved."
     );
 
     if (!confirmed) {
         return;
     }
 
-    window.location.replace(
-        window.location.href.split(/[?#]/)[0]
-    );
-}
 
+    /*
+        Revoke any temporary image URLs
+        currently being used before
+        restoring this step.
+    */
+
+    builderState.inspirationFiles.forEach(
+        (upload) => {
+            if (upload?.previewUrl) {
+                URL.revokeObjectURL(
+                    upload.previewUrl
+                );
+            }
+        }
+    );
+
+    builderState.edibleImages.forEach(
+        (upload) => {
+            if (upload?.url) {
+                URL.revokeObjectURL(
+                    upload.url
+                );
+            }
+        }
+    );
+
+
+    /*
+        Keep navigation unlocked.
+        Resetting a page should NOT
+        send the customer backward.
+    */
+
+    const highestUnlockedStep =
+        builderState.highestUnlockedStep;
+
+
+    /*
+        Restore the builder data to
+        how it looked when this page
+        was entered.
+    */
+
+    const restoredState =
+        structuredClone(
+            snapshot.state
+        );
+
+    Object.keys(
+        builderState
+    ).forEach((key) => {
+        delete builderState[key];
+    });
+
+    Object.assign(
+        builderState,
+        restoredState
+    );
+
+    builderState.currentStep =
+        stepNumber;
+
+    builderState.highestUnlockedStep =
+        highestUnlockedStep;
+
+
+    /*
+        Re-create image URLs from any
+        files that existed when the
+        page was entered.
+    */
+
+    builderState.inspirationFiles =
+        builderState.inspirationFiles.map(
+            (upload) => {
+                if (!upload?.file) {
+                    return upload;
+                }
+
+                return {
+                    ...upload,
+                    previewUrl:
+                        URL.createObjectURL(
+                            upload.file
+                        )
+                };
+            }
+        );
+
+
+    builderState.edibleImages =
+        builderState.edibleImages.map(
+            (upload) => {
+                if (!upload?.file) {
+                    return upload;
+                }
+
+                return {
+                    ...upload,
+                    url:
+                        URL.createObjectURL(
+                            upload.file
+                        )
+                };
+            }
+        );
+
+
+    syncPrimaryEdibleImage();
+
+
+    /*
+        Restore the actual fields,
+        checkboxes, radios, selects,
+        and textareas on this page.
+    */
+
+    snapshot.controls.forEach(
+        ({
+            control,
+            value,
+            checked
+        }) => {
+            if (
+                !document.contains(
+                    control
+                )
+            ) {
+                return;
+            }
+
+            if (
+                control.type === "file"
+            ) {
+                control.value = "";
+                return;
+            }
+
+            control.value = value;
+
+            if (
+                typeof checked ===
+                "boolean"
+            ) {
+                control.checked =
+                    checked;
+            }
+        }
+    );
+
+
+    /*
+        Rebuild generated color controls
+        from the restored builder state.
+    */
+
+    buildBuilderColorControls();
+
+
+    /*
+        Refresh all conditional UI.
+    */
+
+    showCakeSizeGroup(
+        builderState.cakeShape
+    );
+
+    updateCakeBoardControls();
+    updateMatchedBoardColorControls();
+    updateNumberLetterControls();
+
+    updateOtherOccasionVisibility();
+    updateCustomCakeFlavorVisibility();
+    updateCustomFillingVisibility();
+
+    updateBorderControlsVisibility();
+
+    updateFlowerSourceVisibility();
+    updateFlowerPriceDisplay();
+
+    updateDripColorFromSelection();
+    updateExtraDetailControlsVisibility();
+    updateTopperOptionsVisibility();
+    updateQuoteOnlyExtraVisibility();
+
+    updateDeliveryFieldsVisibility();
+
+    updateGuestRecommendation();
+    updateRushFee();
+    updateDeliveryEstimate();
+
+    updateEdibleImageRangeOutputs();
+    renderInspirationPreviews();
+
+    showValidationMessage("");
+
+    renderCakePreview();
+
+
+    /*
+        Clear the Step 8 submission
+        message if Reset is used there.
+    */
+
+    if (stepNumber === 8) {
+        const submissionMessage =
+            getElement(
+                "#submissionMessage"
+            );
+
+        if (submissionMessage) {
+            submissionMessage.textContent =
+                "";
+
+            submissionMessage.className =
+                "submission-message";
+        }
+
+        populateReview();
+    }
+}
 /* =========================================
    NAVIGATION EVENTS
 ========================================= */
