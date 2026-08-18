@@ -1868,7 +1868,7 @@ const cakePreviewDetailStrength = {
     simpleHeart: 0.46,
     simpleOther: 0.44,
     dimensionalFinish: 0.42,
-    border: 0.40,
+    border: 0.38,
     numberLetterBase: 0.32,
     numberLetterPiping: 0.44,
     cupcakeFrosting: 0.48,
@@ -2379,6 +2379,26 @@ function makeNaturalFoodTintedLayer(
     );
 
     return resultCanvas;
+}
+function isVeryLightHexColor(
+    color,
+    threshold = 220
+) {
+    const normalizedColor =
+        normalizeHexColor(color);
+
+    const {
+        red,
+        green,
+        blue
+    } = hexToRgb(normalizedColor);
+
+    const luminance =
+        red * 0.2126 +
+        green * 0.7152 +
+        blue * 0.0722;
+
+    return luminance >= threshold;
 }
 function getContainedAssetSize(image, scale) {
     const sourceWidth = image.naturalWidth || image.width;
@@ -4479,17 +4499,29 @@ function drawCakeSprinkles(
         return;
     }
 
+const sprinkleColor =
+    builderState
+        .cakeBorderSprinkleColor ||
+    "#F7B6D2";
+
+const useSoftLightSprinkleShading =
+    isVeryLightHexColor(
+        sprinkleColor,
+        220
+    );
+
 const tintedSprinkles =
     makeNaturalFoodTintedLayer(
         assets.strokes,
         assets.mask,
-        builderState
-            .cakeBorderSprinkleColor ||
-            "#F7B6D2",
-        0.18,
-        0.30
+        sprinkleColor,
+        useSoftLightSprinkleShading
+            ? 0.06
+            : 0.16,
+        useSoftLightSprinkleShading
+            ? 0.12
+            : 0.22
     );
-
     context.save();
 
     context.globalCompositeOperation =
@@ -5517,8 +5549,8 @@ if (
         asset.strokes,
         asset.mask,
         selectedColor,
-        0.28,
-        0.24
+        0.26,
+        0.22
     );
 }
     return makeTintedLayer(
