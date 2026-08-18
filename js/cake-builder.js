@@ -1866,6 +1866,7 @@ const cakePreviewDetailStrength = {
     simpleOther: 0.44,
     dimensionalFinish: 0.42,
     border: 0.40,
+    sprinkles: 0.18,
     numberLetterBase: 0.32,
     numberLetterPiping: 0.44,
     cupcakeFrosting: 0.48,
@@ -2000,6 +2001,9 @@ function makeTintedLayer(
 
        const isBorderAsset =
         source.includes("/borders/");
+        
+        const isSprinkleAsset =
+    source.includes("-Sprinkles");
 
     const isNumberLetterAsset =
         source.includes("TPJ-Number-Letter-");
@@ -2097,7 +2101,7 @@ layerContext.globalCompositeOperation =
     "multiply";
 
 layerContext.globalAlpha =
-    isBorderAsset
+    isSprinkleAsset
         ? cakePreviewDetailStrength.border
         : isNumberLetterPipingAsset
             ? cakePreviewDetailStrength.numberLetterPiping
