@@ -5421,18 +5421,18 @@ const cakeExtraScaleMap = {
         macaronsDecoration: 1.78
     },
 
-    number0: { discoBallsDecoration: 1.75 },
-    number1: { discoBallsDecoration: 1.75 },
-    number2: { discoBallsDecoration: 1.75 },
-    number3: { discoBallsDecoration: 1.75 },
-    number4: { discoBallsDecoration: 1.75 },
-    number5: { discoBallsDecoration: 1.75 },
-    number6: { discoBallsDecoration: 1.75 },
-    number7: { discoBallsDecoration: 1.75 },
-    number8: { discoBallsDecoration: 1.75 },
-    number9: { discoBallsDecoration: 1.75 },
+    number0: { discoBallsDecoration: 1.00 },
+    number1: { discoBallsDecoration: 1.00 },
+    number2: { discoBallsDecoration: 1.00 },
+    number3: { discoBallsDecoration: 1.00 },
+    number4: { discoBallsDecoration: 1.00 },
+    number5: { discoBallsDecoration: 1.00 },
+    number6: { discoBallsDecoration: 1.00 },
+    number7: { discoBallsDecoration: 1.00},
+    number8: { discoBallsDecoration: 1.00 },
+    number9: { discoBallsDecoration: 1.00 },
 
-    letter: { discoBallsDecoration: 1.75 }
+    letter: { discoBallsDecoration: 1.00 }
 };
 
 function getCakeForegroundExtraDrawBox(
