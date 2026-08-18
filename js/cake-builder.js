@@ -5571,7 +5571,7 @@ if (
         asset.mask,
         selectedColor,
         0.32,
-        0.28
+        0.24
     );
 }
     return makeTintedLayer(
