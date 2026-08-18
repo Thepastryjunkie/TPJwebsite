@@ -416,7 +416,7 @@ flowerMaterial: "",
 
 bowColor: "#F7B6D2",
 butterflyColor: "#F7B6D2",
-
+macaronColor: "#F7B6D2",
 cherryColor: "#E5172F",
 cherryGlitter: "No",
 
@@ -605,7 +605,7 @@ const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
    "?v=tpj-borders-fixed-20260818-2" ;
    const sprinkleAssetVersion =
-    "?v=tpj-sprinkles-20260818-1";
+    "?v=tpj-sprinkles-20260818-2";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -1858,6 +1858,9 @@ const dripTintLayerCache =
 const softTintLayerCache =
     new WeakMap();
 
+const naturalFoodTintLayerCache =
+    new WeakMap();
+
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
@@ -1866,7 +1869,6 @@ const cakePreviewDetailStrength = {
     simpleOther: 0.44,
     dimensionalFinish: 0.42,
     border: 0.40,
-    sprinkles: 0.18,
     numberLetterBase: 0.32,
     numberLetterPiping: 0.44,
     cupcakeFrosting: 0.48,
@@ -2002,8 +2004,6 @@ function makeTintedLayer(
        const isBorderAsset =
         source.includes("/borders/");
         
-        const isSprinkleAsset =
-    source.includes("-Sprinkles");
 
     const isNumberLetterAsset =
         source.includes("TPJ-Number-Letter-");
@@ -2101,7 +2101,7 @@ layerContext.globalCompositeOperation =
     "multiply";
 
 layerContext.globalAlpha =
-    isSprinkleAsset
+  isBorderAsset
         ? cakePreviewDetailStrength.border
         : isNumberLetterPipingAsset
             ? cakePreviewDetailStrength.numberLetterPiping
@@ -2159,7 +2159,227 @@ layerContext.globalCompositeOperation =
 
     return layer;
 }
+function makeNaturalFoodTintedLayer(
+    image,
+    mask,
+    color,
+    shadowStrength = 0.22,
+    highlightStrength = 0.28
+) {
+    let maskCache =
+        naturalFoodTintLayerCache.get(image);
 
+    if (!maskCache) {
+        maskCache = new WeakMap();
+
+        naturalFoodTintLayerCache.set(
+            image,
+            maskCache
+        );
+    }
+
+    let colorCache =
+        maskCache.get(mask);
+
+    if (!colorCache) {
+        colorCache = new Map();
+
+        maskCache.set(
+            mask,
+            colorCache
+        );
+    }
+
+    const normalizedColor =
+        normalizeHexColor(color);
+
+    const cacheKey =
+        `${normalizedColor}|${shadowStrength}|${highlightStrength}`;
+
+    if (colorCache.has(cacheKey)) {
+        return colorCache.get(cacheKey);
+    }
+
+    const width =
+        image.naturalWidth ||
+        image.width;
+
+    const height =
+        image.naturalHeight ||
+        image.height;
+
+    const sourceCanvas =
+        document.createElement("canvas");
+
+    sourceCanvas.width = width;
+    sourceCanvas.height = height;
+
+    const sourceContext =
+        sourceCanvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    sourceContext.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const maskCanvas =
+        document.createElement("canvas");
+
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+
+    const maskContext =
+        maskCanvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    maskContext.drawImage(
+        mask,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const sourceData =
+        sourceContext.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+    const maskData =
+        maskContext.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+    const resultCanvas =
+        document.createElement("canvas");
+
+    resultCanvas.width = width;
+    resultCanvas.height = height;
+
+    const resultContext =
+        resultCanvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    const resultData =
+        resultContext.createImageData(
+            width,
+            height
+        );
+
+    const target =
+        hexToRgb(normalizedColor);
+
+    for (
+        let index = 0;
+        index < sourceData.data.length;
+        index += 4
+    ) {
+        const maskAlpha =
+            maskData.data[index + 3];
+
+        if (!maskAlpha) {
+            continue;
+        }
+
+        const sourceRed =
+            sourceData.data[index];
+
+        const sourceGreen =
+            sourceData.data[index + 1];
+
+        const sourceBlue =
+            sourceData.data[index + 2];
+
+        const luminance =
+            sourceRed * 0.2126 +
+            sourceGreen * 0.7152 +
+            sourceBlue * 0.0722;
+
+        const detail =
+            clampNumber(
+                (luminance - 128) / 127,
+                -1,
+                1
+            );
+
+        let red = target.red;
+        let green = target.green;
+        let blue = target.blue;
+
+        if (detail < 0) {
+            const amount =
+                Math.abs(detail) *
+                shadowStrength;
+
+            red *= 1 - amount;
+            green *= 1 - amount;
+            blue *= 1 - amount;
+        } else {
+            const amount =
+                detail *
+                highlightStrength;
+
+            red +=
+                (255 - red) *
+                amount;
+
+            green +=
+                (255 - green) *
+                amount;
+
+            blue +=
+                (255 - blue) *
+                amount;
+        }
+
+        resultData.data[index] =
+            Math.round(red);
+
+        resultData.data[index + 1] =
+            Math.round(green);
+
+        resultData.data[index + 2] =
+            Math.round(blue);
+
+        resultData.data[index + 3] =
+            maskAlpha;
+    }
+
+    resultContext.putImageData(
+        resultData,
+        0,
+        0
+    );
+
+    colorCache.set(
+        cacheKey,
+        resultCanvas
+    );
+
+    return resultCanvas;
+}
 function getContainedAssetSize(image, scale) {
     const sourceWidth = image.naturalWidth || image.width;
     const sourceHeight = image.naturalHeight || image.height;
@@ -4259,14 +4479,16 @@ function drawCakeSprinkles(
         return;
     }
 
-    const tintedSprinkles =
-        makeTintedLayer(
-            assets.strokes,
-            assets.mask,
-            builderState
-                .cakeBorderSprinkleColor ||
-                "#F7B6D2"
-        );
+const tintedSprinkles =
+    makeNaturalFoodTintedLayer(
+        assets.strokes,
+        assets.mask,
+        builderState
+            .cakeBorderSprinkleColor ||
+            "#F7B6D2",
+        0.18,
+        0.30
+    );
 
     context.save();
 
@@ -5044,7 +5266,10 @@ function getRealisticExtraColor(
             builderState.flowerColor,
 
         pearlsDecoration:
-            builderState.pearlColor
+            builderState.pearlColor,
+
+          macaronsDecoration:
+    builderState.macaronColor  
     };
 
     return colorMap[decorationId] || null;
@@ -5284,7 +5509,18 @@ function getRenderedExtraLayer(asset) {
             selectedColor
         );
     }
-
+if (
+    asset.id ===
+    "macaronsDecoration"
+) {
+    return makeNaturalFoodTintedLayer(
+        asset.strokes,
+        asset.mask,
+        selectedColor,
+        0.28,
+        0.24
+    );
+}
     return makeTintedLayer(
         asset.strokes,
         asset.mask,
@@ -11968,7 +12204,18 @@ buildColorSwatches(
             renderCakePreview();
         }
     );
+buildColorSwatches(
+    "#macaronColorSwatches",
+    "macaronColorChoice",
+    curatedButtercreamPalette,
+    builderState.macaronColor,
+    (value) => {
+        builderState.macaronColor =
+            value;
 
+        renderCakePreview();
+    }
+);
 
     buildColorSwatches(
         "#cherryColorSwatches",
