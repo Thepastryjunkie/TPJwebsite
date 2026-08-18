@@ -2194,8 +2194,8 @@ function makeNaturalFoodTintedLayer(
     const normalizedColor =
         normalizeHexColor(color);
 
-    const cacheKey =
-        `${normalizedColor}|${shadowStrength}|${highlightStrength}`;
+const cacheKey =
+    `${normalizedColor}|${shadowStrength}|${highlightStrength}|${detailStrength}`;
 
     if (colorCache.has(cacheKey)) {
         return colorCache.get(cacheKey);
@@ -2318,12 +2318,14 @@ function makeNaturalFoodTintedLayer(
             sourceGreen * 0.7152 +
             sourceBlue * 0.0722;
 
-        const detail =
-            clampNumber(
-                (luminance - 128) / 127,
-                -1,
-                1
-            );
+const detail =
+    clampNumber(
+        (
+            (luminance - 128) / 127
+        ) * detailStrength,
+        -1,
+        1
+    );
 
         let red = target.red;
         let green = target.green;
@@ -5567,13 +5569,14 @@ if (
     asset.id ===
     "macaronsDecoration"
 ) {
-    return makeNaturalFoodTintedLayer(
-        asset.strokes,
-        asset.mask,
-        selectedColor,
-        0.26,
-        0.18
-    );
+return makeNaturalFoodTintedLayer(
+    asset.strokes,
+    asset.mask,
+    selectedColor,
+    0.30,
+    0.26,
+    1.35
+);
 }
     return makeTintedLayer(
         asset.strokes,
