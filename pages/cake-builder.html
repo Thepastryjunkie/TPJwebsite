@@ -3454,6 +3454,21 @@
 
 </fieldset>
 
+
+    </div>
+
+</fieldset>
+<div
+    id="cakeSprinkleSection"
+    class="conditional-section is-hidden"
+>
+
+    <fieldset class="builder-fieldset">
+
+        <legend>
+            Sprinkles
+        </legend>
+
         <label class="extra-layer-control">
 
             <input
@@ -3470,17 +3485,78 @@
                 </strong>
 
                 <small>
-                    Sprinkles will be added directly to the selected border.
+                    Add realistic jimmies to your piped border or Vintage Piping.
                 </small>
 
             </span>
 
         </label>
 
-    </div>
 
-</fieldset>
+        <div
+            id="cakeSprinkleOptions"
+            class="conditional-section is-hidden"
+        >
 
+            <div class="swatch-subsection">
+
+                <strong class="swatch-subheading">
+                    Sprinkle Placement
+                </strong>
+
+                <div class="compact-choice-row">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="cakeBorderSprinklePlacement"
+                            value="top"
+                        >
+                        <span>Top</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="cakeBorderSprinklePlacement"
+                            value="bottom"
+                        >
+                        <span>Bottom</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="cakeBorderSprinklePlacement"
+                            value="both"
+                            checked
+                        >
+                        <span>Top + Bottom</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="swatch-subsection">
+
+                <strong class="swatch-subheading">
+                    Sprinkle Color
+                </strong>
+
+                <div
+                    id="cakeBorderSprinkleColorSwatches"
+                    class="color-choice-grid"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </fieldset>
+
+</div>
 <fieldset
     id="finishColorCustomizer"
     class="builder-fieldset cake-only-look is-hidden"
@@ -6450,5 +6526,5 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260818-2"></script>
+<script src="../js/cake-builder.js?v=20260818-3"></script>
 </html>

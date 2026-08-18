@@ -372,6 +372,8 @@ cakeBorderBottomColor: "#F7B6D2",
 cakeBorderBottomUsesCustomShade: false,
 customCakeBorderBottomColor: "#F7B6D2",
 cakeBorderSprinkles: false,
+cakeBorderSprinklePlacement: "both",
+cakeBorderSprinkleColor: "#F7B6D2",
 
 finishAccentOne: "#F7B6D2",
 finishAccentTwo: "#D9C2F0",
@@ -602,6 +604,8 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
    "?v=tpj-borders-fixed-20260818-2" ;
+   const sprinkleAssetVersion =
+    "?v=tpj-sprinkles-20260818-1";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -4125,6 +4129,171 @@ function getBorderShapeName(
         entryKey
     ] || null;
 }
+function getSprinkleAssetFiles(
+    entryKey,
+    placement,
+    isBento = false
+) {
+    const shapeName =
+        getBorderShapeName(
+            entryKey,
+            isBento
+        );
+
+    if (!shapeName) {
+        return null;
+    }
+
+    const placementName =
+        placement === "top"
+            ? "Top"
+            : "Bottom";
+
+    const prefix =
+        `TPJ-Border-${shapeName}-${placementName}-Sprinkles`;
+
+    return {
+        strokes:
+            `${prefix}.png`,
+
+        mask:
+            `${prefix}-Mask.png`
+    };
+}
+
+
+async function loadSprinkleAssets(
+    entryKey,
+    placement,
+    isBento = false
+) {
+    const files =
+        getSprinkleAssetFiles(
+            entryKey,
+            placement,
+            isBento
+        );
+
+    if (!files) {
+        return null;
+    }
+
+    const borderRoot =
+        `${finalAssetRoot}/borders`;
+
+    const [
+        strokes,
+        mask
+    ] = await Promise.all([
+        loadOptionalRealisticImage(
+            `${borderRoot}/${files.strokes}${sprinkleAssetVersion}`
+        ),
+
+        loadOptionalRealisticImage(
+            `${borderRoot}/${files.mask}${sprinkleAssetVersion}`
+        )
+    ]);
+
+    if (!strokes || !mask) {
+        return null;
+    }
+
+    return {
+        strokes,
+        mask
+    };
+}
+
+
+async function loadSelectedSprinkleAssets(
+    entryKey,
+    isBento = false
+) {
+    if (!builderState.cakeBorderSprinkles) {
+        return {
+            top: null,
+            bottom: null
+        };
+    }
+
+    const placement =
+        builderState
+            .cakeBorderSprinklePlacement;
+
+    const needsTop =
+        placement === "top" ||
+        placement === "both";
+
+    const needsBottom =
+        placement === "bottom" ||
+        placement === "both";
+
+    const [
+        top,
+        bottom
+    ] = await Promise.all([
+        needsTop
+            ? loadSprinkleAssets(
+                entryKey,
+                "top",
+                isBento
+            )
+            : Promise.resolve(null),
+
+        needsBottom
+            ? loadSprinkleAssets(
+                entryKey,
+                "bottom",
+                isBento
+            )
+            : Promise.resolve(null)
+    ]);
+
+    return {
+        top,
+        bottom
+    };
+}
+
+
+function drawCakeSprinkles(
+    context,
+    assets,
+    x,
+    y,
+    width,
+    height
+) {
+    if (!assets) {
+        return;
+    }
+
+    const tintedSprinkles =
+        makeTintedLayer(
+            assets.strokes,
+            assets.mask,
+            builderState
+                .cakeBorderSprinkleColor ||
+                "#F7B6D2"
+        );
+
+    context.save();
+
+    context.globalCompositeOperation =
+        "source-over";
+
+    context.globalAlpha = 1;
+
+    context.drawImage(
+        tintedSprinkles,
+        x,
+        y,
+        width,
+        height
+    );
+
+    context.restore();
+}
 function getBorderAssetFiles(
     entryKey,
     placement,
@@ -4156,16 +4325,14 @@ function getBorderAssetFiles(
     const prefix =
         `TPJ-Border-${styleName}-${shapeName}-${placementName}`;
 
-    return {
-        strokes:
-            `${prefix}-Strokes.png`,
 
-        mask:
-            `${prefix}-Mask.png`,
+return {
+    strokes:
+        `${prefix}-Strokes.png`,
 
-        sprinkles:
-            `${prefix}-Sprinkles.png`
-    };
+    mask:
+        `${prefix}-Mask.png`
+};
 }
 async function loadBorderAssets(
     entryKey,
@@ -4186,35 +4353,27 @@ async function loadBorderAssets(
     const borderRoot =
         `${finalAssetRoot}/borders`;
 
-        const [
-        strokes,
-        mask,
-        sprinkles
-    ] = await Promise.all([
-        loadOptionalRealisticImage(
-            `${borderRoot}/${files.strokes}${cakeAssetVersion}`
-        ),
+const [
+    strokes,
+    mask
+] = await Promise.all([
+    loadOptionalRealisticImage(
+        `${borderRoot}/${files.strokes}${cakeAssetVersion}`
+    ),
 
-        loadOptionalRealisticImage(
-            `${borderRoot}/${files.mask}${cakeAssetVersion}`
-        ),
+    loadOptionalRealisticImage(
+        `${borderRoot}/${files.mask}${cakeAssetVersion}`
+    )
+]);
 
-        builderState.cakeBorderSprinkles
-            ? loadOptionalRealisticImage(
-                `${borderRoot}/${files.sprinkles}${cakeAssetVersion}`
-            )
-            : Promise.resolve(null)
-    ]);
+if (!strokes || !mask) {
+    return null;
+}
 
-    if (!strokes || !mask) {
-        return null;
-    }
-
-    return {
-        strokes,
-        mask,
-        sprinkles
-    };
+return {
+    strokes,
+    mask
+};
 }
 function getBorderDrawBox(
     assets,
@@ -4341,16 +4500,6 @@ function drawTallTierMiddleBorder(
         drawBox
     );
 
-    if (
-        builderState.cakeBorderSprinkles &&
-        assets.sprinkles
-    ) {
-        drawTallTierMiddleLayer(
-            context,
-            assets.sprinkles,
-            drawBox
-        );
-    }
 
     context.restore();
 }
@@ -4403,17 +4552,7 @@ function drawCakeBorder(
         source,
         drawBox
     );
-if (
-    builderState.cakeBorderSprinkles &&
-    assets.sprinkles
-) {
-  drawRegisteredBorderLayer(
-        context,
-        assets.sprinkles,
-        source,
-        drawBox
-    );
-}
+
 
     context.restore();
 }
@@ -5884,10 +6023,11 @@ if (product.shape === "numberLetter") {
     standaloneImage,
     cupcakeDesign,
     edibleImage,
-    standaloneFinishAssets,
-    standaloneBorderAssets,
-    standaloneExtraAssets,
-    bentoSimpleTextureImage
+standaloneFinishAssets,
+standaloneBorderAssets,
+standaloneSprinkleAssets,
+standaloneExtraAssets,
+bentoSimpleTextureImage
 ] = await Promise.all([  
     loadRealisticImage(
         cakeUrls[0]
@@ -5924,6 +6064,15 @@ if (product.shape === "numberLetter") {
         top: null,
         bottom: null
     }),
+   isBento
+    ? loadSelectedSprinkleAssets(
+        "heart5in",
+        true
+    )
+    : Promise.resolve({
+        top: null,
+        bottom: null
+    }), 
 
 isBento
     ? loadCakeExtraAssets(
@@ -6049,7 +6198,27 @@ if (standaloneBorderAssets?.top) {
         builderState.cakeBorderColor
     );
 }
+if (standaloneSprinkleAssets?.bottom) {
+    drawCakeSprinkles(
+        context,
+        standaloneSprinkleAssets.bottom,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
 
+if (standaloneSprinkleAssets?.top) {
+    drawCakeSprinkles(
+        context,
+        standaloneSprinkleAssets.top,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
 
 /*
     Extras also use the full Bento canvas.
@@ -6089,13 +6258,14 @@ drawCakeForegroundExtras(
         const boardMaskUrl =
             `${finalAssetRoot}/boards/${boardAssets[1]}`;
 
-      const [
+const [
     boardImage,
     boardMask,
     cakeImages,
     edibleImage,
     finishAssetSets,
     borderAssetSets,
+    sprinkleAssetSets,
     extraAssetSets
 ] =
     await Promise.all([
@@ -6136,6 +6306,14 @@ Promise.all(
     previewEntries.map(
         (entry) =>
             loadSelectedBorderAssets(
+                entry.key
+            )
+    )
+),
+Promise.all(
+    previewEntries.map(
+        (entry) =>
+            loadSelectedSprinkleAssets(
                 entry.key
             )
     )
@@ -6357,7 +6535,30 @@ if (borderAssets?.middle) {
         builderState.cakeBorderColor
     );
 }
+const sprinkleAssets =
+    sprinkleAssetSets[index];
 
+if (sprinkleAssets?.bottom) {
+    drawCakeSprinkles(
+        context,
+        sprinkleAssets.bottom,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
+
+if (sprinkleAssets?.top) {
+    drawCakeSprinkles(
+        context,
+        sprinkleAssets.top,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 /*
     Bows, butterflies, cherries,
     flowers, leaf and pearls sit above
@@ -8298,27 +8499,29 @@ function performCakePreviewRender() {
 
     updateCoverageDesignAvailability();
 
-    updateFinishAvailability();
+updateFinishAvailability();
 
-    updateEdibleImageControls();
+updateEdibleImageControls();
 
-    updateRealisticCakePreview();
+updateSprinkleControlsVisibility();
 
-    updateCupcakePreview();
+updateRealisticCakePreview();
 
-    updateVisibleCakeShape();
+updateCupcakePreview();
 
-    updateRendererSize();
+updateVisibleCakeShape();
 
-    updateCakeHeight();
+updateRendererSize();
 
-    updateRendererColors();
+updateCakeHeight();
 
-    updateFinishVisibility();
+updateRendererColors();
 
-    updateFinishColorControls();
+updateFinishVisibility();
 
-    updateDecorationVisibility();
+updateFinishColorControls();
+
+updateDecorationVisibility();
 
     updateSelectedCardStates();
 
@@ -11404,6 +11607,55 @@ function updateBorderControlsVisibility() {
         !showBottomColor
     );
 }
+function updateSprinkleControlsVisibility() {
+    const section =
+        getElement(
+            "#cakeSprinkleSection"
+        );
+
+    const options =
+        getElement(
+            "#cakeSprinkleOptions"
+        );
+
+    const product =
+        getSelectedCakeProduct();
+
+    const canUseSprinkles =
+        product.shape !== "cupcakes" &&
+        (
+            Boolean(
+                builderState.cakeBorderStyle
+            ) ||
+            builderState.cakeFinish ===
+                "Vintage Piping"
+        );
+
+    section?.classList.toggle(
+        "is-hidden",
+        !canUseSprinkles
+    );
+
+    if (!canUseSprinkles) {
+        builderState.cakeBorderSprinkles =
+            false;
+
+        const toggle =
+            getElement(
+                "#cakeBorderSprinkles"
+            );
+
+        if (toggle) {
+            toggle.checked = false;
+        }
+    }
+
+    options?.classList.toggle(
+        "is-hidden",
+        !canUseSprinkles ||
+        !builderState.cakeBorderSprinkles
+    );
+}
 function showCustomShadeControls(
     fieldSelector,
     noteSelector,
@@ -11646,7 +11898,22 @@ function buildBuilderColorControls() {
             }
         }
     );
+/*
+    SPRINKLES
+*/
 
+buildColorSwatches(
+    "#cakeBorderSprinkleColorSwatches",
+    "cakeBorderSprinkleColorChoice",
+    curatedButtercreamPalette,
+    builderState.cakeBorderSprinkleColor,
+    (value) => {
+        builderState.cakeBorderSprinkleColor =
+            value;
+
+        renderCakePreview();
+    }
+);
 
     /*
         FINISH ACCENTS
@@ -11928,20 +12195,8 @@ getElements(
             builderState.cakeBorderStyle =
                 input.value;
 
-            if (!input.value) {
-                builderState.cakeBorderSprinkles =
-                    false;
-
-                const sprinkleToggle =
-                    getElement(
-                        "#cakeBorderSprinkles"
-                    );
-
-                if (sprinkleToggle) {
-                    sprinkleToggle.checked =
-                        false;
-                }
-            }
+            
+            
 
             updateBorderControlsVisibility();
             updateSelectedCardStates();
@@ -11974,9 +12229,27 @@ getElement(
         builderState.cakeBorderSprinkles =
             event.target.checked;
 
+        updateSprinkleControlsVisibility();
+
         renderCakePreview();
     }
 );
+
+
+getElements(
+    'input[name="cakeBorderSprinklePlacement"]'
+).forEach((input) => {
+    input.addEventListener(
+        "change",
+        () => {
+            builderState
+                .cakeBorderSprinklePlacement =
+                input.value;
+
+            renderCakePreview();
+        }
+    );
+});
 /* =========================================
    DECORATION EVENTS
 ========================================= */
