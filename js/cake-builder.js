@@ -5570,7 +5570,7 @@ if (
         asset.strokes,
         asset.mask,
         selectedColor,
-        0.32,
+        0.26,
         0.18
     );
 }
