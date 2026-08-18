@@ -5409,8 +5409,8 @@ const cakeExtraStaggerMap = {
     goldAccentDecoration: [0.020, 0.012],
     flowersDecoration: [0, -0.022],
     cherriesDecoration: [0, 0.022],
-    macaronsDecoration: [0.0, 0.0],
-    discoBallsDecoration: [0.0, 0.0]
+    macaronsDecoration: [0.5, 0.010],
+    discoBallsDecoration: [0.3, 0.08]
 };
 const cakeExtraScaleMap = {
     halfSheet: {
