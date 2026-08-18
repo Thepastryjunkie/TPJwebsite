@@ -5414,25 +5414,25 @@ const cakeExtraStaggerMap = {
 };
 const cakeExtraScaleMap = {
     halfSheet: {
-        macaronsDecoration: 1.28
+        macaronsDecoration: 1.78
     },
 
     fullSheet: {
-        macaronsDecoration: 1.28
+        macaronsDecoration: 1.78
     },
 
-    number0: { discoBallsDecoration: 1.25 },
-    number1: { discoBallsDecoration: 1.25 },
-    number2: { discoBallsDecoration: 1.25 },
-    number3: { discoBallsDecoration: 1.25 },
-    number4: { discoBallsDecoration: 1.25 },
-    number5: { discoBallsDecoration: 1.25 },
-    number6: { discoBallsDecoration: 1.25 },
-    number7: { discoBallsDecoration: 1.25 },
-    number8: { discoBallsDecoration: 1.25 },
-    number9: { discoBallsDecoration: 1.25 },
+    number0: { discoBallsDecoration: 1.75 },
+    number1: { discoBallsDecoration: 1.75 },
+    number2: { discoBallsDecoration: 1.75 },
+    number3: { discoBallsDecoration: 1.75 },
+    number4: { discoBallsDecoration: 1.75 },
+    number5: { discoBallsDecoration: 1.75 },
+    number6: { discoBallsDecoration: 1.75 },
+    number7: { discoBallsDecoration: 1.75 },
+    number8: { discoBallsDecoration: 1.75 },
+    number9: { discoBallsDecoration: 1.75 },
 
-    letter: { discoBallsDecoration: 1.25 }
+    letter: { discoBallsDecoration: 1.75 }
 };
 
 function getCakeForegroundExtraDrawBox(
