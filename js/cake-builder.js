@@ -5582,10 +5582,10 @@ async function loadRealisticFinishAssets(
         return null;
     }
 
-    const assetVersion =
-        finishDefinition.type === "vintagePiping"
-            ?v=tpj-vintage-piping-20260818-1
-            : "";
+const assetVersion =
+    finishDefinition.type === "vintagePiping"
+        ? "?v=tpj-vintage-piping-20260818-1"
+        : "";
 
     const images = await Promise.all(
         finishDefinition.files.map(
