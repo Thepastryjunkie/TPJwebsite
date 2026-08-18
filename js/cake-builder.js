@@ -2164,7 +2164,8 @@ function makeNaturalFoodTintedLayer(
     mask,
     color,
     shadowStrength = 0.22,
-    highlightStrength = 0.28
+    highlightStrength = 0.28,
+    detailStrength = 1
 ) {
     let maskCache =
         naturalFoodTintLayerCache.get(image);
