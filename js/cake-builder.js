@@ -2380,10 +2380,7 @@ function makeNaturalFoodTintedLayer(
 
     return resultCanvas;
 }
-function isVeryLightHexColor(
-    color,
-    threshold = 220
-) {
+function getHexColorLuminance(color) {
     const normalizedColor =
         normalizeHexColor(color);
 
@@ -2393,12 +2390,11 @@ function isVeryLightHexColor(
         blue
     } = hexToRgb(normalizedColor);
 
-    const luminance =
+    return (
         red * 0.2126 +
         green * 0.7152 +
-        blue * 0.0722;
-
-    return luminance >= threshold;
+        blue * 0.0722
+    );
 }
 function getContainedAssetSize(image, scale) {
     const sourceWidth = image.naturalWidth || image.width;
@@ -4504,23 +4500,48 @@ const sprinkleColor =
         .cakeBorderSprinkleColor ||
     "#F7B6D2";
 
-const useSoftLightSprinkleShading =
-    isVeryLightHexColor(
-        sprinkleColor,
-        220
+const sprinkleLuminance =
+    getHexColorLuminance(
+        sprinkleColor
     );
+
+let sprinkleShadowStrength =
+    0.12;
+
+let sprinkleHighlightStrength =
+    0.18;
+
+/*
+    Very light shades:
+    white, cream, pale yellow,
+    pale pink, baby blue, sage
+*/
+if (sprinkleLuminance >= 190) {
+    sprinkleShadowStrength =
+        0.035;
+
+    sprinkleHighlightStrength =
+        0.09;
+}
+
+/*
+    Light / pastel shades
+*/
+else if (sprinkleLuminance >= 155) {
+    sprinkleShadowStrength =
+        0.06;
+
+    sprinkleHighlightStrength =
+        0.12;
+}
 
 const tintedSprinkles =
     makeNaturalFoodTintedLayer(
         assets.strokes,
         assets.mask,
         sprinkleColor,
-        useSoftLightSprinkleShading
-            ? 0.06
-            : 0.16,
-        useSoftLightSprinkleShading
-            ? 0.12
-            : 0.22
+        sprinkleShadowStrength,
+        sprinkleHighlightStrength
     );
     context.save();
 
@@ -5549,8 +5570,8 @@ if (
         asset.strokes,
         asset.mask,
         selectedColor,
-        0.26,
-        0.22
+        0.32,
+        0.28
     );
 }
     return makeTintedLayer(
