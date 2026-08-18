@@ -1223,20 +1223,7 @@ function getLightenedCakePreviewColor(color) {
         return color;
     }
 
-    const normalizedColor =
-        normalizeHexColor(color);
-
-    const isBlackShade = [
-        "#000000",
-        "#111111",
-        "#24201F"
-    ].includes(normalizedColor);
-
-    return mixHexColor(
-        "#FFF1DC",
-        normalizedColor,
-        isBlackShade ? 0.78 : 0.48
-    );
+    return normalizeHexColor(color);
 }
 
 
@@ -1874,7 +1861,7 @@ const softTintLayerCache =
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.32,
+    smoothCake: 0.42,
     simpleHeart: 0.46,
     simpleOther: 0.44,
     dimensionalFinish: 0.42,
