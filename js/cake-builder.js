@@ -5565,20 +5565,59 @@ function getRenderedExtraLayer(asset) {
             selectedColor
         );
     }
-if (
+   if (
     asset.id ===
     "macaronsDecoration"
 ) {
-return makeNaturalFoodTintedLayer(
-    asset.strokes,
-    asset.mask,
-    selectedColor,
-    0.30,
-    0.26,
-    1.35
-);
-}
-    return makeTintedLayer(
+    const macaronLuminance =
+        getHexColorLuminance(
+            selectedColor
+        );
+
+    /*
+        Very light shades:
+        white, cream, very pale pink, etc.
+    */
+    if (macaronLuminance >= 200) {
+        return makeNaturalFoodTintedLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor,
+            0.42,
+            0.10,
+            1.60
+        );
+    }
+
+    /*
+        Light / pastel shades:
+        baby blue, sage, pale yellow,
+        soft pink, lavender, etc.
+    */
+    if (macaronLuminance >= 165) {
+        return makeNaturalFoodTintedLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor,
+            0.36,
+            0.16,
+            1.45
+        );
+    }
+
+    /*
+        Medium / dark shades
+    */
+    return makeNaturalFoodTintedLayer(
+        asset.strokes,
+        asset.mask,
+        selectedColor,
+        0.30,
+        0.26,
+        1.35
+    );
+} 
+  return makeTintedLayer(
         asset.strokes,
         asset.mask,
         selectedColor
