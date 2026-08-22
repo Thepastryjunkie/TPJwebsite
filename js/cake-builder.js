@@ -4377,17 +4377,16 @@ function getSprinkleAssetFiles(
     const placementName =
         placement === "top"
             ? "Top"
-            : "Bottom";
-
-    const prefix =
-        `TPJ-Border-${shapeName}-${placementName}-Sprinkles`;
+            : placement === "middle"
+                ? "Middle"
+                : "Bottom";
 
     return {
         strokes:
-            `${prefix}.png`,
+            `TPJ-Border-${shapeName}-${placementName}-Sprinkles.png`,
 
         mask:
-            `${prefix}-Mask.png`
+            `TPJ-Border-${shapeName}-${placementName}-Mask.png`
     };
 }
 
@@ -4442,6 +4441,7 @@ async function loadSelectedSprinkleAssets(
     if (!builderState.cakeBorderSprinkles) {
         return {
             top: null,
+            middle: null,
             bottom: null
         };
     }
@@ -4458,14 +4458,34 @@ async function loadSelectedSprinkleAssets(
         placement === "bottom" ||
         placement === "both";
 
+    /*
+        On a two-tier cake, the middle seam
+        acts as another top-border location.
+    */
+    const needsMiddle =
+        (
+            entryKey === "tier" ||
+            entryKey === "tallTier"
+        ) &&
+        needsTop;
+
     const [
         top,
+        middle,
         bottom
     ] = await Promise.all([
         needsTop
             ? loadSprinkleAssets(
                 entryKey,
                 "top",
+                isBento
+            )
+            : Promise.resolve(null),
+
+        needsMiddle
+            ? loadSprinkleAssets(
+                entryKey,
+                "middle",
                 isBento
             )
             : Promise.resolve(null),
@@ -4481,6 +4501,7 @@ async function loadSelectedSprinkleAssets(
 
     return {
         top,
+        middle,
         bottom
     };
 }
@@ -6865,6 +6886,17 @@ if (sprinkleAssets?.bottom) {
     drawCakeSprinkles(
         context,
         sprinkleAssets.bottom,
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
+
+if (sprinkleAssets?.middle) {
+    drawCakeSprinkles(
+        context,
+        sprinkleAssets.middle,
         x,
         y + boardYOffset,
         size.width,
