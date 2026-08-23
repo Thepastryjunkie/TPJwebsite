@@ -1860,271 +1860,19 @@ const softTintLayerCache =
 
 const naturalFoodTintLayerCache =
     new WeakMap();
-function makeTwoToneSprinkleLayer(
-    image,
-    mask,
-    color
-) {
-    let maskCache =
-        twoToneSprinkleLayerCache.get(image);
 
-    if (!maskCache) {
-        maskCache = new WeakMap();
-
-        twoToneSprinkleLayerCache.set(
-            image,
-            maskCache
-        );
-    }
-
-    let colorCache = maskCache.get(mask);
-
-    if (!colorCache) {
-        colorCache = new Map();
-        maskCache.set(mask, colorCache);
-    }
-
-    const normalizedColor =
-        normalizeHexColor(color);
-
-    if (colorCache.has(normalizedColor)) {
-        return colorCache.get(normalizedColor);
-    }
-
-    const width =
-        image.naturalWidth || image.width;
-
-    const height =
-        image.naturalHeight || image.height;
-
-    const sourceCanvas =
-        document.createElement("canvas");
-
-    const maskCanvas =
-        document.createElement("canvas");
-
-    const resultCanvas =
-        document.createElement("canvas");
-
-    sourceCanvas.width = width;
-    sourceCanvas.height = height;
-    maskCanvas.width = width;
-    maskCanvas.height = height;
-    resultCanvas.width = width;
-    resultCanvas.height = height;
-
-    const sourceContext =
-        sourceCanvas.getContext("2d", {
-            willReadFrequently: true
-        });
-
-    const maskContext =
-        maskCanvas.getContext("2d", {
-            willReadFrequently: true
-        });
-
-    const resultContext =
-        resultCanvas.getContext("2d");
-
-    sourceContext.drawImage(
-        image,
-        0,
-        0,
-        width,
-        height
-    );
-
-    maskContext.drawImage(
-        mask,
-        0,
-        0,
-        width,
-        height
-    );
-
-    const sourceData =
-        sourceContext.getImageData(
-            0,
-            0,
-            width,
-            height
-        );
-
-    const maskData =
-        maskContext.getImageData(
-            0,
-            0,
-            width,
-            height
-        );
-
-    const resultData =
-        resultContext.createImageData(
-            width,
-            height
-        );
-
-    const tones = [
-        hexToRgb(
-            mixHexColor(
-                normalizedColor,
-                "#FFFFFF",
-                0.28
-            )
-        ),
-        hexToRgb(
-            mixHexColor(
-                normalizedColor,
-                "#000000",
-                0.18
-            )
-        )
-    ];
-
-    const pixelCount = width * height;
-    const visited = new Uint8Array(pixelCount);
-    const stack = new Int32Array(pixelCount);
-    let componentIndex = 0;
-
-    for (
-        let seed = 0;
-        seed < pixelCount;
-        seed += 1
-    ) {
-        if (
-            visited[seed] ||
-            !maskData.data[seed * 4 + 3]
-        ) {
-            continue;
-        }
-
-        const target =
-            tones[componentIndex % 2];
-
-        componentIndex += 1;
-
-        let stackSize = 0;
-
-        stack[stackSize] = seed;
-        stackSize += 1;
-        visited[seed] = 1;
-
-        while (stackSize > 0) {
-            stackSize -= 1;
-
-            const pixel = stack[stackSize];
-            const offset = pixel * 4;
-            const maskAlpha =
-                maskData.data[offset + 3];
-
-            const luminance =
-                sourceData.data[offset] * 0.2126 +
-                sourceData.data[offset + 1] * 0.7152 +
-                sourceData.data[offset + 2] * 0.0722;
-
-            const detail = clampNumber(
-                ((luminance - 128) / 127) * 0.82,
-                -1,
-                1
-            );
-
-            let red = target.red;
-            let green = target.green;
-            let blue = target.blue;
-
-            if (detail < 0) {
-                const amount =
-                    Math.abs(detail) * 0.07;
-
-                red *= 1 - amount;
-                green *= 1 - amount;
-                blue *= 1 - amount;
-            } else {
-                const amount = detail * 0.10;
-
-                red += (255 - red) * amount;
-                green += (255 - green) * amount;
-                blue += (255 - blue) * amount;
-            }
-
-            resultData.data[offset] = red;
-            resultData.data[offset + 1] = green;
-            resultData.data[offset + 2] = blue;
-            resultData.data[offset + 3] = maskAlpha;
-
-            const column = pixel % width;
-            const left = pixel - 1;
-            const right = pixel + 1;
-            const up = pixel - width;
-            const down = pixel + width;
-
-            if (
-                column > 0 &&
-                !visited[left] &&
-                maskData.data[left * 4 + 3]
-            ) {
-                visited[left] = 1;
-                stack[stackSize] = left;
-                stackSize += 1;
-            }
-
-            if (
-                column < width - 1 &&
-                !visited[right] &&
-                maskData.data[right * 4 + 3]
-            ) {
-                visited[right] = 1;
-                stack[stackSize] = right;
-                stackSize += 1;
-            }
-
-            if (
-                up >= 0 &&
-                !visited[up] &&
-                maskData.data[up * 4 + 3]
-            ) {
-                visited[up] = 1;
-                stack[stackSize] = up;
-                stackSize += 1;
-            }
-
-            if (
-                down < pixelCount &&
-                !visited[down] &&
-                maskData.data[down * 4 + 3]
-            ) {
-                visited[down] = 1;
-                stack[stackSize] = down;
-                stackSize += 1;
-            }
-        }
-    }
-
-    resultContext.putImageData(
-        resultData,
-        0,
-        0
-    );
-
-    colorCache.set(
-        normalizedColor,
-        resultCanvas
-    );
-
-    return resultCanvas;
-}
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.20,
-    simpleHeart: 0.24,
-    simpleOther: 0.23,
-    dimensionalFinish: 0.22,
-    border: 0.20,
-    numberLetterBase: 0.16,
-    numberLetterPiping: 0.22,
-    cupcakeFrosting: 0.23,
-    other: 0.08
+    smoothCake: 0.84,
+    simpleHeart: 0.92,
+    simpleOther: 0.88,
+    dimensionalFinish: 0.84,
+    border: 0.76,
+    numberLetterBase: 0.64,
+    numberLetterPiping: 0.88,
+    cupcakeFrosting: 0.96,
+    other: 0.24
 };
 
 function loadRealisticImage(url) {
@@ -2350,7 +2098,7 @@ detailContext.globalCompositeOperation =
     translucent cast over selected colors.
 */
 layerContext.globalCompositeOperation =
-    "overlay";
+    "multiply";
 
 layerContext.globalAlpha =
   isBorderAsset
@@ -4773,31 +4521,87 @@ function drawCakeSprinkles(
     width,
     height
 ) {
-    if (!assets) {
+    if (
+        !assets?.strokes ||
+        !assets?.mask
+    ) {
         return;
     }
 
     const selectedColor =
-        builderState
-            .cakeBorderSprinkleColor ||
+        builderState.cakeBorderSprinkleColor ||
         "#F7B6D2";
 
-    const twoToneSprinkles =
-        makeTwoToneSprinkleLayer(
+    const lightColor = mixHexColor(
+        selectedColor,
+        "#FFFFFF",
+        0.28
+    );
+
+    const darkColor = mixHexColor(
+        selectedColor,
+        "#000000",
+        0.18
+    );
+
+    const lightLayer =
+        makeNaturalFoodTintedLayer(
             assets.strokes,
             assets.mask,
-            selectedColor
+            lightColor,
+            0.12,
+            0.18,
+            2
+        );
+
+    const darkLayer =
+        makeNaturalFoodTintedLayer(
+            assets.strokes,
+            assets.mask,
+            darkColor,
+            0.12,
+            0.18,
+            2
         );
 
     context.save();
 
-    context.globalCompositeOperation =
-        "source-over";
+    context.drawImage(
+        lightLayer,
+        x,
+        y,
+        width,
+        height
+    );
 
-    context.globalAlpha = 1;
+    const columns = 12;
+    const rows = 12;
+    const cellWidth = width / columns;
+    const cellHeight = height / rows;
+
+    context.beginPath();
+
+    for (let row = 0; row < rows; row += 1) {
+        for (
+            let column = 0;
+            column < columns;
+            column += 1
+        ) {
+            if ((row + column) % 2 === 1) {
+                context.rect(
+                    x + column * cellWidth,
+                    y + row * cellHeight,
+                    cellWidth,
+                    cellHeight
+                );
+            }
+        }
+    }
+
+    context.clip();
 
     context.drawImage(
-        twoToneSprinkles,
+        darkLayer,
         x,
         y,
         width,
@@ -5766,6 +5570,63 @@ function makeSoftTintedExtraLayer(
     );
 
     context.globalAlpha = 1;
+    const detailLayer =
+    document.createElement("canvas");
+
+detailLayer.width = width;
+detailLayer.height = height;
+
+const detailContext =
+    detailLayer.getContext("2d");
+
+detailContext.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+);
+
+detailContext.globalCompositeOperation =
+    "saturation";
+
+detailContext.fillStyle = "#808080";
+
+detailContext.fillRect(
+    0,
+    0,
+    width,
+    height
+);
+
+detailContext.globalCompositeOperation =
+    "destination-in";
+
+detailContext.drawImage(
+    mask,
+    0,
+    0,
+    width,
+    height
+);
+
+context.globalCompositeOperation =
+    "multiply";
+
+context.globalAlpha = 0.36;
+
+context.drawImage(
+    detailLayer,
+    0,
+    0,
+    width,
+    height
+);
+
+context.globalCompositeOperation =
+    "source-over";
+
+context.globalAlpha = 1;
 
     colorCache.set(
         normalizedColor,
@@ -5802,14 +5663,11 @@ function getRenderedExtraLayer(asset) {
         asset.id ===
         "flowersDecoration"
     ) {
-return makeNaturalFoodTintedLayer(
-    asset.strokes,
-    asset.mask,
-    selectedColor,
-    0.10,
-    0.12,
-    0.72
-);
+        return makeSoftTintedExtraLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor
+        );
     }
    if (
     asset.id ===
@@ -5829,9 +5687,9 @@ return makeNaturalFoodTintedLayer(
             asset.strokes,
             asset.mask,
             selectedColor,
-            0.16,
-            0.8,
-            0.80
+            0.42,
+            0.10,
+            3.20
         );
     }
 
@@ -5845,9 +5703,9 @@ return makeNaturalFoodTintedLayer(
             asset.strokes,
             asset.mask,
             selectedColor,
-            0.15,
-            0.10,
-            0.85
+            0.36,
+            0.16,
+            2.90
         );
     }
 
@@ -5858,9 +5716,9 @@ return makeNaturalFoodTintedLayer(
         asset.strokes,
         asset.mask,
         selectedColor,
-        0.14,
-        0.12,
-        0.90
+        0.30,
+        0.26,
+        2.70
     );
 } 
   return makeTintedLayer(
