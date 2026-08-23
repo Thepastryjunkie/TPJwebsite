@@ -3275,10 +3275,44 @@ function drawBentoColorPreview(
             transform
         );
 
-    if (
-        builderState.mainCakeColor !==
-        "original"
-    ) {
+  if (
+    builderState.mainCakeColor !==
+    "original"
+) {
+    const activeCakeMask =
+        cakeMask ||
+        (
+            builderState.cakeCoverage === "full"
+                ? image
+                : getCoverageButtercreamMask(
+                    image
+                )
+        );
+
+    context.save();
+
+    traceBentoCakePath(
+        context,
+        map
+    );
+
+    context.clip();
+
+    drawRecoloredAsset(
+        context,
+        image,
+        activeCakeMask,
+        getLightenedCakePreviewColor(
+            builderState.mainCakeColor
+        ),
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+
+    context.restore();
+} {
         context.save();
         traceBentoCakePath(
             context,
@@ -6451,7 +6485,7 @@ builderState.cakeCoverage === "full"
     )
     : Promise.resolve(null),
     isBento
-    ? loadRealisticImage(
+    ? loadOptionalRealisticImage(
         `${finalAssetRoot}/cakes/TPJ-Asset-008-Bento-5in-Heart-Recolor-Mask.png${cakeAssetVersion}`
     )
     : Promise.resolve(null)
@@ -6813,18 +6847,18 @@ if (isCoveragePreview) {
                     : builderState.characterTwoColor
                 : builderState.mainCakeColor;
 
-      drawRecoloredAsset(
+ drawRecoloredAsset(
     context,
-    image,
-    cakeMask,
+    cakeImage,
+    coverageMask,
     getLightenedCakePreviewColor(
-        builderState.mainCakeColor
+        selectedCakeColor
     ),
-    transform.x,
-    transform.y,
-    transform.width,
-    transform.height
-);  
+    x,
+    y + boardYOffset,
+    size.width,
+    size.height
+); 
     }
 
    
