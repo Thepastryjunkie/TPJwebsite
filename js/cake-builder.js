@@ -1868,11 +1868,15 @@ const cakePreviewDetailStrength = {
     simpleHeart: 0.92,
     simpleOther: 0.88,
     dimensionalFinish: 0.84,
+    numberLetterBorder: 0.95,
+macaronExtra: 0.58,
+sprinkle: 0.16,
     border: 0.76,
     numberLetterBase: 0.64,
     numberLetterPiping: 0.88,
     cupcakeFrosting: 0.96,
     other: 0.24
+    
 };
 
 function loadRealisticImage(url) {
@@ -2003,7 +2007,20 @@ function makeTintedLayer(
 
        const isBorderAsset =
         source.includes("/borders/");
-        
+     const isNumberLetterBorderAsset =
+    isBorderAsset &&
+    (
+        source.includes("-Number-") ||
+        source.includes("-Letter-")
+    );
+
+const isMacaronExtraAsset =
+    source.includes(
+        "TPJ-Extra-Macarons-"
+    );
+
+const isSprinkleAsset =
+    source.includes("-Sprinkles.png");   
 
     const isNumberLetterAsset =
         source.includes("TPJ-Number-Letter-");
@@ -2100,24 +2117,66 @@ detailContext.globalCompositeOperation =
 layerContext.globalCompositeOperation =
     "multiply";
 
+let detailStrength =
+    cakePreviewDetailStrength.other;
+
+if (isSmoothCakeAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.smoothCake;
+}
+
+if (isSimpleTextureAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.simpleOther;
+}
+
+if (isHeartSimpleTextureAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.simpleHeart;
+}
+
+if (isDimensionalFinishAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.dimensionalFinish;
+}
+
+if (isCupcakeFrostingAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.cupcakeFrosting;
+}
+
+if (isNumberLetterBaseAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.numberLetterBase;
+}
+
+if (isNumberLetterPipingAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.numberLetterPiping;
+}
+
+if (isBorderAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.border;
+}
+
+if (isNumberLetterBorderAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.numberLetterBorder;
+}
+
+if (isMacaronExtraAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.macaronExtra;
+}
+
+if (isSprinkleAsset) {
+    detailStrength =
+        cakePreviewDetailStrength.sprinkle;
+}
+
 layerContext.globalAlpha =
-  isBorderAsset
-        ? cakePreviewDetailStrength.border
-        : isNumberLetterPipingAsset
-            ? cakePreviewDetailStrength.numberLetterPiping
-            : isNumberLetterBaseAsset
-                ? cakePreviewDetailStrength.numberLetterBase
-                : isCupcakeFrostingAsset
-                    ? cakePreviewDetailStrength.cupcakeFrosting
-                    : isDimensionalFinishAsset
-                        ? cakePreviewDetailStrength.dimensionalFinish
-                        : isHeartSimpleTextureAsset
-                            ? cakePreviewDetailStrength.simpleHeart
-                            : isSimpleTextureAsset
-                                ? cakePreviewDetailStrength.simpleOther
-                                : isSmoothCakeAsset
-                                    ? cakePreviewDetailStrength.smoothCake
-                                    : cakePreviewDetailStrength.other;
+    detailStrength;
 
 layerContext.drawImage(
     detailLayer,
@@ -2877,7 +2936,7 @@ function drawContainedCanvasImage(
     return { x, y, width, height, scale };
 }
 
-const bentoCakeMaskCache = new WeakMap();
+
 
 const coverageButtercreamMaskCache =
     new WeakMap();
@@ -2988,78 +3047,7 @@ function getCoverageButtercreamMask(image) {
     return maskCanvas;
 }
 
-function getBentoCakeMask(image) {
-    if (bentoCakeMaskCache.has(image)) {
-        return bentoCakeMaskCache.get(image);
-    }
 
-    const sourceCanvas = document.createElement("canvas");
-    sourceCanvas.width = image.naturalWidth;
-    sourceCanvas.height = image.naturalHeight;
-
-    const sourceContext = sourceCanvas.getContext("2d", {
-        willReadFrequently: true
-    });
-
-    sourceContext.drawImage(image, 0, 0);
-
-    const pixels = sourceContext.getImageData(
-        0,
-        0,
-        sourceCanvas.width,
-        sourceCanvas.height
-    );
-
-    const maskCanvas = document.createElement("canvas");
-    maskCanvas.width = sourceCanvas.width;
-    maskCanvas.height = sourceCanvas.height;
-
-    const maskContext = maskCanvas.getContext("2d");
-    const maskPixels = maskContext.createImageData(
-        maskCanvas.width,
-        maskCanvas.height
-    );
-
-    for (let y = 500; y < 875; y += 1) {
-        const leftEdge = y < 800
-            ? 220 + Math.max(0, y - 570) * 0.05
-            : 225 + (y - 800) * 1.15;
-        const rightEdge = y < 800
-            ? 625 - Math.max(0, y - 570) * 0.06
-            : 625 - (y - 800) * 0.5;
-
-        for (
-            let x = Math.floor(leftEdge);
-            x < Math.ceil(rightEdge);
-            x += 1
-        ) {
-            const offset = (y * sourceCanvas.width + x) * 4;
-            const red = pixels.data[offset];
-            const green = pixels.data[offset + 1];
-            const blue = pixels.data[offset + 2];
-            const alpha = pixels.data[offset + 3];
-
-            const isButtercream =
-                alpha > 20 &&
-                red > 175 &&
-                green > 135 &&
-                red - blue > 35 &&
-                green - blue > 20;
-
-            if (isButtercream) {
-                maskPixels.data[offset] = 255;
-                maskPixels.data[offset + 1] = 255;
-                maskPixels.data[offset + 2] = 255;
-                maskPixels.data[offset + 3] = alpha;
-            }
-        }
-    }
-
-    maskContext.putImageData(maskPixels, 0, 0);
-    bentoCakeMaskCache.set(image, maskCanvas);
-
-    return maskCanvas;
-}
 
 function getBentoTransformMap(
     image,
@@ -3278,6 +3266,7 @@ function drawBentoSimpleTextureAsset(
 function drawBentoColorPreview(
     context,
     image,
+    cakeMask,
     transform
 ) {
     const map =
@@ -4544,25 +4533,19 @@ function drawCakeSprinkles(
         0.18
     );
 
-    const lightLayer =
-        makeNaturalFoodTintedLayer(
-            assets.strokes,
-            assets.mask,
-            lightColor,
-            0.12,
-            0.18,
-            2
-        );
+const lightLayer =
+    makeTintedLayer(
+        assets.strokes,
+        assets.mask,
+        lightColor
+    );
 
-    const darkLayer =
-        makeNaturalFoodTintedLayer(
-            assets.strokes,
-            assets.mask,
-            darkColor,
-            0.12,
-            0.18,
-            2
-        );
+const darkLayer =
+    makeTintedLayer(
+        assets.strokes,
+        assets.mask,
+        darkColor
+    );
 
     context.save();
 
@@ -5559,7 +5542,7 @@ function makeSoftTintedExtraLayer(
         height
     );
 
-    context.globalAlpha = 0.38;
+    context.globalAlpha = 0.68;
 
     context.drawImage(
         tintLayer,
@@ -5613,7 +5596,7 @@ detailContext.drawImage(
 context.globalCompositeOperation =
     "multiply";
 
-context.globalAlpha = 0.36;
+context.globalAlpha = 0.16;
 
 context.drawImage(
     detailLayer,
@@ -5669,58 +5652,7 @@ function getRenderedExtraLayer(asset) {
             selectedColor
         );
     }
-   if (
-    asset.id ===
-    "macaronsDecoration"
-) {
-    const macaronLuminance =
-        getHexColorLuminance(
-            selectedColor
-        );
 
-    /*
-        Very light shades:
-        white, cream, very pale pink, etc.
-    */
-    if (macaronLuminance >= 200) {
-        return makeNaturalFoodTintedLayer(
-            asset.strokes,
-            asset.mask,
-            selectedColor,
-            0.42,
-            0.10,
-            3.20
-        );
-    }
-
-    /*
-        Light / pastel shades:
-        baby blue, sage, pale yellow,
-        soft pink, lavender, etc.
-    */
-    if (macaronLuminance >= 165) {
-        return makeNaturalFoodTintedLayer(
-            asset.strokes,
-            asset.mask,
-            selectedColor,
-            0.36,
-            0.16,
-            2.90
-        );
-    }
-
-    /*
-        Medium / dark shades
-    */
-    return makeNaturalFoodTintedLayer(
-        asset.strokes,
-        asset.mask,
-        selectedColor,
-        0.30,
-        0.26,
-        2.70
-    );
-} 
   return makeTintedLayer(
         asset.strokes,
         asset.mask,
@@ -5907,7 +5839,8 @@ function getCakeForegroundExtraDrawBox(
         y:
             y +
             (height - adjustedHeight) / 2 +
-            height * offsetY,
+          height * offsetY +
+height * 0.035,
         width: adjustedWidth,
         height: adjustedHeight
     };
@@ -6454,7 +6387,8 @@ standaloneFinishAssets,
 standaloneBorderAssets,
 standaloneSprinkleAssets,
 standaloneExtraAssets,
-bentoSimpleTextureImage
+bentoSimpleTextureImage,
+bentoCakeColorMask
 ] = await Promise.all([  
     loadRealisticImage(
         cakeUrls[0]
@@ -6515,7 +6449,13 @@ builderState.cakeCoverage === "full"
     ? loadRealisticImage(
         `${finalAssetRoot}/cakes/TPJ-Finish-Simple-Texture-Horizontal-Comb-Bento-Heart.png${cakeAssetVersion}`
     )
+    : Promise.resolve(null),
+    isBento
+    ? loadRealisticImage(
+        `${finalAssetRoot}/cakes/TPJ-Asset-008-Bento-5in-Heart-Recolor-Mask.png${cakeAssetVersion}`
+    )
     : Promise.resolve(null)
+
 ]);
             if (renderVersion !== realisticRenderVersion) return;
 
@@ -6547,11 +6487,12 @@ builderState.cakeCoverage === "full"
             );
 
             if (isBento) {
-                drawBentoColorPreview(
-                    context,
-                    standaloneImage,
-                    transform
-                );
+drawBentoColorPreview(
+    context,
+    standaloneImage,
+    bentoCakeColorMask,
+    transform
+);
    drawBentoSimpleTextureAsset(
     context,
     bentoSimpleTextureImage,
@@ -6872,18 +6813,18 @@ if (isCoveragePreview) {
                     : builderState.characterTwoColor
                 : builderState.mainCakeColor;
 
-         drawRecoloredAsset(
-            context,
-            cakeImage,
-            coverageMask,
-            getLightenedCakePreviewColor(
-                selectedCakeColor
-            ),
-            x,
-            y + boardYOffset,
-            size.width,
-            size.height
-        );
+      drawRecoloredAsset(
+    context,
+    image,
+    cakeMask,
+    getLightenedCakePreviewColor(
+        builderState.mainCakeColor
+    ),
+    transform.x,
+    transform.y,
+    transform.width,
+    transform.height
+);  
     }
 
    
@@ -8115,7 +8056,8 @@ function updateCoverageDesignAvailability() {
 
     const isCupcakesOnly =
         product.shape === "cupcakes";
-
+const isNumberLetter =
+    product.shape === "numberLetter";
     const limitedCoverage =
         cakeSupportsCoverage(product) &&
         builderState.cakeCoverage !==
@@ -8128,9 +8070,10 @@ function updateCoverageDesignAvailability() {
     getElement(
         "#cakeFinishCustomizer"
     )?.classList.toggle(
-        "is-hidden",
-        isCupcakesOnly ||
-        limitedCoverage
+"is-hidden",
+isCupcakesOnly ||
+isNumberLetter ||
+limitedCoverage
     );
 
     [
@@ -9326,19 +9269,16 @@ function validateStepFour() {
     const product =
         getSelectedCakeProduct();
 
-    const hasNumberLetterFinish =
-        Boolean(
-            builderState.numberLetterStyle
-        ) ||
-        builderState.cakeFinish ===
-            "Smooth Finish";
-
+const hasNumberLetterFinish =
+    Boolean(
+        builderState.numberLetterStyle
+    );
     if (
         product.shape === "numberLetter" &&
         !hasNumberLetterFinish
     ) {
         showValidationMessage(
-            "Choose Smooth, Layered Piped, or Fully Frosted & Piped."
+            "Choose Smooth, Layered Piped, or Fully Frosted."
         );
 
         return false;
