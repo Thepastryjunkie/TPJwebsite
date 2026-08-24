@@ -603,9 +603,9 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-   "?v=tpj-borders-fixed-20260818-2" ;
-  const sprinkleAssetVersion =
-    "?v=tpj-sprinkles-20260822-1";
+    "?v=tpj-assets-20260824-1";
+const sprinkleAssetVersion =
+    "?v=tpj-sprinkles-20260824-1";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -3312,35 +3312,7 @@ function drawBentoColorPreview(
     );
 
     context.restore();
-} {
-        context.save();
-        traceBentoCakePath(
-            context,
-            map
-        );
-        context.clip();
-
-        drawRecoloredAsset(
-            context,
-            image,
-            builderState.cakeCoverage ===
-                "full"
-                ? image
-                : getCoverageButtercreamMask(
-                    image
-                ),
-            getLightenedCakePreviewColor(
-                builderState.mainCakeColor
-            ),
-            transform.x,
-            transform.y,
-            transform.width,
-            transform.height
-        );
-
-        context.restore();
-    }
-
+} 
 
     if (
         builderState.cupcakeFrostingColor !==
