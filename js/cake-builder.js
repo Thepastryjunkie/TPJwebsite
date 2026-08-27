@@ -6706,7 +6706,7 @@ if (standaloneBorderAssets?.bottom) {
         bentoBottomBorderBox.y,
         bentoBottomBorderBox.width,
         bentoBottomBorderBox.height,
-        getEffectiveCakeBorderColor()
+     getEffectiveCakeBorderBottomColor()
     );
 }
 
@@ -7044,7 +7044,7 @@ if (borderAssets?.top) {
         y + boardYOffset,
         size.width,
         size.height,
-        builderState.cakeBorderColor
+      getEffectiveCakeBorderColor() 
     );
 }
 if (borderAssets?.middle) {
@@ -7055,7 +7055,7 @@ if (borderAssets?.middle) {
         y + boardYOffset,
         size.width,
         size.height,
-        builderState.cakeBorderColor
+       getEffectiveCakeBorderColor()
     );
 }
 const sprinkleAssets =
@@ -8968,7 +8968,7 @@ function scheduleRealisticCakePreview() {
             () => {
                 realisticPreviewTimer = null;
 
-scheduleRealisticCakePreview();
+updateRealisticCakePreview();
             },
             100
         );
@@ -9006,7 +9006,7 @@ updateEdibleImageControls();
 
 updateSprinkleControlsVisibility();
 
-updateRealisticCakePreview();
+scheduleRealisticCakePreview();
 
 updateCupcakePreview();
 
@@ -12543,7 +12543,12 @@ function buildBuilderColorControls() {
                     "#customCakeBorderBottomColorNote",
                     true
                 );
-const cakeBorderShadeIntensityInput =
+
+                renderCakePreview();
+            }
+        }
+    );
+    const cakeBorderShadeIntensityInput =
     getElement(
         "#cakeBorderShadeIntensity"
     );
@@ -12597,10 +12602,6 @@ if (cakeBorderBottomShadeIntensityInput) {
 }
 
 updateBorderShadeOutputs();
-                renderCakePreview();
-            }
-        }
-    );
 /*
     SPRINKLES
 */
