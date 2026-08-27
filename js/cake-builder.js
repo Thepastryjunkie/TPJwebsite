@@ -1986,6 +1986,8 @@ const softTintLayerCache =
 
 const naturalFoodTintLayerCache =
     new WeakMap();
+  const twoToneSprinkleLayerCache =
+    new WeakMap();  
 
 let realisticRenderVersion = 0;
 
@@ -4659,7 +4661,358 @@ async function loadSelectedSprinkleAssets(
     };
 }
 
+function makeTwoToneSprinkleLayer(
+    image,
+    mask,
+    color
+) {
+    let maskCache =
+        twoToneSprinkleLayerCache.get(
+            image
+        );
 
+    if (!maskCache) {
+        maskCache = new WeakMap();
+
+        twoToneSprinkleLayerCache.set(
+            image,
+            maskCache
+        );
+    }
+
+    let colorCache =
+        maskCache.get(mask);
+
+    if (!colorCache) {
+        colorCache = new Map();
+
+        maskCache.set(
+            mask,
+            colorCache
+        );
+    }
+
+    const normalizedColor =
+        normalizeHexColor(color);
+
+    if (
+        colorCache.has(
+            normalizedColor
+        )
+    ) {
+        return colorCache.get(
+            normalizedColor
+        );
+    }
+
+    const width =
+        image.naturalWidth ||
+        image.width;
+
+    const height =
+        image.naturalHeight ||
+        image.height;
+
+
+    /*
+        Two shades from ONE selected
+        color family.
+    */
+
+    const lightColor =
+        hexToRgb(
+            mixHexColor(
+                normalizedColor,
+                "#FFFFFF",
+                0.30
+            )
+        );
+
+    const darkColor =
+        hexToRgb(
+            mixHexColor(
+                normalizedColor,
+                "#000000",
+                0.16
+            )
+        );
+
+
+    const sourceCanvas =
+        document.createElement(
+            "canvas"
+        );
+
+    sourceCanvas.width = width;
+    sourceCanvas.height = height;
+
+    const sourceContext =
+        sourceCanvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    sourceContext.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const sourceData =
+        sourceContext.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+    const maskCanvas =
+        document.createElement(
+            "canvas"
+        );
+
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+
+    const maskContext =
+        maskCanvas.getContext(
+            "2d",
+            {
+                willReadFrequently: true
+            }
+        );
+
+    maskContext.drawImage(
+        mask,
+        0,
+        0,
+        width,
+        height
+    );
+
+    const maskData =
+        maskContext.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+    const resultCanvas =
+        document.createElement(
+            "canvas"
+        );
+
+    resultCanvas.width = width;
+    resultCanvas.height = height;
+
+    const resultContext =
+        resultCanvas.getContext(
+            "2d"
+        );
+
+    const resultData =
+        resultContext.createImageData(
+            width,
+            height
+        );
+
+
+    /*
+        Find each individual sprinkle
+        silhouette in the mask.
+
+        Each whole sprinkle gets either
+        the light or dark version.
+
+        This prevents one sprinkle from
+        becoming half one color and half
+        another.
+    */
+
+    const visited =
+        new Uint8Array(
+            width * height
+        );
+
+    const alphaThreshold = 10;
+
+    let componentNumber = 0;
+
+
+    function pixelIsSprinkle(
+        pixelIndex
+    ) {
+        const dataIndex =
+            pixelIndex * 4;
+
+        return (
+            maskData.data[
+                dataIndex + 3
+            ] > alphaThreshold &&
+            sourceData.data[
+                dataIndex + 3
+            ] > alphaThreshold
+        );
+    }
+
+
+    for (
+        let pixelIndex = 0;
+        pixelIndex < width * height;
+        pixelIndex += 1
+    ) {
+        if (
+            visited[pixelIndex] ||
+            !pixelIsSprinkle(
+                pixelIndex
+            )
+        ) {
+            continue;
+        }
+
+        const tone =
+            componentNumber % 2 === 0
+                ? lightColor
+                : darkColor;
+
+        componentNumber += 1;
+
+        const stack = [
+            pixelIndex
+        ];
+
+        visited[pixelIndex] = 1;
+
+
+        while (stack.length) {
+            const current =
+                stack.pop();
+
+            const x =
+                current % width;
+
+            const y =
+                Math.floor(
+                    current / width
+                );
+
+            const dataIndex =
+                current * 4;
+
+            const maskAlpha =
+                maskData.data[
+                    dataIndex + 3
+                ];
+
+            const sourceAlpha =
+                sourceData.data[
+                    dataIndex + 3
+                ];
+
+            const finalAlpha =
+                Math.round(
+                    (
+                        maskAlpha *
+                        sourceAlpha
+                    ) /
+                    255
+                );
+
+
+            resultData.data[
+                dataIndex
+            ] = tone.red;
+
+            resultData.data[
+                dataIndex + 1
+            ] = tone.green;
+
+            resultData.data[
+                dataIndex + 2
+            ] = tone.blue;
+
+            resultData.data[
+                dataIndex + 3
+            ] = finalAlpha;
+
+
+            const left =
+                current - 1;
+
+            const right =
+                current + 1;
+
+            const up =
+                current - width;
+
+            const down =
+                current + width;
+
+
+            if (
+                x > 0 &&
+                !visited[left] &&
+                pixelIsSprinkle(left)
+            ) {
+                visited[left] = 1;
+                stack.push(left);
+            }
+
+
+            if (
+                x < width - 1 &&
+                !visited[right] &&
+                pixelIsSprinkle(right)
+            ) {
+                visited[right] = 1;
+                stack.push(right);
+            }
+
+
+            if (
+                y > 0 &&
+                !visited[up] &&
+                pixelIsSprinkle(up)
+            ) {
+                visited[up] = 1;
+                stack.push(up);
+            }
+
+
+            if (
+                y < height - 1 &&
+                !visited[down] &&
+                pixelIsSprinkle(down)
+            ) {
+                visited[down] = 1;
+                stack.push(down);
+            }
+        }
+    }
+
+
+    resultContext.putImageData(
+        resultData,
+        0,
+        0
+    );
+
+
+    setLimitedCacheValue(
+        colorCache,
+        normalizedColor,
+        resultCanvas
+    );
+
+    return resultCanvas;
+}
 function drawCakeSprinkles(
     context,
     assets,
@@ -4668,79 +5021,31 @@ function drawCakeSprinkles(
     width,
     height
 ) {
-    if (
-        !assets?.strokes ||
-        !assets?.mask
-    ) {
+    if (!assets) {
         return;
     }
 
-    const selectedColor =
-        builderState.cakeBorderSprinkleColor ||
+    const sprinkleColor =
+        builderState
+            .cakeBorderSprinkleColor ||
         "#F7B6D2";
 
-    const lightColor = mixHexColor(
-        selectedColor,
-        "#FFFFFF",
-        0.28
-    );
-
-    const darkColor = mixHexColor(
-        selectedColor,
-        "#000000",
-        0.18
-    );
-
-const lightLayer =
-    makeFlatTintedMask(
-        assets.mask,
-        lightColor
-    );
-
-const darkLayer =
-    makeFlatTintedMask(
-        assets.mask,
-        darkColor
-    );
+    const tintedSprinkles =
+        makeTwoToneSprinkleLayer(
+            assets.strokes,
+            assets.mask,
+            sprinkleColor
+        );
 
     context.save();
 
-    context.drawImage(
-        lightLayer,
-        x,
-        y,
-        width,
-        height
-    );
+    context.globalCompositeOperation =
+        "source-over";
 
-    const columns = 12;
-    const rows = 12;
-    const cellWidth = width / columns;
-    const cellHeight = height / rows;
-
-    context.beginPath();
-
-    for (let row = 0; row < rows; row += 1) {
-        for (
-            let column = 0;
-            column < columns;
-            column += 1
-        ) {
-            if ((row + column) % 2 === 1) {
-                context.rect(
-                    x + column * cellWidth,
-                    y + row * cellHeight,
-                    cellWidth,
-                    cellHeight
-                );
-            }
-        }
-    }
-
-    context.clip();
+    context.globalAlpha = 1;
 
     context.drawImage(
-        darkLayer,
+        tintedSprinkles,
         x,
         y,
         width,
@@ -9533,18 +9838,12 @@ function validateStepSix() {
 
 
 function validateStepSeven() {
-    if (!builderState.occasion) {
-    showValidationMessage(
-        "Choose the occasion."
-    );
+   builderState.occasion =
+    getElement(
+        "#occasionText"
+    )?.value.trim() || "";
 
-    return false;
-}
-
-if (
-    builderState.occasion === "Other" &&
-    !builderState.otherOccasion.trim()
-) {
+if (!builderState.occasion) {
     showValidationMessage(
         "Enter the occasion."
     );
@@ -9680,14 +9979,16 @@ function validateCurrentStep() {
 ========================================= */
 
 function updateOtherOccasionVisibility() {
-    getElement(
-        "#otherOccasionField"
-    )?.classList.toggle(
-        "is-hidden",
-        builderState.occasion !== "Other"
-    );
-}
+    const occasionInput =
+        getElement(
+            "#occasionText"
+        );
 
+    if (occasionInput) {
+        occasionInput.value =
+            builderState.occasion || "";
+    }
+}
 
 /* =========================================
    GUEST RECOMMENDATION
@@ -10827,18 +11128,9 @@ if (
 ========================================= */
 
 function getDisplayOccasion() {
-    if (
-        builderState.occasion === "Other"
-    ) {
-        return (
-            builderState.otherOccasion.trim() ||
-            "Other"
-        );
-    }
-
     return (
-        builderState.occasion ||
-        "Not selected"
+        builderState.occasion.trim() ||
+        "Not entered"
     );
 }
 
@@ -11783,27 +12075,12 @@ getElements("[data-edit-step]").forEach(
    OCCASION EVENTS
 ========================================= */
 
-getElements(
-    'input[name="occasion"]'
-).forEach((input) => {
-    input.addEventListener(
-        "change",
-        () => {
-            builderState.occasion =
-                input.value;
-
-            updateOtherOccasionVisibility();
-            updateSelectedCardStates();
-        }
-    );
-});
-
 getElement(
-    "#otherOccasionText"
+    "#occasionText"
 )?.addEventListener(
     "input",
     (event) => {
-        builderState.otherOccasion =
+        builderState.occasion =
             event.target.value;
     }
 );
