@@ -1328,7 +1328,7 @@
                             </strong>
 
                             <p>
-                                Requests made fewer than five days before
+                                Requests made fewer than Seven days before
                                 fulfillment may include a $75 rush fee and
                                 remain subject to availability.
                             </p>
@@ -2342,11 +2342,11 @@
                                 <span class="toggle-copy">
 
                                     <strong>
-                                        Match Drum to Cake Palette
+                                        Match Board to Cake Palette
                                     </strong>
 
                                     <small>
-                                        Custom Wrapped Drum · +$5
+                                        Custom Wrapped Board · +$5
                                     </small>
 
                                 </span>
@@ -2360,7 +2360,7 @@
     <label class="form-field">
 
         <span>
-            What color should the cake drum match?
+            What color should the cake Board match?
         </span>
 
         <select id="matchedBoardColor">
@@ -3895,12 +3895,6 @@
             </div>
         </fieldset>
 
-        <p
-            id="edibleImagePlacementNote"
-            class="field-note"
-        >
-            The first uploaded image is used as the representative live preview.
-        </p>
 
         <fieldset class="edible-image-option-group">
             <legend>
@@ -5467,12 +5461,24 @@
                             </h2>
 
                             <p>
-                                Upload up to five inspiration photos and tell
-                                me what you like about each one.
+                            <p>
+    Inspiration photos are optional. If the cake you
+    created already reflects what you want, you can
+    continue without uploading anything.
+</p>
                             </p>
 
                         </div>
+<div class="builder-callout">
+    <strong>Inspiration is completely optional.</strong>
 
+    <p>
+        Leave this page blank if your builder selections
+        already show what you want. If you upload any
+        inspiration photos, the acknowledgment below
+        must be checked before continuing.
+    </p>
+</div>
                         <div
                             id="inspirationUploadZone"
                             class="inspiration-upload-zone"
@@ -5535,8 +5541,10 @@
                             >
 
                             <span>
-                                I understand inspiration photos are used for
-                                direction and will not be copied exactly.
+                           I understand inspiration photos are used for
+    direction and will not be copied exactly.
+    This acknowledgment is required only when
+    inspiration photos are uploaded.
                             </span>
 
                         </label>
@@ -5626,6 +5634,100 @@
 
                             <span>
                                 Theme
+                               <fieldset class="builder-fieldset">
+
+    <legend>
+        Occasion
+    </legend>
+
+    <p class="fieldset-description">
+        What are we celebrating?
+    </p>
+
+    <div class="text-choice-grid">
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Birthday"
+            >
+            <strong>Birthday</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Wedding"
+            >
+            <strong>Wedding</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Baby Shower"
+            >
+            <strong>Baby Shower</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Graduation"
+            >
+            <strong>Graduation</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Anniversary"
+            >
+            <strong>Anniversary</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Corporate / Brand Event"
+            >
+            <strong>Corporate / Brand Event</strong>
+        </label>
+
+        <label class="text-choice-card">
+            <input
+                type="radio"
+                name="occasion"
+                value="Other"
+            >
+            <strong>Other</strong>
+        </label>
+
+    </div>
+
+    <label
+        id="otherOccasionField"
+        class="form-field is-hidden"
+    >
+        <span>
+            What is the occasion?
+        </span>
+
+        <input
+            id="otherOccasionText"
+            type="text"
+            autocomplete="off"
+            placeholder="Tell me what you are celebrating"
+        >
+    </label>
+
+</fieldset> 
                             </span>
 
                             <input
@@ -6070,10 +6172,7 @@
                                 </div>
 
                                 <dl class="review-list">
-                                    <div>
-                                        <dt>Occasion</dt>
-                                        <dd id="reviewOccasion">Not selected</dd>
-                                    </div>
+
 
                                     <div>
                                         <dt>Event Date</dt>
@@ -6241,6 +6340,10 @@
                                 </div>
 
                                 <dl class="review-list">
+                                                                        <div>
+                                        <dt>Occasion</dt>
+                                        <dd id="reviewOccasion">Not selected</dd>
+                                    </div>
                                     <div>
                                         <dt>Theme</dt>
                                         <dd id="reviewTheme">Not entered</dd>
@@ -6560,5 +6663,5 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260824-1"></script>
+<script src="../js/cake-builder.js?v=20260827-1"></script>
 </html>

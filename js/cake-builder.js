@@ -9424,7 +9424,24 @@ function validateStepSix() {
 
 
 function validateStepSeven() {
-    
+    if (!builderState.occasion) {
+    showValidationMessage(
+        "Choose the occasion."
+    );
+
+    return false;
+}
+
+if (
+    builderState.occasion === "Other" &&
+    !builderState.otherOccasion.trim()
+) {
+    showValidationMessage(
+        "Enter the occasion."
+    );
+
+    return false;
+}
     if (!builderState.customerName.trim()) {
         showValidationMessage(
             "Enter your first and last name."
@@ -9667,7 +9684,7 @@ function updateRushFee() {
     const isRush =
         daysUntilFulfillment !== null &&
         daysUntilFulfillment >= 0 &&
-        daysUntilFulfillment < 5;
+        daysUntilFulfillment <=7;
 
     builderState.rushFee =
         isRush ? 75 : 0;
