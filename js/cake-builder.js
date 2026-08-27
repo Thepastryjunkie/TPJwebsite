@@ -606,10 +606,10 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-assets-20260827-1";
+    "?v=tpj-assets-20260827-2";
 
 const sprinkleAssetVersion =
-    "?v=tpj-sprinkles-20260827-1";
+    "?v=tpj-sprinkles-20260827-2";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -5931,15 +5931,16 @@ function drawCakeDripExtra(
 
 
 const cakeExtraStaggerMap = {
-    pearlsDecoration: [-0.018, -0.012],
-    ribbonDecoration: [0.018, -0.014],
-    butterfliesDecoration: [-0.020, 0.012],
-    goldAccentDecoration: [0.020, 0.012],
-    flowersDecoration: [0, -0.022],
-    cherriesDecoration: [0, 0.022],
-    macaronsDecoration: [0.0, 0.0],
-    discoBallsDecoration: [0.0, 0.0]
+    pearlsDecoration: [-0.014, 0],
+    ribbonDecoration: [0.014, 0],
+    butterfliesDecoration: [-0.020, 0],
+    goldAccentDecoration: [0.020, 0],
+    flowersDecoration: [-0.010, 0],
+    cherriesDecoration: [0.010, 0],
+    macaronsDecoration: [-0.016, 0],
+    discoBallsDecoration: [0.016, 0]
 };
+
 const cakeExtraScaleMap = {
     halfSheet: {
         macaronsDecoration: 1.78
@@ -5996,8 +5997,7 @@ function getCakeForegroundExtraDrawBox(
         y:
             y +
             (height - adjustedHeight) / 2 +
-          height * offsetY +
-height * 0.035,
+height * offsetY,
         width: adjustedWidth,
         height: adjustedHeight
     };
@@ -6100,11 +6100,11 @@ async function loadCupcakeExtraAssets() {
             }
 
             const strokes = await loadOptionalRealisticImage(
-                `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Strokes.png`
+            `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Strokes.png${cakeAssetVersion}`
             );
 
             const mask = await loadOptionalRealisticImage(
-                `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Mask.png`
+              `${extraRoot}/TPJ-Cupcake-Extra-${extraName}-${styleName}-Mask.png${cakeAssetVersion}`
             );
 
             if (!strokes) {
@@ -10725,6 +10725,31 @@ function renderInspirationPreviews() {
     }
 
     previewGrid.innerHTML = "";
+   const acknowledgment =
+    getElement(
+        "#inspirationPolicyAcknowledgment"
+    );
+
+const acknowledgmentRow =
+    acknowledgment?.closest(
+        ".policy-check"
+    );
+
+const hasInspiration =
+    builderState.inspirationFiles.length >
+    0;
+
+acknowledgmentRow?.classList.toggle(
+    "is-hidden",
+    !hasInspiration
+);
+
+if (
+    !hasInspiration &&
+    acknowledgment
+) {
+    acknowledgment.checked = false;
+} 
 
     builderState.inspirationFiles.forEach(
         (upload) => {
@@ -11460,7 +11485,58 @@ function resetBuilder() {
     const highestUnlockedStep =
         builderState.highestUnlockedStep;
 
+const preservedCakeSetup =
+    stepNumber === 4
+        ? {
+            cakeShape:
+                builderState.cakeShape,
 
+            cakeProductId:
+                builderState.cakeProductId,
+
+            bentoCupcakeCount:
+                builderState.bentoCupcakeCount,
+
+            isTall:
+                builderState.isTall,
+
+            numberLetterKind:
+                builderState.numberLetterKind,
+
+            numberCakeFirst:
+                builderState.numberCakeFirst,
+
+            numberCakeSecond:
+                builderState.numberCakeSecond,
+
+            letterCakeText:
+                builderState.letterCakeText,
+
+            cakeCoverage:
+                builderState.cakeCoverage,
+
+            cakeBoardStyle:
+                builderState.cakeBoardStyle,
+
+            cakeBoardColor:
+                builderState.cakeBoardColor,
+
+            matchBoardToCakePalette:
+                builderState
+                    .matchBoardToCakePalette,
+
+            matchedBoardColor:
+                builderState.matchedBoardColor,
+
+            matchedBoardUsesCustomShade:
+                builderState
+                    .matchedBoardUsesCustomShade,
+
+            customMatchedBoardColor:
+                builderState
+                    .customMatchedBoardColor
+        }
+        : null;
     /*
         Restore the builder data to
         how it looked when this page
@@ -11478,13 +11554,20 @@ function resetBuilder() {
         delete builderState[key];
     });
 
+Object.assign(
+    builderState,
+    restoredState
+);
+
+if (preservedCakeSetup) {
     Object.assign(
         builderState,
-        restoredState
+        preservedCakeSetup
     );
+}
 
-    builderState.currentStep =
-        stepNumber;
+builderState.currentStep =
+    stepNumber;
 
     builderState.highestUnlockedStep =
         highestUnlockedStep;
