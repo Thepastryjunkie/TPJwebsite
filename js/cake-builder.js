@@ -8067,9 +8067,17 @@ function reorderStepFourControls() {
         );
     }
 
-const cakeDetails = getElement(
-    "#cakeDetailsCustomizer"
-);
+    const cakeDetails = getElement(
+        "#cakeDetailsCustomizer"
+    );
+
+    const toyFigurine = getElement(
+        "#toyFigurineCustomizer"
+    );
+
+    const customSculpted = getElement(
+        "#customSculptedCustomizer"
+    );
 
     const detailsAnchor =
         topperOptions ||
@@ -8084,7 +8092,24 @@ const cakeDetails = getElement(
         );
     }
 
-   
+    if (
+        cakeDetails &&
+        toyFigurine
+    ) {
+        cakeDetails.after(
+            toyFigurine
+        );
+    }
+
+    if (
+        toyFigurine &&
+        customSculpted
+    ) {
+        toyFigurine.after(
+            customSculpted
+        );
+    }
+
 if (
     cupcakeSlot &&
     cakeDetails
