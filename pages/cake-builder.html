@@ -3408,7 +3408,32 @@
         id="cakeBorderColorSwatches"
         class="color-choice-grid"
     ></div>
+<div class="border-shade-scale">
 
+    <div class="border-shade-scale-heading">
+        <span>Lighter</span>
+
+        <output
+            id="cakeBorderShadeIntensityValue"
+            for="cakeBorderShadeIntensity"
+        >
+            Original
+        </output>
+
+        <span>Darker</span>
+    </div>
+
+    <input
+        id="cakeBorderShadeIntensity"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value="50"
+        aria-label="Top border shade intensity"
+    >
+
+</div>
 
     <div
         id="customCakeBorderColorField"
@@ -3448,7 +3473,32 @@
         id="cakeBorderBottomColorSwatches"
         class="color-choice-grid"
     ></div>
+<div class="border-shade-scale">
 
+    <div class="border-shade-scale-heading">
+        <span>Lighter</span>
+
+        <output
+            id="cakeBorderBottomShadeIntensityValue"
+            for="cakeBorderBottomShadeIntensity"
+        >
+            Original
+        </output>
+
+        <span>Darker</span>
+    </div>
+
+    <input
+        id="cakeBorderBottomShadeIntensity"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value="50"
+        aria-label="Bottom border shade intensity"
+    >
+
+</div>
     <div
         id="customCakeBorderBottomColorField"
         class="custom-color-field is-hidden"
@@ -6663,7 +6713,7 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260827-1"></script>
 
+<script src="../js/cake-builder.js?v=20260827-3"></script>
 </body>
 </html>

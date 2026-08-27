@@ -368,9 +368,12 @@ cakeBorderPlacement: "both",
 cakeBorderColor: "#F7B6D2",
 cakeBorderUsesCustomShade: false,
 customCakeBorderColor: "#F7B6D2",
+cakeBorderShadeIntensity: 50,
+
 cakeBorderBottomColor: "#F7B6D2",
 cakeBorderBottomUsesCustomShade: false,
 customCakeBorderBottomColor: "#F7B6D2",
+cakeBorderBottomShadeIntensity: 50,
 cakeBorderSprinkles: false,
 cakeBorderSprinklePlacement: "both",
 cakeBorderSprinkleColor: "#F7B6D2",
@@ -603,9 +606,10 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-assets-20260824-1";
+    "?v=tpj-assets-20260827-1";
+
 const sprinkleAssetVersion =
-    "?v=tpj-sprinkles-20260824-1";
+    "?v=tpj-sprinkles-20260827-1";
 const cakeAssetMap = {
     round: { standard: "TPJ-Asset-001-Blank-Round-Cake.png", tall: "TPJ-Asset-009-Blank-Tall-Round-3-Layer-Cake.png", key: "round", tallKey: "tallRound" },
     heart: { standard: "TPJ-Asset-002-Blank-Heart-Cake.png", tall: "TPJ-Asset-010-Blank-Tall-Heart-3-Layer-Cake.png", key: "heart", tallKey: "tallHeart" },
@@ -1186,7 +1190,95 @@ function mixHexColor(
                 safeAmount
     );
 }
+function applyBorderShadeIntensity(
+    baseColor,
+    intensity
+) {
+    const safeIntensity = clampNumber(
+        Number(intensity),
+        0,
+        100
+    );
 
+    if (safeIntensity < 50) {
+        return mixHexColor(
+            baseColor,
+            "#FFFFFF",
+            (50 - safeIntensity) /
+                50 *
+                0.72
+        );
+    }
+
+    if (safeIntensity > 50) {
+        return mixHexColor(
+            baseColor,
+            "#000000",
+            (safeIntensity - 50) /
+                50 *
+                0.62
+        );
+    }
+
+    return baseColor;
+}
+
+
+function getBorderShadeIntensityLabel(
+    intensity
+) {
+    const safeIntensity = clampNumber(
+        Number(intensity),
+        0,
+        100
+    );
+
+    if (safeIntensity < 45) {
+        return "Lighter";
+    }
+
+    if (safeIntensity > 55) {
+        return "Darker";
+    }
+
+    return "Original";
+}
+
+
+function updateBorderShadeOutputs() {
+    setText(
+        "#cakeBorderShadeIntensityValue",
+        getBorderShadeIntensityLabel(
+            builderState
+                .cakeBorderShadeIntensity
+        )
+    );
+
+    setText(
+        "#cakeBorderBottomShadeIntensityValue",
+        getBorderShadeIntensityLabel(
+            builderState
+                .cakeBorderBottomShadeIntensity
+        )
+    );
+}
+
+
+function getEffectiveCakeBorderColor() {
+    return applyBorderShadeIntensity(
+        builderState.cakeBorderColor,
+        builderState.cakeBorderShadeIntensity
+    );
+}
+
+
+function getEffectiveCakeBorderBottomColor() {
+    return applyBorderShadeIntensity(
+        builderState.cakeBorderBottomColor,
+        builderState
+            .cakeBorderBottomShadeIntensity
+    );
+}
 
 function getDisplayColorName(color) {
     if (!color || color === "original") {
@@ -1846,7 +1938,41 @@ function calculateEstimatedTotal() {
 ========================================= */
 
 const realisticImageCache = new Map();
+const maximumRealisticImageCacheSize = 56;
+const maximumTintedColorsPerAsset = 8;
 
+
+function trimMapCache(
+    cache,
+    maximumSize
+) {
+    while (cache.size > maximumSize) {
+        const oldestKey =
+            cache.keys().next().value;
+
+        cache.delete(oldestKey);
+    }
+}
+
+
+function setLimitedCacheValue(
+    cache,
+    key,
+    value,
+    maximumSize =
+        maximumTintedColorsPerAsset
+) {
+    if (cache.has(key)) {
+        cache.delete(key);
+    }
+
+    cache.set(key, value);
+
+    trimMapCache(
+        cache,
+        maximumSize
+    );
+}
 const tintedLayerCache =
     new WeakMap();
 
@@ -1880,30 +2006,54 @@ sprinkle: 0.16,
 };
 
 function loadRealisticImage(url) {
-    if (!realisticImageCache.has(url)) {
+    if (realisticImageCache.has(url)) {
+        const cachedRequest =
+            realisticImageCache.get(url);
+
+        realisticImageCache.delete(url);
+
         realisticImageCache.set(
             url,
-            new Promise((resolve, reject) => {
-                const image = new Image();
-
-                image.onload = () => resolve(image);
-
-                image.onerror = () => {
-                    realisticImageCache.delete(url);
-
-                    reject(
-                        new Error(
-                            `Unable to load ${url}`
-                        )
-                    );
-                };
-
-                image.src = url;
-            })
+            cachedRequest
         );
+
+        return cachedRequest;
     }
 
-    return realisticImageCache.get(url);
+    const request = new Promise(
+        (resolve, reject) => {
+            const image = new Image();
+
+            image.onload = () =>
+                resolve(image);
+
+            image.onerror = () => {
+                realisticImageCache.delete(
+                    url
+                );
+
+                reject(
+                    new Error(
+                        `Unable to load ${url}`
+                    )
+                );
+            };
+
+            image.src = url;
+        }
+    );
+
+    realisticImageCache.set(
+        url,
+        request
+    );
+
+    trimMapCache(
+        realisticImageCache,
+        maximumRealisticImageCacheSize
+    );
+
+    return request;
 }
 function makeTintedLayer(
     image,
@@ -2211,10 +2361,11 @@ layerContext.globalCompositeOperation =
     layerContext.globalAlpha = 1;
 
 
-    colorCache.set(
-        normalizedColor,
-        layer
-    );
+setLimitedCacheValue(
+    colorCache,
+    normalizedColor,
+    layer
+);
 
     return layer;
 }
@@ -2435,10 +2586,11 @@ const detail =
         0
     );
 
-    colorCache.set(
-        cacheKey,
-        resultCanvas
-    );
+setLimitedCacheValue(
+    colorCache,
+    cacheKey,
+    resultCanvas
+);
 
     return resultCanvas;
 }
@@ -4540,15 +4692,13 @@ function drawCakeSprinkles(
     );
 
 const lightLayer =
-    makeTintedLayer(
-        assets.strokes,
+    makeFlatTintedMask(
         assets.mask,
         lightColor
     );
 
 const darkLayer =
-    makeTintedLayer(
-        assets.strokes,
+    makeFlatTintedMask(
         assets.mask,
         darkColor
     );
@@ -4771,8 +4921,8 @@ function drawTallTierMiddleBorder(
     y,
     width,
     height,
-    borderColor =
-        builderState.cakeBorderColor
+borderColor =
+    getEffectiveCakeBorderColor()
 ) {
     if (!assets) {
         return;
@@ -4818,8 +4968,8 @@ function drawCakeBorder(
     y,
     width,
     height,
-    borderColor =
-        builderState.cakeBorderColor
+borderColor =
+    getEffectiveCakeBorderColor()
 ) {
     if (!assets) {
         return;
@@ -5460,11 +5610,11 @@ function makeDripTintedLayer(
     context.globalAlpha = 1;
 
 
-    colorCache.set(
-        normalizedColor,
-        layer
-    );
-
+setLimitedCacheValue(
+    colorCache,
+    normalizedColor,
+    layer
+);
     return layer;
 }
 function makeSoftTintedExtraLayer(
@@ -5617,10 +5767,11 @@ context.globalCompositeOperation =
 
 context.globalAlpha = 1;
 
-    colorCache.set(
-        normalizedColor,
-        layer
-    );
+setLimitedCacheValue(
+    colorCache,
+    normalizedColor,
+    layer
+);
 
     return layer;
 }
@@ -6555,8 +6706,7 @@ if (standaloneBorderAssets?.bottom) {
         bentoBottomBorderBox.y,
         bentoBottomBorderBox.width,
         bentoBottomBorderBox.height,
-        builderState
-            .cakeBorderBottomColor
+        getEffectiveCakeBorderColor()
     );
 }
 
@@ -6569,7 +6719,7 @@ if (standaloneBorderAssets?.top) {
         bentoTopBorderBox.y,
         bentoTopBorderBox.width,
         bentoTopBorderBox.height,
-        builderState.cakeBorderColor
+       getEffectiveCakeBorderColor()
     );
 }
 if (standaloneSprinkleAssets?.bottom) {
@@ -6882,8 +7032,7 @@ if (borderAssets?.bottom) {
         y + boardYOffset,
         size.width,
         size.height,
-        builderState
-            .cakeBorderBottomColor
+getEffectiveCakeBorderBottomColor()
     );
 }
 
@@ -6911,13 +7060,19 @@ if (borderAssets?.middle) {
 }
 const sprinkleAssets =
     sprinkleAssetSets[index];
+  const bottomSprinkleYOffset =
+    entry.key === "tier"
+        ? -size.height * 0.025
+        : 0;  
 
 if (sprinkleAssets?.bottom) {
     drawCakeSprinkles(
         context,
         sprinkleAssets.bottom,
         x,
-        y + boardYOffset,
+      y +
+    boardYOffset +
+    bottomSprinkleYOffset, 
         size.width,
         size.height
     );
@@ -8062,128 +8217,75 @@ function updateCoverageDesignAvailability() {
 
     const isCupcakesOnly =
         product.shape === "cupcakes";
-const isNumberLetter =
-    product.shape === "numberLetter";
+
+    const isNumberLetter =
+        product.shape === "numberLetter";
+
     const limitedCoverage =
         cakeSupportsCoverage(product) &&
         builderState.cakeCoverage !==
             "full";
 
-    const quoteOnlyUnavailable =
-        limitedCoverage ||
-        isCupcakesOnly;
+    /*
+        Naked and Semi-Naked cakes have no
+        finish selection, but retain borders,
+        toppers, edible images and details.
+    */
 
     getElement(
         "#cakeFinishCustomizer"
     )?.classList.toggle(
-"is-hidden",
-isCupcakesOnly ||
-isNumberLetter ||
-limitedCoverage
+        "is-hidden",
+        isCupcakesOnly ||
+        isNumberLetter ||
+        limitedCoverage
     );
+
+    /*
+        These remain available for regular,
+        Naked, Semi-Naked and Cupcake orders.
+    */
 
     [
         "#edibleImageCustomizer",
         "#cakeTopperCustomizer",
-        "#cakeDetailsCustomizer"
-    ].forEach((selector) => {
-        getElement(selector)?.classList.toggle(
-            "is-hidden",
-            limitedCoverage
-        );
-    });
-
-    [
+        "#cakeDetailsCustomizer",
         "#toyFigurineCustomizer",
         "#customSculptedCustomizer"
     ].forEach((selector) => {
-        getElement(selector)?.classList.toggle(
-            "is-hidden",
-            quoteOnlyUnavailable
-        );
-    });
-
-    if (quoteOnlyUnavailable) {
-        builderState.toyFigurineEnabled =
-            false;
-
-        builderState.sculptedPiecesEnabled =
-            false;
-
-        const toyToggle = getElement(
-            "#toyFigurineEnabledToggle"
-        );
-
-        const sculptedToggle = getElement(
-            "#customSculptedEnabledToggle"
-        );
-
-        if (toyToggle) {
-            toyToggle.checked = false;
-        }
-
-        if (sculptedToggle) {
-            sculptedToggle.checked = false;
-        }
-    }
-
-    if (!limitedCoverage) {
-        updateExtraDetailControlsVisibility();
-        updateFlowerSourceVisibility();
-        updateTopperOptionsVisibility();
-        updateQuoteOnlyExtraVisibility();
-        return;
-    }
-
-    builderState.fondantEnabled = false;
-    builderState.cakeFinish = "";
-    builderState.edibleImageEnabled = false;
-    builderState.cakeTopperEnabled = false;
-    builderState.topperType = "";
-    builderState.topperPrice = 0;
-    builderState.decorations = [];
-
-
-    [
-        "#fondantEnabledToggle",
-        "#edibleImageEnabledToggle",
-        "#cakeTopperEnabledToggle"
-    ].forEach((selector) => {
-        const toggle = getElement(selector);
-
-        if (toggle) {
-            toggle.checked = false;
-        }
-    });
-
-    getElements(
-        'input[name="cakeFinish"], input[name="topperType"], [data-decoration-id]'
-    ).forEach((input) => {
-        input.checked = false;
-    });
-[
-    "#finishColorCustomizer",
-    "#topperTypeOptions",
-    "#metallicLeafDetailOptions",
-    "#bowDetailOptions",
-    "#butterflyDetailOptions",
-    "#cherryDetailOptions",
-    "#dripDetailOptions",
-    "#pearlDetailOptions",
-    "#flowerDetailOptions",
-    "#macaronsDetailOptions",
-    "#discoBallsDetailOptions",
-    "#flowerSourceOptions",
-    "#toyFigurineDetailsField",
-    "#customSculptedDetailsField"
-]
-    .forEach((selector) => {
-        getElement(selector)?.classList.add(
+        getElement(selector)?.classList.remove(
             "is-hidden"
         );
     });
-}
 
+    if (limitedCoverage) {
+        builderState.fondantEnabled = false;
+        builderState.cakeFinish = "";
+
+        const fondantToggle = getElement(
+            "#fondantEnabledToggle"
+        );
+
+        if (fondantToggle) {
+            fondantToggle.checked = false;
+        }
+
+        getElements(
+            'input[name="cakeFinish"]'
+        ).forEach((input) => {
+            input.checked = false;
+        });
+
+        getElement(
+            "#finishColorCustomizer"
+        )?.classList.add("is-hidden");
+    }
+
+    updateExtraDetailControlsVisibility();
+    updateFlowerSourceVisibility();
+    updateTopperOptionsVisibility();
+    updateQuoteOnlyExtraVisibility();
+}
 function updateProductModeUI() {
     const product = getSelectedCakeProduct();
     const isCupcakesOnly = product.shape === "cupcakes";
@@ -8693,9 +8795,6 @@ function updateEdibleImageControls() {
         "#edibleImagePlacementTarget"
     );
 
-    const placementNote = getElement(
-        "#edibleImagePlacementNote"
-    );
 
     const product =
         getSelectedCakeProduct();
@@ -8769,15 +8868,6 @@ if (edibleImageToggle) {
                 : "$15 each on cakes"
     );
 
-    if (placementNote) {
-        placementNote.textContent =
-            isCupcakesOnly
-                ? "Requested placement: centered on top of the cupcakes. The first uploaded design is used as the representative live preview."
-                : builderState.edibleImagePlacement ===
-                    "top"
-                    ? "Requested placement: centered on top of the cake. The first uploaded design is used as the representative live preview."
-                    : "Requested placement: front face of the cake. The first uploaded design is used as the representative live preview.";
-    }
 
     if (
         builderState.edibleImageEnabled
@@ -8858,7 +8948,31 @@ function updatePreviewSummary() {
 
 let previewRenderQueued =
     false;
+let realisticPreviewTimer = null;
 
+
+function scheduleRealisticCakePreview() {
+    /*
+        Immediately invalidate an older
+        unfinished realistic render.
+    */
+
+    realisticRenderVersion += 1;
+
+    window.clearTimeout(
+        realisticPreviewTimer
+    );
+
+    realisticPreviewTimer =
+        window.setTimeout(
+            () => {
+                realisticPreviewTimer = null;
+
+scheduleRealisticCakePreview();
+            },
+            100
+        );
+}
 
 function renderCakePreview() {
     if (previewRenderQueued) {
@@ -8883,6 +8997,7 @@ function renderCakePreview() {
 function performCakePreviewRender() {
     updateProductModeUI();
 updateBorderControlsVisibility();
+updateBorderShadeOutputs();
     updateCoverageDesignAvailability();
 
 updateFinishAvailability();
@@ -8968,16 +9083,10 @@ function showStep(stepNumber) {
         8
     );
 
-    const previousStep =
-        builderState.currentStep;
+const needsInitialResetSnapshot =
+    !stepResetSnapshots.has(safeStep);
 
-    const enteredNewStep =
-        previousStep !== safeStep ||
-        !stepResetSnapshots.has(safeStep);
-
-    builderState.currentStep = safeStep;
-
-    builderState.currentStep = safeStep;
+builderState.currentStep = safeStep;
     const basicsHero =
     getElement("#builderBasicsHero");
 
@@ -9113,7 +9222,7 @@ if (
     });
 }
 
-if (enteredNewStep) {
+if (needsInitialResetSnapshot) {
     captureStepResetSnapshot(
         safeStep
     );
@@ -12434,7 +12543,60 @@ function buildBuilderColorControls() {
                     "#customCakeBorderBottomColorNote",
                     true
                 );
+const cakeBorderShadeIntensityInput =
+    getElement(
+        "#cakeBorderShadeIntensity"
+    );
 
+if (cakeBorderShadeIntensityInput) {
+    cakeBorderShadeIntensityInput.value =
+        String(
+            builderState
+                .cakeBorderShadeIntensity
+        );
+
+    cakeBorderShadeIntensityInput.oninput =
+        () => {
+            builderState
+                .cakeBorderShadeIntensity =
+                Number(
+                    cakeBorderShadeIntensityInput
+                        .value
+                );
+
+            updateBorderShadeOutputs();
+            renderCakePreview();
+        };
+}
+
+
+const cakeBorderBottomShadeIntensityInput =
+    getElement(
+        "#cakeBorderBottomShadeIntensity"
+    );
+
+if (cakeBorderBottomShadeIntensityInput) {
+    cakeBorderBottomShadeIntensityInput.value =
+        String(
+            builderState
+                .cakeBorderBottomShadeIntensity
+        );
+
+    cakeBorderBottomShadeIntensityInput.oninput =
+        () => {
+            builderState
+                .cakeBorderBottomShadeIntensity =
+                Number(
+                    cakeBorderBottomShadeIntensityInput
+                        .value
+                );
+
+            updateBorderShadeOutputs();
+            renderCakePreview();
+        };
+}
+
+updateBorderShadeOutputs();
                 renderCakePreview();
             }
         }
@@ -14135,51 +14297,36 @@ function applyTpjImageBackground(
         }
 
         try {
-            if (isHeroPhoto) {
-                const leftColor =
-                    getTpjImageEdgeColor(
-                        image,
-                        "left"
-                    );
+if (isHeroPhoto) {
+    const heroColor =
+        getTpjImageEdgeColor(
+            image,
+            "right"
+        );
 
-                const rightColor =
-                    getTpjImageEdgeColor(
-                        image,
-                        "right"
-                    );
+    image.style.backgroundColor =
+        heroColor;
 
-                const heroBackground =
-                    `linear-gradient(
-                        90deg,
-                        ${leftColor} 0%,
-                        ${leftColor} 50%,
-                        ${rightColor} 50%,
-                        ${rightColor} 100%
-                    )`;
+    image.style.backgroundImage =
+        "none";
 
-                image.style.backgroundColor =
-                    leftColor;
+    const heroContainer =
+        image.closest(
+            ".builder-basics-hero"
+        );
 
-                image.style.backgroundImage =
-                    heroBackground;
+    heroContainer?.style.setProperty(
+        "background-color",
+        heroColor
+    );
 
-                const heroContainer =
-                    image.closest(
-                        ".builder-basics-hero"
-                    );
+    heroContainer?.style.setProperty(
+        "background-image",
+        "none"
+    );
 
-                heroContainer?.style.setProperty(
-                    "background-color",
-                    leftColor
-                );
-
-                heroContainer?.style.setProperty(
-                    "background-image",
-                    heroBackground
-                );
-
-                return;
-            }
+    return;
+}
 
             const leftColor =
                 getTpjImageEdgeColor(
