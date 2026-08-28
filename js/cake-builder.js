@@ -1975,6 +1975,8 @@ function setLimitedCacheValue(
 }
 const tintedLayerCache =
     new WeakMap();
+ const normalizedDetailLayerCache =
+    new WeakMap();   
 
 const dripTintLayerCache =
     new WeakMap();
@@ -2056,6 +2058,166 @@ function loadRealisticImage(url) {
     );
 
     return request;
+}
+function getNormalizedDetailLayer(
+    image,
+    mask
+) {
+    let maskCache =
+        normalizedDetailLayerCache.get(
+            image
+        );
+
+    if (!maskCache) {
+        maskCache = new WeakMap();
+
+        normalizedDetailLayerCache.set(
+            image,
+            maskCache
+        );
+    }
+
+    if (maskCache.has(mask)) {
+        return maskCache.get(mask);
+    }
+
+    const layer =
+        document.createElement("canvas");
+
+    layer.width =
+        image.naturalWidth ||
+        image.width;
+
+    layer.height =
+        image.naturalHeight ||
+        image.height;
+
+    const context =
+        layer.getContext("2d");
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    context.globalCompositeOperation =
+        "saturation";
+
+    context.fillStyle = "#808080";
+
+    context.fillRect(
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    context.globalCompositeOperation =
+        "destination-in";
+
+    context.drawImage(
+        mask,
+        0,
+        0,
+        layer.width,
+        layer.height
+    );
+
+    context.globalCompositeOperation =
+        "source-over";
+
+    const imageData =
+        context.getImageData(
+            0,
+            0,
+            layer.width,
+            layer.height
+        );
+
+    const pixels = imageData.data;
+
+    let weightedBrightness = 0;
+    let alphaTotal = 0;
+
+    for (
+        let index = 0;
+        index < pixels.length;
+        index += 4
+    ) {
+        const alpha =
+            pixels[index + 3] / 255;
+
+        if (!alpha) {
+            continue;
+        }
+
+        const brightness =
+            pixels[index] * 0.2126 +
+            pixels[index + 1] * 0.7152 +
+            pixels[index + 2] * 0.0722;
+
+        weightedBrightness +=
+            brightness * alpha;
+
+        alphaTotal += alpha;
+    }
+
+    const averageBrightness =
+        alphaTotal
+            ? weightedBrightness /
+                alphaTotal
+            : 128;
+
+    for (
+        let index = 0;
+        index < pixels.length;
+        index += 4
+    ) {
+        if (!pixels[index + 3]) {
+            continue;
+        }
+
+        const brightness =
+            pixels[index] * 0.2126 +
+            pixels[index + 1] * 0.7152 +
+            pixels[index + 2] * 0.0722;
+
+        const normalizedBrightness =
+            Math.round(
+                clampNumber(
+                    128 +
+                        brightness -
+                        averageBrightness,
+                    0,
+                    255
+                )
+            );
+
+        pixels[index] =
+            normalizedBrightness;
+
+        pixels[index + 1] =
+            normalizedBrightness;
+
+        pixels[index + 2] =
+            normalizedBrightness;
+    }
+
+    context.putImageData(
+        imageData,
+        0,
+        0
+    );
+
+    maskCache.set(
+        mask,
+        layer
+    );
+
+    return layer;
 }
 function makeTintedLayer(
     image,
@@ -2206,31 +2368,11 @@ const isSprinkleAsset =
 */
 
 const detailLayer =
-    document.createElement(
-        "canvas"
+    getNormalizedDetailLayer(
+        image,
+        mask
     );
 
-detailLayer.width = layer.width;
-detailLayer.height = layer.height;
-
-const detailContext =
-    detailLayer.getContext("2d");
-
-detailContext.drawImage(
-    image,
-    0,
-    0,
-    layer.width,
-    layer.height
-);
-
-/*
-    Remove the original cream/pink color
-    while retaining its light and shadow.
-*/
-
-detailContext.globalCompositeOperation =
-    "saturation";
 
 detailContext.fillStyle =
     "#808080";
@@ -2267,7 +2409,7 @@ detailContext.globalCompositeOperation =
     translucent cast over selected colors.
 */
 layerContext.globalCompositeOperation =
-    "multiply";
+    "soft-light";
 
 let detailStrength =
     cakePreviewDetailStrength.other;
