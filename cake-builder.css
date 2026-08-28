@@ -5093,3 +5093,94 @@ margin-inline: auto;
 .cupcake-swatch-section {
     margin-top: 0;
 }
+/* MOBILE CUPCAKE ADD-ON PREVIEW */
+
+@media (max-width: 720px) {
+    #cupcakeAddOnStudioSlot
+    > #cupcakeStudio
+    .cupcake-live-preview {
+        position: -webkit-sticky;
+        position: sticky;
+
+        top: calc(
+            var(--builder-header-height) +
+            var(--builder-progress-height) +
+            232px
+        );
+
+        z-index: 1001;
+
+        width: 132px;
+        margin: 0 auto 10px;
+        padding: 4px;
+
+        border: 2px solid var(--chocolate);
+        border-radius: 14px;
+
+        background: var(--cream);
+
+        box-shadow:
+            0 8px 18px
+            rgba(90, 42, 30, 0.18);
+    }
+
+    #cupcakeAddOnStudioSlot
+    > #cupcakeStudio
+    .cupcake-composite {
+        width: 105px;
+        margin: 0 auto;
+    }
+
+    #cupcakeAddOnStudioSlot
+    > #cupcakeStudio
+    #cupcakeSetCaption {
+        display: none;
+    }
+}
+/* LARGER MOBILE CAKE PREVIEW */
+
+@media
+(max-width: 720px) and
+(orientation: portrait) {
+
+    #cakePreviewCard
+    .cake-renderer-stage {
+        width: min(88vw, 340px);
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+}
+/* KEEP THE COMPLETE PREVIEW VISIBLE IN MOBILE LANDSCAPE */
+
+@media
+(max-width: 980px) and
+(max-height: 600px) and
+(orientation: landscape) {
+
+    #cakePreviewCard.preview-visual-card {
+        height: auto;
+        max-height: calc(
+            100svh -
+            var(--builder-header-height) -
+            var(--builder-progress-height) -
+            8px
+        );
+    }
+
+    #cakePreviewCard
+    .cake-renderer-stage {
+        width: min(
+            100%,
+            calc(
+                100svh -
+                var(--builder-header-height) -
+                var(--builder-progress-height) -
+                76px
+            )
+        );
+
+        height: auto;
+        aspect-ratio: 1 / 1;
+        flex: 0 1 auto;
+    }
+}

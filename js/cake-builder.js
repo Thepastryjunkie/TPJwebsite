@@ -10015,13 +10015,8 @@ function validateStepSeven() {
         "#occasionText"
     )?.value.trim() || "";
 
-if (!builderState.occasion) {
-    showValidationMessage(
-        "Enter the occasion."
-    );
 
-    return false;
-}
+
     if (!builderState.customerName.trim()) {
         showValidationMessage(
             "Enter your first and last name."
