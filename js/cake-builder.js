@@ -3359,9 +3359,12 @@ function getBentoTransformMap(
 
 function traceBentoCakePath(
     context,
-    map
+    map,
+    beginPath = true
 ) {
-    context.beginPath();
+    if (beginPath) {
+        context.beginPath();
+    }
 
     context.moveTo(
         map.x(451),
@@ -6531,7 +6534,95 @@ getCakeForegroundExtraDrawBox(
         context.restore();
     });
 }
+function drawBentoForegroundExtras(
+    context,
+    assets,
+    image,
+    transform
+) {
+    if (!assets?.length) {
+        return;
+    }
 
+    const foregroundAssets =
+        assets.filter(
+            (asset) =>
+                asset.id !==
+                "chocolateDripDecoration"
+        );
+
+    const map = getBentoTransformMap(
+        image,
+        transform
+    );
+
+    const cakeYOffset =
+        transform.height * 0.035;
+
+    foregroundAssets.forEach((asset) => {
+        const layer =
+            getRenderedExtraLayer(asset);
+
+        if (!layer) {
+            return;
+        }
+
+        /*
+            Draw the cupcake portions in
+            their original positions.
+        */
+        context.save();
+        context.beginPath();
+
+        context.rect(
+            transform.x,
+            transform.y,
+            transform.width,
+            transform.height
+        );
+
+        traceBentoCakePath(
+            context,
+            map,
+            false
+        );
+
+        context.clip("evenodd");
+
+        context.drawImage(
+            layer,
+            transform.x,
+            transform.y,
+            transform.width,
+            transform.height
+        );
+
+        context.restore();
+
+        /*
+            Draw only the heart-cake portion
+            3.5% lower.
+        */
+        context.save();
+
+        traceBentoCakePath(
+            context,
+            map
+        );
+
+        context.clip();
+
+        context.drawImage(
+            layer,
+            transform.x,
+            transform.y + cakeYOffset,
+            transform.width,
+            transform.height
+        );
+
+        context.restore();
+    });
+}
 function getCupcakeExtraStyleName() {
     switch (builderState.cupcakeFrostingStyle) {
         case "low-piped-edible-image":
@@ -7224,15 +7315,11 @@ if (standaloneSprinkleAssets?.top) {
 /*
     Extras also use the full Bento canvas.
 */
-
-drawCakeForegroundExtras(
+drawBentoForegroundExtras(
     context,
     standaloneExtraAssets,
-    transform.x,
-    transform.y,
-    transform.width,
-    transform.height,
-    true
+    standaloneImage,
+    transform
 );
 
                 drawBentoEdibleImage(
@@ -9499,6 +9586,8 @@ updateFinishVisibility();
 
 updateFinishColorControls();
 
+updateInlineCustomizationPanels();
+
 updateDecorationVisibility();
 
     updateSelectedCardStates();
@@ -10758,6 +10847,232 @@ getElement(
     !whiteChocolateSelected ||
     !whiteChocolateColored
 );
+}
+const inlineDetailPanelMap = {
+    chocolateDripDecoration:
+        "#dripDetailOptions",
+
+    pearlsDecoration:
+        "#pearlDetailOptions",
+
+    ribbonDecoration:
+        "#bowDetailOptions",
+
+    butterfliesDecoration:
+        "#butterflyDetailOptions",
+
+    goldAccentDecoration:
+        "#metallicLeafDetailOptions",
+
+    flowersDecoration:
+        "#flowerDetailOptions",
+
+    cherriesDecoration:
+        "#cherryDetailOptions",
+
+    macaronsDecoration:
+        "#macaronsDetailOptions",
+
+    discoBallsDecoration:
+        "#discoBallsDetailOptions"
+};
+
+
+function placeInlinePanelAfter(
+    panel,
+    anchor
+) {
+    if (!panel || !anchor) {
+        return;
+    }
+
+    panel.classList.add(
+        "inline-card-editor"
+    );
+
+    if (
+        anchor.nextElementSibling !==
+        panel
+    ) {
+        anchor.after(panel);
+    }
+}
+
+
+function updateInlineCustomizationPanels() {
+    Object.entries(
+        inlineDetailPanelMap
+    ).forEach(
+        ([decorationId, panelSelector]) => {
+            const input = getElement(
+                `[data-decoration-id="${decorationId}"]`
+            );
+
+            if (!input?.checked) {
+                return;
+            }
+
+            placeInlinePanelAfter(
+                getElement(panelSelector),
+                input.closest(
+                    ".decoration-choice-card"
+                )
+            );
+        }
+    );
+
+    const borderCustomizer =
+        getElement(
+            "#cakeBorderCustomizer"
+        );
+
+    const borderGrid =
+        borderCustomizer?.querySelector(
+            ".text-choice-grid"
+        );
+
+    const borderControls =
+        getElement(
+            "#cakeBorderControls"
+        );
+
+    const sprinkleSection =
+        getElement(
+            "#cakeSprinkleSection"
+        );
+
+    const selectedBorderInput =
+        getElement(
+            'input[name="cakeBorderStyle"]:checked'
+        );
+
+    const selectedBorderCard =
+        selectedBorderInput?.closest(
+            ".text-choice-card"
+        );
+
+    if (
+        selectedBorderInput?.value &&
+        selectedBorderCard
+    ) {
+        placeInlinePanelAfter(
+            borderControls,
+            selectedBorderCard
+        );
+    } else if (
+        borderGrid &&
+        borderControls
+    ) {
+        borderControls.classList.add(
+            "inline-card-editor"
+        );
+
+        if (
+            borderGrid.nextElementSibling !==
+            borderControls
+        ) {
+            borderGrid.after(
+                borderControls
+            );
+        }
+    }
+
+    const finishControls =
+        getElement(
+            "#finishColorCustomizer"
+        );
+
+    const cakeFinishCustomizer =
+        getElement(
+            "#cakeFinishCustomizer"
+        );
+
+    const product =
+        getSelectedCakeProduct();
+
+    const usesNumberLetterColors =
+        product.shape ===
+            "numberLetter" &&
+        builderState.numberLetterStyle ===
+            "Layered Piped";
+
+    const selectedFinishInput =
+        usesNumberLetterColors
+            ? getElement(
+                'input[name="numberLetterStyle"]:checked'
+            )
+            : getElement(
+                'input[name="cakeFinish"]:checked'
+            );
+
+    const selectedFinishCard =
+        selectedFinishInput?.closest(
+            ".style-choice-card"
+        );
+
+    if (
+        finishControls &&
+        !finishControls.classList.contains(
+            "is-hidden"
+        ) &&
+        selectedFinishCard
+    ) {
+        placeInlinePanelAfter(
+            finishControls,
+            selectedFinishCard
+        );
+    } else if (
+        cakeFinishCustomizer &&
+        finishControls
+    ) {
+        finishControls.classList.add(
+            "inline-card-editor"
+        );
+
+        if (
+            cakeFinishCustomizer
+                .previousElementSibling !==
+            finishControls
+        ) {
+            cakeFinishCustomizer.before(
+                finishControls
+            );
+        }
+    }
+
+    if (
+        sprinkleSection &&
+        !sprinkleSection.classList.contains(
+            "is-hidden"
+        )
+    ) {
+        const sprinkleAnchor =
+            selectedBorderInput?.value
+                ? borderControls
+                : finishControls;
+
+        placeInlinePanelAfter(
+            sprinkleSection,
+            sprinkleAnchor
+        );
+    } else if (
+        borderCustomizer &&
+        sprinkleSection
+    ) {
+        sprinkleSection.classList.add(
+            "inline-card-editor"
+        );
+
+        if (
+            borderCustomizer
+                .nextElementSibling !==
+            sprinkleSection
+        ) {
+            borderCustomizer.after(
+                sprinkleSection
+            );
+        }
+    }
 }
 function updateFlowerSourceVisibility() {
     const flowersSelected =
