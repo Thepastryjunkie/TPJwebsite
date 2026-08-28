@@ -9434,7 +9434,7 @@ function scheduleRealisticCakePreview() {
         unfinished realistic render.
     */
 
-    realisticRenderVersion += 1;
+ 
 
     window.clearTimeout(
         realisticPreviewTimer
@@ -9452,6 +9452,13 @@ updateRealisticCakePreview();
 }
 
 function renderCakePreview() {
+    realisticRenderVersion += 1;
+
+window.clearTimeout(
+    realisticPreviewTimer
+);
+
+realisticPreviewTimer = null;
     if (previewRenderQueued) {
         return;
     }
