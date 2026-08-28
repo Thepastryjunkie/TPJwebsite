@@ -2374,29 +2374,7 @@ const detailLayer =
     );
 
 
-detailContext.fillStyle =
-    "#808080";
 
-detailContext.fillRect(
-    0,
-    0,
-    layer.width,
-    layer.height
-);
-
-detailContext.globalCompositeOperation =
-    "destination-in";
-
-detailContext.drawImage(
-    image,
-    0,
-    0,
-    layer.width,
-    layer.height
-);
-
-detailContext.globalCompositeOperation =
-    "source-over";
 
 /*
     Reveal dimension without washing out
