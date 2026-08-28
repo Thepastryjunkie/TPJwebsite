@@ -606,7 +606,7 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-assets-20260827-2";
+    "?v=tpj-assets-20260828-1";
 
 const sprinkleAssetVersion =
     "?v=tpj-sprinkles-20260827-2";
