@@ -6114,6 +6114,58 @@ function getRenderedExtraLayer(asset) {
             selectedColor
         );
     }
+   if (
+    asset.id ===
+    "macaronsDecoration"
+) {
+    const macaronLuminance =
+        getHexColorLuminance(
+            selectedColor
+        );
+
+    /*
+        Very light colors
+    */
+
+    if (macaronLuminance >= 200) {
+        return makeNaturalFoodTintedLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor,
+            0.42,
+            0.10,
+            1.60
+        );
+    }
+
+    /*
+        Light and pastel colors
+    */
+
+    if (macaronLuminance >= 165) {
+        return makeNaturalFoodTintedLayer(
+            asset.strokes,
+            asset.mask,
+            selectedColor,
+            0.36,
+            0.16,
+            1.45
+        );
+    }
+
+    /*
+        Medium and dark colors
+    */
+
+    return makeNaturalFoodTintedLayer(
+        asset.strokes,
+        asset.mask,
+        selectedColor,
+        0.30,
+        0.26,
+        1.35
+    );
+} 
 
   return makeTintedLayer(
         asset.strokes,
