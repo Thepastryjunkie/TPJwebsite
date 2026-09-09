@@ -12481,8 +12481,18 @@ function closeMobileSummary() {
 
 
 /* =========================================
-   SUBMISSION PLACEHOLDER
+   LIVE CAKE VISION SUBMISSION
 ========================================= */
+
+const cakeVisionSubmissionEndpoint =
+    "https://script.google.com/macros/s/AKfycbxZjHqej-UsmdNcC2U6hDUzN5Uh5xqMNyYJjT6XAazVTwdv6tqMm4U1MDcSx4MuI5oi/exec";
+
+const cakeVisionFormToken =
+    "TPJ_CAKE_VISION_2026";
+
+const maximumSubmissionUploadBytes =
+    27 * 1024 * 1024;
+
 
 function finalAcknowledgmentsAreChecked() {
     return [
@@ -12499,9 +12509,270 @@ function finalAcknowledgmentsAreChecked() {
 }
 
 
-function submitCakeVision() {
+function readSubmissionFileAsDataUrl(file) {
+    return new Promise(
+        (resolve, reject) => {
+            const reader =
+                new FileReader();
+
+            reader.addEventListener(
+                "load",
+                () => {
+                    resolve(reader.result);
+                }
+            );
+
+            reader.addEventListener(
+                "error",
+                () => {
+                    reject(
+                        new Error(
+                            `Could not read ${file.name}.`
+                        )
+                    );
+                }
+            );
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+function createSerializableBuilderState() {
+    return JSON.parse(
+        JSON.stringify(
+            builderState,
+            (key, value) => {
+                if (
+                    typeof File !==
+                        "undefined" &&
+                    value instanceof File
+                ) {
+                    return {
+                        name: value.name,
+                        type: value.type,
+                        size: value.size,
+                        lastModified:
+                            value.lastModified
+                    };
+                }
+
+                if (
+                    (
+                        key === "previewUrl" ||
+                        key === "url" ||
+                        key ===
+                            "edibleImageUrl"
+                    ) &&
+                    typeof value === "string" &&
+                    value.startsWith("blob:")
+                ) {
+                    return undefined;
+                }
+
+                return value;
+            }
+        )
+    );
+}
+
+
+function getSubmissionAcknowledgments() {
+    const termsAccepted =
+        Boolean(
+            getElement(
+                "#termsAcknowledgment"
+            )?.checked
+        );
+
+    return {
+        inquiryOnly:
+            Boolean(
+                getElement(
+                    "#inquiryAcknowledgment"
+                )?.checked
+            ),
+
+        estimatedPrice:
+            Boolean(
+                getElement(
+                    "#priceAcknowledgment"
+                )?.checked
+            ),
+
+        depositRequired:
+            Boolean(
+                getElement(
+                    "#depositAcknowledgment"
+                )?.checked
+            ),
+
+        termsAccepted:
+            termsAccepted,
+
+        termsUrl:
+            "https://www.thepastryjunkie.com/pages/terms.html",
+
+        termsAcceptedAt:
+            termsAccepted
+                ? new Date().toISOString()
+                : ""
+    };
+}
+
+
+async function collectSubmissionFiles() {
+    const files = [];
+
+    for (
+        let index = 0;
+        index <
+        builderState.inspirationFiles.length;
+        index += 1
+    ) {
+        const upload =
+            builderState.inspirationFiles[
+                index
+            ];
+
+        if (!upload?.file) {
+            continue;
+        }
+
+        files.push({
+            role:
+                `Inspiration Photo ${index + 1}`,
+
+            name:
+                upload.file.name,
+
+            mimeType:
+                upload.file.type,
+
+            note:
+                upload.note || "",
+
+            dataUrl:
+                await readSubmissionFileAsDataUrl(
+                    upload.file
+                )
+        });
+    }
+
+    for (
+        let index = 0;
+        index <
+        builderState.edibleImages.length;
+        index += 1
+    ) {
+        const upload =
+            builderState.edibleImages[
+                index
+            ];
+
+        if (!upload?.file) {
+            continue;
+        }
+
+        files.push({
+            role:
+                `Edible Image ${index + 1}`,
+
+            name:
+                upload.file.name,
+
+            mimeType:
+                upload.file.type,
+
+            dataUrl:
+                await readSubmissionFileAsDataUrl(
+                    upload.file
+                )
+        });
+    }
+
+    if (realisticCakeCanvas) {
+        try {
+            const previewDataUrl =
+                realisticCakeCanvas.toDataURL(
+                    "image/webp",
+                    0.9
+                );
+
+            const previewIsWebp =
+                previewDataUrl.startsWith(
+                    "data:image/webp"
+                );
+
+            files.push({
+                role:
+                    "Cake Builder Preview",
+
+                name:
+                    previewIsWebp
+                        ? "cake-vision-preview.webp"
+                        : "cake-vision-preview.png",
+
+                mimeType:
+                    previewIsWebp
+                        ? "image/webp"
+                        : "image/png",
+
+                dataUrl:
+                    previewDataUrl
+            });
+        } catch (error) {
+            console.warn(
+                "The cake preview could not be exported.",
+                error
+            );
+        }
+    }
+
+    return files;
+}
+
+
+function getSelectedUploadByteTotal() {
+    const inspirationBytes =
+        builderState.inspirationFiles
+            .reduce(
+                (total, upload) =>
+                    total +
+                    Number(
+                        upload?.file?.size ||
+                        0
+                    ),
+                0
+            );
+
+    const edibleImageBytes =
+        builderState.edibleImages
+            .reduce(
+                (total, upload) =>
+                    total +
+                    Number(
+                        upload?.file?.size ||
+                        0
+                    ),
+                0
+            );
+
+    return (
+        inspirationBytes +
+        edibleImageBytes
+    );
+}
+
+
+async function submitCakeVision() {
     const message = getElement(
         "#submissionMessage"
+    );
+
+    const submitButton = getElement(
+        "#submitCakeVision"
     );
 
     if (!finalAcknowledgmentsAreChecked()) {
@@ -12516,24 +12787,134 @@ function submitCakeVision() {
         return;
     }
 
-    if (message) {
-        message.className =
-            "submission-message is-success";
+    if (
+        getSelectedUploadByteTotal() >
+        maximumSubmissionUploadBytes
+    ) {
+        if (message) {
+            message.className =
+                "submission-message is-error";
 
-        message.textContent =
-            "The builder is working. The email and image-upload service still needs to be connected before this sends a real inquiry.";
+            message.textContent =
+                "The combined uploaded images are too large. Remove one or more images and try again.";
+        }
+
+        return;
     }
 
-    /*
-        The live form connection will later submit:
+    const originalButtonText =
+        submitButton?.textContent ||
+        "Submit Cake Vision";
 
-        - builderState
-        - inspiration image files
-        - inspiration notes
-        - customer contact information
-        - estimated pricing
-        - selected cake details
-    */
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent =
+            "Sending Inquiry...";
+    }
+
+    if (message) {
+        message.className =
+            "submission-message";
+
+        message.textContent =
+            "Preparing your cake design and uploaded images...";
+    }
+
+    try {
+        const submissionFiles =
+            await collectSubmissionFiles();
+
+        const payload = {
+            formToken:
+                cakeVisionFormToken,
+
+            website: "",
+
+            submittedAt:
+                new Date().toISOString(),
+
+            pageUrl:
+                window.location.href,
+
+            builderState:
+                createSerializableBuilderState(),
+
+            pricing: {
+                cakeSubtotal:
+                    calculateCakeSubtotal(),
+
+                extrasSubtotal:
+                    calculateExtrasTotal(),
+
+                rushFee:
+                    Number(
+                        builderState.rushFee
+                    ) || 0,
+
+                deliveryFee:
+                    Number(
+                        builderState.deliveryFee
+                    ) || 0,
+
+                estimatedTotal:
+                    calculateEstimatedTotal()
+            },
+
+            acknowledgments:
+                getSubmissionAcknowledgments(),
+
+            files:
+                submissionFiles
+        };
+
+        await fetch(
+            cakeVisionSubmissionEndpoint,
+            {
+                method: "POST",
+                mode: "no-cors",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=UTF-8"
+                },
+
+                body:
+                    JSON.stringify(payload)
+            }
+        );
+
+        if (message) {
+            message.className =
+                "submission-message is-success";
+
+            message.textContent =
+                "Your Cake Vision inquiry was submitted successfully. The Pastry Junkie will review your design and contact you using your preferred contact method.";
+        }
+
+        if (submitButton) {
+            submitButton.textContent =
+                "Inquiry Submitted";
+        }
+    } catch (error) {
+        console.error(
+            "Cake Vision submission failed:",
+            error
+        );
+
+        if (message) {
+            message.className =
+                "submission-message is-error";
+
+            message.textContent =
+                "Your inquiry could not be sent. Your selections are still saved on this page, so please try again.";
+        }
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent =
+                originalButtonText;
+        }
+    }
 }
 
 

@@ -5286,3 +5286,24 @@ margin-inline: auto;
         transform: none !important;
     }
 }
+.policy-link {
+    color: var(--signature-pink);
+
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+}
+
+.policy-link:hover {
+    color: var(--buttercream-brown);
+}
+
+.policy-link:focus-visible {
+    border-radius: 4px;
+
+    outline: 3px solid
+        rgba(247, 182, 210, 0.45);
+
+    outline-offset: 3px;
+}

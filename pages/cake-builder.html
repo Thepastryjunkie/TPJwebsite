@@ -19,10 +19,10 @@
         Create Your Cake | The Pastry Junkie
     </title>
 
-    <link
-      rel="stylesheet"
-   href="../cake-builder.css?v=20260828-2"
-    >
+  <link
+    rel="stylesheet"
+    href="../cake-builder.css?v=20260909-1"
+> 
 </head>
 
 <body>
@@ -6389,19 +6389,32 @@
 
                             </label>
 
-                            <label class="policy-check">
+<div class="policy-check">
 
-                                <input
-                                    id="termsAcknowledgment"
-                                    type="checkbox"
-                                >
+    <input
+        id="termsAcknowledgment"
+        name="termsAcknowledgment"
+        type="checkbox"
+        value="accepted"
+        required
+    >
 
-                                <span>
-                                    I have reviewed and agree to The Pastry
-                                    Junkie’s ordering terms and policies.
-                                </span>
+    <span>
+        <label for="termsAcknowledgment">
+            I have reviewed and agree to The Pastry Junkie’s
+        </label>
 
-                            </label>
+        <a
+            class="policy-link"
+            href="https://www.thepastryjunkie.com/pages/terms.html"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Terms and Conditions
+        </a>.
+    </span>
+
+</div>
 
                         </div>
 
@@ -6569,6 +6582,6 @@
 
     </div>
 
-<script src="../js/cake-builder.js?v=20260828-7"></script>
+<script src="../js/cake-builder.js?v=20260909-1"></script>
 </body>
 </html>
