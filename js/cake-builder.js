@@ -606,7 +606,7 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-assets-20260828-1";
+    "?v=tpj-assets-20260909-1";
 
 const sprinkleAssetVersion =
     "?v=tpj-sprinkles-20260827-2";
@@ -1271,14 +1271,22 @@ function getEffectiveCakeBorderColor() {
     );
 }
 
-
 function getEffectiveCakeBorderBottomColor() {
+    const useOneBorderColor =
+        getSelectedCakeProduct().shape ===
+        "numberLetter";
+
+    if (useOneBorderColor) {
+        return getEffectiveCakeBorderColor();
+    }
+
     return applyBorderShadeIntensity(
         builderState.cakeBorderBottomColor,
         builderState
             .cakeBorderBottomShadeIntensity
     );
 }
+
 
 function getDisplayColorName(color) {
     if (!color || color === "original") {
@@ -2461,7 +2469,10 @@ layerContext.drawImage(
     /*
         Final clip back to the original mask.
     */
-if (!isSimpleTextureAsset) {
+if (
+    !isSimpleTextureAsset &&
+    !isBorderAsset
+) {
     layerContext.globalCompositeOperation =
         "destination-in";
 
@@ -5177,30 +5188,7 @@ function drawCakeSprinkles(
 
     context.restore();
 }
-function usesCombinedNumberLetterBorder(
-    entryKey
-) {
-    const shapeName =
-        realisticFinishShapeMap[
-            entryKey
-        ] || "";
 
-    const isNumberLetter =
-        shapeName.startsWith(
-            "Number-"
-        ) ||
-        shapeName === "Letter-A";
-
-    return (
-        isNumberLetter &&
-        (
-            builderState.cakeBorderStyle ===
-                "rosette" ||
-            builderState.cakeBorderStyle ===
-                "ruffle"
-        )
-    );
-}
 function getBorderAssetFiles(
     entryKey,
     placement,
@@ -5225,28 +5213,6 @@ function getBorderAssetFiles(
     }
 
 
-    /*
-        NUMBER / LETTER
-        Rosette + Ruffle use ONE
-        complete border asset.
-    */
-
-    if (
-        usesCombinedNumberLetterBorder(
-            entryKey
-        )
-    ) {
-        const prefix =
-            `TPJ-Border-${styleName}-${shapeName}-Border`;
-
-        return {
-            mask:
-                `${prefix}-Mask.png`,
-
-            strokes:
-                `${prefix}-Strokes.png`
-        };
-    }
 
 
     /*
@@ -5407,30 +5373,6 @@ async function loadSelectedBorderAssets(
     }
 
 
-    /*
-        NUMBER / LETTER:
-        Rosette + Ruffle are one complete
-        visual border asset.
-    */
-
-    if (
-        usesCombinedNumberLetterBorder(
-            entryKey
-        )
-    ) {
-        const combined =
-            await loadBorderAssets(
-                entryKey,
-                "combined",
-                isBento
-            );
-
-        return {
-            top: combined,
-            bottom: null,
-            middle: null
-        };
-    }
 
 
     /*
@@ -9829,7 +9771,41 @@ function showValidationMessage(message) {
             message;
     }
 }
+function getTodayForDateInput() {
+    const now = new Date();
 
+    const localDate = new Date(
+        now.getTime() -
+        now.getTimezoneOffset() * 60000
+    );
+
+    return localDate
+        .toISOString()
+        .slice(0, 10);
+}
+
+
+function enforceEventDateMinimum() {
+    const eventDateInput =
+        getElement("#eventDate");
+
+    if (!eventDateInput) {
+        return;
+    }
+
+    const today =
+        getTodayForDateInput();
+
+    eventDateInput.min = today;
+
+    if (
+        eventDateInput.value &&
+        eventDateInput.value < today
+    ) {
+        eventDateInput.value = "";
+        builderState.eventDate = "";
+    }
+}
 
 function validateStepOne() {
     builderState.eventDate =
@@ -9844,7 +9820,16 @@ function validateStepOne() {
         showValidationMessage(
             "Choose the event date."
         );
+if (
+    builderState.eventDate <
+    getTodayForDateInput()
+) {
+    showValidationMessage(
+        "The event date cannot be in the past."
+    );
 
+    return false;
+}
         return false;
     }
 
@@ -11067,6 +11052,366 @@ function updateInlineCustomizationPanels() {
             );
         }
     }
+}
+function collapseCompletedPanel(
+    panelSelector,
+    anchorSelector
+) {
+    getElement(
+        panelSelector
+    )?.classList.add(
+        "is-complete-collapsed"
+    );
+
+    getElement(
+        anchorSelector
+    )?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+    });
+}
+
+
+function reopenCompletedPanel(
+    panelSelector
+) {
+    getElement(
+        panelSelector
+    )?.classList.remove(
+        "is-complete-collapsed"
+    );
+}
+
+
+function flowerDetailsAreComplete() {
+    const customTypeComplete =
+        builderState.flowerType !==
+            "Other" ||
+        Boolean(
+            builderState
+                .customFlowerType
+                .trim()
+        );
+
+    return Boolean(
+        builderState.flowerMaterial &&
+        builderState.flowerType &&
+        customTypeComplete &&
+        builderState.flowerSource
+    );
+}
+
+
+function initializeCompletedPanelBehavior() {
+    const borderControls =
+        getElement(
+            "#cakeBorderControls"
+        );
+
+    document.addEventListener(
+        "change",
+        (event) => {
+            const target =
+                event.target;
+
+            if (
+                !(
+                    target instanceof
+                    HTMLInputElement
+                )
+            ) {
+                return;
+            }
+
+
+            /*
+                BORDER COLORS
+            */
+
+            if (
+                target.closest(
+                    "#cakeBorderColorSwatches"
+                )
+            ) {
+                borderControls.dataset
+                    .topColorChosen =
+                    "true";
+            }
+
+            if (
+                target.closest(
+                    "#cakeBorderBottomColorSwatches"
+                )
+            ) {
+                borderControls.dataset
+                    .bottomColorChosen =
+                    "true";
+            }
+
+            if (
+                target.closest(
+                    "#cakeBorderColorSwatches, #cakeBorderBottomColorSwatches"
+                )
+            ) {
+                const isNumberLetter =
+                    getSelectedCakeProduct()
+                        .shape ===
+                    "numberLetter";
+
+                const placement =
+                    builderState
+                        .cakeBorderPlacement;
+
+                const complete =
+                    isNumberLetter ||
+
+                    (
+                        placement === "top" &&
+                        borderControls.dataset
+                            .topColorChosen
+                    ) ||
+
+                    (
+                        placement === "bottom" &&
+                        borderControls.dataset
+                            .bottomColorChosen
+                    ) ||
+
+                    (
+                        placement === "both" &&
+                        borderControls.dataset
+                            .topColorChosen &&
+                        borderControls.dataset
+                            .bottomColorChosen
+                    );
+
+                if (complete) {
+                    collapseCompletedPanel(
+                        "#cakeBorderControls",
+                        'input[name="cakeBorderStyle"]:checked'
+                    );
+                }
+            }
+
+
+            /*
+                CAKE DETAILS
+            */
+
+            const completedDetailPanels =
+                new Map([
+                    [
+                        "pearlColorChoice",
+                        [
+                            "#pearlDetailOptions",
+                            '[data-decoration-id="pearlsDecoration"]'
+                        ]
+                    ],
+                    [
+                        "bowColorChoice",
+                        [
+                            "#bowDetailOptions",
+                            '[data-decoration-id="ribbonDecoration"]'
+                        ]
+                    ],
+                    [
+                        "butterflyColorChoice",
+                        [
+                            "#butterflyDetailOptions",
+                            '[data-decoration-id="butterfliesDecoration"]'
+                        ]
+                    ],
+                    [
+                        "macaronColorChoice",
+                        [
+                            "#macaronsDetailOptions",
+                            '[data-decoration-id="macaronsDecoration"]'
+                        ]
+                    ],
+                    [
+                        "metallicLeafType",
+                        [
+                            "#metallicLeafDetailOptions",
+                            '[data-decoration-id="goldAccentDecoration"]'
+                        ]
+                    ],
+                    [
+                        "cherryGlitter",
+                        [
+                            "#cherryDetailOptions",
+                            '[data-decoration-id="cherriesDecoration"]'
+                        ]
+                    ]
+                ]);
+
+            const completedPanel =
+                completedDetailPanels.get(
+                    target.name
+                );
+
+            if (completedPanel) {
+                collapseCompletedPanel(
+                    ...completedPanel
+                );
+            }
+
+
+            /*
+                CHOCOLATE DRIP
+            */
+
+            if (
+                target.name ===
+                    "dripChocolateType" &&
+                target.value !==
+                    "White Chocolate"
+            ) {
+                collapseCompletedPanel(
+                    "#dripDetailOptions",
+                    '[data-decoration-id="chocolateDripDecoration"]'
+                );
+            }
+
+            if (
+                target.name ===
+                    "whiteChocolateColored" &&
+                target.value === "No"
+            ) {
+                collapseCompletedPanel(
+                    "#dripDetailOptions",
+                    '[data-decoration-id="chocolateDripDecoration"]'
+                );
+            }
+
+            if (
+                target.name ===
+                "whiteChocolateDripColor"
+            ) {
+                collapseCompletedPanel(
+                    "#dripDetailOptions",
+                    '[data-decoration-id="chocolateDripDecoration"]'
+                );
+            }
+
+
+            /*
+                FLOWERS
+            */
+
+            if (
+                [
+                    "flowerMaterial",
+                    "flowerType",
+                    "flowerSource"
+                ].includes(target.name) &&
+                flowerDetailsAreComplete()
+            ) {
+                collapseCompletedPanel(
+                    "#flowerDetailOptions",
+                    '[data-decoration-id="flowersDecoration"]'
+                );
+
+                getElement(
+                    "#flowerSourceOptions"
+                )?.classList.add(
+                    "is-complete-collapsed"
+                );
+            }
+
+
+            /*
+                CAKE TOPPER
+            */
+
+            if (
+                target.name ===
+                "topperType"
+            ) {
+                collapseCompletedPanel(
+                    "#topperTypeOptions",
+                    "#cakeTopperCustomizer"
+                );
+            }
+        }
+    );
+
+
+    getElement(
+        "#customFlowerType"
+    )?.addEventListener(
+        "blur",
+        () => {
+            if (
+                flowerDetailsAreComplete()
+            ) {
+                collapseCompletedPanel(
+                    "#flowerDetailOptions",
+                    '[data-decoration-id="flowersDecoration"]'
+                );
+
+                getElement(
+                    "#flowerSourceOptions"
+                )?.classList.add(
+                    "is-complete-collapsed"
+                );
+            }
+        }
+    );
+
+
+    /*
+        Clicking a selected option
+        opens its controls again.
+    */
+
+    document.addEventListener(
+        "click",
+        (event) => {
+            const borderCard =
+                event.target.closest(
+                    ".text-choice-card"
+                );
+
+            const borderInput =
+                borderCard?.querySelector(
+                    'input[name="cakeBorderStyle"]'
+                );
+
+            if (
+                borderInput?.checked
+            ) {
+                reopenCompletedPanel(
+                    "#cakeBorderControls"
+                );
+            }
+
+            const detailCard =
+                event.target.closest(
+                    ".decoration-choice-card"
+                );
+
+            const detailInput =
+                detailCard?.querySelector(
+                    "[data-decoration-id]"
+                );
+
+            if (
+                detailInput?.checked
+            ) {
+                const panelSelector =
+                    inlineDetailPanelMap[
+                        detailInput.dataset
+                            .decorationId
+                    ];
+
+                if (panelSelector) {
+                    reopenCompletedPanel(
+                        panelSelector
+                    );
+                }
+            }
+        }
+    );
 }
 function updateFlowerSourceVisibility() {
     const flowersSelected =
@@ -13068,99 +13413,66 @@ function updateBorderControlsVisibility() {
         !builderState.cakeBorderStyle
     );
 
-const combinedNumberLetterBorder =
-    fullyFrostedNumberLetter &&
-    (
-        builderState.cakeBorderStyle ===
-            "rosette" ||
-        builderState.cakeBorderStyle ===
-            "ruffle"
-    );
+const useOneNumberLetterColor =
+    fullyFrostedNumberLetter;
 
+
+/*
+    Numbers and Letter A retain
+    Top / Bottom / Both placement.
+*/
 
 getElement(
     "#cakeBorderPlacementControls"
-)?.classList.toggle(
-    "is-hidden",
-    combinedNumberLetterBorder
-);
+)?.classList.remove("is-hidden");
 
-
-/*
-    NUMBER / LETTER ROSETTE + RUFFLE
-    use one border and one color.
-*/
-
-if (combinedNumberLetterBorder) {
-
-    builderState.cakeBorderPlacement =
-        "both";
-
-    getElements(
-        'input[name="cakeBorderPlacement"]'
-    ).forEach((input) => {
-        input.checked =
-            input.value === "both";
-    });
-
-
-    getElement(
-        "#cakeBorderTopColorControls"
-    )?.classList.remove(
-        "is-hidden"
-    );
-
-    getElement(
-        "#cakeBorderBottomColorControls"
-    )?.classList.add(
-        "is-hidden"
-    );
-
-
-    const borderColorLegend =
-        getElement(
-            "#cakeBorderTopColorControls legend"
-        );
-
-    if (borderColorLegend) {
-        borderColorLegend.textContent =
-            "Border Color";
-    }
-
-
-    const customBorderLabel =
-        getElement(
-            "#customCakeBorderColorField > span"
-        );
-
-    if (customBorderLabel) {
-        customBorderLabel.textContent =
-            "Custom Border Shade";
-    }
-
-    return;
-}
-
-
-/*
-    NORMAL TOP / BOTTOM BEHAVIOR
-*/
 
 const borderColorLegend =
     getElement(
         "#cakeBorderTopColorControls legend"
     );
 
-if (borderColorLegend) {
-    borderColorLegend.textContent =
-        "Top Border Color";
-}
-
-
 const customBorderLabel =
     getElement(
         "#customCakeBorderColorField > span"
     );
+
+
+if (useOneNumberLetterColor) {
+    if (borderColorLegend) {
+        borderColorLegend.textContent =
+            "Border Color";
+    }
+
+    if (customBorderLabel) {
+        customBorderLabel.textContent =
+            "Custom Border Shade";
+    }
+
+    builderState.cakeBorderBottomColor =
+        builderState.cakeBorderColor;
+
+    builderState
+        .cakeBorderBottomShadeIntensity =
+        builderState
+            .cakeBorderShadeIntensity;
+
+    getElement(
+        "#cakeBorderTopColorControls"
+    )?.classList.remove("is-hidden");
+
+    getElement(
+        "#cakeBorderBottomColorControls"
+    )?.classList.add("is-hidden");
+
+    return;
+}
+
+
+if (borderColorLegend) {
+    borderColorLegend.textContent =
+        "Top Border Color";
+}
 
 if (customBorderLabel) {
     customBorderLabel.textContent =
@@ -14604,6 +14916,12 @@ function setEdibleImageFile(
     }
 
     renderCakePreview();
+    if (edibleImagesAreComplete()) {
+    collapseCompletedPanel(
+        "#edibleImageControls",
+        "#edibleImageCustomizer"
+    );
+}
 }
 
   
@@ -15023,6 +15341,7 @@ getElement(
 ========================================= */
 
 function initializeBuilder() {
+    enforceEventDateMinimum();
     reorderStepFourControls();
     buildBuilderColorControls();
 

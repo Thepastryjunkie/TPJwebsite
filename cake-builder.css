@@ -5176,3 +5176,113 @@ margin-inline: auto;
 .inline-card-editor.is-hidden {
     display: none !important;
 }
+/* =========================================
+   COMPLETED CUSTOMIZATION PANELS
+========================================= */
+
+.is-complete-collapsed {
+    display: none !important;
+}
+
+
+/* =========================================
+   OTHER FLOWER TYPE
+========================================= */
+
+#customFlowerTypeField {
+    display: block;
+    width: 100%;
+}
+
+#customFlowerTypeField > span {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+#customFlowerTypeField #customFlowerType {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 11px 14px;
+}
+
+
+/* =========================================
+   MOBILE CAKE PREVIEW
+========================================= */
+
+@media
+(max-width: 720px) and
+(orientation: portrait) {
+
+    html,
+    body,
+    .cake-builder-app {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .builder-main-inner {
+        width: 100%;
+        max-width: 100%;
+        padding-inline: 8px;
+    }
+
+    .cake-preview-column {
+        position: sticky;
+        top: calc(
+            var(--builder-header-height) +
+            var(--builder-progress-height)
+        );
+        z-index: 1000;
+
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        padding: 4px 0 7px;
+
+        overflow: visible;
+    }
+
+    .cake-preview-sticky {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        max-height: none;
+        overflow: visible;
+    }
+
+    #cakePreviewCard.preview-visual-card {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        padding: 6px 8px 8px;
+        overflow: visible;
+    }
+
+    #cakePreviewCard .cake-renderer-stage {
+        width: min(62vw, 230px);
+        max-width: 100%;
+        height: auto;
+        min-height: 0;
+        aspect-ratio: 1 / 1;
+        margin: 5px auto 0;
+        flex: none;
+        overflow: visible;
+    }
+
+    #realisticCakeRenderer,
+    #realisticCakeCanvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transform: none !important;
+    }
+}
