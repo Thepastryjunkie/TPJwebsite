@@ -5177,6 +5177,30 @@ function drawCakeSprinkles(
 
     context.restore();
 }
+function usesCombinedNumberLetterBorder(
+    entryKey
+) {
+    const shapeName =
+        realisticFinishShapeMap[
+            entryKey
+        ] || "";
+
+    const isNumberLetter =
+        shapeName.startsWith(
+            "Number-"
+        ) ||
+        shapeName === "Letter-A";
+
+    return (
+        isNumberLetter &&
+        (
+            builderState.cakeBorderStyle ===
+                "rosette" ||
+            builderState.cakeBorderStyle ===
+                "ruffle"
+        )
+    );
+}
 function getBorderAssetFiles(
     entryKey,
     placement,
@@ -5200,22 +5224,52 @@ function getBorderAssetFiles(
         return null;
     }
 
+
+    /*
+        NUMBER / LETTER
+        Rosette + Ruffle use ONE
+        complete border asset.
+    */
+
+    if (
+        usesCombinedNumberLetterBorder(
+            entryKey
+        )
+    ) {
+        const prefix =
+            `TPJ-Border-${styleName}-${shapeName}-Border`;
+
+        return {
+            mask:
+                `${prefix}-Mask.png`,
+
+            strokes:
+                `${prefix}-Strokes.png`
+        };
+    }
+
+
+    /*
+        REGULAR CAKES + TIERS
+    */
+
     const placementName =
         placement === "top"
             ? "Top"
-            : "Bottom";
+            : placement === "middle"
+                ? "Middle"
+                : "Bottom";
 
     const prefix =
         `TPJ-Border-${styleName}-${shapeName}-${placementName}`;
 
+    return {
+        mask:
+            `${prefix}-Mask.png`,
 
-return {
-    strokes:
-        `${prefix}-Strokes.png`,
-
-    mask:
-        `${prefix}-Mask.png`
-};
+        strokes:
+            `${prefix}-Strokes.png`
+    };
 }
 async function loadBorderAssets(
     entryKey,
@@ -5279,115 +5333,14 @@ function drawRegisteredBorderLayer(
     source,
     drawBox
 ) {
-
-
-    const isTallTierTop =
-        source.includes(
-            "-Tall-Two-Tier-Top-"
-        );
-
-    if (!isTallTierTop) {
-        context.drawImage(
-            layer,
-            drawBox.x,
-            drawBox.y,
-            drawBox.width,
-            drawBox.height
-        );
-        return;
-    }
-
-    const sourceWidth = layer.width;
-    const sourceHeight = layer.height;
-
-    /*
-        Draw only the Tall Two-Tier upper rim
-        from this asset. Its middle border is
-        supplied by the Standard Two-Tier art.
-    */
     context.drawImage(
         layer,
-        0,
-        0,
-        sourceWidth,
-        sourceHeight * 0.24,
         drawBox.x,
         drawBox.y,
         drawBox.width,
-        drawBox.height * 0.24
+        drawBox.height
     );
 }
-
-
-function drawTallTierMiddleLayer(
-    context,
-    layer,
-    drawBox
-) {
-    const sourceWidth = layer.width;
-    const sourceHeight = layer.height;
-
-    context.drawImage(
-        layer,
-        0,
-        sourceHeight * 0.47,
-        sourceWidth,
-        sourceHeight * 0.10,
-        drawBox.x,
-        drawBox.y +
-            drawBox.height * 0.495,
-        drawBox.width,
-        drawBox.height * 0.10
-    );
-}
-
-
-function drawTallTierMiddleBorder(
-    context,
-    assets,
-    x,
-    y,
-    width,
-    height,
-borderColor =
-    getEffectiveCakeBorderColor()
-) {
-    if (!assets) {
-        return;
-    }
-
-    const tintedBorder =
-        makeTintedLayer(
-            assets.strokes,
-            assets.mask,
-            borderColor || "#FF4FA3"
-        );
-
-    const drawBox = {
-        x,
-        y,
-        width,
-        height
-    };
-
-    context.save();
-
-    context.globalCompositeOperation =
-        "source-over";
-
-    context.globalAlpha = 1;
-
-    drawTallTierMiddleLayer(
-        context,
-        tintedBorder,
-        drawBox
-    );
-
-
-    context.restore();
-}
-
-
 
 function drawCakeBorder(
     context,
@@ -5453,6 +5406,37 @@ async function loadSelectedBorderAssets(
         };
     }
 
+
+    /*
+        NUMBER / LETTER:
+        Rosette + Ruffle are one complete
+        visual border asset.
+    */
+
+    if (
+        usesCombinedNumberLetterBorder(
+            entryKey
+        )
+    ) {
+        const combined =
+            await loadBorderAssets(
+                entryKey,
+                "combined",
+                isBento
+            );
+
+        return {
+            top: combined,
+            bottom: null,
+            middle: null
+        };
+    }
+
+
+    /*
+        REGULAR CAKES
+    */
+
     const placement =
         builderState.cakeBorderPlacement;
 
@@ -5464,11 +5448,26 @@ async function loadSelectedBorderAssets(
         placement === "bottom" ||
         placement === "both";
 
+
+    /*
+        Two-tier cakes have an actual
+        middle border asset now.
+    */
+
+    const needsMiddle =
+        (
+            entryKey === "tier" ||
+            entryKey === "tallTier"
+        ) &&
+        needsTop;
+
+
     const [
         top,
         bottom,
         middle
     ] = await Promise.all([
+
         needsTop
             ? loadBorderAssets(
                 entryKey,
@@ -5485,20 +5484,15 @@ async function loadSelectedBorderAssets(
             )
             : Promise.resolve(null),
 
-        /*
-            For Tall Two-Tier only:
-            load the matching Standard Two-Tier
-            top artwork for its complete middle seam.
-        */
-
-        entryKey === "tallTier" &&
-        needsTop
+        needsMiddle
             ? loadBorderAssets(
-                "tier",
-                "top"
+                entryKey,
+                "middle",
+                isBento
             )
             : Promise.resolve(null)
     ]);
+
 
     return {
         top,
@@ -7612,14 +7606,14 @@ if (borderAssets?.top) {
     );
 }
 if (borderAssets?.middle) {
-    drawTallTierMiddleBorder(
+    drawCakeBorder(
         context,
         borderAssets.middle,
         x,
         y + boardYOffset,
         size.width,
         size.height,
-       getEffectiveCakeBorderColor()
+        getEffectiveCakeBorderColor()
     );
 }
 const sprinkleAssets =
@@ -13074,30 +13068,131 @@ function updateBorderControlsVisibility() {
         !builderState.cakeBorderStyle
     );
 
-    const placement =
-        builderState.cakeBorderPlacement;
+const combinedNumberLetterBorder =
+    fullyFrostedNumberLetter &&
+    (
+        builderState.cakeBorderStyle ===
+            "rosette" ||
+        builderState.cakeBorderStyle ===
+            "ruffle"
+    );
 
-    const showTopColor =
-        placement === "top" ||
-        placement === "both";
 
-    const showBottomColor =
-        placement === "bottom" ||
-        placement === "both";
+getElement(
+    "#cakeBorderPlacementControls"
+)?.classList.toggle(
+    "is-hidden",
+    combinedNumberLetterBorder
+);
+
+
+/*
+    NUMBER / LETTER ROSETTE + RUFFLE
+    use one border and one color.
+*/
+
+if (combinedNumberLetterBorder) {
+
+    builderState.cakeBorderPlacement =
+        "both";
+
+    getElements(
+        'input[name="cakeBorderPlacement"]'
+    ).forEach((input) => {
+        input.checked =
+            input.value === "both";
+    });
+
 
     getElement(
         "#cakeBorderTopColorControls"
-    )?.classList.toggle(
-        "is-hidden",
-        !showTopColor
+    )?.classList.remove(
+        "is-hidden"
     );
 
     getElement(
         "#cakeBorderBottomColorControls"
-    )?.classList.toggle(
-        "is-hidden",
-        !showBottomColor
+    )?.classList.add(
+        "is-hidden"
     );
+
+
+    const borderColorLegend =
+        getElement(
+            "#cakeBorderTopColorControls legend"
+        );
+
+    if (borderColorLegend) {
+        borderColorLegend.textContent =
+            "Border Color";
+    }
+
+
+    const customBorderLabel =
+        getElement(
+            "#customCakeBorderColorField > span"
+        );
+
+    if (customBorderLabel) {
+        customBorderLabel.textContent =
+            "Custom Border Shade";
+    }
+
+    return;
+}
+
+
+/*
+    NORMAL TOP / BOTTOM BEHAVIOR
+*/
+
+const borderColorLegend =
+    getElement(
+        "#cakeBorderTopColorControls legend"
+    );
+
+if (borderColorLegend) {
+    borderColorLegend.textContent =
+        "Top Border Color";
+}
+
+
+const customBorderLabel =
+    getElement(
+        "#customCakeBorderColorField > span"
+    );
+
+if (customBorderLabel) {
+    customBorderLabel.textContent =
+        "Custom Top Border Shade";
+}
+
+
+const placement =
+    builderState.cakeBorderPlacement;
+
+const showTopColor =
+    placement === "top" ||
+    placement === "both";
+
+const showBottomColor =
+    placement === "bottom" ||
+    placement === "both";
+
+
+getElement(
+    "#cakeBorderTopColorControls"
+)?.classList.toggle(
+    "is-hidden",
+    !showTopColor
+);
+
+getElement(
+    "#cakeBorderBottomColorControls"
+)?.classList.toggle(
+    "is-hidden",
+    !showBottomColor
+);
 }
 function updateSprinkleControlsVisibility() {
     const section =
