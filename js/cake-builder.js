@@ -10439,8 +10439,278 @@ function validateStepSeven() {
     return true;
 }
 
+function syncVisibleBuilderForm() {
+    const root = getElement(".cake-builder-app");
 
+    if (!root) {
+        return;
+    }
+
+    const aliases = {
+        cakeSize: "cakeProductId",
+        occasionText: "occasion",
+        extraLayerToggle: "isTall",
+        fondantEnabledToggle: "fondantEnabled",
+        ruffleUnderlayToggle: "ruffleUnderlay",
+        edibleImageEnabledToggle: "edibleImageEnabled",
+        cakeTopperEnabledToggle: "cakeTopperEnabled",
+        toyFigurineEnabledToggle: "toyFigurineEnabled",
+        customSculptedEnabledToggle: "sculptedPiecesEnabled",
+        customSculptedDetails: "sculptedPiecesDetails"
+    };
+
+    const customColors = {
+        mainCakeColor: [
+            "mainCakeUsesCustomShade",
+            "customMainColor"
+        ],
+        cakeBorderColor: [
+            "cakeBorderUsesCustomShade",
+            "customCakeBorderColor"
+        ],
+        cakeBorderBottomColor: [
+            "cakeBorderBottomUsesCustomShade",
+            "customCakeBorderBottomColor"
+        ],
+        cupcakeFrostingColor: [
+            "cupcakeFrostingUsesCustomShade",
+            "customCupcakeFrostingColor"
+        ],
+        matchedBoardColor: [
+            "matchedBoardUsesCustomShade",
+            "customMatchedBoardColor"
+        ]
+    };
+
+    const fields = Array.from(
+        root.querySelectorAll("input, select, textarea")
+    );
+
+    const getStateKey = (field) => {
+        const name = field.name || field.id;
+
+        return (
+            aliases[field.id] ||
+            aliases[name] ||
+            name.replace(/Choice$/, "")
+        );
+    };
+
+    // Read ordinary fields first, including customer details,
+    // dates, quantities, checkboxes and custom-color values.
+    fields.forEach((field) => {
+        if (
+            field.type === "file" ||
+            field.type === "radio" ||
+            field.type === "button" ||
+            field.type === "submit" ||
+            field.type === "reset"
+        ) {
+            return;
+        }
+
+        const key = getStateKey(field);
+
+        if (
+            !key ||
+            !Object.prototype.hasOwnProperty.call(
+                builderState,
+                key
+            )
+        ) {
+            return;
+        }
+
+        if (field.type === "checkbox") {
+            if (typeof builderState[key] === "boolean") {
+                builderState[key] = field.checked;
+            }
+
+            return;
+        }
+
+        // Handled below because "custom" is a UI option,
+        // not the actual board color.
+        if (key === "matchedBoardColor") {
+            return;
+        }
+
+        if (typeof builderState[key] === "number") {
+            const number = Number(field.value);
+
+            if (Number.isFinite(number)) {
+                builderState[key] = number;
+            }
+        } else if (typeof builderState[key] === "string") {
+            builderState[key] = field.value;
+        }
+    });
+
+    // Read all checked radio choices without replaying
+    // handlers that reset dependent selections.
+    fields.forEach((field) => {
+        if (field.type !== "radio" || !field.checked) {
+            return;
+        }
+
+        const key = getStateKey(field);
+
+        if (
+            !key ||
+            !Object.prototype.hasOwnProperty.call(
+                builderState,
+                key
+            )
+        ) {
+            return;
+        }
+
+        const custom = customColors[key];
+
+        if (custom) {
+            const [flag, customKey] = custom;
+            const usesCustom = field.value === "custom";
+
+            builderState[flag] = usesCustom;
+
+            builderState[key] = usesCustom
+                ? builderState[customKey]
+                : field.value;
+
+            return;
+        }
+
+        if (typeof builderState[key] === "number") {
+            const number = Number(field.value);
+
+            if (Number.isFinite(number)) {
+                builderState[key] = number;
+            }
+        } else if (typeof builderState[key] === "string") {
+            builderState[key] = field.value;
+        }
+    });
+
+    const matchedBoard = getElement("#matchedBoardColor");
+
+    if (matchedBoard) {
+        const usesCustom = matchedBoard.value === "custom";
+
+        builderState.matchedBoardUsesCustomShade = usesCustom;
+
+        builderState.matchedBoardColor = usesCustom
+            ? builderState.customMatchedBoardColor
+            : matchedBoard.value;
+    }
+
+    // Preserve the existing six-flower pricing unit.
+    getElements("[data-decoration-quantity]").forEach((field) => {
+        const id = field.dataset.decorationQuantity;
+        const raw = field.value.trim();
+
+        if (!raw) {
+            return;
+        }
+
+        let quantity;
+
+        if (id === "flowersDecoration") {
+            const dozens =
+                raw === "1/2" || raw === "½"
+                    ? 0.5
+                    : Number(raw);
+
+            quantity = dozens * 2;
+        } else {
+            quantity = Number(raw);
+        }
+
+        if (
+            Number.isInteger(quantity) &&
+            quantity >= 1
+        ) {
+            builderState.decorationQuantities[id] = quantity;
+        }
+    });
+
+    builderState.premiumFillings = getElements(
+        "[data-premium-filling]"
+    )
+        .filter((field) => field.checked)
+        .map((field) => ({
+            name: field.dataset.premiumFilling,
+            price: Number(field.dataset.price) || 0
+        }));
+
+    builderState.decorations = getElements(
+        "[data-decoration-id]"
+    )
+        .filter((field) =>
+            field.checked &&
+            field.dataset.decorationId !== "topperDecoration"
+        )
+        .map((field) => {
+            const id = field.dataset.decorationId;
+            const price = getDecorationUnitPrice(field, id);
+
+            const quantity =
+                builderState.decorationQuantities[id] || 1;
+
+            return {
+                id,
+                name: field.dataset.decorationName,
+                price,
+                quantity,
+                total: price * quantity
+            };
+        });
+
+    builderState.extras = getElements("[data-extra-name]")
+        .filter((field) => field.checked)
+        .map((field) => ({
+            name: field.dataset.extraName,
+            price: Number(field.dataset.price) || 0
+        }));
+
+    builderState.quantityExtras = getElements(
+        ".quantity-product"
+    )
+        .map((row) => {
+            const field = row.querySelector(
+                'input[type="number"]'
+            );
+
+            const quantity = Math.max(
+                0,
+                Number.parseInt(field?.value || "0", 10) || 0
+            );
+
+            const unitPrice =
+                Number(row.dataset.unitPrice) || 0;
+
+            return {
+                name: row.dataset.productName || "Extra",
+                quantity,
+                unitPrice,
+                total: quantity * unitPrice
+            };
+        })
+        .filter((item) => item.quantity > 0);
+
+    const topper = getElement(
+        'input[name="topperType"]:checked'
+    );
+
+    builderState.topperPrice =
+        Number(topper?.dataset.price) || 0;
+
+    builderState.deliveryFee =
+        builderState.fulfillmentMethod === "Delivery"
+            ? calculateDeliveryFee(builderState.deliveryMiles)
+            : 0;
+}
 function validateCurrentStep() {
+    syncVisibleBuilderForm();
     showValidationMessage("");
 
     switch (builderState.currentStep) {
@@ -11381,6 +11651,7 @@ function flowerDetailsAreComplete() {
 }
 function initializeRemainingPanelBehavior() {
     const panelRules = [
+        ["#cakeSprinkleOptions", "#cakeSprinkleSection"],
         ["#cakeBorderControls", "#cakeBorderCustomizer"],
         ["#finishColorCustomizer", "#cakeFinishCustomizer"],
         ["#pearlDetailOptions", '[data-decoration-id="pearlsDecoration"]'],
@@ -11548,6 +11819,7 @@ function closePanel(
     // Reopen the upload, topper and description panels
     // by tapping their selected toggle's text.
     const togglePanels = {
+        cakeBorderSprinkles: "#cakeSprinkleOptions",
         edibleImageEnabledToggle: "#edibleImageControls",
         cakeTopperEnabledToggle: "#topperTypeOptions",
         toyFigurineEnabledToggle: "#toyFigurineDetailsField",
@@ -12737,6 +13009,7 @@ function populateEdibleReviewUploads() {
     });
 }
 function populateReviewUploads() {
+    populateEdibleReviewUploads();
     const container = getElement(
         "#reviewUploadPreviews"
     );
@@ -12783,6 +13056,7 @@ function populateReviewUploads() {
 ========================================= */
 
 function populateReview() {
+   syncVisibleBuilderForm(); 
     const product = getSelectedCakeProduct();
 
     const shapeName = getCakeShapeName(product);
@@ -13692,7 +13966,13 @@ if (isCupcakesOnlyProduct()) {
 }
     return summary;
 }
+let cakeVisionSubmissionInProgress = false;
 async function submitCakeVision() {
+    if (cakeVisionSubmissionInProgress) {
+        return;
+    }
+
+    syncVisibleBuilderForm(); 
     const message = getElement(
         "#submissionMessage"
     );
@@ -13728,9 +14008,9 @@ async function submitCakeVision() {
         return;
     }
 
-    const originalButtonText =
-        submitButton?.textContent ||
-        "Submit Cake Vision";
+const originalButtonText = "Submit Cake Vision";
+
+cakeVisionSubmissionInProgress = true;
 
     if (submitButton) {
         submitButton.disabled = true;
@@ -13835,6 +14115,14 @@ async function submitCakeVision() {
             message.textContent =
                 "Your inquiry could not be sent. Your selections are still saved on this page, so please try again.";
         }
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent =
+                originalButtonText;
+        }
+    } finally {
+        cakeVisionSubmissionInProgress = false;
 
         if (submitButton) {
             submitButton.disabled = false;
@@ -14241,18 +14529,31 @@ getElement("#fulfillmentDate")?.addEventListener(
 );
 
 
-window.addEventListener(
-    "pageshow",
-    enforceDateMinimums
-);
+window.addEventListener("pageshow", () => {
+    syncVisibleBuilderForm();
+    enforceDateMinimums();
+
+    updateCustomCakeFlavorVisibility();
+    updateCustomFillingVisibility();
+    updateSelectedCardStates();
+
+    renderCakePreview();
+});
 
 
 document.addEventListener(
     "visibilitychange",
     () => {
-        if (!document.hidden) {
-            enforceDateMinimums();
-        }
+if (!document.hidden) {
+    syncVisibleBuilderForm();
+    enforceDateMinimums();
+
+    updateCustomCakeFlavorVisibility();
+    updateCustomFillingVisibility();
+    updateSelectedCardStates();
+
+    renderCakePreview();
+}
     }
 );
 
@@ -16806,6 +17107,50 @@ function initializeCupcakePreviewOffset() {
     window.addEventListener("resize", updateOffset);
     updateOffset();
 }
+function initializeVisibleBuilderSync() {
+    const root = getElement(".cake-builder-app");
+
+    if (!root) {
+        return;
+    }
+
+    let queued = false;
+
+    function synchronizeAfterInteraction(event) {
+        if (
+            !(event.target instanceof Element) ||
+            !root.contains(event.target)
+        ) {
+            return;
+        }
+
+        if (queued) {
+            return;
+        }
+
+        queued = true;
+
+        queueMicrotask(() => {
+            queued = false;
+
+            syncVisibleBuilderForm();
+
+            updateCustomCakeFlavorVisibility();
+            updateCustomFillingVisibility();
+            updateSelectedCardStates();
+
+            renderCakePreview();
+        });
+    }
+
+    ["input", "change", "click"].forEach((eventName) => {
+        window.addEventListener(
+            eventName,
+            synchronizeAfterInteraction,
+            true
+        );
+    });
+}
 function initializeBuilder() {
     getElement("#ruffleUnderlayToggle")
     ?.addEventListener("change", (event) => {
@@ -16819,7 +17164,7 @@ function initializeBuilder() {
     buildBuilderColorControls();
     initializeRemainingPanelBehavior();
     initializeCupcakePreviewOffset();
-
+initializeVisibleBuilderSync();
 showCustomShadeControls(
     "#customMainColorField",
     "#customMainColorNote",

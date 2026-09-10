@@ -5073,7 +5073,7 @@ margin-inline: auto;
 (orientation: portrait) {
 
     #cakePreviewCard .cake-renderer-stage {
-        width: min(74vw, 290px);
+        width: min(71vw, 287px);
         max-width: 100%;
         height: auto;
         min-width: 0;
@@ -5213,7 +5213,7 @@ margin-inline: auto;
     }
 
     #cupcakeAddOnStudioSlot .cupcake-composite {
-        width: min(30vw, 115px);
+        width: min(27vw, 103px);
         margin: 0 auto;
     }
 
