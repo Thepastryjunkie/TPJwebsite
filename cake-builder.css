@@ -5307,3 +5307,18 @@ margin-inline: auto;
 
     outline-offset: 3px;
 }
+.terms-review-requirement {
+    display: block;
+    margin-top: 6px;
+
+    color: var(--buttercream-brown);
+
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.policy-check input:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
