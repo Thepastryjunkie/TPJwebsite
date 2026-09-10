@@ -5073,7 +5073,7 @@ margin-inline: auto;
 (orientation: portrait) {
 
     #cakePreviewCard .cake-renderer-stage {
-        width: min(82vw, 320px);
+        width: min(74vw, 290px);
         max-width: 100%;
         height: auto;
         min-width: 0;
@@ -5186,4 +5186,44 @@ margin-inline: auto;
     padding: 11px 14px;
 }
 
+/* MOBILE CUPCAKE ADD-ON CUSTOMIZATION */
 
+@media (max-width: 720px) and (orientation: portrait) {
+    #cupcakeAddOnStudioSlot .cupcake-studio-layout {
+        display: block;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-live-preview {
+        position: sticky;
+
+        top: calc(
+            var(--builder-header-height, 0px) +
+            var(--builder-progress-height, 0px) +
+            var(--tpj-main-preview-height, 0px) +
+            8px
+        );
+
+        z-index: 20;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        margin: 8px auto;
+        padding: 4px;
+        background: #fff8f2;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-composite {
+        width: min(30vw, 115px);
+        margin: 0 auto;
+    }
+
+    #cupcakeAddOnStudioSlot #cupcakeSetCaption {
+        margin: 4px 0 0;
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-swatch-section {
+        margin-top: 12px;
+    }
+}

@@ -2048,11 +2048,11 @@ const cakePreviewDetailStrength = {
     smoothCake: 0.84,
     simpleHeart: 0.92,
     simpleOther: 0.88,
-    dimensionalFinish: 0.94,
+    dimensionalFinish: 0.84,
     numberLetterBorder: 0.95,
 macaronExtra: 0.58,
 sprinkle: 0.16,
-    border: 0.88,
+    border: 0.76,
     numberLetterBase: 0.64,
     numberLetterPiping: 0.88,
     cupcakeFrosting: 0.96,
@@ -2236,16 +2236,22 @@ function getNormalizedDetailLayer(
             pixels[index + 1] * 0.7152 +
             pixels[index + 2] * 0.0722;
 
-        const normalizedBrightness =
-            Math.round(
-                clampNumber(
-                    128 +
-                        brightness -
-                        averageBrightness,
-                    0,
-                    255
-                )
-            );
+const shellDetailContrast =
+    image.src.includes(
+        "TPJ-Border-Shell-Round-Bottom-Strokes.png"
+    )
+        ? 1.2
+        : 1;
+
+const normalizedBrightness = Math.round(
+    clampNumber(
+        128 +
+            (brightness - averageBrightness) *
+                shellDetailContrast,
+        0,
+        255
+    )
+);
 
         pixels[index] =
             normalizedBrightness;
@@ -11327,17 +11333,18 @@ function updateInlineCustomizationPanels() {
     }
 function collapseCompletedPanel(
     panelSelector,
-    anchorSelector
+    anchorSelector,
+    confirmedByDone = false
 ) {
-    getElement(
-        panelSelector
-    )?.classList.add(
+    if (!confirmedByDone) {
+        return;
+    }
+
+    getElement(panelSelector)?.classList.add(
         "is-complete-collapsed"
     );
 
-    getElement(
-        anchorSelector
-    )?.scrollIntoView({
+    getElement(anchorSelector)?.scrollIntoView({
         behavior: "smooth",
         block: "nearest"
     });
@@ -11419,7 +11426,14 @@ function initializeRemainingPanelBehavior() {
         return true;
     }
 
-    function closePanel(selector, anchor) {
+function closePanel(
+    selector,
+    anchor,
+    confirmedByDone = false
+) {
+    if (!confirmedByDone) {
+        return;
+    }
         const panel = getElement(selector);
 
         if (!panel || !ready(selector)) {
@@ -11439,7 +11453,7 @@ function initializeRemainingPanelBehavior() {
             return;
         }
 
-        collapseCompletedPanel(selector, anchor);
+      collapseCompletedPanel(selector, anchor, true);
     }
 
     // Done lets customers accept existing/default choices.
@@ -11459,7 +11473,7 @@ function initializeRemainingPanelBehavior() {
         button.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
-            closePanel(selector, anchor);
+           closePanel(selector, anchor, true); 
         });
 
         panel.appendChild(button);
@@ -12657,7 +12671,71 @@ function getQuoteOnlyDetailsSummary() {
         : "None";
 }
 
+function populateEdibleReviewUploads() {
+    const inspirationSection = getElement(
+        "#reviewUploadPreviews"
+    )?.closest(".review-section");
 
+    if (!inspirationSection) {
+        return;
+    }
+
+    let section = getElement("#reviewEdibleUploadsSection");
+
+    if (!section) {
+        section = document.createElement("article");
+        section.id = "reviewEdibleUploadsSection";
+        section.className = "review-section";
+
+        const heading = document.createElement("div");
+        heading.className = "review-section-heading";
+
+        const title = document.createElement("h3");
+        title.textContent = "Edible Images";
+
+        const previews = document.createElement("div");
+        previews.id = "reviewEdibleUploadPreviews";
+        previews.className = "review-upload-previews";
+
+        heading.appendChild(title);
+        section.append(heading, previews);
+
+        inspirationSection.before(section);
+    }
+
+    const previews = section.querySelector(
+        "#reviewEdibleUploadPreviews"
+    );
+
+    previews.replaceChildren();
+
+    section.hidden = !builderState.edibleImageEnabled;
+
+    if (section.hidden) {
+        return;
+    }
+
+    const uploads = builderState.edibleImages
+        .slice(0, Number(builderState.edibleImageQuantity) || 1)
+        .filter((upload) => upload?.url);
+
+    if (!uploads.length) {
+        const message = document.createElement("p");
+        message.textContent = "No edible images uploaded.";
+        previews.appendChild(message);
+        return;
+    }
+
+    uploads.forEach((upload, index) => {
+        const image = document.createElement("img");
+
+        image.src = upload.url;
+        image.alt = `Edible image ${index + 1}`;
+        image.loading = "lazy";
+
+        previews.appendChild(image);
+    });
+}
 function populateReviewUploads() {
     const container = getElement(
         "#reviewUploadPreviews"
@@ -12911,10 +12989,12 @@ function populateReview() {
   const reviewDecorationNames =
     builderState.decorations.map(
         (decoration) => {
-            const quantityLabel =
-                decoration.quantity > 1
-                    ? `${decoration.quantity} × `
-                    : "";
+const quantityLabel =
+    decoration.id === "flowersDecoration"
+        ? `${decoration.quantity / 2} dozen (${decoration.quantity * 6} flowers) · `
+        : decoration.quantity > 1
+            ? `${decoration.quantity} × `
+            : "";
 
             const price =
                 decoration.total ??
@@ -13532,9 +13612,13 @@ function buildReadableInquirySummary() {
     };
 
     builderState.decorations.forEach((item) => {
-        const details = [
-            `Quantity ${item.quantity || 1}`
-        ];
+const quantity = item.quantity || 1;
+
+const details = [
+    item.id === "flowersDecoration"
+        ? `${quantity / 2} dozen (${quantity * 6} flowers)`
+        : `Quantity ${quantity}`
+];
 
         (detailFields[item.id] || []).forEach((key) => {
             if (
@@ -13599,7 +13683,13 @@ function buildReadableInquirySummary() {
             add(label, value);
         }
     });
-
+if (isCupcakesOnlyProduct()) {
+    Object.keys(summary).forEach((label) => {
+        if (/border|ruffle underlay/i.test(label)) {
+            delete summary[label];
+        }
+    });
+}
     return summary;
 }
 async function submitCakeVision() {
@@ -15558,73 +15648,106 @@ renderCakePreview();
         }
     );
 });
-getElements(
-    "[data-decoration-quantity]"
-).forEach((input) => {
+getElements("[data-decoration-quantity]").forEach((input) => {
+    const id = input.dataset.decorationQuantity;
+    const isFlowers = id === "flowersDecoration";
+
     function commitQuantity(finalize = false) {
-        if (
-            !finalize &&
-            (
-                input.value === "" ||
-                input.validity.badInput
-            )
-        ) {
-            return;
-        }
+        let quantity;
 
-        const minimum = Number(input.min) || 1;
-        const maximum = input.max
-            ? Number(input.max)
-            : Infinity;
+        if (isFlowers) {
+            const raw = input.value.trim();
 
-        const entered = Number.parseInt(
-            input.value,
-            10
-        );
+            const dozens =
+                raw === "1/2" || raw === "½"
+                    ? 0.5
+                    : Number(raw);
 
-        const quantity = Math.min(
-            maximum,
-            Math.max(
-                minimum,
-                Number.isFinite(entered)
-                    ? entered
-                    : minimum
-            )
-        );
+            const bundles = dozens * 2;
 
-        if (finalize) {
-            input.value = String(quantity);
-        }
+            const valid =
+                raw !== "" &&
+                Number.isFinite(bundles) &&
+                Number.isInteger(bundles) &&
+                bundles >= 1;
 
-        const id =
-            input.dataset.decorationQuantity;
-
-        builderState.decorationQuantities[id] =
-            quantity;
-
-        const decoration =
-            builderState.decorations.find(
-                (item) => item.id === id
+            input.setCustomValidity(
+                valid
+                    ? ""
+                    : "Enter 1/2 dozen or more, in half-dozen steps."
             );
+
+            if (!valid) {
+                return;
+            }
+
+            // One stored unit remains six flowers.
+            quantity = bundles;
+
+            if (finalize) {
+                input.value =
+                    quantity === 1
+                        ? "1/2"
+                        : String(quantity / 2);
+            }
+        } else {
+            if (
+                !finalize &&
+                (
+                    input.value === "" ||
+                    input.validity.badInput
+                )
+            ) {
+                return;
+            }
+
+            const minimum = Number(input.min) || 1;
+
+            const maximum = input.max
+                ? Number(input.max)
+                : Infinity;
+
+            const entered = Number.parseInt(
+                input.value,
+                10
+            );
+
+            quantity = Math.min(
+                maximum,
+                Math.max(
+                    minimum,
+                    Number.isFinite(entered)
+                        ? entered
+                        : minimum
+                )
+            );
+
+            if (finalize) {
+                input.value = String(quantity);
+            }
+        }
+
+        builderState.decorationQuantities[id] = quantity;
+
+        const decoration = builderState.decorations.find(
+            (item) => item.id === id
+        );
 
         if (decoration) {
             decoration.quantity = quantity;
-            decoration.total =
-                decoration.price * quantity;
+            decoration.total = decoration.price * quantity;
         }
 
         renderCakePreview();
     }
 
-    input.addEventListener(
-        "input",
-        () => commitQuantity()
-    );
+    input.addEventListener("input", () => {
+        commitQuantity();
+    });
 
-    input.addEventListener(
-        "blur",
-        () => commitQuantity(true)
-    );
+    input.addEventListener("blur", () => {
+        commitQuantity(true);
+    });
 });
 getElements(
     'input[name="flowerSource"]'
@@ -16650,7 +16773,39 @@ getElement(
 /* =========================================
    INITIALIZE
 ========================================= */
+function initializeCupcakePreviewOffset() {
+    const mainPreview = getElement(
+        ".cake-preview-column"
+    );
 
+    if (!mainPreview) {
+        return;
+    }
+
+    const updateOffset = () => {
+        const position = getComputedStyle(
+            mainPreview
+        ).position;
+
+        const height =
+            position === "sticky" || position === "fixed"
+                ? Math.ceil(
+                    mainPreview.getBoundingClientRect().height
+                )
+                : 0;
+
+        document.documentElement.style.setProperty(
+            "--tpj-main-preview-height",
+            `${height}px`
+        );
+    };
+
+    const observer = new ResizeObserver(updateOffset);
+    observer.observe(mainPreview);
+
+    window.addEventListener("resize", updateOffset);
+    updateOffset();
+}
 function initializeBuilder() {
     getElement("#ruffleUnderlayToggle")
     ?.addEventListener("change", (event) => {
@@ -16662,8 +16817,8 @@ function initializeBuilder() {
     enforceDateMinimums();
     reorderStepFourControls();
     buildBuilderColorControls();
-    initializeCompletedPanelBehavior();
     initializeRemainingPanelBehavior();
+    initializeCupcakePreviewOffset();
 
 showCustomShadeControls(
     "#customMainColorField",
