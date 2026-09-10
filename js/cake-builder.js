@@ -2044,12 +2044,12 @@ const naturalFoodTintLayerCache =
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.88,
-    simpleHeart: 0.98,
-    simpleOther: 0.98,
-    dimensionalFinish: 0.98,
-    numberLetterBorder: 0.99,
-macaronExtra: 0.65,
+    smoothCake: 0.84,
+    simpleHeart: 0.92,
+    simpleOther: 0.88,
+    dimensionalFinish: 0.94,
+    numberLetterBorder: 0.95,
+macaronExtra: 0.58,
 sprinkle: 0.16,
     border: 0.88,
     numberLetterBase: 0.64,
