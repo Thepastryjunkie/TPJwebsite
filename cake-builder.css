@@ -5064,61 +5064,38 @@ margin-inline: auto;
 .cupcake-swatch-section {
     margin-top: 0;
 }
-/* MOBILE CUPCAKE ADD-ON PREVIEW */
 
-@media (max-width: 720px) {
-    #cupcakeAddOnStudioSlot
-    > #cupcakeStudio
-    .cupcake-live-preview {
-        position: -webkit-sticky;
-        position: sticky;
-
-        top: calc(
-            var(--builder-header-height) +
-            var(--builder-progress-height) +
-            232px
-        );
-
-        z-index: 1001;
-
-        width: 132px;
-        margin: 0 auto 10px;
-        padding: 4px;
-
-        border: 2px solid var(--chocolate);
-        border-radius: 14px;
-
-        background: var(--cream);
-
-        box-shadow:
-            0 8px 18px
-            rgba(90, 42, 30, 0.18);
-    }
-
-    #cupcakeAddOnStudioSlot
-    > #cupcakeStudio
-    .cupcake-composite {
-        width: 105px;
-        margin: 0 auto;
-    }
-
-    #cupcakeAddOnStudioSlot
-    > #cupcakeStudio
-    #cupcakeSetCaption {
-        display: none;
-    }
-}
 /* LARGER MOBILE CAKE PREVIEW */
 
 @media
 (max-width: 720px) and
 (orientation: portrait) {
 
-    #cakePreviewCard
-    .cake-renderer-stage {
+    #cakePreviewCard .cake-renderer-stage {
         width: min(88vw, 340px);
+        max-width: 100%;
         height: auto;
+        min-width: 0;
+        min-height: 0;
         aspect-ratio: 1 / 1;
+
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+    }
+
+    #cakePreviewCard #realisticCakeRenderer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    #cakePreviewCard #realisticCakeCanvas {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 }
 /*
@@ -5209,116 +5186,3 @@ margin-inline: auto;
 }
 
 
-/* =========================================
-   MOBILE CAKE PREVIEW
-========================================= */
-
-@media
-(max-width: 720px) and
-(orientation: portrait) {
-
-    html,
-    body,
-    .cake-builder-app {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-
-    .builder-main-inner {
-        width: 100%;
-        max-width: 100%;
-        padding-inline: 8px;
-    }
-
-    .cake-preview-column {
-        position: sticky;
-        top: calc(
-            var(--builder-header-height) +
-            var(--builder-progress-height)
-        );
-        z-index: 1000;
-
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        padding: 4px 0 7px;
-
-        overflow: visible;
-    }
-
-    .cake-preview-sticky {
-        position: static;
-        width: 100%;
-        max-width: 100%;
-        max-height: none;
-        overflow: visible;
-    }
-
-    #cakePreviewCard.preview-visual-card {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        max-height: none;
-        min-height: 0;
-        padding: 6px 8px 8px;
-        overflow: visible;
-    }
-
-    #cakePreviewCard .cake-renderer-stage {
-        width: min(62vw, 230px);
-        max-width: 100%;
-        height: auto;
-        min-height: 0;
-        aspect-ratio: 1 / 1;
-        margin: 5px auto 0;
-        flex: none;
-        overflow: visible;
-    }
-
-    #realisticCakeRenderer,
-    #realisticCakeCanvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        object-fit: contain;
-        transform: none !important;
-    }
-}
-.policy-link {
-    color: var(--signature-pink);
-
-    font-weight: 800;
-    text-decoration: underline;
-    text-decoration-thickness: 1.5px;
-    text-underline-offset: 3px;
-}
-
-.policy-link:hover {
-    color: var(--buttercream-brown);
-}
-
-.policy-link:focus-visible {
-    border-radius: 4px;
-
-    outline: 3px solid
-        rgba(247, 182, 210, 0.45);
-
-    outline-offset: 3px;
-}
-.terms-review-requirement {
-    display: block;
-    margin-top: 6px;
-
-    color: var(--buttercream-brown);
-
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1.45;
-}
-
-.policy-check input:disabled {
-    cursor: not-allowed;
-    opacity: 0.45;
-}
