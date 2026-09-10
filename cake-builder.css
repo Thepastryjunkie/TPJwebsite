@@ -4777,6 +4777,7 @@ margin-inline: auto;
     .cake-preview-column,
     .cake-preview-column:has(#builderBasicsHero:not(.is-hidden)){
         position:sticky;
+        align-self: start;    
         top:calc(var(--builder-header-height) + var(--builder-progress-height) + 4px);
         z-index:1000;
         padding:0;
@@ -5072,7 +5073,7 @@ margin-inline: auto;
 (orientation: portrait) {
 
     #cakePreviewCard .cake-renderer-stage {
-        width: min(88vw, 340px);
+        width: min(82vw, 320px);
         max-width: 100%;
         height: auto;
         min-width: 0;

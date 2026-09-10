@@ -2044,14 +2044,14 @@ const naturalFoodTintLayerCache =
 let realisticRenderVersion = 0;
 
 const cakePreviewDetailStrength = {
-    smoothCake: 0.84,
-    simpleHeart: 0.92,
-    simpleOther: 0.88,
-    dimensionalFinish: 0.84,
-    numberLetterBorder: 0.95,
-macaronExtra: 0.58,
+    smoothCake: 0.88,
+    simpleHeart: 0.98,
+    simpleOther: 0.98,
+    dimensionalFinish: 0.98,
+    numberLetterBorder: 0.99,
+macaronExtra: 0.65,
 sprinkle: 0.16,
-    border: 0.76,
+    border: 0.88,
     numberLetterBase: 0.64,
     numberLetterPiping: 0.88,
     cupcakeFrosting: 0.96,
@@ -11194,6 +11194,22 @@ function updateInlineCustomizationPanels() {
         }
     }
 }
+    const flowerPanel =
+        getElement("#flowerDetailOptions");
+
+    const flowerSourcePanel =
+        getElement("#flowerSourceOptions");
+
+    if (
+        flowerPanel &&
+        flowerSourcePanel &&
+        flowerSourcePanel.parentElement !==
+            flowerPanel
+    ) {
+        flowerPanel.appendChild(
+            flowerSourcePanel
+        );
+    }
 function collapseCompletedPanel(
     panelSelector,
     anchorSelector
@@ -11624,6 +11640,87 @@ function initializeCompletedPanelBehavior() {
         }
     );
 }
+    document.addEventListener(
+        "click",
+        (event) => {
+            if (!(event.target instanceof Element)) {
+                return;
+            }
+
+            // Keep direct checkbox clicks available
+            // for intentionally removing a selection.
+            if (
+                event.target.matches(
+                    'input[type="checkbox"]'
+                )
+            ) {
+                return;
+            }
+
+            const card = event.target.closest(
+                ".text-choice-card, " +
+                ".style-choice-card, " +
+                ".decoration-choice-card"
+            );
+
+            if (!card) {
+                return;
+            }
+
+            const input = card.querySelector(
+                'input[name="cakeBorderStyle"], ' +
+                'input[name="cakeFinish"], ' +
+                'input[name="numberLetterStyle"], ' +
+                'input[data-decoration-id]'
+            );
+
+            if (!input?.checked) {
+                return;
+            }
+
+            let panelSelector = "";
+
+            if (input.name === "cakeBorderStyle") {
+                panelSelector = "#cakeBorderControls";
+            } else if (
+                input.name === "cakeFinish" ||
+                input.name === "numberLetterStyle"
+            ) {
+                panelSelector = "#finishColorCustomizer";
+            } else {
+                panelSelector =
+                    inlineDetailPanelMap[
+                        input.dataset.decorationId
+                    ] || "";
+            }
+
+            const panel = panelSelector
+                ? getElement(panelSelector)
+                : null;
+
+            if (
+                !panel?.classList.contains(
+                    "is-complete-collapsed"
+                )
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            reopenCompletedPanel(panelSelector);
+
+            panel.querySelectorAll(
+                ".is-complete-collapsed"
+            ).forEach((child) => {
+                child.classList.remove(
+                    "is-complete-collapsed"
+                );
+            });
+        },
+        true
+    );
 function updateFlowerSourceVisibility() {
     const flowersSelected =
         builderState.decorations.some(
@@ -14916,45 +15013,69 @@ renderCakePreview();
 getElements(
     "[data-decoration-quantity]"
 ).forEach((input) => {
-    input.addEventListener(
-        "input",
-        () => {
-            const id =
-                input.dataset
-                    .decorationQuantity;
+    function commitQuantity(finalize = false) {
+        if (
+            !finalize &&
+            (
+                input.value === "" ||
+                input.validity.badInput
+            )
+        ) {
+            return;
+        }
 
-            const quantity = Math.max(
-                1,
-                Number.parseInt(
-                    input.value || "1",
-                    10
-                ) || 1
+        const minimum = Number(input.min) || 1;
+        const maximum = input.max
+            ? Number(input.max)
+            : Infinity;
+
+        const entered = Number.parseInt(
+            input.value,
+            10
+        );
+
+        const quantity = Math.min(
+            maximum,
+            Math.max(
+                minimum,
+                Number.isFinite(entered)
+                    ? entered
+                    : minimum
+            )
+        );
+
+        if (finalize) {
+            input.value = String(quantity);
+        }
+
+        const id =
+            input.dataset.decorationQuantity;
+
+        builderState.decorationQuantities[id] =
+            quantity;
+
+        const decoration =
+            builderState.decorations.find(
+                (item) => item.id === id
             );
 
-            input.value =
-                String(quantity);
-
-            builderState
-                .decorationQuantities[id] =
-                quantity;
-
-            const decoration =
-                builderState.decorations.find(
-                    (item) =>
-                        item.id === id
-                );
-
-            if (decoration) {
-                decoration.quantity =
-                    quantity;
-
-                decoration.total =
-                    decoration.price *
-                    quantity;
-            }
-
-            renderCakePreview();
+        if (decoration) {
+            decoration.quantity = quantity;
+            decoration.total =
+                decoration.price * quantity;
         }
+
+        renderCakePreview();
+    }
+
+    input.addEventListener(
+        "input",
+        () => commitQuantity()
+    );
+
+    input.addEventListener(
+        "blur",
+        () => commitQuantity(true)
     );
 });
 getElements(
