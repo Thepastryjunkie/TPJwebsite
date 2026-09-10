@@ -364,6 +364,7 @@ mainCakeUsesCustomShade: false,
 accentColor: "#F7B6D2",
 
 cakeBorderStyle: "",
+ruffleUnderlay: false,
 cakeBorderPlacement: "both",
 cakeBorderColor: "#F5B8D2",
 cakeBorderUsesCustomShade: false,
@@ -5401,6 +5402,17 @@ borderColor =
     if (!assets) {
         return;
     }
+    if (assets.underlay) {
+    drawCakeBorder(
+        context,
+        assets.underlay,
+        x,
+        y,
+        width,
+        height,
+        borderColor
+    );
+}
 
     const tintedBorder =
         makeTintedLayer(
@@ -5438,7 +5450,110 @@ borderColor =
 
     context.restore();
 }
+async function loadRuffleUnderlay(
+    entryKey,
+    placement,
+    isBento
+) {
+    const shape = getBorderShapeName(entryKey, isBento);
+
+    if (!shape) {
+        return null;
+    }
+
+    const combined =
+        shape.startsWith("Number-") ||
+        shape.startsWith("Letter-");
+
+    const part = combined
+        ? "Border"
+        : placement === "top"
+            ? "Top"
+            : placement === "middle"
+                ? "Middle"
+                : "Bottom";
+
+    const prefix =
+        `${finalAssetRoot}/borders/` +
+        `TPJ-Border-Ruffle-${shape}-${part}`;
+
+    const [strokes, mask] = await Promise.all([
+        loadOptionalRealisticImage(
+            `${prefix}-Strokes.png${cakeAssetVersion}`
+        ),
+        loadOptionalRealisticImage(
+            `${prefix}-Mask.png${cakeAssetVersion}`
+        )
+    ]);
+
+    return strokes && mask
+        ? { strokes, mask }
+        : null;
+}
+
 async function loadSelectedBorderAssets(
+    entryKey,
+    isBento = false
+) {
+    if (builderState.cakeFinish === "Vintage Piping") {
+        return {
+            top: null,
+            bottom: null,
+            middle: null
+        };
+    }
+
+    const useRuffle =
+        builderState.ruffleUnderlay &&
+        ["shell", "rope", "rosette"].includes(
+            builderState.cakeBorderStyle
+        );
+
+    const primary = await loadPrimaryBorderAssets(
+        entryKey,
+        isBento
+    );
+
+    if (!useRuffle) {
+        return primary;
+    }
+
+    const shape = getBorderShapeName(entryKey, isBento);
+    const combined =
+        shape?.startsWith("Number-") ||
+        shape?.startsWith("Letter-");
+
+    if (combined) {
+        // Complete number/letter ruffle is drawn once,
+        // underneath the first visible border layer.
+        const first = primary.bottom ? "bottom" : "top";
+
+        if (primary[first]) {
+            primary[first].underlay =
+                await loadRuffleUnderlay(
+                    entryKey,
+                    first,
+                    isBento
+                );
+        }
+    } else {
+        await Promise.all(
+            ["bottom", "top", "middle"].map(async (part) => {
+                if (primary[part]) {
+                    primary[part].underlay =
+                        await loadRuffleUnderlay(
+                            entryKey,
+                            part,
+                            isBento
+                        );
+                }
+            })
+        );
+    }
+
+    return primary;
+}
+async function loadPrimaryBorderAssets(
     entryKey,
     isBento = false
 ) {
@@ -11257,7 +11372,202 @@ function flowerDetailsAreComplete() {
         builderState.flowerSource
     );
 }
+function initializeRemainingPanelBehavior() {
+    const panelRules = [
+        ["#cakeBorderControls", "#cakeBorderCustomizer"],
+        ["#finishColorCustomizer", "#cakeFinishCustomizer"],
+        ["#pearlDetailOptions", '[data-decoration-id="pearlsDecoration"]'],
+        ["#bowDetailOptions", '[data-decoration-id="ribbonDecoration"]'],
+        ["#butterflyDetailOptions", '[data-decoration-id="butterfliesDecoration"]'],
+        ["#metallicLeafDetailOptions", '[data-decoration-id="goldAccentDecoration"]'],
+        ["#cherryDetailOptions", '[data-decoration-id="cherriesDecoration"]'],
+        ["#macaronsDetailOptions", '[data-decoration-id="macaronsDecoration"]'],
+        ["#discoBallsDetailOptions", '[data-decoration-id="discoBallsDecoration"]'],
+        ["#flowerDetailOptions", '[data-decoration-id="flowersDecoration"]'],
+        ["#dripDetailOptions", '[data-decoration-id="chocolateDripDecoration"]'],
+        ["#edibleImageControls", "#edibleImageCustomizer"],
+        ["#topperTypeOptions", "#cakeTopperCustomizer"],
+        ["#toyFigurineDetailsField", "#toyFigurineCustomizer"],
+        ["#customSculptedDetailsField", "#customSculptedCustomizer"]
+    ];
 
+    function ready(selector) {
+        if (selector === "#flowerDetailOptions") {
+            return flowerDetailsAreComplete();
+        }
+
+        if (selector === "#edibleImageControls") {
+            return edibleImagesAreComplete();
+        }
+
+        if (selector === "#topperTypeOptions") {
+            return Boolean(builderState.topperType);
+        }
+
+        if (selector === "#toyFigurineDetailsField") {
+            return Boolean(
+                getElement("#toyFigurineDetails")?.value.trim()
+            );
+        }
+
+        if (selector === "#customSculptedDetailsField") {
+            return Boolean(
+                getElement("#customSculptedDetails")?.value.trim()
+            );
+        }
+
+        return true;
+    }
+
+    function closePanel(selector, anchor) {
+        const panel = getElement(selector);
+
+        if (!panel || !ready(selector)) {
+            return;
+        }
+
+        const invalid = Array.from(
+            panel.querySelectorAll("input, select, textarea")
+        ).find((field) =>
+            field.getClientRects().length &&
+            !field.disabled &&
+            !field.checkValidity()
+        );
+
+        if (invalid) {
+            invalid.reportValidity();
+            return;
+        }
+
+        collapseCompletedPanel(selector, anchor);
+    }
+
+    // Done lets customers accept existing/default choices.
+    panelRules.forEach(([selector, anchor]) => {
+        const panel = getElement(selector);
+
+        if (!panel || panel.querySelector("[data-panel-done]")) {
+            return;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "reset-cake-button";
+        button.dataset.panelDone = "true";
+        button.textContent = "Done";
+
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            closePanel(selector, anchor);
+        });
+
+        panel.appendChild(button);
+    });
+
+    // These controls were missing automatic completion.
+    document.addEventListener("change", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        if (target.matches(
+            '#cherryColorSwatches input[type="radio"]'
+        )) {
+            closePanel(
+                "#cherryDetailOptions",
+                '[data-decoration-id="cherriesDecoration"]'
+            );
+        }
+
+        if (
+            target.matches(
+                '#flowerDetailOptions input[type="radio"]'
+            ) &&
+            flowerDetailsAreComplete()
+        ) {
+            closePanel(
+                "#flowerDetailOptions",
+                '[data-decoration-id="flowersDecoration"]'
+            );
+        }
+    });
+
+    document.addEventListener("focusout", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        const textPanels = {
+            toyFigurineDetails: [
+                "#toyFigurineDetailsField",
+                "#toyFigurineCustomizer"
+            ],
+            customSculptedDetails: [
+                "#customSculptedDetailsField",
+                "#customSculptedCustomizer"
+            ]
+        };
+
+        if (textPanels[target.id]) {
+            closePanel(...textPanels[target.id]);
+            return;
+        }
+
+        if (target.matches("[data-decoration-quantity]")) {
+            const id = target.dataset.decorationQuantity;
+            const selector = inlineDetailPanelMap[id];
+
+            if (selector) {
+                closePanel(
+                    selector,
+                    `[data-decoration-id="${id}"]`
+                );
+            }
+        }
+    });
+
+    // Reopen the upload, topper and description panels
+    // by tapping their selected toggle's text.
+    const togglePanels = {
+        edibleImageEnabledToggle: "#edibleImageControls",
+        cakeTopperEnabledToggle: "#topperTypeOptions",
+        toyFigurineEnabledToggle: "#toyFigurineDetailsField",
+        customSculptedEnabledToggle: "#customSculptedDetailsField"
+    };
+
+    document.addEventListener("click", (event) => {
+        const target = event.target;
+
+        if (
+            !(target instanceof Element) ||
+            target.matches("input, button, a, textarea, select")
+        ) {
+            return;
+        }
+
+        const label = target.closest("label");
+        const toggle = label?.querySelector(
+            'input[type="checkbox"]'
+        );
+
+        const selector = togglePanels[toggle?.id];
+        const panel = selector ? getElement(selector) : null;
+
+        if (
+            toggle?.checked &&
+            panel?.classList.contains("is-complete-collapsed")
+        ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            reopenCompletedPanel(selector);
+        }
+    }, true);
+}
 
 function initializeCompletedPanelBehavior() {
     const borderControls =
@@ -11270,6 +11580,9 @@ function initializeCompletedPanelBehavior() {
         (event) => {
             const target =
                 event.target;
+                if (target.value === "custom") {
+    return;
+}
 
             if (
                 !(
@@ -13101,7 +13414,194 @@ function getSelectedUploadByteTotal() {
     );
 }
 
+function buildReadableInquirySummary() {
+    populateReview();
 
+    const summary = {};
+
+    function add(label, value) {
+        const text = String(value ?? "").trim();
+
+        if (
+            !text ||
+            /^(none|none selected|no extras selected\.?|not selected|not entered|not applicable|no)$/i.test(text)
+        ) {
+            return;
+        }
+
+        summary[label] = text;
+    }
+
+    add("Customer", builderState.customerName);
+    add("Email", builderState.customerEmail);
+    add("Phone", builderState.customerPhone);
+    add("Preferred contact", builderState.preferredContactMethod);
+
+    document.querySelectorAll(
+        ".review-section"
+    ).forEach((section) => {
+        const heading =
+            section.querySelector("h2, h3")
+                ?.textContent.trim() || "Order";
+
+        section.querySelectorAll(
+            ".review-list > div"
+        ).forEach((row) => {
+            if (row.closest(".is-hidden, [hidden]")) {
+                return;
+            }
+
+            const label = row.querySelector("dt")
+                ?.textContent.trim();
+
+            const value = row.querySelector("dd")
+                ?.textContent.trim();
+
+            if (label) {
+                add(`${heading} — ${label}`, value);
+            }
+        });
+    });
+
+    add("Celebration extras", getExtrasSummary());
+
+    if (builderState.cakeBorderStyle) {
+        add(
+            "Coating border",
+            borderStyleNameMap[builderState.cakeBorderStyle]
+        );
+
+        add("Border placement", builderState.cakeBorderPlacement);
+
+        if (builderState.cakeBorderPlacement !== "bottom") {
+            add(
+                "Top border color",
+                getDisplayColorName(getEffectiveCakeBorderColor())
+            );
+        }
+
+        if (builderState.cakeBorderPlacement !== "top") {
+            add(
+                "Bottom border color",
+                getDisplayColorName(
+                    getEffectiveCakeBorderBottomColor()
+                )
+            );
+        }
+
+        if (builderState.ruffleUnderlay) {
+            add("Underneath border", "Ruffle");
+        }
+    }
+
+    if (
+        ["Vintage Piping", "Watercolor Finish",
+         "Palette Knife Finish"].includes(builderState.cakeFinish)
+    ) {
+        add(
+            "Finish color 1",
+            getDisplayColorName(builderState.finishAccentOne)
+        );
+        add(
+            "Finish color 2",
+            getDisplayColorName(builderState.finishAccentTwo)
+        );
+    }
+
+    if (builderState.cakeBorderSprinkles) {
+        add(
+            "Sprinkles",
+            `${builderState.cakeBorderSprinklePlacement} · ` +
+            getDisplayColorName(builderState.cakeBorderSprinkleColor)
+        );
+    }
+
+    const detailFields = {
+        pearlsDecoration: ["pearlColor"],
+        ribbonDecoration: ["bowColor"],
+        butterfliesDecoration: ["butterflyColor"],
+        goldAccentDecoration: ["metallicLeafType"],
+        silverLeafDecoration: ["metallicLeafType"],
+        flowersDecoration: [
+            "flowerMaterial", "flowerType",
+            "customFlowerType", "flowerSource", "flowerColor"
+        ],
+        cherriesDecoration: ["cherryColor", "cherryGlitter"],
+        macaronsDecoration: ["macaronColor"],
+        chocolateDripDecoration: ["dripChocolateType", "dripColor"]
+    };
+
+    builderState.decorations.forEach((item) => {
+        const details = [
+            `Quantity ${item.quantity || 1}`
+        ];
+
+        (detailFields[item.id] || []).forEach((key) => {
+            if (
+                key === "customFlowerType" &&
+                builderState.flowerType !== "Other"
+            ) {
+                return;
+            }
+
+            const value = builderState[key];
+
+            if (!value) {
+                return;
+            }
+
+            const label = key
+                .replace(/([A-Z])/g, " $1")
+                .toLowerCase();
+
+            details.push(
+                `${label}: ${
+                    /color$/i.test(key)
+                        ? getDisplayColorName(value)
+                        : value
+                }`
+            );
+        });
+
+        add(item.name, details.join(" · "));
+    });
+
+    if (builderState.cakeTopperEnabled) {
+        add("Topper wording", builderState.topperWording);
+    }
+
+    if (builderState.fulfillmentMethod === "Delivery") {
+        add(
+            "Delivery address",
+            [
+                builderState.deliveryStreet,
+                builderState.deliveryCity,
+                builderState.deliveryState,
+                builderState.deliveryZip
+            ].filter(Boolean).join(", ")
+        );
+    }
+
+    add("Design notes", builderState.cakeVision);
+    add("Must-have details", builderState.mustHaveDetails);
+    add("Do not include", builderState.doNotInclude);
+
+    [
+        ["Cake subtotal", "#reviewCakeSubtotal"],
+        ["Extras subtotal", "#reviewExtrasSubtotal"],
+        ["Rush fee", "#reviewRushFee"],
+        ["Delivery fee", "#reviewDeliveryFee"],
+        ["Estimated starting total", "#reviewEstimatedTotal"]
+    ].forEach(([label, selector]) => {
+        const value = getElement(selector)?.textContent.trim();
+
+        if (value && value !== "$0" && value !== "$0.00") {
+            add(label, value);
+        }
+    });
+
+    return summary;
+}
 async function submitCakeVision() {
     const message = getElement(
         "#submissionMessage"
@@ -13161,6 +13661,7 @@ async function submitCakeVision() {
             await collectSubmissionFiles();
 
         const payload = {
+            inquirySummary: buildReadableInquirySummary(),
             formToken:
                 cakeVisionFormToken,
 
@@ -14087,6 +14588,53 @@ function ensureNumberLetterBorderSelection() {
 function updateBorderControlsVisibility() {
     const product =
         getSelectedCakeProduct();
+    const vintageSelected =
+    builderState.cakeFinish === "Vintage Piping";
+
+const borderFieldset =
+    getElement("#cakeBorderCustomizer");
+
+if (borderFieldset) {
+    borderFieldset.disabled = vintageSelected;
+}
+
+if (vintageSelected) {
+    builderState.cakeBorderStyle = "";
+    builderState.ruffleUnderlay = false;
+
+    getElements(
+        'input[name="cakeBorderStyle"]'
+    ).forEach((input) => {
+        input.checked = input.value === "";
+    });
+
+    const underlayToggle =
+        getElement("#ruffleUnderlayToggle");
+
+    if (underlayToggle) {
+        underlayToggle.checked = false;
+    }
+}   
+const underlayAllowed =
+    !vintageSelected &&
+    ["shell", "rope", "rosette"].includes(
+        builderState.cakeBorderStyle
+    );
+
+getElement("#ruffleUnderlayOption")
+    ?.classList.toggle("is-hidden", !underlayAllowed);
+
+if (!underlayAllowed) {
+    builderState.ruffleUnderlay = false;
+}
+
+const ruffleToggle =
+    getElement("#ruffleUnderlayToggle");
+
+if (ruffleToggle) {
+    ruffleToggle.checked =
+        Boolean(builderState.ruffleUnderlay);
+}
 
     const isNumberLetter =
         product.shape === "numberLetter";
@@ -16104,10 +16652,18 @@ getElement(
 ========================================= */
 
 function initializeBuilder() {
+    getElement("#ruffleUnderlayToggle")
+    ?.addEventListener("change", (event) => {
+        builderState.ruffleUnderlay =
+            event.target.checked;
+
+        renderCakePreview();
+    });
     enforceDateMinimums();
     reorderStepFourControls();
     buildBuilderColorControls();
     initializeCompletedPanelBehavior();
+    initializeRemainingPanelBehavior();
 
 showCustomShadeControls(
     "#customMainColorField",
