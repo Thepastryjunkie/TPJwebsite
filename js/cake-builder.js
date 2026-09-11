@@ -5365,11 +5365,11 @@ const [
     mask
 ] = await Promise.all([
     loadOptionalRealisticImage(
-        `${borderRoot}/${files.strokes}${borderAssetVersion}`
+        `${borderRoot}/${files.strokes}${cakeAssetVersion}`
     ),
 
     loadOptionalRealisticImage(
-       `${borderRoot}/${files.mask}${borderAssetVersion}` 
+        `${borderRoot}/${files.mask}${cakeAssetVersion}`
     )
 ]);
 
@@ -5502,10 +5502,10 @@ async function loadRuffleUnderlay(
 
     const [strokes, mask] = await Promise.all([
         loadOptionalRealisticImage(
-          `${prefix}-Strokes.png${borderAssetVersion}`
+            `${prefix}-Strokes.png${cakeAssetVersion}`
         ),
         loadOptionalRealisticImage(
-           `${prefix}-Mask.png${borderAssetVersion}` 
+            `${prefix}-Mask.png${cakeAssetVersion}`
         )
     ]);
 
