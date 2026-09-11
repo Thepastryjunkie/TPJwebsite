@@ -9021,6 +9021,46 @@ function updateCoverageDesignAvailability() {
     updateTopperOptionsVisibility();
     updateQuoteOnlyExtraVisibility();
 }
+function updateCupcakeAddOnStudioAvailability() {
+    const cupcakeStudio =
+        getElement("#cupcakeStudio");
+
+    const addOnSlot =
+        getElement("#cupcakeAddOnStudioSlot");
+
+    if (!cupcakeStudio || !addOnSlot) {
+        return;
+    }
+
+    /*
+        If this studio is being used for
+        Cupcakes Only or the Bento Box,
+        leave it enabled.
+    */
+    if (
+        cupcakeStudio.parentElement !==
+        addOnSlot
+    ) {
+        cupcakeStudio.disabled = false;
+        return;
+    }
+
+    /*
+        On the Extras page, require a
+        4-, 8-, or 12-count cupcake set first.
+    */
+    const hasSelectedCupcakeCount =
+        getElements("[data-extra-name]").some(
+            (input) =>
+                input.checked &&
+                /^\d+ Gourmet Cupcakes$/.test(
+                    input.dataset.extraName || ""
+                )
+        );
+
+    cupcakeStudio.disabled =
+        !hasSelectedCupcakeCount;
+}
 function updateProductModeUI() {
     const product = getSelectedCakeProduct();
     const isCupcakesOnly = product.shape === "cupcakes";
@@ -9168,6 +9208,7 @@ const cupcakeStudio =
     ) {
         targetSlot.appendChild(cupcakeStudio);
     }
+updateCupcakeAddOnStudioAvailability();
 
     setText(
         "#step3Eyebrow",
