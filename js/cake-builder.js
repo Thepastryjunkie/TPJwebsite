@@ -5524,6 +5524,8 @@ async function loadSelectedBorderAssets(
     entryKey,
     isBento = false
 ) {
+    builderState.ruffleUnderlay = false;
+
     if (builderState.cakeFinish === "Vintage Piping") {
         return {
             top: null,
@@ -5532,55 +5534,10 @@ async function loadSelectedBorderAssets(
         };
     }
 
-    const useRuffle =
-        builderState.ruffleUnderlay &&
-        ["shell", "rope", "rosette"].includes(
-            builderState.cakeBorderStyle
-        );
-
-    const primary = await loadPrimaryBorderAssets(
+    return loadPrimaryBorderAssets(
         entryKey,
         isBento
     );
-
-    if (!useRuffle) {
-        return primary;
-    }
-
-    const shape = getBorderShapeName(entryKey, isBento);
-    const combined =
-        shape?.startsWith("Number-") ||
-        shape?.startsWith("Letter-");
-
-    if (combined) {
-        // Complete number/letter ruffle is drawn once,
-        // underneath the first visible border layer.
-        const first = primary.bottom ? "bottom" : "top";
-
-        if (primary[first]) {
-            primary[first].underlay =
-                await loadRuffleUnderlay(
-                    entryKey,
-                    first,
-                    isBento
-                );
-        }
-    } else {
-        await Promise.all(
-            ["bottom", "top", "middle"].map(async (part) => {
-                if (primary[part]) {
-                    primary[part].underlay =
-                        await loadRuffleUnderlay(
-                            entryKey,
-                            part,
-                            isBento
-                        );
-                }
-            })
-        );
-    }
-
-    return primary;
 }
 async function loadPrimaryBorderAssets(
     entryKey,
