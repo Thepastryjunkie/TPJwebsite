@@ -5412,3 +5412,10 @@ margin-inline: auto;
     transform: scale(1.15);
     transform-origin: center center;
 }
+/* =========================================
+   FORM QUESTIONS + OPTIONS SLIGHT ZOOM OUT
+========================================= */
+
+.builder-step {
+    zoom: 0.97;
+}
