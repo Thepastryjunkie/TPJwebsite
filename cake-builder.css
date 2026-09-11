@@ -5404,3 +5404,11 @@ margin-inline: auto;
         margin: 4px auto 0;
     }
 }
+/* =========================================
+   CAKE PREVIEW VISUAL ZOOM ONLY
+========================================= */
+
+#cakePreviewCard #realisticCakeCanvas {
+    transform: scale(1.12);
+    transform-origin: center center;
+}
