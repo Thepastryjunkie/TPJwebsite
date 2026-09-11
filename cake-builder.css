@@ -3055,49 +3055,15 @@ margin-inline: auto;
     margin: 18px auto 0;
 }
 
-.cupcake-composite img,
-.cupcake-tint {
+.cupcake-studio-canvas {
     position: absolute;
+
     inset: 0;
+
+    display: block;
+
     width: 100%;
     height: 100%;
-    object-fit: contain;
-}
-.cupcake-tint {
-    background-color: transparent;
-
-    -webkit-mask-size: contain;
-    mask-size: contain;
-
-    -webkit-mask-position: center;
-    mask-position: center;
-
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-
-    -webkit-mask-mode: alpha;
-    mask-mode: alpha;
-
-    mix-blend-mode: multiply;
-    opacity: 1;
-
-    pointer-events: none;
-}
-
-#cupcakeFoundation {
-    z-index: 1;
-}
-
-#cupcakeLinerTint {
-    z-index: 2;
-}
-
-#cupcakeFrosting {
-    z-index: 3;
-}
-
-#cupcakeFrostingTint {
-    z-index: 4;
 }
 
 .cupcake-decoration-preview {

@@ -738,48 +738,8 @@ const curatedButtercreamPalette = [
         value: "#F1D77D"
     }
 ];
-const borderButtercreamPalette = [
-    {
-        name: "Soft Pink",
-        value: "#F5B8D2"
-    },
-    {
-        name: "Hot Pink",
-        value: "#E45F9D"
-    },
-    {
-        name: "Chocolate",
-        value: "#7F5741"
-    },
-    {
-        name: "Cream",
-        value: "#F1E2C9"
-    },
-    {
-        name: "White",
-        value: "#FFFDFC"
-    },
-    {
-        name: "Black",
-        value: "#24201F"
-    },
-    {
-        name: "Lavender",
-        value: "#D4C2E6"
-    },
-    {
-        name: "Baby Blue",
-        value: "#BFD5E6"
-    },
-    {
-        name: "Sage",
-        value: "#BAC5B1"
-    },
-    {
-        name: "Yellow",
-        value: "#EDD581"
-    }
-];
+const borderButtercreamPalette =
+    curatedButtercreamPalette;
 
 const boardPalette = [
     {
@@ -1312,28 +1272,25 @@ function updateBorderShadeOutputs() {
 
 
 function getEffectiveCakeBorderColor() {
-    return applyBorderShadeIntensity(
-        builderState.cakeBorderColor,
-        builderState.cakeBorderShadeIntensity
-    );
+    return builderState
+        .cakeBorderColor;
 }
+
 
 function getEffectiveCakeBorderBottomColor() {
     const useOneBorderColor =
-        getSelectedCakeProduct().shape ===
+        getSelectedCakeProduct()
+            .shape ===
         "numberLetter";
 
     if (useOneBorderColor) {
-        return getEffectiveCakeBorderColor();
+        return builderState
+            .cakeBorderColor;
     }
 
-    return applyBorderShadeIntensity(
-        builderState.cakeBorderBottomColor,
-        builderState
-            .cakeBorderBottomShadeIntensity
-    );
+    return builderState
+        .cakeBorderBottomColor;
 }
-
 
 function getDisplayColorName(color) {
     if (!color || color === "original") {
@@ -2047,39 +2004,54 @@ function setLimitedCacheValue(
 }
 const tintedLayerCache =
     new WeakMap();
- const normalizedDetailLayerCache =
-    new WeakMap();   
 
-const dripTintLayerCache =
-    new WeakMap();
-    const registeredExtraArtworkCache =
+const registeredExtraArtworkCache =
     new WeakMap();
 
-const softTintLayerCache =
+const twoToneSprinkleLayerCache =
     new WeakMap();
-
-const naturalFoodTintLayerCache =
-    new WeakMap();
-  const twoToneSprinkleLayerCache =
-    new WeakMap();  
 
 let realisticRenderVersion = 0;
+let cupcakeStudioRenderVersion = 0;
+const unifiedRecolorSettings = Object.freeze({
+    lowPercentile: 0.08,
+    midPercentile: 0.50,
+    highPercentile: 0.92,
 
-const cakePreviewDetailStrength = {
-    smoothCake: 0.84,
-    simpleHeart: 0.92,
-    simpleOther: 0.88,
-    dimensionalFinish: 0.84,
-    numberLetterBorder: 0.95,
-macaronExtra: 0.58,
-sprinkle: 0.16,
-    border: 0.76,
-    numberLetterBase: 0.64,
-    numberLetterPiping: 0.88,
-    cupcakeFrosting: 0.96,
-    other: 0.24
-    
-};
+    minimumTonalRange: 40,
+
+    /*
+        Normal detail response used by
+        piping, borders, flowers, macarons,
+        cupcakes, etc.
+    */
+    detailPower: 1.40,
+
+    /*
+        Smooth cake bodies suppress small
+        photographic buttercream texture
+        while preserving major lighting.
+    */
+    smoothSurfaceDetailPower: 2.00,
+
+    shadowForDarkColor: 0.22,
+    shadowForLightColor: 0.28,
+
+    /*
+        Only protect LIGHT colors from
+        overly dark source shadows.
+
+        Chocolate / Hot Pink stay below
+        this range and therefore remain
+        essentially unchanged.
+    */
+    lightShadowProtectionStart: 0.58,
+    lightShadowProtectionEnd: 0.90,
+    lightShadowMinimum: 0.48,
+
+    highlightForDarkColor: 0.52,
+    highlightForLightColor: 0.18
+});
 
 function loadRealisticImage(url) {
     if (realisticImageCache.has(url)) {
@@ -2131,179 +2103,54 @@ function loadRealisticImage(url) {
 
     return request;
 }
-function getNormalizedDetailLayer(
-    image,
-    mask
+function getUnifiedRecolorPercentile(
+    histogram,
+    totalWeight,
+    percentile
 ) {
-    let maskCache =
-        normalizedDetailLayerCache.get(
-            image
-        );
-
-    if (!maskCache) {
-        maskCache = new WeakMap();
-
-        normalizedDetailLayerCache.set(
-            image,
-            maskCache
-        );
+    if (!totalWeight) {
+        return 128;
     }
 
-    if (maskCache.has(mask)) {
-        return maskCache.get(mask);
-    }
+    const target =
+        totalWeight * percentile;
 
-    const layer =
-        document.createElement("canvas");
-
-    layer.width =
-        image.naturalWidth ||
-        image.width;
-
-    layer.height =
-        image.naturalHeight ||
-        image.height;
-
-    const context =
-        layer.getContext("2d");
-
-    context.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-    context.globalCompositeOperation =
-        "saturation";
-
-    context.fillStyle = "#808080";
-
-    context.fillRect(
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-    context.globalCompositeOperation =
-        "destination-in";
-
-    context.drawImage(
-        mask,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-    context.globalCompositeOperation =
-        "source-over";
-
-    const imageData =
-        context.getImageData(
-            0,
-            0,
-            layer.width,
-            layer.height
-        );
-
-    const pixels = imageData.data;
-
-    let weightedBrightness = 0;
-    let alphaTotal = 0;
+    let runningWeight = 0;
 
     for (
-        let index = 0;
-        index < pixels.length;
-        index += 4
+        let value = 0;
+        value < 256;
+        value += 1
     ) {
-        const alpha =
-            pixels[index + 3] / 255;
+        runningWeight +=
+            histogram[value];
 
-        if (!alpha) {
-            continue;
+        if (
+            runningWeight >= target
+        ) {
+            return value;
         }
-
-        const brightness =
-            pixels[index] * 0.2126 +
-            pixels[index + 1] * 0.7152 +
-            pixels[index + 2] * 0.0722;
-
-        weightedBrightness +=
-            brightness * alpha;
-
-        alphaTotal += alpha;
     }
 
-    const averageBrightness =
-        alphaTotal
-            ? weightedBrightness /
-                alphaTotal
-            : 128;
-
-    for (
-        let index = 0;
-        index < pixels.length;
-        index += 4
-    ) {
-        if (!pixels[index + 3]) {
-            continue;
-        }
-
-        const brightness =
-            pixels[index] * 0.2126 +
-            pixels[index + 1] * 0.7152 +
-            pixels[index + 2] * 0.0722;
-
-const shellDetailContrast =
-    image.src.includes(
-        "TPJ-Border-Shell-Round-Bottom-Strokes.png"
-    )
-        ? 1.2
-        : 1;
-
-const normalizedBrightness = Math.round(
-    clampNumber(
-        128 +
-            (brightness - averageBrightness) *
-                shellDetailContrast,
-        0,
-        255
-    )
-);
-
-        pixels[index] =
-            normalizedBrightness;
-
-        pixels[index + 1] =
-            normalizedBrightness;
-
-        pixels[index + 2] =
-            normalizedBrightness;
-    }
-
-    context.putImageData(
-        imageData,
-        0,
-        0
-    );
-
-    maskCache.set(
-        mask,
-        layer
-    );
-
-    return layer;
+    return 255;
 }
+
+
 function makeTintedLayer(
     image,
     mask,
-    color
-) { if (!color || color === "original") {
-    return image;
-}
+    color,
+    detailPower =
+        unifiedRecolorSettings.detailPower
+) {
+    if (
+        !color ||
+        color === "original" ||
+        !mask
+    ) {
+        return image;
+    }
+
     let maskCache =
         tintedLayerCache.get(image);
 
@@ -2330,291 +2177,43 @@ function makeTintedLayer(
         );
     }
 
-    const normalizedColor =
-        normalizeHexColor(color);
+const normalizedColor =
+    normalizeHexColor(color);
 
-    if (
-        colorCache.has(
-            normalizedColor
+const numericDetailPower =
+    Number(detailPower);
+
+const safeDetailPower =
+    Number.isFinite(
+        numericDetailPower
+    )
+        ? clampNumber(
+            numericDetailPower,
+            0.75,
+            3
         )
-    ) {
-        return colorCache.get(
-            normalizedColor
-        );
-    }
-
-
-    const layer =
-        document.createElement(
-            "canvas"
-        );
-
-    layer.width =
-        image.naturalWidth ||
-        image.width;
-
-    layer.height =
-        image.naturalHeight ||
-        image.height;
-
-    const layerContext =
-        layer.getContext("2d");
-
-
-    /*
-        Build color only inside
-        the approved recolor mask.
-    */
-
-    layerContext.drawImage(
-        mask,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-    layerContext.globalCompositeOperation =
-        "source-in";
-
-    layerContext.fillStyle =
-        normalizedColor;
-
-    layerContext.fillRect(
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-
-       const source = image.src || "";
-
-    const isSimpleTextureAsset =
-        source.includes(
-            "Simple-Texture-Horizontal-Comb"
-        );
-
-    const isHeartSimpleTextureAsset =
-        isSimpleTextureAsset &&
-        source.includes("-Heart");
-
-       const isBorderAsset =
-        source.includes("/borders/");
-     const isNumberLetterBorderAsset =
-    isBorderAsset &&
-    (
-        source.includes("-Number-") ||
-        source.includes("-Letter-")
-    );
-
-const isMacaronExtraAsset =
-    source.includes(
-        "TPJ-Extra-Macarons-"
-    );
-
-const isSprinkleAsset =
-    source.includes("-Sprinkles.png");   
-
-    const isNumberLetterAsset =
-        source.includes("TPJ-Number-Letter-");
-
-    const isNumberLetterBaseAsset =
-        isNumberLetterAsset &&
-        source.includes("-Base");
-
-    const isNumberLetterPipingAsset =
-        isNumberLetterAsset &&
-        source.includes("-Accent-");
-
-    const isCupcakeFrostingAsset =
-        source.includes("/cupcakes/frosting/") &&
-        source.includes("-Frosting") &&
-        !source.includes("Foundation");
-
-    const isDimensionalFinishAsset =
-        source.includes("TPJ-Finish-") &&
-        !isSimpleTextureAsset;
-
-    const isSmoothCakeAsset =
-        source.includes("/cakes/") &&
-        !source.includes("TPJ-Finish-") &&
-        !isNumberLetterAsset;
-
-    /*
-    Preserve the selected color while using
-    only grayscale highlights and shadows
-    from the original artwork for dimension.
-*/
-
-const detailLayer =
-    getNormalizedDetailLayer(
-        image,
-        mask
-    );
-
-
-
-
-/*
-    Reveal dimension without washing out
-    or overpowering the selected color.
-*/
-
-/*
-    Keep only a light multiply detail pass.
-    The former soft-light pass laid a pale,
-    translucent cast over selected colors.
-*/
-layerContext.globalCompositeOperation =
-    "soft-light";
-
-let detailStrength =
-    cakePreviewDetailStrength.other;
-
-if (isSmoothCakeAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.smoothCake;
-}
-
-if (isSimpleTextureAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.simpleOther;
-}
-
-if (isHeartSimpleTextureAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.simpleHeart;
-}
-
-if (isDimensionalFinishAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.dimensionalFinish;
-}
-
-if (isCupcakeFrostingAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.cupcakeFrosting;
-}
-
-if (isNumberLetterBaseAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.numberLetterBase;
-}
-
-if (isNumberLetterPipingAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.numberLetterPiping;
-}
-
-if (isBorderAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.border;
-}
-
-if (isNumberLetterBorderAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.numberLetterBorder;
-}
-
-if (isMacaronExtraAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.macaronExtra;
-}
-
-if (isSprinkleAsset) {
-    detailStrength =
-        cakePreviewDetailStrength.sprinkle;
-}
-
-layerContext.globalAlpha =
-    detailStrength;
-
-layerContext.drawImage(
-    detailLayer,
-    0,
-    0,
-    layer.width,
-    layer.height
-);
-
-    /*
-        Final clip back to the original mask.
-    */
-if (
-    !isSimpleTextureAsset &&
-    !isBorderAsset
-) {
-    layerContext.globalCompositeOperation =
-        "destination-in";
-
-    layerContext.globalAlpha = 1;
-
-    layerContext.drawImage(
-        mask,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-}
-
-
-layerContext.globalCompositeOperation =
-    "source-over";
-
-    layerContext.globalAlpha = 1;
-
-
-setLimitedCacheValue(
-    colorCache,
-    normalizedColor,
-    layer
-);
-
-    return layer;
-}
-function makeNaturalFoodTintedLayer(
-    image,
-    mask,
-    color,
-    shadowStrength = 0.22,
-    highlightStrength = 0.28,
-    detailStrength = 1
-) {
-    let maskCache =
-        naturalFoodTintLayerCache.get(image);
-
-    if (!maskCache) {
-        maskCache = new WeakMap();
-
-        naturalFoodTintLayerCache.set(
-            image,
-            maskCache
-        );
-    }
-
-    let colorCache =
-        maskCache.get(mask);
-
-    if (!colorCache) {
-        colorCache = new Map();
-
-        maskCache.set(
-            mask,
-            colorCache
-        );
-    }
-
-    const normalizedColor =
-        normalizeHexColor(color);
+        : unifiedRecolorSettings
+            .detailPower;
 
 const cacheKey =
-    `${normalizedColor}|${shadowStrength}|${highlightStrength}|${detailStrength}`;
+    `${normalizedColor}|${safeDetailPower.toFixed(3)}`;
 
-    if (colorCache.has(cacheKey)) {
-        return colorCache.get(cacheKey);
-    }
+if (
+    colorCache.has(
+        cacheKey
+    )
+) {
+    return colorCache.get(
+        cacheKey
+    );
+}
+
+
+    /*
+        -------------------------------------
+        SOURCE + MASK
+        -------------------------------------
+    */
 
     const width =
         image.naturalWidth ||
@@ -2624,8 +2223,11 @@ const cacheKey =
         image.naturalHeight ||
         image.height;
 
+
     const sourceCanvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
     sourceCanvas.width = width;
     sourceCanvas.height = height;
@@ -2646,8 +2248,11 @@ const cacheKey =
         height
     );
 
+
     const maskCanvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
     maskCanvas.width = width;
     maskCanvas.height = height;
@@ -2668,6 +2273,7 @@ const cacheKey =
         height
     );
 
+
     const sourceData =
         sourceContext.getImageData(
             0,
@@ -2684,8 +2290,217 @@ const cacheKey =
             height
         );
 
+    const sourcePixels =
+        sourceData.data;
+
+    const maskPixels =
+        maskData.data;
+
+
+    /*
+        -------------------------------------
+        ANALYZE THE ASSET'S LIGHTING
+
+        We are NOT keeping its original hue.
+
+        We only measure:
+        shadows
+        midtones
+        highlights
+        -------------------------------------
+    */
+
+    const histogram =
+        new Uint32Array(256);
+
+    let totalWeight = 0;
+
+    for (
+        let index = 0;
+        index < sourcePixels.length;
+        index += 4
+    ) {
+        const maskAlpha =
+            maskPixels[index + 3];
+
+        const sourceAlpha =
+            sourcePixels[index + 3];
+
+        if (
+            maskAlpha <= 8 ||
+            sourceAlpha <= 8
+        ) {
+            continue;
+        }
+
+        const luminance =
+            Math.round(
+                sourcePixels[index] *
+                    0.2126 +
+                sourcePixels[index + 1] *
+                    0.7152 +
+                sourcePixels[index + 2] *
+                    0.0722
+            );
+
+        histogram[luminance] +=
+            maskAlpha;
+
+        totalWeight +=
+            maskAlpha;
+    }
+
+
+    /*
+        Instead of trusting every PNG's
+        original brightness range, find
+        its useful dark / middle / light
+        points.
+
+        This is what makes different assets
+        speak the same tonal language.
+    */
+
+    const low =
+        getUnifiedRecolorPercentile(
+            histogram,
+            totalWeight,
+            unifiedRecolorSettings
+                .lowPercentile
+        );
+
+    const middle =
+        getUnifiedRecolorPercentile(
+            histogram,
+            totalWeight,
+            unifiedRecolorSettings
+                .midPercentile
+        );
+
+    const high =
+        getUnifiedRecolorPercentile(
+            histogram,
+            totalWeight,
+            unifiedRecolorSettings
+                .highPercentile
+        );
+
+
+    const shadowRange =
+        Math.max(
+            middle - low,
+            unifiedRecolorSettings
+                .minimumTonalRange
+        );
+
+    const highlightRange =
+        Math.max(
+            high - middle,
+            unifiedRecolorSettings
+                .minimumTonalRange
+        );
+
+
+    /*
+        -------------------------------------
+        CUSTOMER'S COLOR
+
+        THIS is now the actual hue.
+
+        Original PNG color contributes ZERO.
+        -------------------------------------
+    */
+
+    const target =
+        hexToRgb(
+            normalizedColor
+        );
+
+    const selectedLuminance =
+        (
+            target.red * 0.2126 +
+            target.green * 0.7152 +
+            target.blue * 0.0722
+        ) / 255;
+
+
+    /*
+        Light colors:
+        stronger shadows
+        gentler highlights
+
+        Dark colors:
+        gentler shadows
+        stronger highlights
+    */
+
+const baseShadowStrength =
+    unifiedRecolorSettings
+        .shadowForDarkColor +
+    (
+        unifiedRecolorSettings
+            .shadowForLightColor -
+        unifiedRecolorSettings
+            .shadowForDarkColor
+    ) *
+    selectedLuminance;
+
+
+const lightShadowProgress =
+    clampNumber(
+        (
+            selectedLuminance -
+            unifiedRecolorSettings
+                .lightShadowProtectionStart
+        ) /
+        (
+            unifiedRecolorSettings
+                .lightShadowProtectionEnd -
+            unifiedRecolorSettings
+                .lightShadowProtectionStart
+        ),
+        0,
+        1
+    );
+
+
+const shadowProtection =
+    1 -
+    lightShadowProgress *
+    (
+        1 -
+        unifiedRecolorSettings
+            .lightShadowMinimum
+    );
+
+
+const shadowStrength =
+    baseShadowStrength *
+    shadowProtection;
+
+
+    const highlightStrength =
+        unifiedRecolorSettings
+            .highlightForDarkColor +
+        (
+            unifiedRecolorSettings
+                .highlightForLightColor -
+            unifiedRecolorSettings
+                .highlightForDarkColor
+        ) *
+        selectedLuminance;
+
+
+    /*
+        -------------------------------------
+        BUILD THE FINAL COLORED ASSET
+        -------------------------------------
+    */
+
     const resultCanvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
     resultCanvas.width = width;
     resultCanvas.height = height;
@@ -2704,57 +2519,129 @@ const cacheKey =
             height
         );
 
-    const target =
-        hexToRgb(normalizedColor);
+    const resultPixels =
+        resultData.data;
+
 
     for (
         let index = 0;
-        index < sourceData.data.length;
+        index < sourcePixels.length;
         index += 4
     ) {
         const maskAlpha =
-            maskData.data[index + 3];
+            maskPixels[index + 3];
 
         if (!maskAlpha) {
             continue;
         }
 
-        const sourceRed =
-            sourceData.data[index];
+        const sourceAlpha =
+            sourcePixels[index + 3];
 
-        const sourceGreen =
-            sourceData.data[index + 1];
+        let detail = 0;
 
-        const sourceBlue =
-            sourceData.data[index + 2];
 
-        const luminance =
-            sourceRed * 0.2126 +
-            sourceGreen * 0.7152 +
-            sourceBlue * 0.0722;
+        /*
+            Transparent source pixels should
+            not invent shadows/highlights.
+            They simply receive the selected
+            base color wherever the mask says
+            coloring is allowed.
+        */
 
-const detail =
-    clampNumber(
-        (
-            (luminance - 128) / 127
-        ) * detailStrength,
-        -1,
-        1
+        if (sourceAlpha > 8) {
+            const luminance =
+                sourcePixels[index] *
+                    0.2126 +
+                sourcePixels[index + 1] *
+                    0.7152 +
+                sourcePixels[index + 2] *
+                    0.0722;
+
+
+            if (luminance < middle) {
+                detail =
+                    -(
+                        (
+                            middle -
+                            luminance
+                        ) /
+                        shadowRange
+                    );
+            } else {
+                detail =
+                    (
+                        luminance -
+                        middle
+                    ) /
+                    highlightRange;
+            }
+
+
+            detail =
+                clampNumber(
+                    detail,
+                    -1,
+                    1
+                );
+
+
+            /*
+                Preserve large folds/ridges,
+                soften tiny noisy texture.
+            */
+
+detail =
+    Math.sign(detail) *
+    Math.pow(
+        Math.abs(detail),
+        safeDetailPower
     );
+        }
 
-        let red = target.red;
-        let green = target.green;
-        let blue = target.blue;
+
+        let red =
+            target.red;
+
+        let green =
+            target.green;
+
+        let blue =
+            target.blue;
+
+
+        /*
+            DARK SOURCE DETAIL
+
+            Darken the SELECTED COLOR.
+            Do not restore original PNG hue.
+        */
 
         if (detail < 0) {
             const amount =
                 Math.abs(detail) *
                 shadowStrength;
 
-            red *= 1 - amount;
-            green *= 1 - amount;
-            blue *= 1 - amount;
-        } else {
+            red *=
+                1 - amount;
+
+            green *=
+                1 - amount;
+
+            blue *=
+                1 - amount;
+        }
+
+
+        /*
+            LIGHT SOURCE DETAIL
+
+            Lift the SELECTED COLOR toward
+            white according to the physical
+            highlights in the artwork.
+        */
+
+        if (detail > 0) {
             const amount =
                 detail *
                 highlightStrength;
@@ -2772,18 +2659,45 @@ const detail =
                 amount;
         }
 
-        resultData.data[index] =
-            Math.round(red);
 
-        resultData.data[index + 1] =
-            Math.round(green);
+        resultPixels[index] =
+            Math.round(
+                clampNumber(
+                    red,
+                    0,
+                    255
+                )
+            );
 
-        resultData.data[index + 2] =
-            Math.round(blue);
+        resultPixels[index + 1] =
+            Math.round(
+                clampNumber(
+                    green,
+                    0,
+                    255
+                )
+            );
 
-        resultData.data[index + 3] =
+        resultPixels[index + 2] =
+            Math.round(
+                clampNumber(
+                    blue,
+                    0,
+                    255
+                )
+            );
+
+        /*
+            The mask owns transparency.
+
+            The source PNG owns lighting,
+            NOT final color opacity.
+        */
+
+        resultPixels[index + 3] =
             maskAlpha;
     }
+
 
     resultContext.putImageData(
         resultData,
@@ -2791,30 +2705,17 @@ const detail =
         0
     );
 
+
 setLimitedCacheValue(
     colorCache,
     cacheKey,
     resultCanvas
 );
 
+
     return resultCanvas;
 }
-function getHexColorLuminance(color) {
-    const normalizedColor =
-        normalizeHexColor(color);
 
-    const {
-        red,
-        green,
-        blue
-    } = hexToRgb(normalizedColor);
-
-    return (
-        red * 0.2126 +
-        green * 0.7152 +
-        blue * 0.0722
-    );
-}
 function getContainedAssetSize(image, scale) {
     const sourceWidth = image.naturalWidth || image.width;
     const sourceHeight = image.naturalHeight || image.height;
@@ -2828,6 +2729,19 @@ function getContainedAssetSize(image, scale) {
         height: sourceHeight * containScale * scale
     };
 }
+function getCakeSurfaceDetailPower() {
+    const usesSmoothCakeSurface =
+        builderState.cakeCoverage ===
+            "full" &&
+        builderState.cakeFinish !==
+            "Simple Texture";
+
+    return usesSmoothCakeSurface
+        ? unifiedRecolorSettings
+            .smoothSurfaceDetailPower
+        : unifiedRecolorSettings
+            .detailPower;
+}
 function drawRecoloredAsset(
     context,
     image,
@@ -2836,7 +2750,9 @@ function drawRecoloredAsset(
     x,
     y,
     width,
-    height
+    height,
+    detailPower =
+        unifiedRecolorSettings.detailPower
 ) {
     if (!color || color === "original") {
         context.drawImage(
@@ -2850,11 +2766,12 @@ function drawRecoloredAsset(
         return;
     }
 
-    const tintLayer = makeTintedLayer(
-        image,
-        mask,
-        color
-    );
+const tintLayer = makeTintedLayer(
+    image,
+    mask,
+    color,
+    detailPower
+);
 
     context.save();
     context.globalAlpha = 1;
@@ -3617,8 +3534,9 @@ function drawBentoSimpleTextureAsset(
         textureColor,
         transform.x,
         transform.y,
-        transform.width,
-        transform.height
+transform.width,
+transform.height,
+getCakeSurfaceDetailPower()
     );
 
     context.restore();
@@ -3813,8 +3731,9 @@ function drawTwoTierColors(
         ),
         x,
         y,
-        width,
-        height
+width,
+height,
+getCakeSurfaceDetailPower()
     );
 
     const left =
@@ -3884,8 +3803,9 @@ function drawTwoTierColors(
         ),
         x,
         y,
-        width,
-        height
+width,
+height,
+getCakeSurfaceDetailPower()
     );
 
     context.restore();
@@ -6078,353 +5998,51 @@ function getRealisticExtraColor(
 
     return colorMap[decorationId] || null;
 }
-function makeDripTintedLayer(
-    image,
-    color
-) {
-    let colorCache =
-        dripTintLayerCache.get(image);
 
-    if (!colorCache) {
-        colorCache =
-            new Map();
-
-        dripTintLayerCache.set(
-            image,
-            colorCache
-        );
-    }
-
-
-    const normalizedColor =
-        normalizeHexColor(color);
-
-
-    if (
-        colorCache.has(
-            normalizedColor
-        )
-    ) {
-        return colorCache.get(
-            normalizedColor
-        );
-    }
-
-
-    const layer =
-        document.createElement(
-            "canvas"
-        );
-
-    layer.width =
-        image.naturalWidth ||
-        image.width;
-
-    layer.height =
-        image.naturalHeight ||
-        image.height;
-
-    const context =
-        layer.getContext("2d");
-
-
-    context.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-
-    context.globalCompositeOperation =
-        "source-in";
-
-    context.fillStyle =
-        normalizedColor;
-
-    context.fillRect(
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-
-    context.globalCompositeOperation =
-        "multiply";
-
-    context.globalAlpha =
-        0.18;
-
-    context.drawImage(
-        image,
-        0,
-        0,
-        layer.width,
-        layer.height
-    );
-
-
-    context.globalCompositeOperation =
-        "source-over";
-
-    context.globalAlpha = 1;
-
-
-setLimitedCacheValue(
-    colorCache,
-    normalizedColor,
-    layer
-);
-    return layer;
-}
-function makeSoftTintedExtraLayer(
-    image,
-    mask,
-    color
-) {
-    const normalizedColor =
-        normalizeHexColor(color);
-
-    let colorCache =
-        softTintLayerCache.get(image);
-
-    if (!colorCache) {
-        colorCache = new Map();
-
-        softTintLayerCache.set(
-            image,
-            colorCache
-        );
-    }
-
-    if (colorCache.has(normalizedColor)) {
-        return colorCache.get(
-            normalizedColor
-        );
-    }
-
-    const width =
-        image.naturalWidth ||
-        image.width;
-
-    const height =
-        image.naturalHeight ||
-        image.height;
-
-    const layer =
-        document.createElement("canvas");
-
-    layer.width = width;
-    layer.height = height;
-
-    const context =
-        layer.getContext("2d");
-
-    context.drawImage(
-        image,
-        0,
-        0,
-        width,
-        height
-    );
-
-    const tintLayer =
-        document.createElement("canvas");
-
-    tintLayer.width = width;
-    tintLayer.height = height;
-
-    const tintContext =
-        tintLayer.getContext("2d");
-
-    tintContext.drawImage(
-        mask,
-        0,
-        0,
-        width,
-        height
-    );
-
-    tintContext.globalCompositeOperation =
-        "source-in";
-
-    tintContext.fillStyle =
-        normalizedColor;
-
-    tintContext.fillRect(
-        0,
-        0,
-        width,
-        height
-    );
-
-    context.globalAlpha = 0.68;
-
-    context.drawImage(
-        tintLayer,
-        0,
-        0,
-        width,
-        height
-    );
-
-    context.globalAlpha = 1;
-    const detailLayer =
-    document.createElement("canvas");
-
-detailLayer.width = width;
-detailLayer.height = height;
-
-const detailContext =
-    detailLayer.getContext("2d");
-
-detailContext.drawImage(
-    image,
-    0,
-    0,
-    width,
-    height
-);
-
-detailContext.globalCompositeOperation =
-    "saturation";
-
-detailContext.fillStyle = "#808080";
-
-detailContext.fillRect(
-    0,
-    0,
-    width,
-    height
-);
-
-detailContext.globalCompositeOperation =
-    "destination-in";
-
-detailContext.drawImage(
-    mask,
-    0,
-    0,
-    width,
-    height
-);
-
-context.globalCompositeOperation =
-    "multiply";
-
-context.globalAlpha = 0.16;
-
-context.drawImage(
-    detailLayer,
-    0,
-    0,
-    width,
-    height
-);
-
-context.globalCompositeOperation =
-    "source-over";
-
-context.globalAlpha = 1;
-
-setLimitedCacheValue(
-    colorCache,
-    normalizedColor,
-    layer
-);
-
-    return layer;
-}
 function getRenderedExtraLayer(asset) {
     const selectedColor =
         getRealisticExtraColor(
             asset.id
         );
 
-if (!selectedColor || selectedColor === "original") {
-    return asset.strokes;
-}
-
+    /*
+        Metallic Leaf, Disco Balls,
+        or anything else without a
+        selectable recolor stays in
+        its original artwork.
+    */
     if (
-        asset.id ===
-        "chocolateDripDecoration"
+        !selectedColor ||
+        selectedColor === "original"
     ) {
-        return makeDripTintedLayer(
-            asset.strokes,
-            selectedColor
-        );
+        return asset.strokes;
     }
 
+    /*
+        A recolorable asset MUST have
+        a proper mask.
+
+        If it does not, fall back to
+        original artwork instead of
+        inventing a fake tint.
+    */
     if (!asset.mask) {
         return asset.strokes;
     }
 
-    if (
-        asset.id ===
-        "flowersDecoration"
-    ) {
-        return makeSoftTintedExtraLayer(
-            asset.strokes,
-            asset.mask,
-            selectedColor
-        );
-    }
-   if (
-    asset.id ===
-    "macaronsDecoration"
-) {
-    const macaronLuminance =
-        getHexColorLuminance(
-            selectedColor
-        );
-
     /*
-        Very light colors
+        ONE COLOR ENGINE.
+
+        Flowers.
+        Macarons.
+        Chocolate Drip.
+        Bows.
+        Butterflies.
+        Cherries.
+        Pearls.
+        Everything recolorable.
     */
-
-    if (macaronLuminance >= 200) {
-        return makeNaturalFoodTintedLayer(
-            asset.strokes,
-            asset.mask,
-            selectedColor,
-            0.42,
-            0.10,
-            1.60
-        );
-    }
-
-    /*
-        Light and pastel colors
-    */
-
-    if (macaronLuminance >= 165) {
-        return makeNaturalFoodTintedLayer(
-            asset.strokes,
-            asset.mask,
-            selectedColor,
-            0.36,
-            0.16,
-            1.45
-        );
-    }
-
-    /*
-        Medium and dark colors
-    */
-
-    return makeNaturalFoodTintedLayer(
-        asset.strokes,
-        asset.mask,
-        selectedColor,
-        0.30,
-        0.26,
-        1.35
-    );
-} 
-
-  return makeTintedLayer(
+    return makeTintedLayer(
         asset.strokes,
         asset.mask,
         selectedColor
@@ -7670,7 +7288,7 @@ if (isCoveragePreview) {
                     : builderState.characterTwoColor
                 : builderState.mainCakeColor;
 
- drawRecoloredAsset(
+drawRecoloredAsset(
     context,
     cakeImage,
     coverageMask,
@@ -7680,8 +7298,9 @@ if (isCoveragePreview) {
     x,
     y + boardYOffset,
     size.width,
-    size.height
-); 
+    size.height,
+    getCakeSurfaceDetailPower()
+);
     }
 
    
@@ -8172,113 +7791,135 @@ function drawCupcakeSetPreview(
     context.restore();
 }
 
-function updateCupcakePreview() {
-    const foundation = getElement("#cupcakeFoundation");
-    const frosting = getElement("#cupcakeFrosting");
-    const linerTint = getElement("#cupcakeLinerTint");
-    const frostingTint = getElement("#cupcakeFrostingTint");
+async function updateCupcakePreview() {
+    const previewCanvas =
+        getElement(
+            "#cupcakeStudioCanvas"
+        );
 
-    if (
-        !foundation ||
-        !frosting ||
-        !linerTint ||
-        !frostingTint
-    ) {
+    if (!previewCanvas) {
         return;
     }
 
-    const liner =
-        builderState.cupcakeLinerStyle || "paper";
 
-    const foundationFiles =
-        cupcakeFoundationMap[liner] ||
-        cupcakeFoundationMap.paper;
+    /*
+        Caption first so the UI does not
+        have to wait for artwork rendering.
+    */
 
-    const frostingFiles =
-        getCupcakeFrostingFiles(
-            liner,
-            builderState.cupcakeFrostingStyle
+    const selectedSet =
+        builderState.extras.find(
+            (extra) =>
+                /^\d+ Gourmet Cupcakes$/.test(
+                    extra.name
+                )
         );
-
-    const hasFrosting = Boolean(frostingFiles);
-
-    const linerRoot =
-        `${finalAssetRoot}/cupcakes/liners`;
-
-    const frostingRoot =
-        `${finalAssetRoot}/cupcakes/frosting`;
-
-    const linerMaskUrl =
-        `${linerRoot}/${foundationFiles[1]}`;
-
-    foundation.src = hasFrosting
-        ? `${frostingRoot}/${foundationFiles[2]}`
-        : `${linerRoot}/${foundationFiles[0]}`;
-
-    linerTint.style.backgroundColor =
-        builderState.cupcakeLinerColor === "original"
-            ? "transparent"
-            : builderState.cupcakeLinerColor;
-
-    linerTint.style.webkitMaskImage =
-        `url("${linerMaskUrl}")`;
-
-    linerTint.style.maskImage =
-        `url("${linerMaskUrl}")`;
-
-    if (hasFrosting) {
-        const frostingMaskUrl =
-            `${frostingRoot}/${frostingFiles[1]}`;
-
-        frosting.src =
-            `${frostingRoot}/${frostingFiles[0]}`;
-
-        frosting.style.display = "";
-        frostingTint.style.display = "";
-
-        frostingTint.style.backgroundColor =
-            builderState.cupcakeFrostingColor === "original"
-                ? "transparent"
-                : builderState.cupcakeFrostingColor;
-
-        frostingTint.style.webkitMaskImage =
-            `url("${frostingMaskUrl}")`;
-
-        frostingTint.style.maskImage =
-            `url("${frostingMaskUrl}")`;
-    } else {
-        frosting.removeAttribute("src");
-        frosting.style.display = "none";
-
-        frostingTint.style.display = "none";
-        frostingTint.style.backgroundColor = "transparent";
-        frostingTint.style.webkitMaskImage = "none";
-        frostingTint.style.maskImage = "none";
-    }
-
-    const selectedSet = builderState.extras.find(
-        (extra) =>
-            /^\d+ Gourmet Cupcakes$/.test(extra.name)
-    );
 
     setText(
         "#cupcakeSetCaption",
-        getSelectedCakeProduct().shape === "cupcakes"
+
+        getSelectedCakeProduct()
+            .shape === "cupcakes"
+
             ? `${getDisplayCakeName()} · preview applies to every cupcake`
-            : builderState.cakeProductId === "heart-5-bento"
+
+            : builderState
+                .cakeProductId ===
+                "heart-5-bento"
+
             ? `Bento box · preview applies to all ${builderState.bentoCupcakeCount} included cupcakes`
+
             : selectedSet
+
             ? `${selectedSet.name} · preview applies to every cupcake`
+
             : "Select a 4-, 8-, or 12-count set above."
     );
 
- getElements(
-    "[data-cupcake-decoration]"
-).forEach((element) => {
-    element.classList.remove(
-        "is-visible"
-    );
-});   
+
+    /*
+        Prevent an older async render from
+        replacing a newer customer choice.
+    */
+
+    const renderVersion =
+        ++cupcakeStudioRenderVersion;
+
+
+    try {
+        /*
+            IMPORTANT:
+
+            This is the exact same cupcake
+            design renderer used by the
+            realistic cake preview.
+
+            No second tint engine.
+        */
+
+        const cupcakeDesign =
+            await renderCupcakeDesignCanvas();
+
+
+        if (
+            renderVersion !==
+            cupcakeStudioRenderVersion
+        ) {
+            return;
+        }
+
+
+        previewCanvas.width =
+            cupcakeDesign.width;
+
+        previewCanvas.height =
+            cupcakeDesign.height;
+
+
+        const context =
+            previewCanvas.getContext(
+                "2d"
+            );
+
+
+        context.clearRect(
+            0,
+            0,
+            previewCanvas.width,
+            previewCanvas.height
+        );
+
+
+        context.drawImage(
+            cupcakeDesign,
+            0,
+            0
+        );
+    } catch (error) {
+        if (
+            renderVersion !==
+            cupcakeStudioRenderVersion
+        ) {
+            return;
+        }
+
+        const context =
+            previewCanvas.getContext(
+                "2d"
+            );
+
+        context.clearRect(
+            0,
+            0,
+            previewCanvas.width,
+            previewCanvas.height
+        );
+
+        console.warn(
+            "Cupcake Studio preview could not be rendered.",
+            error
+        );
+    }
 }
 
 function updateRendererColors() {
