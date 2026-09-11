@@ -361,17 +361,17 @@ mainCakeColor: "original",
 customMainColor: "#F7B6D2",
 mainCakeUsesCustomShade: false,
 
-accentColor: "#F7B6D2",
+accentColor: "original",
 
 cakeBorderStyle: "",
 ruffleUnderlay: false,
 cakeBorderPlacement: "both",
-cakeBorderColor: "#F5B8D2",
+cakeBorderColor: "original",
 cakeBorderUsesCustomShade: false,
 customCakeBorderColor: "#F5B8D2",
 cakeBorderShadeIntensity: 50,
 
-cakeBorderBottomColor: "#F5B8D2",
+cakeBorderBottomColor: "original",
 cakeBorderBottomUsesCustomShade: false,
 customCakeBorderBottomColor: "#F5B8D2",
 cakeBorderBottomShadeIntensity: 50,
@@ -379,8 +379,8 @@ cakeBorderSprinkles: false,
 cakeBorderSprinklePlacement: "both",
 cakeBorderSprinkleColor: "#F7B6D2",
 
-finishAccentOne: "#F7B6D2",
-finishAccentTwo: "#D9C2F0",
+finishAccentOne: "original",
+finishAccentTwo: "original",
 
 cakeFinish: "",
 cakeCoverage: "full",
@@ -400,7 +400,7 @@ customMatchedBoardColor: "#F7B6D2",
 
 cupcakeLinerStyle: "paper",
 cupcakeFrostingStyle: "",
-cupcakeLinerColor: "#FFFFFF",
+cupcakeLinerColor: "original",
 cupcakeFrostingColor: "original",
 cupcakeFrostingUsesCustomShade: false,
 customCupcakeFrostingColor: "#F7B6D2",
@@ -418,10 +418,10 @@ decorationQuantities: {
 flowerSource: "",
 flowerMaterial: "",
 
-bowColor: "#F7B6D2",
-butterflyColor: "#F7B6D2",
-macaronColor: "#F7B6D2",
-cherryColor: "#E5172F",
+bowColor: "original",
+butterflyColor: "original",
+macaronColor: "original",
+cherryColor: "original",
 cherryGlitter: "No",
 
 dripChocolateType: "Milk Chocolate",
@@ -429,9 +429,9 @@ whiteChocolateColored: "No",
 whiteChocolateDripColor: "#F7B6D2",
 dripColor: "#84563C",
 
-pearlColor: "#FFF7F2",
+pearlColor:"original",
 
-flowerColor: "#FFF3D6",
+flowerColor: "original",
 flowerType: "",
 customFlowerType: "",
 metallicLeafType: "Gold",
@@ -1031,9 +1031,11 @@ function buildColorSwatches(
         input.name = inputName;
         input.value = color.value;
 
-        input.checked =
-            selectedValue ===
-            color.value;
+      input.checked =
+    String(selectedValue).toLowerCase() ===
+    String(color.value).toLowerCase();
+
+input.defaultChecked = input.checked;
 
         const swatch =
             document.createElement(
@@ -1105,7 +1107,7 @@ function buildColorSwatches(
             Boolean(
                 options.customSelected
             );
-
+customInput.defaultChecked = customInput.checked;
         const customSwatch =
             document.createElement(
                 "span"
@@ -1236,7 +1238,9 @@ function mixHexColor(
 function applyBorderShadeIntensity(
     baseColor,
     intensity
-) {
+) { if (!baseColor || baseColor === "original") {
+    return "original";
+}
     const safeIntensity = clampNumber(
         Number(intensity),
         0,
@@ -2297,7 +2301,9 @@ function makeTintedLayer(
     image,
     mask,
     color
-) {
+) { if (!color || color === "original") {
+    return image;
+}
     let maskCache =
         tintedLayerCache.get(image);
 
@@ -6380,9 +6386,9 @@ function getRenderedExtraLayer(asset) {
             asset.id
         );
 
-    if (!selectedColor) {
-        return asset.strokes;
-    }
+if (!selectedColor || selectedColor === "original") {
+    return asset.strokes;
+}
 
     if (
         asset.id ===
@@ -7014,6 +7020,9 @@ function makeFlatTintedMask(
     layer.height =
         mask.naturalHeight ||
         mask.height;
+        if (!color || color === "original") {
+    return layer;
+}
 
     const layerContext =
         layer.getContext("2d");
@@ -8324,9 +8333,9 @@ function updateRendererColors() {
         builderState.mainCakeColor
     );
 
-    const accentColor = normalizeHexColor(
-        builderState.accentColor
-    );
+const accentColor = getRenderableCakeColor(
+    builderState.accentColor
+);
 
     const highlightColor = mixHexColor(
         mainColor,
@@ -10514,13 +10523,18 @@ function getBuilderFields() {
     );
 }
 
+function normalizedBuilderFieldValue(field, value) {
+    return field.type === "color"
+        ? String(value).toLowerCase()
+        : value;
+}
+
 function builderFieldSignature(field) {
     return JSON.stringify([
-        field.value,
+        normalizedBuilderFieldValue(field, field.value),
         Boolean(field.checked)
     ]);
 }
-
 function rememberBuilderFields(useDefaults = false) {
     getBuilderFields().forEach((field) => {
         let signature = builderFieldSignature(field);
@@ -10537,10 +10551,10 @@ function rememberBuilderFields(useDefaults = false) {
                 value = option?.value || "";
             }
 
-            signature = JSON.stringify([
-                value,
-                Boolean(field.defaultChecked)
-            ]);
+ signature = JSON.stringify([
+    normalizedBuilderFieldValue(field, value),
+    Boolean(field.defaultChecked)
+]);
         }
 
         builderFieldHistory.set(field, signature);
@@ -10572,13 +10586,15 @@ function syncVisibleBuilderForm() {
 
     try {
         changedFields.forEach(({ field, value, checked }) => {
-            if (
-                !field.isConnected ||
-                field.disabled ||
-                (field.type === "radio" && !checked)
-            ) {
-                return;
-            }
+if (
+    !field.isConnected ||
+    field.disabled ||
+    field.type === "color" ||
+    field.type === "hidden" ||
+    (field.type === "radio" && !checked)
+) {
+    return;
+}
 
             field.value = value;
 
@@ -14584,14 +14600,20 @@ getElement("#fulfillmentDate")?.addEventListener(
 );
 
 
-window.addEventListener("pageshow", () => {
-    syncVisibleBuilderForm();
-    enforceDateMinimums();
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        // Back/Forward restored a previous page session.
+        window.location.reload();
+        return;
+    }
 
+    prepareFreshBuilderForm();
+    rememberBuilderFields();
+
+    enforceDateMinimums();
     updateCustomCakeFlavorVisibility();
     updateCustomFillingVisibility();
     updateSelectedCardStates();
-
     renderCakePreview();
 });
 
@@ -17163,7 +17185,7 @@ function initializeCupcakePreviewOffset() {
     updateOffset();
 }
 function initializeVisibleBuilderSync() {
-    rememberBuilderFields(true);
+    rememberBuilderFields();
 
     let queued = false;
 
@@ -17863,7 +17885,33 @@ function extraCustomizationsAreComplete() {
 
     return true;
 }
+function prepareFreshBuilderForm() {
+    getBuilderFields().forEach((field) => {
+        if (field.tagName === "SELECT") {
+            const defaultIndex = Array.from(field.options)
+                .findIndex((option) => option.defaultSelected);
+
+            field.selectedIndex =
+                defaultIndex >= 0 ? defaultIndex : 0;
+        } else if (
+            field.type === "radio" ||
+            field.type === "checkbox"
+        ) {
+            field.checked = field.defaultChecked;
+        } else {
+            field.value = field.defaultValue;
+        }
+    });
+
+    // The initial cake is a sample, not a confirmed selection.
+    getElements(
+        'input[name="cakeShape"], input[name="cakeSize"]'
+    ).forEach((input) => {
+        input.checked = false;
+    });
+}
 function initializeBuilder() {
+    prepareFreshBuilderForm();
     getElement("#ruffleUnderlayToggle")
     ?.addEventListener("change", (event) => {
         builderState.ruffleUnderlay =
