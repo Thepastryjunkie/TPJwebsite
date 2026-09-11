@@ -7220,7 +7220,14 @@ previewEntries.forEach((entry, index) => {
         cakePlacements[entry.key]?.round ||
         [0, 0, 1];
 
-    const [x, y, scale] = placement;
+    const [x, originalY, scale] =
+    placement;
+
+const cakeBoardSeatOffset = 24;
+
+const y =
+    originalY +
+    cakeBoardSeatOffset;
 
     const size = getContainedAssetSize(
         cakeImage,
