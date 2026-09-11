@@ -608,7 +608,7 @@ const realisticCakeCanvas = getElement("#realisticCakeCanvas");
 
 const finalAssetRoot = "../images/cake-builder/final";
 const cakeAssetVersion =
-    "?v=tpj-assets-20260911-2";
+    "?v=tpj-assets-20260909-1";
 
 const sprinkleAssetVersion =
     "?v=tpj-sprinkles-20260827-2";
@@ -5365,11 +5365,11 @@ const [
     mask
 ] = await Promise.all([
     loadOptionalRealisticImage(
-        `${borderRoot}/${files.strokes}${cakeAssetVersion}`
+        `${borderRoot}/${files.strokes}${borderAssetVersion}`
     ),
 
     loadOptionalRealisticImage(
-        `${borderRoot}/${files.mask}${cakeAssetVersion}`
+       `${borderRoot}/${files.mask}${borderAssetVersion}` 
     )
 ]);
 
@@ -5502,10 +5502,10 @@ async function loadRuffleUnderlay(
 
     const [strokes, mask] = await Promise.all([
         loadOptionalRealisticImage(
-            `${prefix}-Strokes.png${cakeAssetVersion}`
+          `${prefix}-Strokes.png${borderAssetVersion}`
         ),
         loadOptionalRealisticImage(
-            `${prefix}-Mask.png${cakeAssetVersion}`
+           `${prefix}-Mask.png${borderAssetVersion}` 
         )
     ]);
 
