@@ -364,7 +364,6 @@ mainCakeUsesCustomShade: false,
 accentColor: "#F7B6D2",
 
 cakeBorderStyle: "",
-ruffleUnderlay: false,
 cakeBorderPlacement: "both",
 cakeBorderColor: "#F5B8D2",
 cakeBorderUsesCustomShade: false,
@@ -5365,11 +5364,11 @@ const [
     mask
 ] = await Promise.all([
     loadOptionalRealisticImage(
-        `${borderRoot}/${files.strokes}${cakeAssetVersion}`
+        `${borderRoot}/${files.strokes}${borderAssetVersion}`
     ),
 
     loadOptionalRealisticImage(
-        `${borderRoot}/${files.mask}${cakeAssetVersion}`
+       `${borderRoot}/${files.mask}${borderAssetVersion}` 
     )
 ]);
 
@@ -5425,17 +5424,6 @@ borderColor =
     if (!assets) {
         return;
     }
-    if (assets.underlay) {
-    drawCakeBorder(
-        context,
-        assets.underlay,
-        x,
-        y,
-        width,
-        height,
-        borderColor
-    );
-}
 
     const tintedBorder =
         makeTintedLayer(
@@ -5472,46 +5460,6 @@ borderColor =
 
 
     context.restore();
-}
-async function loadRuffleUnderlay(
-    entryKey,
-    placement,
-    isBento
-) {
-    const shape = getBorderShapeName(entryKey, isBento);
-
-    if (!shape) {
-        return null;
-    }
-
-    const combined =
-        shape.startsWith("Number-") ||
-        shape.startsWith("Letter-");
-
-    const part = combined
-        ? "Border"
-        : placement === "top"
-            ? "Top"
-            : placement === "middle"
-                ? "Middle"
-                : "Bottom";
-
-    const prefix =
-        `${finalAssetRoot}/borders/` +
-        `TPJ-Border-Ruffle-${shape}-${part}`;
-
-    const [strokes, mask] = await Promise.all([
-        loadOptionalRealisticImage(
-            `${prefix}-Strokes.png${cakeAssetVersion}`
-        ),
-        loadOptionalRealisticImage(
-            `${prefix}-Mask.png${cakeAssetVersion}`
-        )
-    ]);
-
-    return strokes && mask
-        ? { strokes, mask }
-        : null;
 }
 
 async function loadSelectedBorderAssets(
@@ -15020,26 +14968,6 @@ if (vintageSelected) {
         underlayToggle.checked = false;
     }
 }   
-const underlayAllowed =
-    !vintageSelected &&
-    ["shell", "rope", "rosette"].includes(
-        builderState.cakeBorderStyle
-    );
-
-getElement("#ruffleUnderlayOption")
-    ?.classList.toggle("is-hidden", !underlayAllowed);
-
-if (!underlayAllowed) {
-    builderState.ruffleUnderlay = false;
-}
-
-const ruffleToggle =
-    getElement("#ruffleUnderlayToggle");
-
-if (ruffleToggle) {
-    ruffleToggle.checked =
-        Boolean(builderState.ruffleUnderlay);
-}
 
     const isNumberLetter =
         product.shape === "numberLetter";
@@ -17823,13 +17751,6 @@ function extraCustomizationsAreComplete() {
     return true;
 }
 function initializeBuilder() {
-    getElement("#ruffleUnderlayToggle")
-    ?.addEventListener("change", (event) => {
-        builderState.ruffleUnderlay =
-            event.target.checked;
-
-        renderCakePreview();
-    });
     enforceDateMinimums();
     reorderStepFourControls();
     buildBuilderColorControls();
