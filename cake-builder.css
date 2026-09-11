@@ -5227,3 +5227,139 @@ margin-inline: auto;
         margin-top: 12px;
     }
 }
+/* EXTRA ITEM CUSTOMIZATION */
+
+.extra-customization-panel {
+    margin: -4px 0 12px;
+    padding: 12px 14px;
+    border: 2px solid #f4bfd8;
+    border-radius: 16px;
+    background: #fff8f2;
+    color: #5a2a1e;
+}
+
+.extra-customization-panel[hidden] {
+    display: none;
+}
+
+.extra-customization-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.extra-customization-summary::-webkit-details-marker {
+    display: none;
+}
+
+.extra-customization-edit {
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: #7b294f;
+    text-decoration: underline;
+}
+
+.extra-customization-panel[open]
+.extra-customization-edit {
+    visibility: hidden;
+}
+
+.extra-customization-body {
+    display: grid;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.extra-customization-body select,
+.extra-customization-body textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #cbb9b3;
+    border-radius: 10px;
+    background: #fff;
+    color: #5a2a1e;
+    font: inherit;
+}
+
+.extra-customization-body select {
+    min-height: 44px;
+}
+
+.extra-customization-body textarea {
+    resize: vertical;
+}
+
+.extra-customization-body .reset-cake-button {
+    justify-self: start;
+}
+
+.extra-match-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.extra-match-choice input {
+    flex: 0 0 auto;
+    margin-top: 4px;
+}
+
+#reviewExtras {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+
+/* PHONE LANDSCAPE CUPCAKE ADD-ON PREVIEW */
+
+@media
+(max-width: 980px) and
+(max-height: 600px) and
+(orientation: landscape) {
+
+    #cupcakeAddOnStudioSlot .cupcake-studio-layout {
+        display: block;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-live-preview {
+        position: sticky;
+
+        top: calc(
+            var(--builder-header-height, 0px) +
+            var(--builder-progress-height, 0px) +
+            4px
+        );
+
+        z-index: 20;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        margin: 6px auto;
+        padding: 3px;
+        background: #fff8f2;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-composite {
+        width: min(16vw, 88px);
+        margin: 0 auto;
+    }
+
+    #cupcakeAddOnStudioSlot #cupcakeSetCaption {
+        margin: 3px 0 0;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    #cupcakeAddOnStudioSlot .cupcake-swatch-section {
+        margin-top: 10px;
+    }
+}
