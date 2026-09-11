@@ -5409,7 +5409,7 @@ margin-inline: auto;
 ========================================= */
 
 #cakePreviewCard #realisticCakeCanvas {
-    transform: scale(1.13);
+    transform: scale(1.12);
     transform-origin: center center;
 }
 /* =========================================
@@ -5417,5 +5417,5 @@ margin-inline: auto;
 ========================================= */
 
 .builder-step {
-    zoom: 0.97;
+    zoom: 0.95;
 }
