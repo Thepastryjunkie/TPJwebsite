@@ -5363,3 +5363,11 @@ margin-inline: auto;
         margin-top: 10px;
     }
 }
+.quantity-product-description {
+    display: block;
+    margin-top: 5px;
+    max-width: 440px;
+    color: #765951;
+    font-size: 0.86rem;
+    line-height: 1.4;
+}
