@@ -6828,6 +6828,227 @@ function getEffectiveBoardColor() {
     return builderState
         .matchedBoardColor;
 }
+const realisticPreviewFitProbe =
+    document.createElement("canvas");
+
+realisticPreviewFitProbe.width = 256;
+realisticPreviewFitProbe.height = 256;
+
+const realisticPreviewFitContext =
+    realisticPreviewFitProbe.getContext(
+        "2d",
+        {
+            willReadFrequently: true
+        }
+    );
+
+
+function fitRealisticPreviewToArtwork() {
+    if (
+        !realisticCakeCanvas ||
+        !realisticPreviewFitContext
+    ) {
+        return;
+    }
+
+    const probeSize = 256;
+
+    realisticPreviewFitContext.clearRect(
+        0,
+        0,
+        probeSize,
+        probeSize
+    );
+
+    /*
+        Make a tiny copy only for measuring.
+        This does NOT alter the real preview.
+    */
+    realisticPreviewFitContext.drawImage(
+        realisticCakeCanvas,
+        0,
+        0,
+        probeSize,
+        probeSize
+    );
+
+    const pixels =
+        realisticPreviewFitContext.getImageData(
+            0,
+            0,
+            probeSize,
+            probeSize
+        ).data;
+
+    let minX = probeSize;
+    let minY = probeSize;
+    let maxX = -1;
+    let maxY = -1;
+
+    const alphaThreshold = 12;
+
+    for (
+        let y = 0;
+        y < probeSize;
+        y += 1
+    ) {
+        for (
+            let x = 0;
+            x < probeSize;
+            x += 1
+        ) {
+            const alpha =
+                pixels[
+                    (
+                        y * probeSize +
+                        x
+                    ) *
+                    4 +
+                    3
+                ];
+
+            if (
+                alpha <=
+                alphaThreshold
+            ) {
+                continue;
+            }
+
+            minX =
+                Math.min(
+                    minX,
+                    x
+                );
+
+            maxX =
+                Math.max(
+                    maxX,
+                    x
+                );
+
+            minY =
+                Math.min(
+                    minY,
+                    y
+                );
+
+            maxY =
+                Math.max(
+                    maxY,
+                    y
+                );
+        }
+    }
+
+    /*
+        Nothing visible.
+    */
+    if (
+        maxX < minX ||
+        maxY < minY
+    ) {
+        realisticCakeCanvas.style
+            .transform = "none";
+
+        return;
+    }
+
+    const contentWidth =
+        maxX - minX + 1;
+
+    const contentHeight =
+        maxY - minY + 1;
+
+    /*
+        White breathing room around
+        cake + board.
+
+        Smaller = closer.
+        Larger = more breathing room.
+    */
+    const safetyPadding = 10;
+
+    const availableSize =
+        probeSize -
+        safetyPadding * 2;
+
+    let previewScale =
+        Math.min(
+            availableSize /
+                contentWidth,
+
+            availableSize /
+                contentHeight
+        );
+
+    /*
+        Never zoom farther in than
+        the close-up amount you liked.
+
+        But allow wider scenes such as
+        Double Numbers to pull back.
+    */
+    previewScale =
+        Math.min(
+            1.13,
+            previewScale
+        );
+
+    previewScale =
+        Math.max(
+            0.72,
+            previewScale
+        );
+
+    /*
+        Center the ACTUAL visible artwork,
+        not just the transparent canvas.
+    */
+    const artworkCenterX =
+        (
+            minX +
+            maxX
+        ) / 2;
+
+    const artworkCenterY =
+        (
+            minY +
+            maxY
+        ) / 2;
+
+    const center =
+        probeSize / 2;
+
+    const translateX =
+        (
+            (
+                center -
+                artworkCenterX
+            ) *
+            previewScale /
+            probeSize
+        ) *
+        100;
+
+    const translateY =
+        (
+            (
+                center -
+                artworkCenterY
+            ) *
+            previewScale /
+            probeSize
+        ) *
+        100;
+
+    realisticCakeCanvas.style
+        .transformOrigin =
+        "center center";
+
+    realisticCakeCanvas.style
+        .transform =
+        `translate(${translateX.toFixed(2)}%, ${translateY.toFixed(2)}%) scale(${previewScale.toFixed(4)})`;
+}
 async function updateRealisticCakePreview() {
     if (!realisticCakeCanvas) return;
 
@@ -7472,6 +7693,7 @@ drawCakeForegroundExtras(
                 );
             });
         }
+        fitRealisticPreviewToArtwork();
  } catch (error) {
     if (
         renderVersion ===
