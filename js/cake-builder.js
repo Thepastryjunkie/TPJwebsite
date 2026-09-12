@@ -644,12 +644,101 @@ const numberCakeAssetMap = {
 };
 
 const boardAssetMap = {
-    round: ["TPJ-Asset-033-Round-Cake-Board.png", "TPJ-Asset-033-Round-Cake-Board-Recolor-Mask.png"],
-    square: ["TPJ-Asset-034-Square-Cake-Board.png", "TPJ-Asset-034-Square-Cake-Board-Recolor-Mask.png"],
-    rectangleHorizontal: ["TPJ-Asset-037-Rectangle-Horizontal-Cake-Board.png", "TPJ-Asset-037-Rectangle-Horizontal-Cake-Board-Recolor-Mask.png"],
-    letterNumber: ["TPJ-Asset-044-Letter-Number-Cake-Board.png", "TPJ-Asset-044-Letter-Number-Cake-Board-Recolor-Mask.png"]
-};
+    round: {
+        white: "TPJ-Board-Round-White.png",
+        black: "TPJ-Board-Round-Black.png",
+        silver: "TPJ-Board-Round-Silver.png",
+        gold: "TPJ-Board-Round-Gold.png",
+        mask: "TPJ-Board-Round-Mask.png"
+    },
 
+    square: {
+        white: "TPJ-Board-Square-White.png",
+        black: "TPJ-Board-Square-Black.png",
+        silver: "TPJ-Board-Square-Silver.png",
+        gold: "TPJ-Board-Square-Gold.png",
+        mask: "TPJ-Board-Square-Mask.png"
+    },
+
+    rectangleHorizontal: {
+        white: "TPJ-Board-Rectangle-White.png",
+        black: "TPJ-Board-Rectangle-Black.png",
+        silver: "TPJ-Board-Rectangle-Silver.png",
+        gold: "TPJ-Board-Rectangle-Gold.png",
+        mask: "TPJ-Board-Rectangle-Mask.png"
+    },
+
+    letterNumber: {
+        white: "TPJ-Board-Number-Letter-Double-White.png",
+        black: "TPJ-Board-Number-Letter-Double-Black.png",
+        silver: "TPJ-Board-Number-Letter-Double-Silver.png",
+        gold: "TPJ-Board-Number-Letter-Double-Gold.png",
+        mask: "TPJ-Board-Number-Letter-Double-Mask.png"
+    }
+};
+function getBoardRenderAsset(
+    boardKey,
+    colorValue
+) {
+    const assets =
+        boardAssetMap[boardKey] ||
+        boardAssetMap.round;
+
+
+    /*
+        MATCH BOARD TO CAKE PALETTE
+
+        Always use the WHITE board as
+        the artwork base, then recolor
+        it through that board's mask.
+    */
+    if (
+        builderState
+            .matchBoardToCakePalette
+    ) {
+        return {
+            mode: "recolor",
+            imageFile: assets.white,
+            maskFile: assets.mask
+        };
+    }
+
+
+    /*
+        NORMAL BOARD COLOR SELECTION
+
+        White / Black / Silver / Gold
+        use their real exported artwork.
+    */
+    const directKey =
+        getDirectBoardAssetKeyForColor(
+            colorValue
+        );
+
+    if (
+        directKey &&
+        assets[directKey]
+    ) {
+        return {
+            mode: "direct",
+            imageFile:
+                assets[directKey],
+            maskFile: null
+        };
+    }
+
+
+    /*
+        Anything without its own export,
+        such as Natural / Kraft,
+        also uses WHITE + MASK.
+    */
+    return {
+        mode: "recolor",
+        imageFile: assets.white,
+        maskFile: assets.mask
+    };
+}
 const cakePlacements = {
     round: { round:[118.1462,153.004,.810277], square:[130.5573,169.1502,.790514], rectangleHorizontal:[118.1462,-106.996,.810277] },
     heart: { round:[145.5955,166.2172,.76779], square:[157.3371,182.0412,.749064], rectangleHorizontal:[145.5955,-93.7828,.76779] },
@@ -666,17 +755,60 @@ const cakePlacements = {
     tallTier: { round:[75,0,.88], square:[78,4,.87], rectangleHorizontal:[75,-260,.88] },
     halfSheet: { rectangleHorizontal:[159.0955,248.2004,.762644] },
     fullSheet: { rectangleHorizontal:[179.5674,316.6618,.712675] },
-    number0: { letterNumber:[163.2443,21.1758,.742009] },
-    number1: { letterNumber:[155.4427,9.6082,.744368] },
-    number2: { letterNumber:[160.6533,9.6082,.744368] },
-    number3: { letterNumber:[164.3592,14,.737864] },
-    number4: { letterNumber:[186.8887,47.667,.68929] },
-    number5: { letterNumber:[164.808,13.3366,.737148] },
-    number6: { letterNumber:[165.5975,13.3429,.730067] },
-    number7: { letterNumber:[162.8835,15.4757,.737864] },
-    number8: { letterNumber:[163.1278,15.6922,.735721] },
-    number9: { letterNumber:[168.8929,20.9751,.726577] },
-    letter: { letterNumber:[206.6667,133.3333,.666667] },
+    number0: {
+        square: [163.2443, 21.1758, 0.742009],
+        letterNumber: [163.2443, 21.1758, 0.742009]
+    },
+
+    number1: {
+        square: [155.4427, 9.6082, 0.744368],
+        letterNumber: [155.4427, 9.6082, 0.744368]
+    },
+
+    number2: {
+        square: [160.6533, 9.6082, 0.744368],
+        letterNumber: [160.6533, 9.6082, 0.744368]
+    },
+
+    number3: {
+        square: [164.3592, 14, 0.737864],
+        letterNumber: [164.3592, 14, 0.737864]
+    },
+
+    number4: {
+        square: [186.8887, 47.667, 0.68929],
+        letterNumber: [186.8887, 47.667, 0.68929]
+    },
+
+    number5: {
+        square: [164.808, 13.3366, 0.737148],
+        letterNumber: [164.808, 13.3366, 0.737148]
+    },
+
+    number6: {
+        square: [165.5975, 13.3429, 0.730067],
+        letterNumber: [165.5975, 13.3429, 0.730067]
+    },
+
+    number7: {
+        square: [162.8835, 15.4757, 0.737864],
+        letterNumber: [162.8835, 15.4757, 0.737864]
+    },
+
+    number8: {
+        square: [163.1278, 15.6922, 0.735721],
+        letterNumber: [163.1278, 15.6922, 0.735721]
+    },
+
+    number9: {
+        square: [168.8929, 20.9751, 0.726577],
+        letterNumber: [168.8929, 20.9751, 0.726577]
+    },
+
+    letter: {
+        square: [206.6667, 133.3333, 0.666667],
+        letterNumber: [206.6667, 133.3333, 0.666667]
+    },
     heart5in: { round:[80.6229,131.3771,.868644], square:[93.9492,148.0508,.847458], rectangleHorizontal:[80.6229,-128.6229,.868644] },
     tallHeart5in: { round:[92.6802,113.9979,.851506], square:[105.7124,131.0955,.830737], rectangleHorizontal:[92.6802,-146.0021,.851506] }
 };
@@ -7059,16 +7191,21 @@ async function updateRealisticCakePreview() {
     const isCupcakesOnly = product.shape === "cupcakes";
     const isStandalonePreview = isBento || isCupcakesOnly;
 
- let boardKey =
-    builderState.cakeBoardStyle;
+const boardKey =
+    getResolvedBoardKey(product);
 
-if (product.shape === "numberLetter") {
-    boardKey = "letterNumber";
-}  
+const boardAssets =
+    boardAssetMap[boardKey] ||
+    boardAssetMap.round;
 
-    const boardAssets =
-        boardAssetMap[boardKey] ||
-        boardAssetMap.round;
+const effectiveBoardColor =
+    getEffectiveBoardColor();
+
+const boardRenderAsset =
+    getBoardRenderAsset(
+        boardKey,
+        effectiveBoardColor
+    );
 
     const previewEntries =
     getCakePreviewEntries(product);
@@ -7317,11 +7454,12 @@ drawBentoForegroundExtras(
         }
 
         const boardUrl =
-            `${finalAssetRoot}/boards/${boardAssets[0]}`;
+            `${finalAssetRoot}/boards/${boardRenderAsset.imageFile}`;
 
         const boardMaskUrl =
-            `${finalAssetRoot}/boards/${boardAssets[1]}`;
-
+            boardRenderAsset.maskFile
+                ? `${finalAssetRoot}/boards/${boardRenderAsset.maskFile}`
+                : null;
 const [
     boardImage,
     boardMask,
@@ -7337,9 +7475,12 @@ const [
             boardUrl
         ),
 
-        loadRealisticImage(
-            boardMaskUrl
-        ),
+        boardMaskUrl
+            ? loadRealisticImage(
+                boardMaskUrl
+            )
+            : Promise.resolve(null),
+
 
         Promise.all(
             cakeUrls.map(
@@ -7422,16 +7563,26 @@ const boardYOffset =
     ) +
     tallRoundSceneYOffset;
 
-        drawRecoloredAsset(
-            context,
-            boardImage,
-            boardMask,
-            getEffectiveBoardColor(),
-            0,
-            boardYOffset,
-            realisticCakeCanvas.width,
-            realisticCakeCanvas.height
-        );
+        if (boardRenderAsset.mode === "direct") {
+            context.drawImage(
+                boardImage,
+                0,
+                boardYOffset,
+                realisticCakeCanvas.width,
+                realisticCakeCanvas.height
+            );
+        } else {
+            drawRecoloredAsset(
+                context,
+                boardImage,
+                boardMask,
+                effectiveBoardColor,
+                0,
+                boardYOffset,
+                realisticCakeCanvas.width,
+                realisticCakeCanvas.height
+            );
+        }
 previewEntries.forEach((entry, index) => {
     const cakeImage = cakeImages[index];
 
@@ -10729,20 +10880,25 @@ const allowedBoardMap = {
         "round",
         "square",
         "rectangleHorizontal"
-    ],
-
-    numberLetter: [
-        "letterNumber"
     ]
 };
 
-const allowedBoards =
+let allowedBoards =
     allowedBoardMap[product.shape] ||
     [
         "round",
         "square",
         "rectangleHorizontal"
     ];
+
+if (product.shape === "numberLetter") {
+    const forcedBoard =
+        product.characterCount === 2
+            ? "letterNumber"
+            : "square";
+
+    allowedBoards = [forcedBoard];
+}
 
     if (
         !allowedBoards.includes(
@@ -10778,7 +10934,9 @@ getElements(
 if (boardNotice) {
     if (product.shape === "numberLetter") {
         boardNotice.textContent =
-            "Number and letter cakes use their dedicated board. You can still choose its color.";
+            product.characterCount === 2
+                ? "Double number and letter cakes use the dedicated wide board. You can still choose its color."
+                : "Single number and letter cakes use the square board. You can still choose its color.";
     } else if (product.shape === "sheet") {
         boardNotice.textContent =
             "Half-sheet and full-sheet cakes use the horizontal rectangle board.";
