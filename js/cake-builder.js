@@ -890,15 +890,45 @@ square: {
         match:   { x: 0, y: 0, scale: 1 }
     },
 
-    letterNumber: {
-        default: { x: 0, y: 0, scale: 1 },
-        white:   { x: 0, y: 0, scale: 1 },
-        silver:  { x: 0, y: 0, scale: 1 },
-        gold:    { x: 0, y: 0, scale: 1 },
-        black:   { x: 0, y: 0, scale: 1 },
-        recolor: { x: 0, y: 0, scale: 1 },
-        match:   { x: 0, y: 0, scale: 1 }
+letterNumber: {
+    default: { x: 0, y: 0, scale: 1 },
+
+    white: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    silver: {
+        x: 0,
+        y: 30,
+        scale: 1
+    },
+
+    gold: {
+        x: 0,
+        y: -50,
+        scale: 1.08
+    },
+
+    black: {
+        x: 0,
+        y: -8,
+        scale: 1.10
+    },
+
+    recolor: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    match: {
+        x: 0,
+        y: 0,
+        scale: 1
     }
+}
 };
 
 
@@ -912,7 +942,15 @@ square: {
    or resized differently.
 */
 
-const boardSceneAdjustments = {};
+const boardSceneAdjustments = {
+    doubleNumberLetter: {
+        letterNumber: {
+            x: 0,
+            y: 40,
+            scale: 1
+        }
+    }
+};
 
 
 function getBoardArtworkVariant(
@@ -3329,10 +3367,10 @@ function getNumberLetterPreviewEntries(product) {
     const isDouble =
         product.characterCount === 2;
 
-    const doublePlacements = [
-        [40, 330, 0.46],
-        [610, 330, 0.46]
-    ];
+const doublePlacements = [
+    [83, 373, 0.391],
+    [653, 373, 0.391]
+];
 
     const styleSlug =
         getNumberLetterStyleSlug();
@@ -8024,9 +8062,92 @@ previewEntries.forEach((entry, index) => {
         cakePlacements[entry.key]?.round ||
         [0, 0, 1];
 
-    const [x, originalY, scale] =
+let [x, originalY, scale] =
     placement;
 
+/*
+    SINGLE NUMBER / LETTER + SQUARE BOARD
+
+    The individual 0–9 / A placements are already
+    tuned separately, so preserve those differences.
+
+    Shrink the complete cake assembly 15%
+    around its existing center.
+*/
+if (
+    boardKey === "square" &&
+    product.shape === "numberLetter" &&
+    product.characterCount === 1
+) {
+    const singleCharacterShrink = 0.70;
+
+    const originalSize =
+        getContainedAssetSize(
+            cakeImage,
+            scale
+        );
+
+
+    // Keep the smaller character horizontally centered
+    x +=
+        originalSize.width *
+        (1 - singleCharacterShrink) /
+        2;
+
+    scale *= singleCharacterShrink;
+
+    // Move the Single character toward the middle/front
+    originalY += 425;
+}
+/*
+    DOUBLE NUMBER / LETTER
+    Gold + Black boards only.
+
+    Board position stays exactly where it is.
+    Only the actual number / letter cakes shrink.
+*/
+if (
+    boardKey === "letterNumber" &&
+    product.shape === "numberLetter" &&
+    product.characterCount === 2
+) {
+    const oldSize =
+        getContainedAssetSize(
+            cakeImage,
+            scale
+        );
+
+    const doubleCharacterShrink = 0.75;
+
+    const newScale =
+        scale * doubleCharacterShrink;
+
+    const newSize =
+        getContainedAssetSize(
+            cakeImage,
+            newScale
+        );
+
+    x +=
+        (oldSize.width - newSize.width) / 2;
+
+    originalY +=
+        (oldSize.height - newSize.height) / 2;
+
+    scale = newScale;
+}
+/*
+    Gold + Black Double Number/Letter only:
+    move the actual cakes down slightly.
+*/
+if (
+    boardKey === "letterNumber" &&
+    product.shape === "numberLetter" &&
+    product.characterCount === 2 &&
+    ["gold", "black"].includes(boardVariant)
+) {
+    originalY += 45;
+}
 const cakeBoardSeatOffset = 24;
 
 const squareBoardColorCakeOffset =
@@ -8035,6 +8156,7 @@ const squareBoardColorCakeOffset =
     ["silver", "gold", "black"].includes(boardVariant)
         ? 25
         : 0;
+   
 
 /*
     Tall 5-inch Heart:
@@ -8328,7 +8450,37 @@ drawCakeForegroundExtras(
                     cakePlacements[entry.key]?.round ||
                     [0, 0, 1];
 
-                const [x, y, scale] = placement;
+let [x, originalY, scale] =
+    placement;
+
+if (
+    boardKey === "square" &&
+    product.shape === "numberLetter" &&
+    product.characterCount === 1
+) {
+    const oldSize =
+        getContainedAssetSize(
+            cakeImage,
+            scale
+        );
+
+    const newScale =
+        scale * 0.85;
+
+    const newSize =
+        getContainedAssetSize(
+            cakeImage,
+            newScale
+        );
+
+    x +=
+        (oldSize.width - newSize.width) / 2;
+
+    originalY +=
+        (oldSize.height - newSize.height) / 2;
+
+    scale = newScale;
+}
                 const size = getContainedAssetSize(
                     cakeImage,
                     scale
