@@ -676,6 +676,59 @@ const boardAssetMap = {
         mask: "TPJ-Board-Number-Letter-Double-Mask.png"
     }
 };
+function getForcedBoardKey(
+    product = getSelectedCakeProduct()
+) {
+    if (
+        product.shape !==
+        "numberLetter"
+    ) {
+        return null;
+    }
+
+    return product.characterCount === 2
+        ? "letterNumber"
+        : "square";
+}
+
+
+function getResolvedBoardKey(
+    product = getSelectedCakeProduct()
+) {
+    return (
+        getForcedBoardKey(product) ||
+        builderState.cakeBoardStyle
+    );
+}
+
+
+function getDirectBoardAssetKeyForColor(
+    colorValue
+) {
+    const normalized =
+        String(colorValue || "")
+            .trim()
+            .toUpperCase();
+
+    switch (normalized) {
+        case "#FFFFFF":
+        case "#FFFDFC":
+            return "white";
+
+        case "#24201F":
+            return "black";
+
+        case "#C9C9C7":
+            return "silver";
+
+        case "#C7A14A":
+        case "#D4A934":
+            return "gold";
+
+        default:
+            return null;
+    }
+}
 function getBoardRenderAsset(
     boardKey,
     colorValue
@@ -739,11 +792,339 @@ function getBoardRenderAsset(
         maskFile: assets.mask
     };
 }
+/* =========================================
+   BOARD ARTWORK FIT ADJUSTMENTS
+
+   These adjust ONLY the cake board artwork.
+   They do NOT move or resize the cake,
+   borders, finishes, or decorations.
+========================================= */
+
+const boardArtworkAdjustments = {
+round: {
+    default: { x: 0, y: 0, scale: 1 },
+
+    white: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    silver: {
+        x: 0,
+        y: 120,
+        scale: 1
+    },
+
+    gold: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    black: {
+        x: 0,
+        y: 75,
+        scale: 1
+    },
+
+    recolor: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    match: {
+        x: 0,
+        y: 0,
+        scale: 1
+    }
+},
+
+square: {
+    default: { x: 0, y: 0, scale: 1 },
+
+    white: {
+        x: 0,
+        y: 0,
+        scale: 1.08
+    },
+
+    silver: {
+        x: 0,
+        y: 0,
+        scale: 1.08
+    },
+
+    gold: {
+        x: 0,
+        y: 0,
+        scale: 1
+    },
+
+    black: {
+        x: 0,
+        y: 0,
+        scale: 1.08
+    },
+
+    recolor: {
+        x: 0,
+        y: 0,
+        scale: 1.08
+    },
+
+    match: {
+        x: 0,
+        y: 0,
+        scale: 1.08
+    }
+},
+    rectangleHorizontal: {
+        default: { x: 0, y: 0, scale: 1 },
+        white:   { x: 0, y: 0, scale: 1 },
+        silver:  { x: 0, y: 0, scale: 1 },
+        gold:    { x: 0, y: 0, scale: 1 },
+        black:   { x: 0, y: 0, scale: 1 },
+        recolor: { x: 0, y: 0, scale: 1 },
+        match:   { x: 0, y: 0, scale: 1 }
+    },
+
+    letterNumber: {
+        default: { x: 0, y: 0, scale: 1 },
+        white:   { x: 0, y: 0, scale: 1 },
+        silver:  { x: 0, y: 0, scale: 1 },
+        gold:    { x: 0, y: 0, scale: 1 },
+        black:   { x: 0, y: 0, scale: 1 },
+        recolor: { x: 0, y: 0, scale: 1 },
+        match:   { x: 0, y: 0, scale: 1 }
+    }
+};
+
+
+/*
+   Optional cake-specific board adjustments.
+
+   LEAVE THIS EMPTY FOR NOW.
+
+   Later we can put something here only when
+   one particular cake needs its board moved
+   or resized differently.
+*/
+
+const boardSceneAdjustments = {};
+
+
+function getBoardArtworkVariant(
+    boardRenderAsset,
+    effectiveBoardColor
+) {
+    if (
+        builderState.matchBoardToCakePalette
+    ) {
+        return "match";
+    }
+
+    if (
+        boardRenderAsset.mode === "direct"
+    ) {
+        return (
+            getDirectBoardAssetKeyForColor(
+                effectiveBoardColor
+            ) ||
+            "default"
+        );
+    }
+
+    return "recolor";
+}
+function getBoardSceneKey(
+    product,
+    previewEntries
+) {
+    if (
+        product.shape === "numberLetter"
+    ) {
+        return product.characterCount === 2
+            ? "doubleNumberLetter"
+            : "singleNumberLetter";
+    }
+
+    return (
+        previewEntries?.[0]?.key ||
+        product.shape ||
+        "default"
+    );
+}
+
+function getBoardDrawBox(
+    boardKey,
+    boardVariant,
+    sceneKey,
+    boardYOffset = 0
+) {
+        /*
+        Special fit only for Standard Round and Tall Round
+        cakes using the Square board.
+
+        These measurements come from the actual visible
+        pixels inside each 1254 × 1254 exported board.
+    */
+    if (
+        boardKey === "square" &&
+        (
+            sceneKey === "round" ||
+            sceneKey === "tallRound"
+        )
+    ) {
+        const squareBoardVisibleBounds = {
+            white: {
+                left: 60,
+                right: 1145,
+                bottom: 1254
+            },
+
+            silver: {
+                left: 87,
+                right: 1134,
+                bottom: 1226
+            },
+
+            gold: {
+                left: 87,
+                right: 1131,
+                bottom: 1233
+            },
+
+            black: {
+                left: 87,
+                right: 1131,
+                bottom: 1253
+            },
+
+            recolor: {
+                left: 60,
+                right: 1145,
+                bottom: 1254
+            },
+
+            match: {
+                left: 60,
+                right: 1145,
+                bottom: 1254
+            },
+
+            default: {
+                left: 60,
+                right: 1145,
+                bottom: 1254
+            }
+        };
+
+        const bounds =
+            squareBoardVisibleBounds[boardVariant] ||
+            squareBoardVisibleBounds.default;
+
+        const scale = 1;
+
+        const visibleCenterX =
+            (
+                bounds.left +
+                bounds.right
+            ) / 2;
+
+        return {
+            x:
+                realisticCakeCanvas.width / 2 -
+                visibleCenterX * scale,
+
+            y:
+                realisticCakeCanvas.height -
+                16 -
+                bounds.bottom * scale,
+
+            width:
+                realisticCakeCanvas.width *
+                scale,
+
+            height:
+                realisticCakeCanvas.height *
+                scale
+        };
+    }
+    const artworkGroup =
+        boardArtworkAdjustments[boardKey] ||
+        {};
+
+    const artworkAdjustment =
+        artworkGroup[boardVariant] ||
+        artworkGroup.default ||
+        {
+            x: 0,
+            y: 0,
+            scale: 1
+        };
+
+    const sceneGroup =
+        boardSceneAdjustments[sceneKey] ||
+        {};
+
+    const sceneAdjustment =
+        sceneGroup[boardKey] ||
+        sceneGroup.default ||
+        {
+            x: 0,
+            y: 0,
+            scale: 1
+        };
+
+    const scale =
+        artworkAdjustment.scale *
+        sceneAdjustment.scale;
+
+    const width =
+        realisticCakeCanvas.width *
+        scale;
+
+    const height =
+        realisticCakeCanvas.height *
+        scale;
+
+    return {
+        x:
+            (
+                realisticCakeCanvas.width -
+                width
+            ) / 2 +
+            artworkAdjustment.x +
+            sceneAdjustment.x,
+
+        y:
+            boardYOffset +
+            (
+                realisticCakeCanvas.height -
+                height
+            ) / 2 +
+            artworkAdjustment.y +
+            sceneAdjustment.y,
+
+        width,
+        height
+    };
+}
 const cakePlacements = {
-    round: { round:[118.1462,153.004,.810277], square:[130.5573,169.1502,.790514], rectangleHorizontal:[118.1462,-106.996,.810277] },
+    round: {
+    round: [118.1462, 153.004, 0.810277],
+    square: [175.6166, 23.05, 0.718649],
+    rectangleHorizontal: [118.1462, -106.996, 0.810277]
+},
     heart: { round:[145.5955,166.2172,.76779], square:[157.3371,182.0412,.749064], rectangleHorizontal:[145.5955,-93.7828,.76779] },
     star: { round:[161.04,221.6379,.746133], square:[172.4049,236.1101,.727934], rectangleHorizontal:[161.04,-38.3621,.746133] },
-    tallRound: { round:[55.9934,-65.7743,.90708], square:[55.9934,-70.7743,.90708], rectangleHorizontal:[55.9934,-325.7743,.90708] },
+    tallRound: {
+    round: [55.9934, -65.7743, 0.90708],
+    square: [107.6970, -30, 0.824618],
+    rectangleHorizontal: [55.9934, -325.7743, 0.90708]
+},
     tallHeart: { round:[130.8091,93.2498,.790743], square:[142.9113,110.8534,.771456], rectangleHorizontal:[130.8091,-166.7502,.790743] },
     tallStar: { round:[126.8638,96.3035,.797665], square:[139.0623,113.8327,.77821], rectangleHorizontal:[126.8638,-163.6965,.797665] },
     square: { square:[157.597,200.0746,.746269], rectangleHorizontal:[145.8619,-75.2985,.764925] },
@@ -7563,26 +7944,48 @@ const boardYOffset =
     ) +
     tallRoundSceneYOffset;
 
-        if (boardRenderAsset.mode === "direct") {
-            context.drawImage(
-                boardImage,
-                0,
-                boardYOffset,
-                realisticCakeCanvas.width,
-                realisticCakeCanvas.height
-            );
-        } else {
-            drawRecoloredAsset(
-                context,
-                boardImage,
-                boardMask,
-                effectiveBoardColor,
-                0,
-                boardYOffset,
-                realisticCakeCanvas.width,
-                realisticCakeCanvas.height
-            );
-        }
+
+const boardVariant =
+    getBoardArtworkVariant(
+        boardRenderAsset,
+        effectiveBoardColor
+    );
+
+
+const boardDrawBox =
+    getBoardDrawBox(
+        boardKey,
+        boardVariant,
+        getBoardSceneKey(
+            product,
+            previewEntries
+        ),
+        boardYOffset
+    );
+
+
+if (
+    boardRenderAsset.mode === "direct"
+) {
+    context.drawImage(
+        boardImage,
+        boardDrawBox.x,
+        boardDrawBox.y,
+        boardDrawBox.width,
+        boardDrawBox.height
+    );
+} else {
+    drawRecoloredAsset(
+        context,
+        boardImage,
+        boardMask,
+        effectiveBoardColor,
+        boardDrawBox.x,
+        boardDrawBox.y,
+        boardDrawBox.width,
+        boardDrawBox.height
+    );
+}
 previewEntries.forEach((entry, index) => {
     const cakeImage = cakeImages[index];
 
