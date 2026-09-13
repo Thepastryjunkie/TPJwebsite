@@ -10717,11 +10717,27 @@ function getTodayForDateInput() {
         .toISOString()
         .slice(0, 10);
 }
-
-
-function enforceDateMinimums() {
+function getMinimumDateForField(stateKey) {
     const today = getTodayForDateInput();
 
+    if (stateKey !== "fulfillmentDate") {
+        return today;
+    }
+
+    const eventDate =
+        getElement("#eventDate")?.value ||
+        builderState.eventDate ||
+        "";
+
+    return (
+        eventDate &&
+        eventDate > today
+    )
+        ? eventDate
+        : today;
+}
+
+function enforceDateMinimums() {
     [
         ["#eventDate", "eventDate"],
         ["#fulfillmentDate", "fulfillmentDate"]
@@ -10732,36 +10748,45 @@ function enforceDateMinimums() {
             return;
         }
 
-        input.min = today;
+        const minimumDate =
+            getMinimumDateForField(stateKey);
+
+        input.min = minimumDate;
 
         if (
             input.value &&
-            input.value < today
+            input.value < minimumDate
         ) {
             input.value = "";
             builderState[stateKey] = "";
+
+            if (stateKey === "fulfillmentDate") {
+                updateRushFee();
+            }
         }
     });
 }
-
 
 function protectDateFromPast(
     input,
     stateKey
 ) {
-    const today = getTodayForDateInput();
+    const minimumDate =
+        getMinimumDateForField(stateKey);
 
-    input.min = today;
+    input.min = minimumDate;
 
     if (
         input.value &&
-        input.value < today
+        input.value < minimumDate
     ) {
         input.value = "";
         builderState[stateKey] = "";
 
         input.setCustomValidity(
-            "Please choose today or a future date."
+            stateKey === "fulfillmentDate"
+                ? "Pickup or delivery must be on or after the event date."
+                : "Please choose today or a future date."
         );
 
         input.reportValidity();
@@ -10769,6 +10794,7 @@ function protectDateFromPast(
     }
 
     input.setCustomValidity("");
+
     builderState[stateKey] =
         input.value;
 
@@ -10818,7 +10844,16 @@ if (
 
         return false;
     }
+if (
+    builderState.fulfillmentDate <
+    builderState.eventDate
+) {
+    showValidationMessage(
+        "Choose the preferred pickup or delivery date."
+    );
 
+    return false;
+}
     if (
         !builderState.guestCount ||
         builderState.guestCount < 1
@@ -15229,10 +15264,15 @@ getElement(
 getElement("#eventDate")?.addEventListener(
     "input",
     (event) => {
-        protectDateFromPast(
-            event.target,
-            "eventDate"
-        );
+        const accepted =
+            protectDateFromPast(
+                event.target,
+                "eventDate"
+            );
+
+        if (accepted) {
+            enforceDateMinimums();
+        }
     }
 );
 
