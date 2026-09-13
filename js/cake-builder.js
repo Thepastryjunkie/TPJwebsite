@@ -1115,7 +1115,7 @@ function getBoardDrawBox(
 const cakePlacements = {
     round: {
     round: [118.1462, 153.004, 0.810277],
-    square: [175.6166, 23.05, 0.718649],
+    square: [175.6166, 127, 0.718649],
     rectangleHorizontal: [118.1462, -106.996, 0.810277]
 },
     heart: { round:[145.5955,166.2172,.76779], square:[157.3371,182.0412,.749064], rectangleHorizontal:[145.5955,-93.7828,.76779] },
@@ -8016,9 +8016,17 @@ previewEntries.forEach((entry, index) => {
 
 const cakeBoardSeatOffset = 24;
 
+const squareBoardColorCakeOffset =
+    boardKey === "square" &&
+    entry.key === "round" &&
+    ["silver", "gold", "black"].includes(boardVariant)
+        ? 25
+        : 0;
+
 const y =
     originalY +
-    cakeBoardSeatOffset;
+    cakeBoardSeatOffset +
+    squareBoardColorCakeOffset;
 
     const size = getContainedAssetSize(
         cakeImage,
