@@ -1122,7 +1122,7 @@ const cakePlacements = {
     star: { round:[161.04,221.6379,.746133], square:[172.4049,236.1101,.727934], rectangleHorizontal:[161.04,-38.3621,.746133] },
     tallRound: {
     round: [55.9934, -65.7743, 0.90708],
-    square: [107.6970, -30, 0.824618],
+    square: [107.6970, -100, 0.824618],
     rectangleHorizontal: [55.9934, -325.7743, 0.90708]
 },
     tallHeart: { round:[130.8091,93.2498,.790743], square:[142.9113,110.8534,.771456], rectangleHorizontal:[130.8091,-166.7502,.790743] },
@@ -7936,21 +7936,30 @@ const tallRoundSceneYOffset =
         ? 50
         : 0;
 
+/*
+    Moves the complete Tall Round + Square-board
+    scene together without changing their fit.
+*/
+const tallRoundSquareSceneShiftY =
+    boardKey === "square" &&
+    tallRoundSceneYOffset
+        ? 12
+        : 0;
+
 const boardYOffset =
     (
         boardKey === "rectangleHorizontal"
             ? 260
             : 0
     ) +
-    tallRoundSceneYOffset;
-
+    tallRoundSceneYOffset +
+    tallRoundSquareSceneShiftY;
 
 const boardVariant =
     getBoardArtworkVariant(
         boardRenderAsset,
         effectiveBoardColor
     );
-
 
 const boardDrawBox =
     getBoardDrawBox(
@@ -7962,6 +7971,13 @@ const boardDrawBox =
         ),
         boardYOffset
     );
+
+/*
+    The special Square-board draw box handles its
+    own position, so apply the same scene shift here.
+*/
+boardDrawBox.y +=
+    tallRoundSquareSceneShiftY;
 
 
 if (
