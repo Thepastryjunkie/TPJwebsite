@@ -8100,6 +8100,19 @@ if (
     originalY += 425;
 }
 /*
+    SINGLE LETTER A ONLY:
+    push it farther back.
+*/
+if (
+    boardKey === "square" &&
+    product.shape === "numberLetter" &&
+    product.characterCount === 1 &&
+    entry.key === "letter"
+) {
+    originalY -= 110;
+}
+
+/*
     DOUBLE NUMBER / LETTER
     Gold + Black boards only.
 
