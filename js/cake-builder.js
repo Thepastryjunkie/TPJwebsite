@@ -6692,7 +6692,7 @@ const cakeExtraScaleMap = {
     },
 
     fullSheet: {
-        macaronsDecoration: 1.78
+        macaronsDecoration: 1.25
     },
 
     number0: { discoBallsDecoration: 1.00 },
@@ -6718,8 +6718,12 @@ function getCakeForegroundExtraDrawBox(
     shouldStagger,
     entryKey = ""
 ) {
-    const scale =
-        cakeExtraScaleMap[entryKey]?.[asset.id] || 1;
+const scale =
+    entryKey === "tallRound" &&
+    getResolvedBoardKey() === "rectangleHorizontal" &&
+    asset.id === "macaronsDecoration"
+        ? 0.90
+        : cakeExtraScaleMap[entryKey]?.[asset.id] || 1;
 
     const [offsetX, offsetY] =
         shouldStagger
@@ -8023,10 +8027,72 @@ const squareBoardColorCakeOffset =
         ? 25
         : 0;
 
+/*
+    Tall 5-inch Heart:
+    move the complete cake assembly slightly
+    farther back on every board.
+*/
+const tallFiveInHeartPushBack =
+    boardKey === "rectangleHorizontal" &&
+    entry.key === "tallHeart5in"
+        ? (
+            ["silver", "gold", "black"].includes(boardVariant)
+                ? -55
+                : -35
+        )
+        : 0;
+
+
+/*
+    Standard Heart + Square board:
+    metallic board colors need the cake
+    slightly farther back.
+
+    White / Match stay untouched.
+*/
+const standardHeartMetallicPushBack =
+    entry.key === "heart" &&
+     boardKey === "rectangleHorizontal"&&
+    ["silver", "gold", "black"].includes(boardVariant)
+        ? -35
+        : 0;
+/*
+    Rectangle-board cakes sit farther back
+    on the board.
+
+    This moves the COMPLETE cake assembly:
+    cake, finish, borders, drip, sprinkles,
+    and extras.
+
+    The Rectangle board itself does NOT move.
+*/
+const rectangleCakePushBack =
+    boardKey === "rectangleHorizontal" &&
+    [
+        "round",
+        "tallRound",
+        "heart",
+        "tallHeart",
+        "star",
+        "tallStar",
+        "square",
+        "tallSquare",
+        "halfSheet",
+        "fullSheet",
+        "tier",
+        "tallTier"
+    ].includes(entry.key)
+        ? -45
+        : 0;
+
+
 const y =
     originalY +
     cakeBoardSeatOffset +
-    squareBoardColorCakeOffset;
+    squareBoardColorCakeOffset +
+    tallFiveInHeartPushBack +
+    standardHeartMetallicPushBack +
+    rectangleCakePushBack;
 
     const size = getContainedAssetSize(
         cakeImage,
