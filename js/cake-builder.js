@@ -7949,6 +7949,14 @@ const tallRoundSquareSceneShiftY =
     tallRoundSceneYOffset
         ? 12
         : 0;
+ const tallTierRectangleCanvasRoom =
+    boardKey === "rectangleHorizontal" &&
+    previewEntries.some(
+        (entry) =>
+            entry.key === "tallTier"
+    )
+        ? 45
+        : 0;       
 
 const boardYOffset =
     (
@@ -7957,7 +7965,8 @@ const boardYOffset =
             : 0
     ) +
     tallRoundSceneYOffset +
-    tallRoundSquareSceneShiftY;
+    tallRoundSquareSceneShiftY +
+    tallTierRectangleCanvasRoom;
 
 const boardVariant =
     getBoardArtworkVariant(
@@ -8081,9 +8090,10 @@ const rectangleCakePushBack =
         "fullSheet",
         "tier",
         "tallTier"
-    ].includes(entry.key)
-        ? -45
-        : 0;
+   ].includes(entry.key)
+    ? (entry.key === "tallTier" ? -65 : -45)
+    : 0;
+   
 
 
 const y =
