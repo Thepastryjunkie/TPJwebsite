@@ -6403,31 +6403,7 @@ const extraAssetVersion =
                         await loadOptionalRealisticImage(
                             `${extraRoot}/${prefix}-Mask.png${extraAssetVersion}`
                         );
-const donorShapeName =
-    id ===
-        "chocolateDripDecoration" &&
-    entryKey ===
-        "tier"
-        ? "Tall-Two-Tier"
-        : "";
 
-if (
-    donorShapeName &&
-    strokes
-) {
-    const donorStrokes =
-        await loadOptionalRealisticImage(
-            `${extraRoot}/TPJ-Extra-${styleName}-${donorShapeName}-Strokes.png${extraAssetVersion}`
-        );
-
-    if (donorStrokes) {
-        strokes =
-            registerExtraArtworkToReference(
-                donorStrokes,
-                strokes
-            );
-    }
-}
                     if (!strokes) {
                         return null;
                     }
@@ -6599,64 +6575,7 @@ function getDripDrawBox(
     width,
     height
 ) {
-    const source =
-        dripAsset?.strokes?.src || "";
-
-    let scaleX = 1;
-    let scaleY = 1;
-    let offsetY = 0;
-
-  if (
-    source.includes("-Tall-Round-")
-) {
-    scaleX = 1.025;
-} else if (
-    source.includes("-Tall-Square-")
-) {
-    scaleX = 0.96;
-    scaleY = 0.98;
-    offsetY = 5;
-    } else if (
-        source.includes("-Square-")
-    ) {
-        scaleX = 0.98;
-        scaleY = 0.99;
-        offsetY = 3;
-    } else if (
-        source.includes(
-            "-Tall-Two-Tier-"
-        )
-    ) {
-        scaleX = 0.97;
-        scaleY = 0.98;
-        offsetY = 5;
-    }
-
-    const adjustedWidth =
-        width * scaleX;
-
-    const adjustedHeight =
-        height * scaleY;
-
-    return {
-        x:
-            x +
-            (
-                width -
-                adjustedWidth
-            ) / 2,
-
-        y:
-            y +
-            (
-                height -
-                adjustedHeight
-            ) / 2 +
-            offsetY,
-
-        width: adjustedWidth,
-        height: adjustedHeight
-    };
+    return { x, y, width, height };
 }
 function drawCakeDripExtra(
     context,
