@@ -5238,20 +5238,19 @@ async function loadSprinkleAssets(
     if (!files) {
         return null;
     }
-
-    const borderRoot =
-        `${finalAssetRoot}/borders`;
+const sprinkleRoot =
+    `${finalAssetRoot}/borders/Sprinkles`;
 
     const [
         strokes,
         mask
     ] = await Promise.all([
         loadOptionalRealisticImage(
-            `${borderRoot}/${files.strokes}${sprinkleAssetVersion}`
+      `${sprinkleRoot}/${files.strokes}${sprinkleAssetVersion}`     
         ),
 
         loadOptionalRealisticImage(
-            `${borderRoot}/${files.mask}${sprinkleAssetVersion}`
+      `${sprinkleRoot}/${files.mask}${sprinkleAssetVersion}`      
         )
     ]);
 
@@ -5739,20 +5738,9 @@ function usesCombinedNumberLetterBorder(
             entryKey
         ] || "";
 
-    const isNumberLetter =
-        shapeName.startsWith(
-            "Number-"
-        ) ||
-        shapeName === "Letter-A";
-
     return (
-        isNumberLetter &&
-        (
-            builderState.cakeBorderStyle ===
-                "rosette" ||
-            builderState.cakeBorderStyle ===
-                "ruffle"
-        )
+        shapeName.startsWith("Number-") ||
+        shapeName === "Letter-A"
     );
 }
 function getBorderAssetFiles(
@@ -5834,8 +5822,13 @@ async function loadBorderAssets(
         return null;
     }
 
-    const borderRoot =
-        `${finalAssetRoot}/borders`;
+const styleFolder =
+    borderStyleNameMap[
+        builderState.cakeBorderStyle
+    ];
+
+const borderRoot =
+    `${finalAssetRoot}/borders/${styleFolder}`;
 
 const [
     strokes,
