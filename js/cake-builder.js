@@ -18835,3 +18835,299 @@ function matchTpjBuilderImageBackgrounds() {
 
 
 matchTpjBuilderImageBackgrounds();
+/* TPJ COMPACT COLOR PICKERS */
+(() => {
+    const pickers = new Map();
+    let observer;
+    let scheduled = false;
+
+    function closeOtherPickers(current) {
+        pickers.forEach(({ details }) => {
+            if (details !== current) {
+                details.open = false;
+            }
+        });
+    }
+
+    function updateSummary(grid, picker) {
+        const selected =
+            grid.querySelector('input[type="radio"]:checked');
+
+        const label = selected?.closest(".color-choice");
+        const custom = selected?.value === "custom";
+
+        const name =
+            label?.querySelector("small")?.textContent?.trim() ||
+            "Choose a color";
+
+        const swatch = label?.querySelector(".color-swatch");
+
+        const customColor =
+            picker.panel.querySelector('input[type="color"]');
+
+        const color = custom
+            ? customColor?.value || "#F7B6D2"
+            : swatch
+                ? getComputedStyle(swatch)
+                    .getPropertyValue("--swatch-color").trim()
+                : "#F7B6D2";
+
+        picker.name.textContent =
+            custom ? "Custom Shade" : name;
+
+        picker.preview.style.setProperty(
+            "--tpj-selected-color",
+            color || "#F7B6D2"
+        );
+
+        picker.details.hidden =
+            grid.hidden || grid.classList.contains("is-hidden");
+    }
+
+    function enhanceGrid(grid) {
+        if (pickers.has(grid)) {
+            updateSummary(grid, pickers.get(grid));
+            return;
+        }
+
+        const details = document.createElement("details");
+        details.className = "tpj-color-picker";
+
+        const summary = document.createElement("summary");
+
+        const preview = document.createElement("span");
+        preview.className = "tpj-color-preview";
+        preview.setAttribute("aria-hidden", "true");
+
+        const copy = document.createElement("span");
+        copy.className = "tpj-color-copy";
+
+        const name = document.createElement("strong");
+
+        const hint = document.createElement("small");
+        hint.textContent = "Change color";
+
+        copy.append(name, hint);
+        summary.append(preview, copy);
+
+        const panel = document.createElement("div");
+        panel.className = "tpj-color-panel";
+
+        /*
+         * Collect only this palette's immediately
+         * following custom-color field and note.
+         */
+        const customControls = [];
+        let sibling = grid.nextElementSibling;
+
+        while (
+            sibling &&
+            (
+                sibling.classList.contains("custom-color-field") ||
+                sibling.classList.contains("field-note")
+            )
+        ) {
+            customControls.push(sibling);
+            sibling = sibling.nextElementSibling;
+        }
+
+        grid.before(details);
+        panel.append(grid, ...customControls);
+
+        const done = document.createElement("button");
+        done.type = "button";
+        done.className = "tpj-color-done";
+        done.textContent = "Done";
+
+        panel.append(done);
+        details.append(summary, panel);
+
+        const picker = {
+            details,
+            summary,
+            panel,
+            preview,
+            name
+        };
+
+        pickers.set(grid, picker);
+
+        summary.addEventListener("click", () => {
+            closeOtherPickers(details);
+        });
+
+        details.addEventListener("toggle", () => {
+            if (details.open) {
+                closeOtherPickers(details);
+            }
+        });
+
+        grid.addEventListener("change", (event) => {
+            const input = event.target;
+
+            if (!input.matches('input[type="radio"]')) {
+                return;
+            }
+
+            /*
+             * Wait for the existing color handler
+             * to finish updating the cake and mask.
+             */
+            queueMicrotask(() => {
+                updateSummary(grid, picker);
+
+                if (input.value === "custom") {
+                    details.open = true;
+                    closeOtherPickers(details);
+                } else {
+                    details.open = false;
+                    summary.focus({ preventScroll: true });
+                }
+            });
+        });
+
+        panel.addEventListener("input", () => {
+            updateSummary(grid, picker);
+        });
+
+        done.addEventListener("click", () => {
+            updateSummary(grid, picker);
+            details.open = false;
+            summary.focus({ preventScroll: true });
+        });
+
+        details.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                details.open = false;
+                summary.focus({ preventScroll: true });
+            }
+        });
+
+        updateSummary(grid, picker);
+    }
+
+    /*
+     * The matched-board control is a native select,
+     * so give it swatches that use its existing handler.
+     */
+    function enhanceMatchedBoard() {
+        const select = document.getElementById("matchedBoardColor");
+
+        if (!select || select.dataset.tpjEnhanced) {
+            return;
+        }
+
+        select.dataset.tpjEnhanced = "true";
+        select.classList.add("tpj-color-native");
+        select.hidden = true;
+
+        const grid = document.createElement("div");
+        grid.className = "color-choice-grid";
+        grid.id = "tpjMatchedBoardSwatches";
+
+        const anchor = select.closest("label") || select;
+        anchor.after(grid);
+
+        Array.from(select.options).forEach((option) => {
+            const label = document.createElement("label");
+            const custom = option.value === "custom";
+
+            label.className = custom
+                ? "color-choice custom-shade-tile"
+                : "color-choice";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "tpjMatchedBoardColor";
+            radio.value = option.value;
+            radio.checked = select.value === option.value;
+
+            const swatch = document.createElement("span");
+            swatch.className = custom
+                ? "custom-shade-icon"
+                : "color-swatch";
+
+            if (custom) {
+                swatch.textContent = "+";
+            } else {
+                swatch.style.setProperty(
+                    "--swatch-color",
+                    option.value
+                );
+            }
+
+            const text = document.createElement("small");
+            text.textContent = option.textContent;
+
+            radio.addEventListener("change", () => {
+                if (!radio.checked) return;
+
+                select.value = radio.value;
+                select.dispatchEvent(
+                    new Event("change", { bubbles: true })
+                );
+            });
+
+            label.append(radio, swatch, text);
+            grid.append(label);
+        });
+    }
+
+    function refresh() {
+        scheduled = false;
+        observer?.disconnect();
+
+        try {
+            enhanceMatchedBoard();
+
+            const select =
+                document.getElementById("matchedBoardColor");
+
+            document.querySelectorAll(
+                '#tpjMatchedBoardSwatches input[type="radio"]'
+            ).forEach((input) => {
+                input.checked = input.value === select?.value;
+            });
+
+            /*
+             * Includes dynamically generated palettes
+             * and the existing hard-coded drip palette.
+             */
+            document.querySelectorAll(
+                ".color-choice-grid"
+            ).forEach(enhanceGrid);
+        } finally {
+            observer?.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["class"]
+            });
+        }
+    }
+
+    function scheduleRefresh() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(refresh);
+    }
+
+    function start() {
+        observer = new MutationObserver(scheduleRefresh);
+
+        refresh();
+
+        document.addEventListener("change", scheduleRefresh);
+        document.addEventListener("reset", () => {
+            setTimeout(scheduleRefresh, 0);
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, {
+            once: true
+        });
+    } else {
+        start();
+    }
+})();
