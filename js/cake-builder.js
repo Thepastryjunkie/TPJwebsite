@@ -10631,22 +10631,28 @@ function getTodayForDateInput() {
 }
 function getMinimumDateForField(stateKey) {
     const today = getTodayForDateInput();
+    const eventDate = getElement("#eventDate")?.value || "";
 
-    if (stateKey !== "fulfillmentDate") {
+    if (stateKey !== "fulfillmentDate" || !eventDate) {
         return today;
     }
 
-    const eventDate =
-        getElement("#eventDate")?.value ||
-        builderState.eventDate ||
-        "";
+    const earliest = new Date(`${eventDate}T12:00:00`);
+    earliest.setDate(earliest.getDate() - 3);
 
-    return (
-        eventDate &&
-        eventDate > today
-    )
-        ? eventDate
-        : today;
+    const earliestDate = [
+        earliest.getFullYear(),
+        String(earliest.getMonth() + 1).padStart(2, "0"),
+        String(earliest.getDate()).padStart(2, "0")
+    ].join("-");
+
+    return earliestDate > today ? earliestDate : today;
+}
+
+function getMaximumDateForField(stateKey) {
+    return stateKey === "fulfillmentDate"
+        ? getElement("#eventDate")?.value || ""
+        : "";
 }
 
 function enforceDateMinimums() {
@@ -10655,97 +10661,83 @@ function enforceDateMinimums() {
         ["#fulfillmentDate", "fulfillmentDate"]
     ].forEach(([selector, stateKey]) => {
         const input = getElement(selector);
+        if (!input) return;
 
-        if (!input) {
-            return;
-        }
-
-        const minimumDate =
-            getMinimumDateForField(stateKey);
-
-        input.min = minimumDate;
+        input.min = getMinimumDateForField(stateKey);
+        input.max = getMaximumDateForField(stateKey);
+        input.setCustomValidity("");
 
         if (
             input.value &&
-            input.value < minimumDate
+            (
+                input.value < input.min ||
+                (input.max && input.value > input.max)
+            )
         ) {
             input.value = "";
-            builderState[stateKey] = "";
-
-            if (stateKey === "fulfillmentDate") {
-                updateRushFee();
-            }
         }
+
+        builderState[stateKey] = input.value;
     });
+
+    updateRushFee();
 }
 
-function protectDateFromPast(
-    input,
-    stateKey
-) {
-    const minimumDate =
-        getMinimumDateForField(stateKey);
+function protectDateFromPast(input, stateKey) {
+    input.min = getMinimumDateForField(stateKey);
+    input.max = getMaximumDateForField(stateKey);
+    input.setCustomValidity("");
 
-    input.min = minimumDate;
-
-    if (
+    const outsideRange =
         input.value &&
-        input.value < minimumDate
-    ) {
+        (
+            input.value < input.min ||
+            (input.max && input.value > input.max)
+        );
+
+    if (outsideRange) {
         input.value = "";
         builderState[stateKey] = "";
 
         input.setCustomValidity(
             stateKey === "fulfillmentDate"
-                ? "Pickup or delivery must be on or after the event date."
+                ? "Pickup or delivery must be within the three days before your event or on the event day, and cannot be in the past."
                 : "Please choose today or a future date."
         );
+
+        if (stateKey === "fulfillmentDate") {
+            updateRushFee();
+        }
 
         input.reportValidity();
         return false;
     }
 
-    input.setCustomValidity("");
-
-    builderState[stateKey] =
-        input.value;
-
+    builderState[stateKey] = input.value;
     return true;
 }
 
 function validateStepOne() {
     builderState.eventDate =
         getElement("#eventDate")?.value || "";
+
     builderState.fulfillmentDate =
         getElement("#fulfillmentDate")?.value || "";
-     if (
-    builderState.fulfillmentDate <
-    getTodayForDateInput()
-) {
-    showValidationMessage(
-        "The pickup or delivery date cannot be in the past."
-    );
 
-    return false;
-}   
     builderState.guestCount =
         Number(getElement("#guestCount")?.value) || 0;
- 
+
+    const today = getTodayForDateInput();
 
     if (!builderState.eventDate) {
-        showValidationMessage(
-            "Choose the event date."
-        );
-if (
-    builderState.eventDate <
-    getTodayForDateInput()
-) {
-    showValidationMessage(
-        "The event date cannot be in the past."
-    );
+        showValidationMessage("Choose the event date.");
+        return false;
+    }
 
-    return false;
-}
+    if (builderState.eventDate < today) {
+        showValidationMessage(
+            "The event date cannot be in the past."
+        );
         return false;
     }
 
@@ -10753,27 +10745,24 @@ if (
         showValidationMessage(
             "Choose the preferred pickup or delivery date."
         );
-
         return false;
     }
-if (
-    builderState.fulfillmentDate <
-    builderState.eventDate
-) {
-    showValidationMessage(
-        "Choose the preferred pickup or delivery date."
-    );
 
-    return false;
-}
     if (
-        !builderState.guestCount ||
-        builderState.guestCount < 1
+        builderState.fulfillmentDate <
+            getMinimumDateForField("fulfillmentDate") ||
+        builderState.fulfillmentDate > builderState.eventDate
     ) {
+        showValidationMessage(
+            "Pickup or delivery must be within the three days before your event or on the event day, and cannot be in the past."
+        );
+        return false;
+    }
+
+    if (builderState.guestCount < 1) {
         showValidationMessage(
             "Enter the approximate guest count."
         );
-
         return false;
     }
 
