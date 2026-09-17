@@ -19,8 +19,8 @@
         Create Your Cake | The Pastry Junkie
     </title>
 
-<link rel="stylesheet" href="../cake-builder.css?v=20260916-transparent-hero-7">
-</head>
+
+</head><link rel="stylesheet" href="../cake-builder.css?v=20260917-step1-option1-2">
 
 <body>
 
@@ -1181,9 +1181,10 @@
                              PREVIEW TOTALS
                         ========================== -->
 
-                        <div
-    class="preview-summary"
+<div
+    class="preview-summary is-hidden"
     id="cakePreviewMeta"
+>
 >
                             <div>
                                 <span>
@@ -1207,8 +1208,8 @@
 
                         </div>
 
-                      <p
-    class="preview-note"
+<p
+    class="preview-note is-hidden"
     id="cakePreviewDisclaimer"
 >
                             
@@ -1232,105 +1233,119 @@
                          STEP 1
                     ============================== -->
 
-                    <section
-                        id="builderStep1"
-                        class="builder-step is-active"
-                        data-step="1"
-                    >
+        <section
+    id="builderStep1"
+    class="builder-step is-active"
+    data-step="1"
+>
 
-                        <div class="step-heading">
+    <div class="step-heading step-one-heading">
 
-    <p class="step-number">
-        First, The Basics
-    </p>
+        <p class="step-number step-one-eyebrow">
+            First, The Basics
+            <span
+                class="step-one-heart"
+                aria-hidden="true"
+            >♡</span>
+        </p>
 
-    <h2>
-        Let’s Get Started.
-    </h2>
+        <h2 class="step-one-script-title">
+            Let’s Make Something Sweet.
+        </h2>
 
-    <p>
-        Tell me when you need it and how many guests
-        you're serving. I'll use that to help guide
-        your timing and cake size.
-    </p>
+        <p class="step-one-intro">
+            Tell me when you need it, how many guests
+            you're serving, and I'll help guide your
+            timing and cake size.
+        </p>
 
-</div>
+    </div>
 
-                        <div class="two-column-fields">
 
-                            <label class="form-field">
+    <div class="step-one-date-grid">
 
-                                <span>
-                                    Event Date
-                                </span>
+        <label class="form-field step-one-field">
 
-                                <div class="date-field-shell">
-                                    <input
-                                        id="eventDate"
-                                        type="date"
-                                    >
-                                </div>
+            <span>
+                Event Date
+            </span>
 
-                            </label>
+            <div class="date-field-shell step-one-date-shell">
 
-                            <label class="form-field">
+                <input
+                    id="eventDate"
+                    type="date"
+                >
 
-                                <span>
-                                    Pickup or Delivery Date
-                                </span>
+            </div>
 
-                                <div class="date-field-shell">
-                                    <input
-                                        id="fulfillmentDate"
-                                        type="date"
-                                    >
-                                </div>
+        </label>
 
-                            </label>
 
-                        </div>
+        <label class="form-field step-one-field">
 
-                        <label class="form-field">
+            <span>
+                Pickup or Delivery Date
+            </span>
 
-                            <span>
-                                How many people are you serving?
-                            </span>
+            <div class="date-field-shell step-one-date-shell">
 
-                            <input
-                                id="guestCount"
-                                type="number"
-                                min="1"
-                                max="500"
-                                inputmode="numeric"
-                                placeholder="Enter the guest count"
-                            >
+                <input
+                    id="fulfillmentDate"
+                    type="date"
+                >
 
-                        </label>
+            </div>
 
-                        <div
-                            id="guestRecommendation"
-                            class="builder-callout is-hidden"
-                            aria-live="polite"
-                        ></div>
+        </label>
 
-                        <div
-                            id="rushOrderNotice"
-                            class="builder-warning is-hidden"
-                            aria-live="polite"
-                        >
-                            <strong>
-                                Rush Request
-                            </strong>
+    </div>
 
-                            <p>
-                                 Orders requested seven days or less before
-    fulfillment may include a $75 rush fee and
-    remain subject to availability.  
-                            </p>
-                        </div>
 
-                    </section>
+    <label class="form-field step-one-field step-one-guest-field">
 
+        <span>
+            How many people are you serving?
+        </span>
+
+        <input
+            id="guestCount"
+            type="number"
+            min="1"
+            max="500"
+            inputmode="numeric"
+            placeholder="Enter the guest count"
+        >
+
+    </label>
+
+
+    <div
+        id="guestRecommendation"
+        class="builder-callout is-hidden"
+        aria-live="polite"
+    ></div>
+
+
+    <div
+        id="rushOrderNotice"
+        class="builder-warning is-hidden"
+        aria-live="polite"
+    >
+
+        <strong>
+            Rush Request
+        </strong>
+
+        <p>
+            Orders requested seven days or less before
+            fulfillment may include a $75 rush fee and
+            remain subject to availability.
+        </p>
+
+    </div>
+
+</section>          
 
                     <!-- =============================
                          STEP 2
