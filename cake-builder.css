@@ -8028,8 +8028,8 @@ body {
     align-items: center;
     justify-items: center;
 
-    column-gap: 26px;
-    row-gap: 0;
+    column-gap: 22px;
+    row-gap: -4;
 
     padding:
         14px
@@ -8059,7 +8059,7 @@ body {
 .option-card-image {
     width: min(100%, 135px);
 
-    margin-left: auto;
+    margin-left: -2;
     margin-right: auto;
 }
 
