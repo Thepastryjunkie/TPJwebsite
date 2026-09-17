@@ -19131,3 +19131,379 @@ matchTpjBuilderImageBackgrounds();
         start();
     }
 })();
+/* TPJ reference decoration. Does not read or change builderState. */
+(() => {
+    'use strict';
+    if (window.tpjReferenceDecorInstalled) return;
+    const main = document.querySelector('.builder-main');
+    const inner = document.querySelector('.builder-main-inner');
+    const header = document.querySelector('.builder-header-inner');
+    const preview = document.querySelector('#cakePreviewCard');
+    if (!main || !inner || !header || !preview) return;
+    window.tpjReferenceDecorInstalled = true;
+
+    // Only obsolete decoration is removed. No form elements are moved.
+    document.querySelectorAll('.tpj-decor-layer, .tpj-page-decor')
+        .forEach(node => node.remove());
+
+    function layer(host, className) {
+        const node = document.createElement('div');
+        node.className = className;
+        node.setAttribute('aria-hidden', 'true');
+        host.appendChild(node);
+        return node;
+    }
+    const scene = layer(main, 'tpj-ref-scene');
+    const headerArt = layer(header, 'tpj-ref-local');
+    const previewArt = layer(preview, 'tpj-ref-local');
+    const steps = [2, 3, 4, 5].map(n => document.getElementById(`builderStep${n}`));
+
+    // Source rectangles measured from the supplied 1254 x 1254 PNG.
+    // CSS displays the original pixels; no replacement image is generated.
+    const sugars = [
+        [971, 54, 61, 70], [890, 106, 72, 58],
+        [444, 147, 79, 71], [1016, 162, 78, 77],
+        [324, 179, 65, 87], [1045, 261, 76, 65],
+        [240, 272, 71, 84], [565, 322, 84, 61],
+        [137, 362, 74, 70], [893, 466, 80, 55]
+    ];
+    const rect = (x, y, width, height) => ({x, y, width, height});
+    const overlap = (a, b, pad = 6) =>
+        a.x < b.x + b.width + pad && a.x + a.width + pad > b.x &&
+        a.y < b.y + b.height + pad && a.y + a.height + pad > b.y;
+    function box(el, origin) {
+        const b = el.getBoundingClientRect();
+        return rect(b.left - origin.left, b.top - origin.top, b.width, b.height);
+    }
+    function visible(el) {
+        return el && el.getClientRects().length &&
+            getComputedStyle(el).visibility !== 'hidden';
+    }
+    function word(host, text, width, fontSize) {
+        const el = document.createElement('span');
+        el.className = 'tpj-ref-word';
+        el.textContent = text;
+        el.style.width = `${width}px`;
+        if (fontSize) el.style.fontSize = `${fontSize}px`;
+        host.appendChild(el);
+        return el;
+    }
+    function put(el, x, y) {
+        el.style.left = `${Math.round(x)}px`;
+        el.style.top = `${Math.round(y)}px`;
+    }
+    function sugar(x, y, index, occupied, bounds) {
+        const [sx, sy, sw, sh] = sugars[index % sugars.length];
+        const scale = 0.40;
+        const b = rect(x, y, sw * scale, sh * scale);
+        if (x < 0 || y < 0 || x + b.width > bounds.width ||
+            y + b.height > bounds.height || occupied.some(r => overlap(b, r, 3))) return;
+        const el = document.createElement('span');
+        el.className = 'tpj-ref-sugar';
+        Object.assign(el.style, {
+            width: `${b.width}px`, height: `${b.height}px`,
+            backgroundSize: `${1254 * scale}px ${1254 * scale}px`,
+            backgroundPosition: `${-sx * scale}px ${-sy * scale}px`
+        });
+        put(el, x, y);
+        scene.appendChild(el);
+        occupied.push(b);
+    }
+    function headerWords(step) {
+        const origin = header.getBoundingClientRect();
+        const home = header.querySelector('.builder-back-link');
+        const logo = header.querySelector('.builder-logo-link');
+        const summary = header.querySelector('.header-summary-button');
+        if (![home, logo, summary].every(visible)) return;
+        const h = box(home, origin), l = box(logo, origin), s = box(summary, origin);
+        const slots = [
+            [h.x + h.width + 12, l.x - 12, 'More Cake\nMore Joy! ♡'],
+            [l.x + l.width + 12, s.x - 12,
+                step === 3 ? 'Sweet Choices\nHappier Days! ♡' : 'Spreading\nSweet Chaos ♡']
+        ];
+        slots.forEach(([left, right, text]) => {
+            if (right - left < 108) return;
+            const width = Math.min(168, right - left);
+            const el = word(headerArt, text, width, 24);
+            const height = el.getBoundingClientRect().height;
+            if (height > origin.height - 6) { el.remove(); return; }
+            put(el, left + (right - left - width) / 2, (origin.height - height) / 2);
+        });
+    }
+    function previewWords() {
+        const stage = preview.querySelector('.cake-renderer-stage');
+        if (!visible(preview) || !visible(stage)) return;
+        const origin = preview.getBoundingClientRect();
+        const s = box(stage, origin);
+        const rightSpace = origin.width - s.x - s.width - 12;
+        const leftSpace = s.x - 12;
+        const useRight = rightSpace >= leftSpace;
+        const available = useRight ? rightSpace : leftSpace;
+        if (available < 56) return;
+        const width = Math.min(124, available);
+        const el = word(previewArt, 'Make\nIt Yours!\n♡', width, width < 85 ? 21 : 28);
+        const height = el.getBoundingClientRect().height;
+        if (height > s.height - 12) { el.remove(); return; }
+        put(el, useRight ? s.x + s.width + 4 : 6, s.y + 8);
+    }
+    function textBoxes(el, origin) {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return Array.from(range.getClientRects()).filter(b => b.width && b.height)
+            .map(b => rect(b.left - origin.left, b.top - origin.top, b.width, b.height));
+    }
+    let pending = false;
+    function render() {
+        pending = false;
+        scene.replaceChildren(); headerArt.replaceChildren(); previewArt.replaceChildren();
+        const active = steps.find(el => el && !el.hidden && visible(el));
+        if (!active) return;
+        const step = Number(active.dataset.step);
+        headerWords(step);
+        previewWords();
+        const origin = main.getBoundingClientRect();
+        const bounds = {width: main.clientWidth, height: main.clientHeight};
+        const occupied = [];
+        // Actual UI rectangles are exclusion zones for all background art.
+        const blocks = main.querySelectorAll(
+            '#cakePreviewCard,.preview-summary,.preview-note,.builder-basics-hero,' +
+            'label,button,input,select,textarea,.tpj-color-picker,' +
+            '.quantity-product,.cupcake-live-preview,.cupcake-set-preview'
+        );
+        blocks.forEach(el => { if (visible(el)) occupied.push(box(el, origin)); });
+        main.querySelectorAll('h1,h2,h3,legend,p').forEach(el => {
+            if (visible(el)) occupied.push(...textBoxes(el, origin));
+        });
+        const summary = main.querySelector('.preview-summary');
+        if (visible(summary)) {
+            const a = box(summary, origin);
+            const el = word(scene, 'Sprinkles Make Everything Happier! ♡', 190, 25);
+            const height = el.getBoundingClientRect().height;
+            const b = rect(a.x + (a.width - 190) / 2, a.y + a.height + 24, 190, height);
+            if (b.x >= 0 && b.y + height < bounds.height &&
+                !occupied.some(r => overlap(b, r))) {
+                put(el, b.x, b.y); occupied.push(b);
+            } else el.remove();
+        }
+        const heading = active.querySelector('.step-heading');
+        const legends = [...active.querySelectorAll('legend')].filter(visible);
+        const find = re => legends.find(el => re.test(el.textContent.trim()));
+        const plans = {
+            2: [[heading, 'Good Things Come\nin Cake! ♡'],
+                [find(/^Shape$/i), "What's your shape? ♡"],
+                [find(/Cake Size|Round Cake Size/i), 'Size\nIt your way! ♡'],
+                [find(/Coverage/i), 'How will it look? ♡']],
+            3: [[heading, 'Cake Dreams\nStart Here! ♡'],
+                [find(/^Cake Flavor$/i), 'So Many\nYummy Options! ♡'],
+                [find(/^Filling$/i), 'Filling =\nHappiness ♡'],
+                [find(/^Coating$/i), 'Finishing Touches\nMake It Magical! ♡']],
+            4: [[heading, 'Make It\nYours! ♡'],
+                [find(/Coating Border/i), 'Little Details.\nBig Happiness! ♡'],
+                [find(/Cake Details/i), 'Sprinkles Make\nEverything Happier! ♡']],
+            5: [[heading, 'Good Things Taste\nBetter Together! ♡'],
+                [find(/Cupcake Look/i), 'Cupcakes Make\nEverything Happier! ♡'],
+                [find(/Chocolate-Covered Treats/i), 'Little Details.\nBig Happiness! ♡'],
+                [find(/Dessert Jars/i), 'Happiness Comes\nin Layers! ♡']]
+        };
+        for (const [anchor, text] of plans[step] || []) {
+            if (!anchor) continue;
+            const a = box(anchor, origin);
+            const form = box(active, origin);
+            const width = 132;
+            const el = word(scene, text, width, 25);
+            const height = el.getBoundingClientRect().height;
+            // Search only beside the relevant heading/group, never random
+            // blank space elsewhere on the page or on top of product cards.
+            const candidates = [
+                [form.x + form.width - width, a.y],
+                [form.x + form.width + 8, a.y],
+                [form.x + form.width - width, a.y + 25],
+                [a.x + a.width + 14, a.y - 3]
+            ];
+            const spot = candidates.find(([x, y]) => {
+                const b = rect(x, y, width, height);
+                return x >= 0 && y >= 0 && x + width <= bounds.width - 4 &&
+                    y + height <= bounds.height && !occupied.some(r => overlap(b, r));
+            });
+            if (!spot) { el.remove(); continue; }
+            put(el, ...spot); occupied.push(rect(...spot, width, height));
+        }
+        const form = box(active, origin);
+        const previewColumn = main.querySelector('.cake-preview-column');
+        const pc = box(previewColumn, origin);
+        // Both outer edges, the gap between preview and choices, plus the
+        // free end of each heading/group. Different seed per step.
+        let n = step * 3;
+        for (let y = 28 + step * 13; y < bounds.height - 38; y += 145) {
+            sugar(5 + (n % 2) * 8, y, n++, occupied, bounds);
+            sugar(bounds.width - 34, y + 47, n++, occupied, bounds);
+            const gap = form.x - pc.x - pc.width;
+            if (gap >= 32) sugar(pc.x + pc.width + (gap - 30) / 2, y + 73, n++, occupied, bounds);
+        }
+        [heading, ...legends].filter(Boolean).forEach((anchor, i) => {
+            const a = box(anchor, origin);
+            for (let j = 0; j < 4; j++)
+                sugar(form.x + form.width - 42 - j * 53,
+                    a.y + (j % 2 ? 6 : 28), n++ + i, occupied, bounds);
+        });
+    }
+    function schedule() {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(render);
+    }
+    const observer = new MutationObserver(schedule);
+    steps.filter(Boolean).forEach(el => observer.observe(el, {
+        subtree: true, attributes: true, attributeFilter: ['hidden', 'class'], characterData: true
+    }));
+    const resize = new ResizeObserver(schedule);
+    [inner, header, preview, ...steps.filter(Boolean)].forEach(el => resize.observe(el));
+    window.addEventListener('resize', schedule, {passive: true});
+    window.addEventListener('scroll', schedule, {passive: true});
+    main.addEventListener('load', schedule, true);
+    if (document.fonts) document.fonts.ready.then(schedule);
+    schedule();
+})();
+/* PAGE 3 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
+(() => {
+    function installRowShelves() {
+        const step = document.getElementById('builderStep3');
+
+        if (!step || step.dataset.tpjShelvesInstalled === 'true') {
+            return;
+        }
+
+        step.dataset.tpjShelvesInstalled = 'true';
+
+        const grids = [...step.querySelectorAll(
+            '.text-choice-grid, .upgrade-grid, .description-choice-grid'
+        )];
+
+        const displays = grids.map(grid => {
+            grid.classList.add('tpj-shelf-grid');
+
+            const layer = document.createElement('div');
+            layer.className = 'tpj-row-shelf-layer';
+            layer.setAttribute('aria-hidden', 'true');
+            grid.appendChild(layer);
+
+            return { grid, layer };
+        });
+
+        let pending = false;
+
+        function drawShelves() {
+            pending = false;
+
+            displays.forEach(({ grid, layer }) => {
+                if (!grid.getClientRects().length) {
+                    layer.replaceChildren();
+                    return;
+                }
+
+                const gridBox = grid.getBoundingClientRect();
+                const rows = [];
+
+                // Only illustrated product choices receive shelves.
+                // Text-only "Something Else" options remain untouched.
+                [...grid.children].forEach(card => {
+                    if (
+                        !card.matches('label') ||
+                        !card.querySelector(':scope > img') ||
+                        !card.getClientRects().length ||
+                        getComputedStyle(card).visibility === 'hidden'
+                    ) {
+                        return;
+                    }
+
+                    const bounds = card.getBoundingClientRect();
+                    const top = bounds.top - gridBox.top - grid.clientTop;
+                    const left = bounds.left - gridBox.left - grid.clientLeft;
+                    const right = left + bounds.width;
+                    const bottom = top + bounds.height;
+
+                    let row = rows.find(item =>
+                        Math.abs(item.top - top) < 5
+                    );
+
+                    if (!row) {
+                        row = { top, left, right, bottom };
+                        rows.push(row);
+                    } else {
+                        row.left = Math.min(row.left, left);
+                        row.right = Math.max(row.right, right);
+                        row.bottom = Math.max(row.bottom, bottom);
+                    }
+                });
+
+                const fragment = document.createDocumentFragment();
+
+                rows.forEach(row => {
+                    const shelf = document.createElement('div');
+                    shelf.className = 'tpj-row-shelf';
+
+                    const height = Math.min(
+                        64,
+                        Math.max(40, (row.bottom - row.top) * 0.36)
+                    );
+
+                    shelf.style.left = `${row.left}px`;
+                    shelf.style.width = `${row.right - row.left}px`;
+                    shelf.style.top = `${row.bottom - height + 4}px`;
+                    shelf.style.height = `${height}px`;
+
+                    fragment.appendChild(shelf);
+                });
+
+                layer.replaceChildren(fragment);
+            });
+        }
+
+        function schedule() {
+            if (pending) return;
+            pending = true;
+            requestAnimationFrame(drawShelves);
+        }
+
+        const resizeObserver = new ResizeObserver(schedule);
+
+        displays.forEach(({ grid }) => {
+            resizeObserver.observe(grid);
+
+            [...grid.children].forEach(child => {
+                if (child.matches('label')) {
+                    resizeObserver.observe(child);
+                }
+            });
+        });
+
+        // Recalculate when the step or conditional options become visible.
+        const visibilityObserver = new MutationObserver(schedule);
+
+        visibilityObserver.observe(step, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['hidden', 'class']
+        });
+
+        step.addEventListener('load', schedule, true);
+        step.addEventListener('change', schedule);
+        window.addEventListener('resize', schedule, { passive: true });
+
+        if (document.fonts) {
+            document.fonts.ready.then(schedule);
+        }
+
+        schedule();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            installRowShelves,
+            { once: true }
+        );
+    } else {
+        installRowShelves();
+    }
+})();
