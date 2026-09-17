@@ -1105,19 +1105,29 @@ fieldset {
 .preview-summary {
     width: 100%;
     margin: 0;
-    padding: 17px 20px;
+    padding: 10px 8px 0;
 
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
 
-    border: 2px solid var(--chocolate);
-    border-radius: 24px; 
-    background: #FFF8F2;
-    box-shadow: 0 12px 26px rgba(90, 42, 30, 0.09);
+    align-items: start;
+    gap: 32px;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+
+    box-shadow: none;
 }
 
 .preview-summary > div {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
     text-align: center;
 }
 
@@ -6214,14 +6224,7 @@ body {
         0 18px 34px rgba(244, 183, 209, 0.32);
 }
 
-/* PRICE / SERVING SUMMARY — LIGHT PANEL */
 
-.preview-summary {
-    background: var(--tpj-panel-pink);
-
-    box-shadow:
-        0 7px 18px rgba(244, 183, 209, 0.25);
-}
 
 /*
    Keep the choices floating over the color waves.
@@ -6596,8 +6599,15 @@ body {
     pointer-events: none;
     user-select: none;
 }
-.tpj-ref-scene { z-index: 0; overflow: hidden; }
-.tpj-ref-local { z-index: 2; overflow: hidden; }
+.tpj-ref-scene { 
+    z-index: 0; 
+    overflow: visible; 
+}
+
+.tpj-ref-local { 
+    z-index: 2; 
+    overflow: visible; 
+}
 .tpj-ref-word {
     position: absolute;
     display: block;
@@ -6680,6 +6690,265 @@ body {
 
     position: relative;
     z-index: 5;
+}
+/* ==========================================================
+   TPJ PAGE 2 — CAKE SIZE STRIP
+   All cake-size groups use the compact reference layout.
+========================================================== */
+
+
+/* ----------------------------------------------------------
+   SIZE ROW
+---------------------------------------------------------- */
+
+#builderStep2 .cake-size-group .cake-size-grid {
+    width: 100%;
+
+    display: flex !important;
+    align-items: stretch;
+
+    gap: 0 !important;
+
+    padding: 0;
+
+    overflow: visible;
+}
+
+
+/* ----------------------------------------------------------
+   INDIVIDUAL SIZE OPTION
+---------------------------------------------------------- */
+
+#builderStep2 .cake-size-group .cake-size-card {
+    position: relative;
+
+    flex: 1 1 0;
+
+    min-width: 0;
+    min-height: 72px !important;
+
+    padding:
+        9px
+        12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 3px !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    text-align: center;
+
+    transform:
+        none !important;
+
+    cursor: pointer;
+}
+
+
+/* Kill old card hover lift */
+
+#builderStep2
+.cake-size-group
+.cake-size-card:hover {
+    border: 0 !important;
+
+    background:
+        transparent;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* ----------------------------------------------------------
+   THIN DIVIDERS BETWEEN SIZES
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card:not(:first-child)::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+
+    width: 1px;
+
+    background:
+        rgba(90, 42, 30, 0.18);
+}
+
+
+/* ----------------------------------------------------------
+   ONLY SHOW SIZE + PRICE
+   Hide cake nickname and serving text in this selector.
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card > strong,
+
+#builderStep2
+.cake-size-group
+.cake-size-card > small {
+    display: none;
+}
+
+
+/* ----------------------------------------------------------
+   SIZE TEXT
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card
+.size-label {
+    display: block;
+
+    margin: 0;
+
+    color:
+        var(--chocolate);
+
+    font-family:
+        'Manrope',
+        sans-serif;
+
+    font-size: 12px !important;
+    font-weight: 500;
+
+    line-height: 1.15;
+}
+
+
+/* ----------------------------------------------------------
+   PRICE
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card > b {
+    margin: 2px 0 0 !important;
+
+    color:
+        var(--chocolate);
+
+    font-family:
+        'Manrope',
+        sans-serif;
+
+    font-size: 17px !important;
+    font-weight: 800;
+
+    line-height: 1;
+}
+
+
+/* ----------------------------------------------------------
+   SELECTED SIZE — PINK DASH
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card.is-selected::after,
+
+#builderStep2
+.cake-size-group
+.cake-size-card:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 1px;
+
+    width: 52px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background:
+        var(--signature-pink);
+
+    transform:
+        translateX(-50%);
+}
+
+
+/* ----------------------------------------------------------
+   KEYBOARD FOCUS
+---------------------------------------------------------- */
+
+#builderStep2
+.cake-size-group
+.cake-size-card:has(input:focus-visible) {
+    outline:
+        2px solid
+        var(--signature-pink);
+
+    outline-offset: 2px;
+}
+@media (max-width: 720px) {
+
+    #builderStep2
+    .cake-size-group
+    .cake-size-grid {
+        justify-content:
+            flex-start;
+
+        overflow-x:
+            auto;
+
+        overflow-y:
+            hidden;
+
+        scrollbar-width:
+            none;
+
+        scroll-snap-type:
+            x proximity;
+    }
+
+
+    #builderStep2
+    .cake-size-group
+    .cake-size-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    #builderStep2
+    .cake-size-group
+    .cake-size-card {
+        flex:
+            0
+            0
+            92px;
+
+        min-height:
+            62px !important;
+
+        scroll-snap-align:
+            start;
+    }
 }
 /* ==========================================================
    TPJ STEP 1 — FINAL OPTION 1 DESIGN
@@ -7526,4 +7795,210 @@ body {
     .continue-button::after {
         content: " →";
     }
+}
+/* ==========================================================
+   TPJ GLOBAL STEP NAVIGATION
+   New navigation design for Steps 1–8
+========================================================== */
+
+
+/* ----------------------------------------------------------
+   NAVIGATION ROW
+---------------------------------------------------------- */
+
+.builder-step-navigation {
+    width: 100%;
+
+    margin-top: 30px;
+
+    padding:
+        0
+        0
+        24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+/* ----------------------------------------------------------
+   ALL PREVIOUS / CONTINUE BUTTONS
+   No pills, no boxes.
+---------------------------------------------------------- */
+
+.builder-step-navigation
+.step-navigation-button {
+    min-width: 0;
+    min-height: 44px;
+
+    padding:
+        7px
+        2px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    color:
+        var(--chocolate) !important;
+
+    box-shadow:
+        none !important;
+
+    font-family:
+        'Manrope',
+        sans-serif;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+
+    cursor: pointer;
+
+    transform:
+        none !important;
+
+    transition:
+        color 180ms ease;
+}
+
+
+/* ----------------------------------------------------------
+   PREVIOUS ←
+---------------------------------------------------------- */
+
+.builder-step-navigation
+.previous-button::before {
+    content: "←";
+
+    margin-right: 10px;
+
+    color:
+        var(--chocolate);
+
+    font-size: 25px;
+    font-weight: 400;
+
+    line-height: 1;
+
+    transition:
+        transform 180ms ease,
+        color 180ms ease;
+}
+
+
+/* ----------------------------------------------------------
+   CONTINUE →
+---------------------------------------------------------- */
+
+.builder-step-navigation
+.continue-button {
+    margin-left: auto;
+}
+
+
+.builder-step-navigation
+.continue-button::after {
+    content: "→";
+
+    margin-left: 10px;
+
+    color:
+        var(--chocolate);
+
+    font-size: 25px;
+    font-weight: 400;
+
+    line-height: 1;
+
+    transition:
+        transform 180ms ease,
+        color 180ms ease;
+}
+
+
+/* ----------------------------------------------------------
+   HOVER / KEYBOARD
+---------------------------------------------------------- */
+
+.builder-step-navigation
+.step-navigation-button:hover:not(:disabled),
+
+.builder-step-navigation
+.step-navigation-button:focus-visible:not(:disabled) {
+    background:
+        transparent !important;
+
+    color:
+        var(--signature-pink) !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+.builder-step-navigation
+.previous-button:hover:not(:disabled)::before,
+
+.builder-step-navigation
+.previous-button:focus-visible:not(:disabled)::before {
+    color:
+        var(--signature-pink);
+
+    transform:
+        translateX(-5px);
+}
+
+
+.builder-step-navigation
+.continue-button:hover::after,
+
+.builder-step-navigation
+.continue-button:focus-visible::after {
+    color:
+        var(--signature-pink);
+
+    transform:
+        translateX(5px);
+}
+
+
+/* ----------------------------------------------------------
+   STEP 1 ONLY
+   There is nowhere to go backward, so Previous disappears.
+---------------------------------------------------------- */
+
+#previousStepButton:disabled {
+    display: none !important;
+}
+
+
+/* When Previous is absent, Continue stays on the right. */
+
+.builder-step-navigation:has(
+    #previousStepButton:disabled
+) {
+    justify-content: flex-end;
 }

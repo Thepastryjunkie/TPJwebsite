@@ -19265,11 +19265,11 @@ matchTpjBuilderImageBackgrounds();
         const bounds = {width: main.clientWidth, height: main.clientHeight};
         const occupied = [];
         // Actual UI rectangles are exclusion zones for all background art.
-        const blocks = main.querySelectorAll(
-            '#cakePreviewCard,.preview-summary,.preview-note,.builder-basics-hero,' +
-            'label,button,input,select,textarea,.tpj-color-picker,' +
-            '.quantity-product,.cupcake-live-preview,.cupcake-set-preview'
-        );
+const blocks = main.querySelectorAll(
+    '.cake-renderer-stage,.preview-summary,.preview-note,.builder-basics-hero,' +
+    'label,button,input,select,textarea,.tpj-color-picker,' +
+    '.quantity-product,.cupcake-live-preview,.cupcake-set-preview'
+);
         blocks.forEach(el => { if (visible(el)) occupied.push(box(el, origin)); });
         main.querySelectorAll('h1,h2,h3,legend,p').forEach(el => {
             if (visible(el)) occupied.push(...textBoxes(el, origin));
@@ -19334,12 +19334,73 @@ matchTpjBuilderImageBackgrounds();
         // Both outer edges, the gap between preview and choices, plus the
         // free end of each heading/group. Different seed per step.
         let n = step * 3;
-        for (let y = 28 + step * 13; y < bounds.height - 38; y += 145) {
-            sugar(5 + (n % 2) * 8, y, n++, occupied, bounds);
-            sugar(bounds.width - 34, y + 47, n++, occupied, bounds);
-            const gap = form.x - pc.x - pc.width;
-            if (gap >= 32) sugar(pc.x + pc.width + (gap - 30) / 2, y + 73, n++, occupied, bounds);
-        }
+for (
+    let y = 28 + step * 13;
+    y < bounds.height - 38;
+    y += 145
+) {
+
+    /* Far left edge */
+    sugar(
+        5 + (n % 2) * 8,
+        y,
+        n++,
+        occupied,
+        bounds
+    );
+
+
+    /* Inside left / cake-preview side */
+    sugar(
+        pc.x + 18,
+        y + 52,
+        n++,
+        occupied,
+        bounds
+    );
+
+
+    /* Opposite edge of cake-preview side */
+    sugar(
+        pc.x + pc.width - 40,
+        y + 98,
+        n++,
+        occupied,
+        bounds
+    );
+
+
+    /* Far right edge */
+    sugar(
+        bounds.width - 34,
+        y + 47,
+        n++,
+        occupied,
+        bounds
+    );
+
+
+    /* Gap between cake preview and form */
+    const gap =
+        form.x -
+        pc.x -
+        pc.width;
+
+    if (gap >= 32) {
+        sugar(
+            pc.x +
+            pc.width +
+            (gap - 30) / 2,
+
+            y + 73,
+
+            n++,
+
+            occupied,
+            bounds
+        );
+    }
+}
         [heading, ...legends].filter(Boolean).forEach((anchor, i) => {
             const a = box(anchor, origin);
             for (let j = 0; j < 4; j++)
@@ -19359,7 +19420,6 @@ matchTpjBuilderImageBackgrounds();
     const resize = new ResizeObserver(schedule);
     [inner, header, preview, ...steps.filter(Boolean)].forEach(el => resize.observe(el));
     window.addEventListener('resize', schedule, {passive: true});
-    window.addEventListener('scroll', schedule, {passive: true});
     main.addEventListener('load', schedule, true);
     if (document.fonts) document.fonts.ready.then(schedule);
     schedule();
