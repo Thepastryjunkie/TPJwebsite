@@ -20,7 +20,7 @@
     </title>
 
 
-</head><link rel="stylesheet" href="../cake-builder.css?v=20260917-step1-option1-">
+</head><link rel="stylesheet" href="../cake-builder.css?v=20260917-board-shapes-1">
 
 <body>
 
@@ -2302,33 +2302,126 @@
                                 Cake Board
                             </legend>
 
-                            <label class="form-field">
+                        <div class="board-shape-selector">
 
-                                <span>
-                                    Board Shape
-                                </span>
+    <p class="fieldset-description board-shape-label">
+        Board Shape
+    </p>
 
-                                <select id="cakeBoardStyle">
+    <div
+        id="cakeBoardStyleOptions"
+        class="shape-choice-grid board-shape-grid"
+    >
 
-                                    <option value="round">
-                                        Round
-                                    </option>
+        <!-- ROUND BOARD -->
 
-                                    <option value="square">
-                                        Square
-                                    </option>
+        <label
+            class="shape-choice-card board-shape-card"
+            data-board-style="round"
+        >
 
-                                    <option value="rectangleHorizontal">
-                                        Rectangle
-                                    </option>
+            <input
+                type="radio"
+                name="cakeBoardStyle"
+                value="round"
+                checked
+            >
 
-                                    <option value="letterNumber" hidden>
-                                        Letter / Number Board
-                                    </option>
+            <img
+                class="option-card-image"
+                src="../images/cake-builder/final/boards/TPJ-Board-Round-White.png"
+                alt="Round cake board"
+            >
 
-                                </select>
+            <strong>
+                Round
+            </strong>
 
-                            </label>
+        </label>
+
+
+        <!-- SQUARE BOARD -->
+
+        <label
+            class="shape-choice-card board-shape-card"
+            data-board-style="square"
+        >
+
+            <input
+                type="radio"
+                name="cakeBoardStyle"
+                value="square"
+            >
+
+            <img
+                class="option-card-image"
+                src="../images/cake-builder/final/boards/TPJ-Board-Square-White.png"
+                alt="Square cake board"
+            >
+
+            <strong>
+                Square
+            </strong>
+
+        </label>
+
+
+        <!-- RECTANGLE BOARD -->
+
+        <label
+            class="shape-choice-card board-shape-card"
+            data-board-style="rectangleHorizontal"
+        >
+
+            <input
+                type="radio"
+                name="cakeBoardStyle"
+                value="rectangleHorizontal"
+            >
+
+            <img
+                class="option-card-image"
+                src="../images/cake-builder/final/boards/TPJ-Board-Rectangle-White.png"
+                alt="Rectangle cake board"
+            >
+
+            <strong>
+                Rectangle
+            </strong>
+
+        </label>
+
+
+        <!-- DOUBLE NUMBER / LETTER BOARD
+             JS only reveals this when applicable. -->
+
+        <label
+            class="shape-choice-card board-shape-card"
+            data-board-style="letterNumber"
+            hidden
+        >
+
+            <input
+                type="radio"
+                name="cakeBoardStyle"
+                value="letterNumber"
+            >
+
+            <img
+                class="option-card-image"
+                src="../images/cake-builder/final/boards/TPJ-Board-Number-Letter-Double-White.png"
+                alt="Wide number or letter cake board"
+            >
+
+            <strong>
+                Number / Letter
+            </strong>
+
+        </label>
+
+    </div>
+
+</div>   
 
                             <p class="fieldset-description">
                                 Board Color
@@ -6664,7 +6757,6 @@
         </section>
 
     </div>
-
-<script src="../js/cake-builder.js?v=20260917-fix-2"></script>
+<script src="../js/cake-builder.js?v=20260917-board-shapes-2"></script>
 </body>
 </html>

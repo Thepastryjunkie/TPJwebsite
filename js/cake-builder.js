@@ -9053,15 +9053,15 @@ function updateCakeHeight() {
         !builderState.isTall
     );
 
-    const layerControl =
-        extraLayerToggle?.closest(
-            ".extra-layer-control"
-        );
-
-    layerControl?.classList.toggle(
-        "is-hidden",
-        !cakeAllowsExtraLayer()
+const heightFieldset =
+    extraLayerToggle?.closest(
+        "fieldset"
     );
+
+heightFieldset?.classList.toggle(
+    "is-hidden",
+    !cakeAllowsExtraLayer()
+);
 
     if (extraLayerDescription) {
         if (builderState.isTall) {
@@ -11429,80 +11429,105 @@ function showCakeSizeGroup(shape) {
 
 
 function updateCakeBoardControls() {
-    const boardSelect = getElement(
-        "#cakeBoardStyle"
+
+    const boardInputs = getElements(
+        'input[name="cakeBoardStyle"]'
     );
 
-    if (!boardSelect) {
+    if (!boardInputs.length) {
         return;
     }
 
+
     const product =
         getSelectedCakeProduct();
+
 
     const isBento =
         builderState.cakeProductId ===
         "heart-5-bento";
 
+
+    /*
+       Keep the same board restrictions
+       that already existed in the builder.
+    */
+
+    const allowedBoardMap = {
+
+        round: [
+            "round",
+            "square",
+            "rectangleHorizontal"
+        ],
+
+        heart: [
+            "round",
+            "square",
+            "rectangleHorizontal"
+        ],
+
+        star: [
+            "round",
+            "square",
+            "rectangleHorizontal"
+        ],
+
+        square: [
+            "square",
+            "rectangleHorizontal"
+        ],
+
+        sheet: [
+            "rectangleHorizontal"
+        ],
+
+        tier: [
+            "round",
+            "square",
+            "rectangleHorizontal"
+        ]
+    };
+
+
+    let allowedBoards =
+        allowedBoardMap[product.shape] ||
+        [
+            "round",
+            "square",
+            "rectangleHorizontal"
+        ];
+
+
+    /*
+       Number / letter cakes keep their
+       existing forced-board behavior.
+
+       Single = Square
+       Double = Wide Number / Letter board
+    */
+
     if (
-        product.shape === "cupcakes" ||
-        isBento
+        product.shape ===
+        "numberLetter"
     ) {
-        boardSelect.disabled = true;
-        return;
+
+        const forcedBoard =
+            product.characterCount === 2
+                ? "letterNumber"
+                : "square";
+
+        allowedBoards = [
+            forcedBoard
+        ];
     }
 
-const allowedBoardMap = {
-    round: [
-        "round",
-        "square",
-        "rectangleHorizontal"
-    ],
 
-    heart: [
-        "round",
-        "square",
-        "rectangleHorizontal"
-    ],
-
-    star: [
-        "round",
-        "square",
-        "rectangleHorizontal"
-    ],
-
-    square: [
-        "square",
-        "rectangleHorizontal"
-    ],
-
-    sheet: [
-        "rectangleHorizontal"
-    ],
-
-    tier: [
-        "round",
-        "square",
-        "rectangleHorizontal"
-    ]
-};
-
-let allowedBoards =
-    allowedBoardMap[product.shape] ||
-    [
-        "round",
-        "square",
-        "rectangleHorizontal"
-    ];
-
-if (product.shape === "numberLetter") {
-    const forcedBoard =
-        product.characterCount === 2
-            ? "letterNumber"
-            : "square";
-
-    allowedBoards = [forcedBoard];
-}
+    /*
+       If the currently selected board is
+       unavailable for this cake, automatically
+       move to the first allowed board.
+    */
 
     if (
         !allowedBoards.includes(
@@ -11513,45 +11538,107 @@ if (product.shape === "numberLetter") {
             allowedBoards[0];
     }
 
-getElements(
-    "#cakeBoardStyle option"
-).forEach((option) => {
-    const unavailable =
-        !allowedBoards.includes(
-            option.value
+
+    /*
+       Bento and cupcakes keep the previous
+       behavior where board selection is disabled.
+    */
+
+    const boardSelectionDisabled =
+        product.shape === "cupcakes" ||
+        isBento;
+
+
+    /*
+       Show only board shapes that are actually
+       available for the selected cake.
+    */
+
+    boardInputs.forEach((input) => {
+
+        const card =
+            input.closest(
+                ".board-shape-card"
+            );
+
+
+        const unavailable =
+            !allowedBoards.includes(
+                input.value
+            );
+
+
+        input.disabled =
+            boardSelectionDisabled ||
+            unavailable;
+
+
+        input.checked =
+            input.value ===
+            builderState.cakeBoardStyle;
+
+
+        if (card) {
+
+            card.hidden =
+                unavailable;
+
+
+            card.classList.toggle(
+                "is-disabled",
+                boardSelectionDisabled
+            );
+        }
+    });
+
+
+    /*
+       Refresh pink dash / selected-card state.
+    */
+
+    updateSelectedCardStates();
+
+
+    const boardNotice =
+        getElement(
+            "#cakeBoardNotice"
         );
 
-    option.hidden = unavailable;
-    option.disabled = unavailable;
-});
 
-    boardSelect.value =
-        builderState.cakeBoardStyle;
+    if (boardNotice) {
 
-    boardSelect.disabled =
-        allowedBoards.length === 1;
+        if (
+            product.shape ===
+            "numberLetter"
+        ) {
 
-    const boardNotice = getElement(
-        "#cakeBoardNotice"
-    );
+            boardNotice.textContent =
+                product.characterCount === 2
+                    ? "Double number and letter cakes use the dedicated wide board. You can still choose its color."
+                    : "Single number and letter cakes use the square board. You can still choose its color.";
 
-if (boardNotice) {
-    if (product.shape === "numberLetter") {
-        boardNotice.textContent =
-            product.characterCount === 2
-                ? "Double number and letter cakes use the dedicated wide board. You can still choose its color."
-                : "Single number and letter cakes use the square board. You can still choose its color.";
-    } else if (product.shape === "sheet") {
-        boardNotice.textContent =
-            "Half-sheet and full-sheet cakes use the horizontal rectangle board.";
-    } else if (product.shape === "square") {
-        boardNotice.textContent =
-            "Square cakes use a square or horizontal rectangle board.";
-    } else {
-        boardNotice.textContent =
-            "Choose a round, square, or rectangle board.";
+        } else if (
+            product.shape ===
+            "sheet"
+        ) {
+
+            boardNotice.textContent =
+                "Half-sheet and full-sheet cakes use the horizontal rectangle board.";
+
+        } else if (
+            product.shape ===
+            "square"
+        ) {
+
+            boardNotice.textContent =
+                "Square cakes use a square or horizontal rectangle board.";
+
+        } else {
+
+            boardNotice.textContent =
+                "Choose a round, square, or rectangle board.";
+        }
     }
-}
 }
 
 
@@ -16974,17 +17061,32 @@ getElement(
    EXTRA EVENTS
 ========================================= */
 
-getElement(
-    "#cakeBoardStyle"
-)?.addEventListener(
-    "change",
-    (event) => {
-        builderState.cakeBoardStyle =
-            event.target.value;
+getElements(
+    'input[name="cakeBoardStyle"]'
+).forEach((input) => {
 
-        renderCakePreview();
-    }
-);
+    input.addEventListener(
+        "change",
+        () => {
+
+            if (
+                !input.checked ||
+                input.disabled
+            ) {
+                return;
+            }
+
+
+            builderState.cakeBoardStyle =
+                input.value;
+
+
+            updateSelectedCardStates();
+
+            renderCakePreview();
+        }
+    );
+});
 
 
 getElement(

@@ -8002,3 +8002,19 @@ body {
 ) {
     justify-content: flex-end;
 }
+/* ==========================================================
+   TPJ PAGE 2 — BOARD SHAPE IMAGE SELECTOR
+========================================================== */
+
+#builderStep2 .board-shape-grid {
+    margin-top: 4px;
+}
+
+
+#builderStep2 .board-shape-card.is-disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    pointer-events: none;
+}
