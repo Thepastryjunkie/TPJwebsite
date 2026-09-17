@@ -6700,11 +6700,17 @@ body {
     }
 }
 /* ==========================================================
-   STEP 1 HERO — TRANSPARENT CUTOUT ONLY
+   STEP 1 HERO — LARGE FLOATING TRANSPARENT COLLAGE
 ========================================================== */
 
 .builder-basics-hero {
     width: 100%;
+    min-height: 620px;
+
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
 
     padding: 0;
 
@@ -6714,28 +6720,27 @@ body {
 
     border: 0 !important;
     border-radius: 0 !important;
-
     box-shadow: none !important;
 
     overflow: visible !important;
 }
 
-
 .builder-basics-hero img {
     display: block;
 
-    width: 100%;
-    height: 100%;
+    width: 118%;
+    max-width: none;
+    height: auto;
 
     object-fit: contain;
-    object-position: center;
+    object-position: left bottom;
 
     background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-
     border: 0 !important;
     border-radius: 0 !important;
-
     box-shadow: none !important;
+
+    position: relative;
+    left: -40px;
+    bottom: -10px;
 }
