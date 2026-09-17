@@ -20,7 +20,8 @@
     </title>
 
 
-</head><link rel="stylesheet" href="../cake-builder.css?v=20260917-board-shapes-2">
+</head>
+<link rel="stylesheet" href="../cake-builder.css?v=20260917-page2-controls-1">
 
 <body>
 
@@ -2257,41 +2258,73 @@
                         </fieldset>
 
 
-                        <fieldset class="builder-fieldset">
+<fieldset
+    class="builder-fieldset cake-height-selector"
+>
 
-                            <legend>
-                                Height
-                            </legend>
+    <legend>
+        Height
+    </legend>
 
-                            <label class="extra-layer-control">
 
-                                <input
-                                    id="extraLayerToggle"
-                                    type="checkbox"
-                                >
+    <!--
+        Keep the original checkbox because the
+        existing cake renderer already uses it.
+    -->
 
-                                <span class="toggle-track"></span>
+    <input
+        id="extraLayerToggle"
+        class="visually-hidden"
+        type="checkbox"
+    >
 
-                                <span class="toggle-copy">
 
-                                    <strong>
-                                        Add Another Layer
-                                    </strong>
+    <div class="height-choice-row">
 
-                                    <small id="extraLayerDescription">
-                                        Makes your cake tall · Adds $30
-                                    </small>
+        <button
+            type="button"
+            class="height-choice height-choice-standard"
+            data-height-choice="standard"
+            aria-pressed="true"
+        >
 
-                                </span>
+            <strong>
+                Standard
+            </strong>
 
-                            </label>
+            <small id="standardHeightDescription">
+                2 Layers
+            </small>
 
-                            <p
-                                id="bentoLayerNotice"
-                                class="field-note is-hidden"
-                            ></p>
+        </button>
 
-                        </fieldset>
+
+        <button
+            type="button"
+            class="height-choice height-choice-tall"
+            data-height-choice="tall"
+            aria-pressed="false"
+        >
+
+            <strong>
+                Make It Tall
+            </strong>
+
+            <small id="extraLayerDescription">
+                +$30
+            </small>
+
+        </button>
+
+    </div>
+
+
+    <p
+        id="bentoLayerNotice"
+        class="field-note is-hidden"
+    ></p>
+
+</fieldset>
 
                         <fieldset
                             id="cakeBoardCustomizer"
@@ -2432,28 +2465,27 @@
                                 class="color-choice-grid"
                             ></div>
 
-                            <label class="extra-layer-control">
+<label class="board-palette-choice">
 
-                                <input
-                                    id="matchBoardToCakePalette"
-                                    type="checkbox"
-                                >
+    <input
+        id="matchBoardToCakePalette"
+        type="checkbox"
+    >
 
-                                <span class="toggle-track"></span>
 
-                                <span class="toggle-copy">
+    <span class="board-palette-copy">
 
-                                    <strong>
-                                        Match Board to Cake Palette
-                                    </strong>
+        <strong>
+            Match My Cake Palette
+        </strong>
 
-                                    <small>
-                                        Custom Wrapped Board · +$5
-                                    </small>
+        <small>
+            Custom wrapped board · +$5
+        </small>
 
-                                </span>
+    </span>
 
-                            </label>
+</label>
 <div
     id="matchedBoardColorOptions"
     class="conditional-section board-match-color-options is-hidden"
@@ -2462,7 +2494,7 @@
     <label class="form-field">
 
         <span>
-            What color should the cake Board match?
+         Match Board To
         </span>
 
         <select id="matchedBoardColor">
@@ -6757,6 +6789,6 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260917-board-shapes-2"></script>
+<script src="../js/cake-builder.js?v=20260917-page2-controls-1"></script>
 </body>
 </html>

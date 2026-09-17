@@ -8022,45 +8022,71 @@ body {
 
     margin-top: 4px;
 
+    display: grid !important;
+
     grid-template-columns:
         repeat(3, minmax(0, 1fr)) !important;
 
     align-items: center;
     justify-items: center;
 
-    column-gap: 22px;
-    row-gap: -4;
+    column-gap: 0 !important;
+    row-gap: 0 !important;
 
     padding:
-        14px
+        0
         8px
-        18px;
+        0;
 }
 
 
-/* Keep each board centered inside its third */
+/* Each board gets exactly one-third of the row */
 
 #builderStep2 .board-shape-card {
     width: 100%;
+
+    padding:
+        0
+        6px
+        4px !important;
 
     display: flex;
 
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    gap: 4px !important;
+
+    transform:
+    translate(-20px, -16px) !important;
 }
 
 
-/* Keep the board PNGs from becoming huge
-   now that their columns are wider */
+/* Keep all three board images matching */
+/* Rectangle board thumbnail only:
+   bring it visually forward without changing the real board asset */
 
+#builderStep2
+.board-shape-card[data-board-style="rectangleHorizontal"]
+.option-card-image {
+    position: relative;
+
+    top: 14px;
+
+    width: 138px !important;
+    max-width: 138px;
+}
 #builderStep2
 .board-shape-card
 .option-card-image {
-    width: min(100%, 135px);
+    width: 118px !important;
+    max-width: 118px;
 
-    margin-left: -2;
-    margin-right: auto;
+    margin:
+        0
+        auto
+        2px !important;
 }
 
 
@@ -8070,4 +8096,764 @@ body {
     cursor: not-allowed;
 
     pointer-events: none;
+}
+/* ==========================================================
+   TPJ PAGE 2 — HEIGHT + BOARD COLOR REDESIGN
+========================================================== */
+
+
+/* ==========================================================
+   HEIGHT
+   Standard / Make It Tall
+========================================================== */
+
+#builderStep2 .cake-height-selector {
+    margin-bottom: 24px;
+}
+
+
+#builderStep2 .height-choice-row {
+    width: min(100%, 390px);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    align-items: stretch;
+
+    gap: 22px;
+}
+
+
+#builderStep2 .height-choice {
+    position: relative;
+
+    min-height: 58px;
+
+    padding:
+        7px
+        8px
+        14px;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    color:
+        var(--chocolate);
+
+    box-shadow:
+        none !important;
+
+    cursor: pointer;
+
+    transform:
+        none !important;
+}
+
+
+#builderStep2 .height-choice strong {
+    font-size: 13px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+
+#builderStep2 .height-choice small {
+    color:
+        var(--deep-berry);
+
+    font-size: 10px;
+
+    line-height: 1.2;
+}
+
+
+/* Pink selection dash */
+
+#builderStep2
+.cake-height-selector:not(
+    :has(#extraLayerToggle:checked)
+)
+.height-choice-standard::after,
+
+#builderStep2
+.cake-height-selector:has(
+    #extraLayerToggle:checked
+)
+.height-choice-tall::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 1px;
+
+    width: 54px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background:
+        var(--signature-pink);
+
+    transform:
+        translateX(-50%);
+}
+
+
+/* Hover */
+
+#builderStep2
+.height-choice:hover {
+    color:
+        var(--signature-pink);
+}
+
+
+/* ==========================================================
+   BOARD COLOR
+   Five colors permanently across
+========================================================== */
+
+#builderStep2
+#cakeBoardColorSwatches {
+    width: 100%;
+
+    max-width: 560px;
+
+    margin:
+        2px
+        0
+        22px;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr)) !important;
+
+    align-items: start;
+
+    gap: 0 !important;
+}
+
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 72px !important;
+
+    margin: 0;
+
+    padding:
+        6px
+        4px
+        15px !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+
+    text-align: center;
+
+    cursor: pointer;
+}
+
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice:hover,
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice:focus-within,
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice:has(input:checked) {
+    border:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-swatch {
+    width: 38px;
+    height: 38px;
+
+    flex:
+        0 0 38px;
+
+    border:
+        2px solid
+        rgba(90, 42, 30, 0.13);
+
+    border-radius:
+        50%;
+
+    outline:
+        0 !important;
+
+    box-shadow:
+        inset
+        0
+        1px
+        2px
+        rgba(255, 255, 255, 0.65),
+        0
+        4px
+        8px
+        rgba(90, 42, 30, 0.08);
+}
+
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice small {
+    color:
+        var(--chocolate);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    line-height: 1.15;
+
+    text-align: center;
+}
+
+
+/* Remove the old checkmark */
+
+#builderStep2
+#cakeBoardColorSwatches
+.color-choice:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 1px;
+
+    width: 44px;
+    height: 3px;
+
+    margin: 0;
+
+    border-radius: 999px;
+
+    background:
+        var(--signature-pink);
+
+    transform:
+        translateX(-50%);
+}
+
+
+/*
+   While Match My Cake Palette is active,
+   keep the customer's previous solid color
+   remembered but visually inactive.
+*/
+
+#builderStep2
+#cakeBoardCustomizer:has(
+    #matchBoardToCakePalette:checked
+)
+#cakeBoardColorSwatches {
+    opacity: 0.48;
+}
+
+
+#builderStep2
+#cakeBoardCustomizer:has(
+    #matchBoardToCakePalette:checked
+)
+#cakeBoardColorSwatches
+.color-choice:has(input:checked)::after {
+    opacity: 0;
+}
+
+
+/* ==========================================================
+   MATCH MY CAKE PALETTE
+========================================================== */
+
+#builderStep2
+.board-palette-choice {
+    position: relative;
+
+    width: fit-content;
+
+    max-width: 100%;
+
+    margin:
+        2px
+        0
+        12px;
+
+    padding:
+        7px
+        6px
+        14px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    cursor: pointer;
+}
+
+
+#builderStep2
+.board-palette-choice
+> input {
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+
+
+#builderStep2
+.board-palette-copy {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+#builderStep2
+.board-palette-copy strong {
+    color:
+        var(--chocolate);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+
+#builderStep2
+.board-palette-copy small {
+    color:
+        var(--deep-berry);
+
+    font-size: 9px;
+
+    line-height: 1.2;
+}
+
+
+/* Pink selection dash */
+
+#builderStep2
+.board-palette-choice:has(
+    #matchBoardToCakePalette:checked
+)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 1px;
+
+    width: 70px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background:
+        var(--signature-pink);
+
+    transform:
+        translateX(-50%);
+}
+
+
+/* ==========================================================
+   MATCH BOARD TO — COMPACT DROPDOWN
+========================================================== */
+
+#builderStep2
+#matchedBoardColorOptions {
+    position: relative;
+
+    overflow: visible;
+
+    width: min(100%, 350px);
+
+    margin:
+        0
+        0
+        14px;
+
+    padding:
+        0 !important;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+/* "Match Board To" heading */
+
+#builderStep2
+#matchedBoardColorOptions
+> .form-field {
+    margin:
+        0
+        0
+        5px;
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+> .form-field
+> span {
+    margin:
+        0
+        0
+        5px;
+
+    color:
+        var(--buttercream-brown);
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* Generated compact picker */
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-picker:has(
+    #tpjMatchedBoardSwatches
+) {
+    position: relative;
+
+    width: 100%;
+
+    margin: 0;
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-picker:has(
+    #tpjMatchedBoardSwatches
+)
+> summary {
+    min-height: 44px;
+
+    padding:
+        8px
+        11px;
+
+    border:
+        1px solid
+        rgba(90, 42, 30, 0.18);
+
+    border-radius:
+        12px;
+
+    background:
+        rgba(255, 255, 255, 0.64);
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-copy small {
+    display: none;
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-preview {
+    width: 25px;
+    height: 25px;
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-picker[open] {
+    z-index: 60;
+}
+
+
+/* Floating menu */
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-panel {
+    position: absolute;
+
+    top:
+        calc(100% + 4px);
+
+    left: 0;
+
+    z-index: 60;
+
+    width: 100%;
+
+    max-height: 330px;
+
+    overflow-y: auto;
+
+    margin: 0;
+
+    padding: 5px;
+
+    border:
+        1px solid
+        rgba(90, 42, 30, 0.15);
+
+    border-radius:
+        12px;
+
+    background:
+        #FFFDF9;
+
+    box-shadow:
+        0
+        10px
+        24px
+        rgba(90, 42, 30, 0.13);
+}
+
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-picker:not([open])
+> .tpj-color-panel {
+    display:
+        none !important;
+}
+
+
+/* One palette color per line */
+
+#builderStep2
+#tpjMatchedBoardSwatches {
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    gap:
+        1px !important;
+}
+
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.color-choice {
+    width: 100%;
+
+    min-height: 38px !important;
+
+    padding:
+        6px
+        8px !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        row !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        flex-start !important;
+
+    gap:
+        9px !important;
+
+    border:
+        0 !important;
+
+    border-radius:
+        7px !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+
+    text-align:
+        left !important;
+}
+
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.color-choice:hover,
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.color-choice:has(input:checked) {
+    background:
+        var(--blush-pink) !important;
+}
+
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.color-swatch {
+    width: 23px;
+    height: 23px;
+
+    flex:
+        0 0 23px;
+}
+
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.color-choice small {
+    color:
+        var(--chocolate);
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* Custom Shade remains at the bottom */
+
+#builderStep2
+#tpjMatchedBoardSwatches
+.custom-shade-icon {
+    width: 23px;
+    height: 23px;
+
+    flex:
+        0 0 23px;
+
+    font-size: 15px;
+}
+
+
+/* No Done button */
+
+#builderStep2
+#matchedBoardColorOptions
+.tpj-color-done {
+    display:
+        none !important;
+}
+
+
+/* Custom shade control inside dropdown */
+
+#builderStep2
+#matchedBoardColorOptions
+.custom-color-field {
+    margin:
+        5px
+        4px;
+
+    padding:
+        8px;
+
+    border:
+        0;
+
+    background:
+        var(--blush-pink);
 }

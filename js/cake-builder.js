@@ -9063,15 +9063,48 @@ heightFieldset?.classList.toggle(
     !cakeAllowsExtraLayer()
 );
 
-    if (extraLayerDescription) {
-        if (builderState.isTall) {
-            extraLayerDescription.textContent =
-                `${product.tallLayers} layers · ${formatCurrency(product.tallPrice)} base`;
-        } else {
-            extraLayerDescription.textContent =
-                `Makes your cake tall · Adds ${formatCurrency(getExtraLayerPrice())}`;
-        }
-    }
+setText(
+    "#standardHeightDescription",
+    `${product.standardLayers} ${
+        product.standardLayers === 1
+            ? "Layer"
+            : "Layers"
+    }`
+);
+
+
+if (extraLayerDescription) {
+
+    extraLayerDescription.textContent =
+        `+${formatCurrency(
+            getExtraLayerPrice()
+        )}`;
+}
+
+
+/*
+   Keep the new Standard / Tall buttons
+   visually synchronized with builderState.
+*/
+
+getElements(
+    "[data-height-choice]"
+).forEach((button) => {
+
+    const isSelected =
+        button.dataset.heightChoice ===
+        (
+            builderState.isTall
+                ? "tall"
+                : "standard"
+        );
+
+
+    button.setAttribute(
+        "aria-pressed",
+        String(isSelected)
+    );
+});
 
     if (bentoLayerNotice) {
         const isBento =
@@ -15477,7 +15510,46 @@ extraLayerToggle?.addEventListener(
         renderCakePreview();
     }
 );
+/*
+   NEW HEIGHT CHOICE BUTTONS
 
+   These control the original hidden
+   #extraLayerToggle, so the renderer,
+   price and serving logic stay unchanged.
+*/
+
+getElements(
+    "[data-height-choice]"
+).forEach((button) => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            if (
+                !extraLayerToggle ||
+                !cakeAllowsExtraLayer()
+            ) {
+                return;
+            }
+
+
+            extraLayerToggle.checked =
+                button.dataset.heightChoice ===
+                "tall";
+
+
+            extraLayerToggle.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+        }
+    );
+});
 
 /* =========================================
    FLAVOR EVENTS
@@ -15680,7 +15752,32 @@ getElement(
         renderCakePreview();
     }
 );
+/*
+   When the native color picker finishes,
+   close the Match Board To dropdown.
+*/
 
+getElement(
+    "#customMatchedBoardColor"
+)?.addEventListener(
+    "change",
+    () => {
+
+        const matchedColorPicker =
+            getElement(
+                "#tpjMatchedBoardSwatches"
+            )?.closest(
+                ".tpj-color-picker"
+            );
+
+
+        if (matchedColorPicker) {
+
+            matchedColorPicker.open =
+                false;
+        }
+    }
+);
 
 getElement(
     "#customCupcakeFrostingColor"
@@ -16425,18 +16522,46 @@ buildColorSwatches(
         BOARD
     */
 
-    buildColorSwatches(
-        "#cakeBoardColorSwatches",
-        "cakeBoardColorChoice",
-        boardPalette,
-        builderState.cakeBoardColor,
-        (value) => {
-            builderState.cakeBoardColor =
-                value;
+buildColorSwatches(
+    "#cakeBoardColorSwatches",
+    "cakeBoardColorChoice",
+    boardPalette,
+    builderState.cakeBoardColor,
 
-            renderCakePreview();
+    (value) => {
+
+        builderState.cakeBoardColor =
+            value;
+
+
+        /*
+           Choosing a regular solid board
+           turns Match My Cake Palette off.
+        */
+
+        builderState
+            .matchBoardToCakePalette =
+            false;
+
+
+        const matchBoardInput =
+            getElement(
+                "#matchBoardToCakePalette"
+            );
+
+
+        if (matchBoardInput) {
+
+            matchBoardInput.checked =
+                false;
         }
-    );
+
+
+        updateMatchedBoardColorControls();
+
+        renderCakePreview();
+    }
+);
 
 
     /*
@@ -18986,8 +19111,22 @@ matchTpjBuilderImageBackgrounds();
             grid.hidden || grid.classList.contains("is-hidden");
     }
 
-    function enhanceGrid(grid) {
-        if (pickers.has(grid)) {
+function enhanceGrid(grid) {
+
+    /*
+       Page 2 Board Color stays permanently
+       visible as five side-by-side swatches.
+    */
+
+    if (
+        grid.id ===
+        "cakeBoardColorSwatches"
+    ) {
+        return;
+    }
+
+
+    if (pickers.has(grid)) {
             updateSummary(grid, pickers.get(grid));
             return;
         }
