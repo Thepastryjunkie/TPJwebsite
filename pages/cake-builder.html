@@ -21,7 +21,7 @@
 
 
 </head>
-<link rel="stylesheet" href="../cake-builder.css?v=20260917-page2-controls-1">
+<link rel="stylesheet" href="../cake-builder.css?v=20260918-page4-structure-1">
 
 <body>
 
@@ -2737,7 +2737,7 @@
     >
 
     <strong>
-        Something Else
+        Something Else?
     </strong>
 
 </label> 
@@ -2935,7 +2935,7 @@
     >
 
     <strong>
-        Something Else
+        Something Else?
     </strong>
 </label>
         
@@ -3401,21 +3401,26 @@
         Fondant is added over the selected coating. The coating and fondant charges stack.
     </p>
 
-    <label class="extra-layer-control">
-        <input
-            id="fondantEnabledToggle"
-            type="checkbox"
-        >
+<label class="design-text-toggle">
 
-        <span class="toggle-track"></span>
+    <input
+        id="fondantEnabledToggle"
+        type="checkbox"
+    >
 
-        <span class="toggle-copy">
-            <strong>Add Fondant</strong>
-            <small id="fondantPriceLabel">
-                Priced by cake size
-            </small>
-        </span>
-    </label>
+    <span class="design-text-toggle-copy">
+
+        <strong>
+            Add Fondant
+        </strong>
+
+        <small id="fondantPriceLabel">
+            Priced by cake size
+        </small>
+
+    </span>
+
+</label>
 </fieldset>
               <fieldset
     id="cakeBorderCustomizer"
@@ -3623,29 +3628,26 @@
             Sprinkles
         </legend>
 
-        <label class="extra-layer-control">
+     <label class="design-text-toggle">
 
-            <input
-                id="cakeBorderSprinkles"
-                type="checkbox"
-            >
+    <input
+        id="cakeBorderSprinkles"
+        type="checkbox"
+    >
 
-            <span class="toggle-track"></span>
+    <span class="design-text-toggle-copy">
 
-            <span class="toggle-copy">
+        <strong>
+            Add Sprinkles
+        </strong>
 
-                <strong>
-                    Add Sprinkles
-                </strong>
+        <small>
+            Add sprinkles to your cake !
+        </small>
 
-                <small>
-                    Add Sprinkles to your piped border or Vintage Piping.
-                </small>
+    </span>
 
-            </span>
-
-        </label>
-
+</label> 
 
         <div
             id="cakeSprinkleOptions"
@@ -3897,18 +3899,25 @@
         Add a photo, logo, or printed design without replacing your coating finish or other decorations.
     </p>
 
-    <label class="extra-layer-control">
+<label class="design-text-toggle">
+
     <input
         id="edibleImageEnabledToggle"
         type="checkbox"
     >
 
-    <span class="toggle-track"></span>
+    <span class="design-text-toggle-copy">
 
-    <span class="toggle-copy">
-        <strong>Add an Edible Image</strong>
-        <small>Turn on to upload the image and choose its placement.</small>
+        <strong>
+            Add an Edible Image
+        </strong>
+
+        <small>
+            Upload the image and choose its placement.
+        </small>
+
     </span>
+
 </label>
 
     <div
@@ -4077,18 +4086,25 @@
         Available for cakes and cupcakes. The topper choice is recorded in your review and is not drawn on the live preview.
     </p>
 
-    <label class="extra-layer-control">
+<label class="design-text-toggle">
+
     <input
         id="cakeTopperEnabledToggle"
         type="checkbox"
     >
 
-    <span class="toggle-track"></span>
+    <span class="design-text-toggle-copy">
 
-    <span class="toggle-copy">
-        <strong>Add a Cake Topper</strong>
-        <small>Turn on to choose the topper type and wording.</small>
+        <strong>
+            Add a Cake Topper
+        </strong>
+
+        <small>
+            Choose the topper material and wording.
+        </small>
+
     </span>
+
 </label>
 </fieldset>
 
@@ -5889,19 +5905,26 @@
                                 Add Toy / Figurine Decorations?
                             </legend>
 
-                            <label class="extra-layer-control">
-                                <input
-                                    id="toyFigurineEnabledToggle"
-                                    type="checkbox"
-                                >
+<label class="design-text-toggle">
 
-                                <span class="toggle-track"></span>
+    <input
+        id="toyFigurineEnabledToggle"
+        type="checkbox"
+    >
 
-                                <span class="toggle-copy">
-                                    <strong>Add Toy / Figurine Decorations</strong>
-                                    <small>Turn on to describe the toys or figurines you want.</small>
-                                </span>
-                            </label>
+    <span class="design-text-toggle-copy">
+
+        <strong>
+            Add Toy / Figurine Decorations
+        </strong>
+
+        <small>
+            Describe the toys or figurines you want.
+        </small>
+
+    </span>
+
+</label>
 
                             <label
                                 id="toyFigurineDetailsField"
@@ -5928,19 +5951,26 @@
                                 Add Custom 3D Sculpted Pieces?
                             </legend>
 
-                            <label class="extra-layer-control">
-                                <input
-                                    id="customSculptedEnabledToggle"
-                                    type="checkbox"
-                                >
+                           <label class="design-text-toggle">
 
-                                <span class="toggle-track"></span>
+    <input
+        id="customSculptedEnabledToggle"
+        type="checkbox"
+    >
 
-                                <span class="toggle-copy">
-                                    <strong>Add Custom 3D Sculpted Pieces</strong>
-                                    <small>Turn on to describe what you want sculpted.</small>
-                                </span>
-                            </label>
+    <span class="design-text-toggle-copy">
+
+        <strong>
+            Add Custom 3D Sculpted Pieces
+        </strong>
+
+        <small>
+            Describe what you want sculpted.
+        </small>
+
+    </span>
+
+</label>
 
                             <label
                                 id="customSculptedDetailsField"
@@ -6789,6 +6819,6 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260917-page2-controls-1"></script>
+<script src="../js/cake-builder.js?v=20260918-page4-structure-1"></script>
 </body>
 </html>

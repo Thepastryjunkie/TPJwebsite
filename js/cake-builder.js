@@ -9427,23 +9427,58 @@ function reorderStepFourControls() {
         );
     }
 
-    if (
-        cakeDetails &&
-        toyFigurine
-    ) {
-        cakeDetails.after(
+let specialtyGrid =
+    getElement(
+        "#step4SpecialtyGrid"
+    );
+
+
+if (
+    !specialtyGrid &&
+    cakeDetails &&
+    (
+        toyFigurine ||
+        customSculpted
+    )
+) {
+
+    specialtyGrid =
+        document.createElement(
+            "div"
+        );
+
+
+    specialtyGrid.id =
+        "step4SpecialtyGrid";
+
+
+    specialtyGrid.className =
+        "step4-specialty-grid";
+
+
+    cakeDetails.after(
+        specialtyGrid
+    );
+}
+
+
+if (specialtyGrid) {
+
+    if (toyFigurine) {
+
+        specialtyGrid.appendChild(
             toyFigurine
         );
     }
 
-    if (
-        toyFigurine &&
-        customSculpted
-    ) {
-        toyFigurine.after(
+
+    if (customSculpted) {
+
+        specialtyGrid.appendChild(
             customSculpted
         );
     }
+}
 
 if (
     cupcakeSlot &&
@@ -19665,146 +19700,473 @@ for (
     if (document.fonts) document.fonts.ready.then(schedule);
     schedule();
 })();
-/* PAGE 3 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
+/* PAGE 3 + PAGE 4 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
 (() => {
-    function installRowShelves() {
-        const step = document.getElementById('builderStep3');
 
-        if (!step || step.dataset.tpjShelvesInstalled === 'true') {
+    const shelfConfigurations = [
+
+        {
+            stepId:
+                "builderStep3",
+
+            gridSelector:
+                ".text-choice-grid, " +
+                ".upgrade-grid, " +
+                ".description-choice-grid"
+        },
+
+
+        {
+            stepId:
+                "builderStep4",
+
+            gridSelector:
+                "#cakeFinishCustomizer .style-choice-grid, " +
+                "#cakeBorderCustomizer > .text-choice-grid, " +
+                "#cakeDetailsCustomizer .decoration-choice-grid"
+        }
+
+    ];
+
+
+    function installRowShelves(
+        stepId,
+        gridSelector
+    ) {
+
+        const step =
+            document.getElementById(
+                stepId
+            );
+
+
+        if (
+            !step ||
+            step.dataset
+                .tpjShelvesInstalled ===
+                "true"
+        ) {
             return;
         }
 
-        step.dataset.tpjShelvesInstalled = 'true';
 
-        const grids = [...step.querySelectorAll(
-            '.text-choice-grid, .upgrade-grid, .description-choice-grid'
-        )];
+        step.dataset
+            .tpjShelvesInstalled =
+            "true";
 
-        const displays = grids.map(grid => {
-            grid.classList.add('tpj-shelf-grid');
 
-            const layer = document.createElement('div');
-            layer.className = 'tpj-row-shelf-layer';
-            layer.setAttribute('aria-hidden', 'true');
-            grid.appendChild(layer);
+        const grids = [
+            ...step.querySelectorAll(
+                gridSelector
+            )
+        ];
 
-            return { grid, layer };
-        });
+
+        const displays =
+            grids.map(
+                (grid) => {
+
+                    grid.classList.add(
+                        "tpj-shelf-grid"
+                    );
+
+
+                    const layer =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    layer.className =
+                        "tpj-row-shelf-layer";
+
+
+                    layer.setAttribute(
+                        "aria-hidden",
+                        "true"
+                    );
+
+
+                    grid.appendChild(
+                        layer
+                    );
+
+
+                    return {
+                        grid,
+                        layer
+                    };
+                }
+            );
+
 
         let pending = false;
 
+
         function drawShelves() {
+
             pending = false;
 
-            displays.forEach(({ grid, layer }) => {
-                if (!grid.getClientRects().length) {
-                    layer.replaceChildren();
-                    return;
-                }
 
-                const gridBox = grid.getBoundingClientRect();
-                const rows = [];
+            displays.forEach(
+                ({
+                    grid,
+                    layer
+                }) => {
 
-                // Only illustrated product choices receive shelves.
-                // Text-only "Something Else" options remain untouched.
-                [...grid.children].forEach(card => {
                     if (
-                        !card.matches('label') ||
-                        !card.querySelector(':scope > img') ||
-                        !card.getClientRects().length ||
-                        getComputedStyle(card).visibility === 'hidden'
+                        !grid
+                            .getClientRects()
+                            .length
                     ) {
+                        layer.replaceChildren();
+
                         return;
                     }
 
-                    const bounds = card.getBoundingClientRect();
-                    const top = bounds.top - gridBox.top - grid.clientTop;
-                    const left = bounds.left - gridBox.left - grid.clientLeft;
-                    const right = left + bounds.width;
-                    const bottom = top + bounds.height;
 
-                    let row = rows.find(item =>
-                        Math.abs(item.top - top) < 5
+                    const gridBox =
+                        grid
+                            .getBoundingClientRect();
+
+
+                    const rows = [];
+
+
+                    /*
+                       EXACT SAME RULE AS PAGE 3:
+
+                       Only illustrated choices
+                       receive shelves.
+
+                       Text-only options such as
+                       "None" remain untouched.
+                    */
+
+                    [
+                        ...grid.children
+                    ].forEach(
+                        (card) => {
+
+                            if (
+                                !card.matches(
+                                    "label"
+                                ) ||
+
+                                !card.querySelector(
+                                    ":scope > img"
+                                ) ||
+
+                                !card
+                                    .getClientRects()
+                                    .length ||
+
+                                getComputedStyle(
+                                    card
+                                ).visibility ===
+                                    "hidden"
+                            ) {
+                                return;
+                            }
+
+
+                            const bounds =
+                                card
+                                    .getBoundingClientRect();
+
+
+                            const top =
+                                bounds.top -
+                                gridBox.top -
+                                grid.clientTop;
+
+
+                            const left =
+                                bounds.left -
+                                gridBox.left -
+                                grid.clientLeft;
+
+
+                            const right =
+                                left +
+                                bounds.width;
+
+
+                            const bottom =
+                                top +
+                                bounds.height;
+
+
+                            let row =
+                                rows.find(
+                                    (item) =>
+                                        Math.abs(
+                                            item.top -
+                                            top
+                                        ) < 5
+                                );
+
+
+                            if (!row) {
+
+                                row = {
+                                    top,
+                                    left,
+                                    right,
+                                    bottom
+                                };
+
+
+                                rows.push(
+                                    row
+                                );
+
+                            } else {
+
+                                row.left =
+                                    Math.min(
+                                        row.left,
+                                        left
+                                    );
+
+
+                                row.right =
+                                    Math.max(
+                                        row.right,
+                                        right
+                                    );
+
+
+                                row.bottom =
+                                    Math.max(
+                                        row.bottom,
+                                        bottom
+                                    );
+                            }
+                        }
                     );
 
-                    if (!row) {
-                        row = { top, left, right, bottom };
-                        rows.push(row);
-                    } else {
-                        row.left = Math.min(row.left, left);
-                        row.right = Math.max(row.right, right);
-                        row.bottom = Math.max(row.bottom, bottom);
-                    }
-                });
 
-                const fragment = document.createDocumentFragment();
+                    const fragment =
+                        document
+                            .createDocumentFragment();
 
-                rows.forEach(row => {
-                    const shelf = document.createElement('div');
-                    shelf.className = 'tpj-row-shelf';
 
-                    const height = Math.min(
-                        64,
-                        Math.max(40, (row.bottom - row.top) * 0.36)
+                    rows.forEach(
+                        (row) => {
+
+                            const shelf =
+                                document
+                                    .createElement(
+                                        "div"
+                                    );
+
+
+                            shelf.className =
+                                "tpj-row-shelf";
+
+
+                            /*
+                               EXACT PAGE 3
+                               shelf sizing formula.
+                            */
+
+                            const height =
+                                Math.min(
+                                    64,
+
+                                    Math.max(
+                                        40,
+
+                                        (
+                                            row.bottom -
+                                            row.top
+                                        ) * 0.36
+                                    )
+                                );
+
+
+                            shelf.style.left =
+                                `${row.left}px`;
+
+
+                            shelf.style.width =
+                                `${
+                                    row.right -
+                                    row.left
+                                }px`;
+
+
+                            shelf.style.top =
+                                `${
+                                    row.bottom -
+                                    height +
+                                    4
+                                }px`;
+
+
+                            shelf.style.height =
+                                `${height}px`;
+
+
+                            fragment.appendChild(
+                                shelf
+                            );
+                        }
                     );
 
-                    shelf.style.left = `${row.left}px`;
-                    shelf.style.width = `${row.right - row.left}px`;
-                    shelf.style.top = `${row.bottom - height + 4}px`;
-                    shelf.style.height = `${height}px`;
 
-                    fragment.appendChild(shelf);
-                });
-
-                layer.replaceChildren(fragment);
-            });
+                    layer.replaceChildren(
+                        fragment
+                    );
+                }
+            );
         }
+
 
         function schedule() {
-            if (pending) return;
+
+            if (pending) {
+                return;
+            }
+
+
             pending = true;
-            requestAnimationFrame(drawShelves);
+
+
+            requestAnimationFrame(
+                drawShelves
+            );
         }
 
-        const resizeObserver = new ResizeObserver(schedule);
 
-        displays.forEach(({ grid }) => {
-            resizeObserver.observe(grid);
+        const resizeObserver =
+            new ResizeObserver(
+                schedule
+            );
 
-            [...grid.children].forEach(child => {
-                if (child.matches('label')) {
-                    resizeObserver.observe(child);
-                }
-            });
-        });
 
-        // Recalculate when the step or conditional options become visible.
-        const visibilityObserver = new MutationObserver(schedule);
+        displays.forEach(
+            ({
+                grid
+            }) => {
 
-        visibilityObserver.observe(step, {
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['hidden', 'class']
-        });
+                resizeObserver.observe(
+                    grid
+                );
 
-        step.addEventListener('load', schedule, true);
-        step.addEventListener('change', schedule);
-        window.addEventListener('resize', schedule, { passive: true });
+
+                [
+                    ...grid.children
+                ].forEach(
+                    (child) => {
+
+                        if (
+                            child.matches(
+                                "label"
+                            )
+                        ) {
+                            resizeObserver.observe(
+                                child
+                            );
+                        }
+                    }
+                );
+            }
+        );
+
+
+        const visibilityObserver =
+            new MutationObserver(
+                schedule
+            );
+
+
+        visibilityObserver.observe(
+            step,
+            {
+                subtree: true,
+
+                attributes: true,
+
+                attributeFilter: [
+                    "hidden",
+                    "class"
+                ]
+            }
+        );
+
+
+        step.addEventListener(
+            "load",
+            schedule,
+            true
+        );
+
+
+        step.addEventListener(
+            "change",
+            schedule
+        );
+
+
+        window.addEventListener(
+            "resize",
+            schedule,
+            {
+                passive: true
+            }
+        );
+
 
         if (document.fonts) {
-            document.fonts.ready.then(schedule);
+
+            document.fonts
+                .ready
+                .then(
+                    schedule
+                );
         }
+
 
         schedule();
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener(
-            'DOMContentLoaded',
-            installRowShelves,
-            { once: true }
-        );
-    } else {
-        installRowShelves();
+
+    function installAllRowShelves() {
+
+        shelfConfigurations
+            .forEach(
+                ({
+                    stepId,
+                    gridSelector
+                }) => {
+
+                    installRowShelves(
+                        stepId,
+                        gridSelector
+                    );
+                }
+            );
     }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            installAllRowShelves,
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        installAllRowShelves();
+    }
+
 })();

@@ -2415,13 +2415,15 @@ fieldset {
 }
 
 .edible-image-controls {
-    margin-top: 17px;
-    padding: 18px;
+    margin-top: 14px;
 
-    border: 2px solid rgba(90, 42, 30, 0.14);
-    border-radius: 20px;
+    padding: 0;
 
-    background: #FFFDF9;
+    border: 0;
+
+    border-radius: 0;
+
+    background: transparent;
 }
 
 .visually-hidden-file-input {
@@ -4858,10 +4860,7 @@ margin-inline: auto;
    MACARON + DISCO BALL DETAIL CARDS
 ========================================= */
 
-/* Keep all Cake Detail cards in three matching columns. */
-#cakeDetailsCustomizer .decoration-choice-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
+
 
 .macaron-disco-card-group {
     display: contents;
@@ -5045,18 +5044,19 @@ margin-inline: auto;
     grid-column: 1 / -1;
 
     box-sizing: border-box;
+
     width: 100%;
-    margin: 2px 0 12px !important;
-    padding: clamp(12px, 2vw, 20px);
 
-    border: 2px solid var(--soft-pink);
-    border-radius: 18px;
+    margin: 8px 0 18px !important;
 
-    background: #FFFAFC;
+    padding: 0;
 
-    box-shadow:
-        0 8px 18px
-        rgba(90, 42, 30, 0.10);
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+
+    box-shadow: none;
 }
 
 .inline-card-editor > .builder-fieldset {
@@ -5445,7 +5445,60 @@ margin-inline: auto;
     border-radius: 17px;
     box-shadow: 0 8px 20px #78214808;
 }
+/* =========================================
+   PAGE 4 — FLOATING COLOR MENUS
+========================================= */
 
+#builderStep4 .tpj-color-picker {
+    position: relative;
+}
+
+
+#builderStep4 .tpj-color-picker[open] {
+    z-index: 80;
+}
+
+
+#builderStep4
+.tpj-color-picker
+> .tpj-color-panel {
+    position: absolute;
+
+    top: calc(100% + 5px);
+    left: 0;
+
+    z-index: 80;
+
+    width: min(430px, 100%);
+
+    max-height: 330px;
+
+    overflow-y: auto;
+
+    margin: 0;
+
+    padding: 10px;
+
+    border:
+        1px solid
+        rgba(90, 42, 30, 0.14);
+
+    border-radius: 13px;
+
+    background:
+        rgba(255, 253, 249, 0.98);
+
+    box-shadow:
+        0 12px 28px
+        rgba(90, 42, 30, 0.12);
+}
+
+
+#builderStep4
+.tpj-color-picker:not([open])
+> .tpj-color-panel {
+    display: none !important;
+}
 .tpj-color-panel .color-choice-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -5981,23 +6034,77 @@ margin-inline: auto;
     .text-choice-grid,
     .upgrade-grid,
     .description-choice-grid
-) {
+),
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-grid,
+
+#builderStep4
+#cakeBorderCustomizer
+> .text-choice-grid,
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid {
     position: relative;
+
     isolation: isolate;
+
     padding: 12px 4px 8px;
+
     border-radius: 0;
+
     background: none;
+
     row-gap: 24px;
 }
 
 /* Keep the actual choices above the decorative shelves. */
-#builderStep3 .tpj-shelf-grid > label {
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-shelf-grid
+> label {
     position: relative;
+
     z-index: 1;
 }
 
+
+/*
+   Page 3 description cards must start from the top
+   instead of vertically centering shorter options.
+*/
+
+#builderStep3
+.description-choice-grid
+> .description-choice-card {
+    justify-content: flex-start;
+}
+
+
+/*
+   Reserve the same two-line title area for every
+   coating so Ganache's price begins at the same
+   height as the other descriptions.
+*/
+
+#builderStep3
+.description-choice-grid
+> .description-choice-card
+> strong {
+    width: 100%;
+    min-height: 2.8em;
+}
+
 /* This layer takes up no space and cannot intercept clicks. */
-#builderStep3 .tpj-row-shelf-layer {
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf-layer {
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -6005,54 +6112,207 @@ margin-inline: auto;
     user-select: none;
 }
 
-/* Each shelf has a pink surface, front edge, and rosy shadow. */
-#builderStep3 .tpj-row-shelf {
+/* Each row gets a soft floating pink shadow plate. */
+/* ==========================================================
+   PAGE 3 — REFERENCE-STYLE FLOATING SHADOW PLATFORMS
+========================================================== */
+
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf {
     position: absolute;
+
     box-sizing: border-box;
+
     pointer-events: none;
 
-    background: linear-gradient(
+    overflow: visible;
+
+
+    /*
+       Very pale platform.
+       This should NOT read like a solid pink shelf.
+    */
+
+ background:
+    linear-gradient(
         180deg,
-        #f6c7da 0%,
-        #fbdce9 56%,
-        #fdebf3 86%,
-        #f4b7d1 87%,
-        #f4b7d1 100%
+        rgba(255, 252, 253, 0.42) 0%,
+        rgba(255, 246, 250, 0.32) 38%,
+        rgba(250, 226, 237, 0.22) 76%,
+        rgba(244, 200, 220, 0.10) 100%
     );
 
-    border-radius: 22px 22px 12px 12px;
 
-    box-shadow:
-        inset 0 -7px 0 rgba(235, 139, 180, 0.24),
-        0 9px 13px -5px rgba(218, 76, 139, 0.32),
-        0 17px 23px -12px rgba(218, 76, 139, 0.28);
 
-    transform: perspective(240px) rotateX(16deg);
-    transform-origin: center bottom;
+    /*
+       Reference has angled ends instead of
+       giant rounded capsule corners.
+    */
+
+    border-radius: 0;
+
+    clip-path:
+        polygon(
+            4% 0,
+            96% 0,
+            100% 100%,
+            0 100%
+        );
+
+
+    /*
+       NO physical shelf tilt.
+    */
+
+    transform: none;
+
+    transform-origin: center;
+
+
+    /*
+       Keep the actual platform clean.
+       The separate shadow is created below.
+    */
+
+    box-shadow: none;
+
+    filter: none;
 }
 
+
+/*
+   SEPARATE SHADOW STRIP UNDER EACH ROW
+*/
+
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf::after {
+    content: "";
+
+    position: absolute;
+
+    left: 4%;
+    right: 4%;
+
+    bottom: -9px;
+
+    height: 10px;
+
+    border-radius: 50%;
+
+background: rgba(214, 118, 166, 0.12);
+filter: blur(12px);
+opacity: 0.72;
+
+    pointer-events: none;
+}
+
+
 @media (max-width: 720px) {
+
     #builderStep3 :is(
         .text-choice-grid,
         .upgrade-grid,
         .description-choice-grid
-    ) {
+    ),
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-grid,
+
+    #builderStep4
+    #cakeBorderCustomizer
+    > .text-choice-grid,
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid {
         row-gap: 20px;
     }
 
-    #builderStep3 .tpj-row-shelf {
-        border-radius: 16px 16px 10px 10px;
+
+    :is(
+        #builderStep3,
+        #builderStep4
+    )
+    .tpj-row-shelf {
+        border-radius: 0;
     }
 }
 #builderStep3 .custom-text-only-card {
-    align-self: end;
+    position: relative;
+
+    align-self: center;
     justify-self: center;
-    width: calc(100% - 8px);
-    min-height: 44px;
-    padding: 10px 8px;
-    border-width: 1px;
+
+    width: fit-content;
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 6px 4px 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    color: var(--chocolate);
+
+    cursor: pointer;
+
+    transform: none !important;
+}
+#builderStep3 .custom-text-only-card strong {
+    margin: 0;
+    padding: 0;
+
+    color: var(--chocolate);
+
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+
+/* Hover */
+#builderStep3 .custom-text-only-card:hover strong {
+    color: var(--signature-pink);
+}
+
+
+/* Selected pink dash */
+#builderStep3
+.custom-text-only-card:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 2px;
+
+    width: 54px;
+    height: 3px;
+
     border-radius: 999px;
-    font-size: 11px;
+
+    background: var(--signature-pink);
+
+    transform: translateX(-50%);
 }
 #builderStep2 .cake-size-card {
     min-height: 0;
@@ -6438,10 +6698,10 @@ body {
 /* =========================
    COMPACT OPENED OPTIONS
 ========================= */
+/* STEP 2 + STEP 5 KEEP THEIR COMPACT PANELS */
 
 :is(
     #builderStep2,
-    #builderStep4,
     #builderStep5
 ) :is(
     .conditional-field,
@@ -6466,17 +6726,237 @@ body {
 }
 
 
-/* Remove that old big dashed-panel feeling */
+/* PAGE 4 — OPEN, NO GIANT OUTER CARD */
 
-:is(
-    #builderStep2,
-    #builderStep4,
-    #builderStep5
-) .conditional-section {
-    border-style: solid;
+#builderStep4 :is(
+    .conditional-field,
+    .conditional-section
+) {
+    margin-bottom: 18px;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+/* =========================
+   PAGE 4 TEXT TOGGLES
+   Open text + pink dash
+========================= */
+
+#builderStep4 .design-text-toggle,
+#toyFigurineCustomizer .design-text-toggle,
+#customSculptedCustomizer .design-text-toggle {
+    position: relative;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin: 0;
+    padding: 6px 3px 12px;
+
+    display: inline-flex;
+    align-items: flex-start;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    cursor: pointer;
+
+    transform: none !important;
 }
 
 
+#builderStep4 .design-text-toggle > input,
+#toyFigurineCustomizer .design-text-toggle > input,
+#customSculptedCustomizer .design-text-toggle > input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+#builderStep4 .design-text-toggle-copy,
+#toyFigurineCustomizer .design-text-toggle-copy,
+#customSculptedCustomizer .design-text-toggle-copy {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+#builderStep4 .design-text-toggle-copy strong,
+#toyFigurineCustomizer .design-text-toggle-copy strong,
+#customSculptedCustomizer .design-text-toggle-copy strong {
+    color: var(--chocolate);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    line-height: 1.25;
+}
+
+
+#builderStep4 .design-text-toggle-copy small,
+#toyFigurineCustomizer .design-text-toggle-copy small,
+#customSculptedCustomizer .design-text-toggle-copy small {
+    color: var(--deep-berry);
+
+    font-size: 9px;
+
+    line-height: 1.3;
+}
+
+
+/* Selected pink dash */
+
+#builderStep4 .design-text-toggle:has(input:checked)::after,
+#toyFigurineCustomizer .design-text-toggle:has(input:checked)::after,
+#customSculptedCustomizer .design-text-toggle:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 3px;
+    bottom: 2px;
+
+    width: 68px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background: var(--signature-pink);
+}
+
+
+/* Hover */
+
+#builderStep4 .design-text-toggle:hover strong,
+#toyFigurineCustomizer .design-text-toggle:hover strong,
+#customSculptedCustomizer .design-text-toggle:hover strong {
+    color: var(--signature-pink);
+}
+/* =========================
+   PAGE 4 VISUAL GRIDS
+========================= */
+
+
+/* Five finish styles across */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-grid {
+    grid-template-columns:
+        repeat(
+            5,
+            minmax(0, 1fr)
+        );
+}
+
+
+/* Five Cake Details across */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid {
+    grid-template-columns:
+        repeat(
+            5,
+            minmax(0, 1fr)
+        );
+}
+
+
+/* Mid-size screens */
+
+@media (max-width: 1180px) {
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-grid,
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+    }
+}
+
+
+/* Phones */
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-grid,
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+}
+/* Specialty design requests */
+
+#step4SpecialtyGrid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    align-items: start;
+
+    gap: 28px;
+}
+
+
+#step4SpecialtyGrid
+.builder-fieldset {
+    min-width: 0;
+
+    margin-bottom: 16px;
+}
+
+
+@media (max-width: 720px) {
+
+    #step4SpecialtyGrid {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+}
 /* =========================
    PAGE 4 BORDER ARTWORK
    Make those piping examples
