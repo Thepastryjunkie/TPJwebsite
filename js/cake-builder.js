@@ -20170,3 +20170,166 @@ for (
     }
 
 })();
+/* TPJ frosting pictures for existing color pickers */
+(() => {
+    const basePath = "../images/cake-builder/color-swatches/";
+
+    const mainPickers = new Set([
+        "mainCakeColorSwatches",
+        "tierTopColorSwatches",
+        "tierBottomColorSwatches",
+        "characterOneColorSwatches",
+        "characterTwoColorSwatches"
+    ]);
+
+    const borderPickers = new Set([
+        "cakeBorderColorSwatches",
+        "cakeBorderBottomColorSwatches"
+    ]);
+
+    const finishPickers = new Set([
+        "finishAccentOneSwatches",
+        "finishAccentTwoSwatches"
+    ]);
+
+    const colors = new Set([
+        "soft-pink", "hot-pink", "chocolate", "cream", "white",
+        "black", "lavender", "baby-blue", "sage", "yellow"
+    ]);
+
+    let scheduled = false;
+
+    function folderFor(grid) {
+        if (mainPickers.has(grid.id)) return "main";
+        if (borderPickers.has(grid.id)) return "border";
+
+        if (finishPickers.has(grid.id)) {
+            const finish =
+                document.querySelector('input[name="cakeFinish"]:checked')
+                    ?.value || "";
+
+            if (finish === "Vintage Piping") return "vintage";
+            if (finish === "Watercolor Finish") return "watercolor";
+            if (finish === "Palette Knife Finish") return "palette-knife";
+        }
+
+        return null;
+    }
+
+    function syncPictures() {
+        scheduled = false;
+
+        document.querySelectorAll(".color-choice-grid").forEach((grid) => {
+            const relevant =
+                mainPickers.has(grid.id) ||
+                borderPickers.has(grid.id) ||
+                finishPickers.has(grid.id);
+
+            if (!relevant) return;
+
+            const folder = folderFor(grid);
+
+            grid.querySelectorAll("label.color-choice").forEach((label) => {
+                const swatch = label.querySelector(".color-swatch");
+                if (!swatch) return;
+
+                const color = label.querySelector("small")
+                    ?.textContent.trim().toLowerCase()
+                    .replace(/\s+/g, "-");
+
+                const shouldShowPicture = folder && colors.has(color);
+                let picture = swatch.querySelector(".tpj-swatch-picture");
+
+                if (!shouldShowPicture) {
+                    picture?.remove();
+                    swatch.classList.remove("tpj-picture-swatch");
+                    return;
+                }
+
+                const path = `${basePath}${folder}/${color}.png`;
+
+                if (!picture) {
+                    picture = document.createElement("img");
+                    picture.className = "tpj-swatch-picture";
+                    picture.alt = "";
+                    picture.decoding = "async";
+                    swatch.appendChild(picture);
+                }
+
+                if (picture.getAttribute("src") !== path) {
+                    picture.src = path;
+                }
+
+                swatch.classList.add("tpj-picture-swatch");
+            });
+
+            const preview = grid.closest(".tpj-color-picker")
+                ?.querySelector("summary .tpj-color-preview");
+
+            if (!preview) return;
+
+            const selected = grid.querySelector(
+                'input[type="radio"]:checked'
+            );
+
+            const selectedPicture = selected
+                ?.closest(".color-choice")
+                ?.querySelector(".tpj-swatch-picture");
+
+            let previewPicture = preview.querySelector(
+                ".tpj-preview-picture"
+            );
+
+            if (!selectedPicture) {
+                previewPicture?.remove();
+                preview.classList.remove("tpj-picture-preview");
+                return;
+            }
+
+            if (!previewPicture) {
+                previewPicture = document.createElement("img");
+                previewPicture.className = "tpj-preview-picture";
+                previewPicture.alt = "";
+                preview.appendChild(previewPicture);
+            }
+
+            const path = selectedPicture.getAttribute("src");
+
+            if (previewPicture.getAttribute("src") !== path) {
+                previewPicture.src = path;
+            }
+
+            preview.classList.add("tpj-picture-preview");
+        });
+    }
+
+    function scheduleSync() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(syncPictures);
+    }
+
+    function start() {
+        scheduleSync();
+
+        // Covers color selections, changing finish, and reset.
+        document.addEventListener("change", scheduleSync);
+        document.addEventListener("reset", () => {
+            setTimeout(scheduleSync, 0);
+        });
+
+        // Covers palettes rebuilt by your existing builder code.
+        new MutationObserver(scheduleSync).observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, {
+            once: true
+        });
+    } else {
+        start();
+    }
+})();
