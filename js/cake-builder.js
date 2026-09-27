@@ -20192,6 +20192,10 @@ for (
         "finishAccentTwoSwatches"
     ]);
 
+    const sprinklePickers = new Set([
+        "cakeBorderSprinkleColorSwatches"
+    ]);
+
     const colors = new Set([
         "soft-pink", "hot-pink", "chocolate", "cream", "white",
         "black", "lavender", "baby-blue", "sage", "yellow"
@@ -20201,7 +20205,8 @@ for (
 
     function folderFor(grid) {
         if (mainPickers.has(grid.id)) return "main";
-        if (borderPickers.has(grid.id)) return "border";
+          if (borderPickers.has(grid.id)) return "border";
+        if (sprinklePickers.has(grid.id)) return "sprinkles";
 
         if (finishPickers.has(grid.id)) {
             const finish =
@@ -20223,7 +20228,8 @@ for (
             const relevant =
                 mainPickers.has(grid.id) ||
                 borderPickers.has(grid.id) ||
-                finishPickers.has(grid.id);
+                finishPickers.has(grid.id) ||
+                sprinklePickers.has(grid.id);
 
             if (!relevant) return;
 
