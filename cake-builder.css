@@ -7384,6 +7384,185 @@ margin-left: 0 !important;
 /* TPJ reference decoration. No renderer sizing or grid-column changes. */
 .builder-main { position: relative; isolation: isolate; }
 .builder-main-inner { position: relative; z-index: 1; }
+
+/* =========================================
+   TPJ BUTTERCREAM CORNER FRAME
+   Steps 2–8 only
+========================================= */
+
+.cake-builder-app {
+    position: relative;
+    isolation: isolate;
+}
+
+/* TOP CORNERS: extend into the header */
+
+.cake-builder-app::before,
+.cake-builder-app::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+
+    width: clamp(65px, 7vw, 115px);
+
+    height: calc(
+        var(--builder-header-height) +
+        var(--builder-progress-height) +
+        25px
+    );
+
+    z-index: 0;
+    pointer-events: none;
+
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+
+    opacity: 0.85;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 55%,
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 55%,
+        transparent 100%
+    );
+}
+
+/* TOP LEFT */
+
+.cake-builder-app::before {
+    left: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-edge-left.png");
+
+    background-position: left top;
+}
+
+/* TOP RIGHT */
+
+.cake-builder-app::after {
+    right: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-edge-right.png");
+
+    background-position: right top;
+}
+
+
+/* BOTTOM CORNERS: anchored to the document */
+
+.builder-main::before,
+.builder-main::after {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+
+    width: clamp(95px, 13vw, 205px);
+    height: clamp(240px, 34vw, 450px);
+
+    z-index: 0;
+    pointer-events: none;
+
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+
+    opacity: 0.85;
+
+    -webkit-mask-image: linear-gradient(
+        to top,
+        black 0%,
+        black 65%,
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to top,
+        black 0%,
+        black 65%,
+        transparent 100%
+    );
+}
+
+/* BOTTOM LEFT: PIPING BAG */
+
+.builder-main::before {
+    left: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-edge-left.png");
+
+    background-position: left bottom;
+}
+
+/* BOTTOM RIGHT */
+
+.builder-main::after {
+    right: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-edge-right.png");
+
+    background-position: right bottom;
+}
+
+
+/* BASICS: NO BUTTERCREAM */
+
+.cake-builder-app:has(#builderStep1.is-active)::before,
+.cake-builder-app:has(#builderStep1.is-active)::after,
+.cake-builder-app:has(#builderStep1.is-active)
+.builder-main::before,
+.cake-builder-app:has(#builderStep1.is-active)
+.builder-main::after {
+    display: none;
+}
+
+
+/* SHOW FROSTING THROUGH HEADER EDGES */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-progress {
+    background: linear-gradient(
+        to right,
+        rgba(253, 235, 243, 0.35) 0%,
+        rgba(253, 235, 243, 0.95) 12%,
+        rgba(253, 235, 243, 0.95) 88%,
+        rgba(253, 235, 243, 0.35) 100%
+    );
+
+    backdrop-filter: none;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 720px) {
+    .cake-builder-app::before,
+    .cake-builder-app::after {
+        width: 40px;
+        opacity: 0.65;
+    }
+
+    .builder-main::before,
+    .builder-main::after {
+        width: 75px;
+        height: 220px;
+        opacity: 0.65;
+    }
+}
 .builder-header-inner, #cakePreviewCard { position: relative; }
 .tpj-ref-scene, .tpj-ref-local {
     position: absolute;
@@ -10883,9 +11062,6 @@ label:has(input:focus-visible) {
     display: block;
     font-size: 15px;
 }
-#builderStep4 #tpj-popup-finishColorCustomizer > .tpj-popup-title {
-    display: none;
-}
 #builderStep4 .tpj-option-popup > fieldset > legend {
     font-size: 20px;
     margin-bottom: 7px;
@@ -11111,7 +11287,26 @@ label:has(input:focus-visible) {
 #cakePreviewCard .cake-renderer-stage {
     position: relative;
 }
+/* PINK GLOW BEHIND THE CAKE ONLY */
 
+#cakePreviewCard .cake-renderer-stage::before {
+    content: "";
+    position: absolute;
+
+    inset: 10% 3%;
+    z-index: 0;
+    pointer-events: none;
+
+    background: radial-gradient(
+        ellipse 58% 55% at 50% 45%,
+        rgba(255, 95, 176, 0.95) 0%,
+        rgba(224, 69, 137, 0.83) 20%,
+        rgba(135, 42, 83, 0.57) 44%,
+        transparent 78%
+    );
+
+    filter: blur(25px);
+}
 #cakePreviewCard .cake-renderer-stage > #resetCakeBuilder {
     position: absolute;
     top: 8px;
