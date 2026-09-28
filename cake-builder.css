@@ -6230,9 +6230,7 @@ text-underline-offset: 4px;
     border-radius: 12px 12px 8px 8px;
     border-bottom: 2px solid #fdebf3;
 
-    box-shadow:
-    0 -10px 23px 4px rgba(255, 63, 159, 0.32),
-    0 9px 14px rgba(190, 66, 122, 0.22);
+box-shadow: 0 6px 12px rgba(190, 66, 122, 0.20);
 
     clip-path: none;
     transform: none;
@@ -6243,19 +6241,19 @@ text-underline-offset: 4px;
 :is(#builderStep3, #builderStep4) .tpj-row-shelf::before {
     content: "";
     position: absolute;
-    left: 3%;
-    right: 3%;
-    bottom: 7px;
-    height: 54px;
+    left: 2%;
+    right: 2%;
+    bottom: 0;
+    height: 64px;
     border-radius: 50%;
     background: radial-gradient(
         ellipse at center,
-        rgba(255, 63, 159, 0.54) 0%,
-        rgba(240, 87, 151, 0.27) 45%,
-        transparent 76%
+        rgba(255, 63, 159, 0.62) 0%,
+        rgba(240, 87, 151, 0.34) 48%,
+        transparent 78%
     );
-    filter: blur(8px);
-    z-index: -1;
+    filter: blur(9px);
+    z-index: 1;
     pointer-events: none;
 }
 
@@ -10835,7 +10833,9 @@ label:has(input:focus-visible) {
 #builderStep4 .tpj-option-popup[hidden] {
     display: none !important;
 }
-
+#builderStep4 .tpj-popup-source-open {
+    visibility: hidden;
+}
 #builderStep4 .tpj-option-popup {
     position: absolute;
     z-index: 100;
@@ -11117,6 +11117,24 @@ label:has(input:focus-visible) {
     z-index: 10;
     margin: 0;
 }
+#cakePreviewCard .cake-renderer-stage::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    top: 31%;
+    width: 80%;
+    height: 54%;
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 63, 159, 0.40) 0%,
+        rgba(240, 87, 151, 0.23) 46%,
+        transparent 76%
+    );
+    filter: blur(18px);
+    z-index: 0;
+    pointer-events: none;
+}
 
 /* A failed PNG still leaves a usable color choice. */
 
@@ -11173,6 +11191,8 @@ label:has(input:focus-visible) {
     margin-bottom: 4px;
     object-fit: contain;
     filter: drop-shadow(0 6px 5px rgba(77, 31, 22, .13));
+  transform: translateY(-14px) scale(1.16);
+transform-origin: center bottom;  
 }
 
 #builderStep4 #step4SpecialtyPicker > summary > strong {
@@ -11199,9 +11219,9 @@ label:has(input:focus-visible) {
 }
 
 #builderStep4 #step4SpecialtyPicker #step4SpecialtyGrid {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    right: 0;
+position: absolute;
+top: 0;
+right: 0;
     z-index: 20;
     box-sizing: border-box;
     width: min(340px, calc(100vw - 32px));
@@ -11216,6 +11236,9 @@ label:has(input:focus-visible) {
     background: #fdebf3;
     box-shadow: 0 10px 24px rgba(77, 31, 22, .15);
     text-align: left;
+}
+#builderStep4 #step4SpecialtyPicker[open] > summary {
+    visibility: hidden;
 }
 
 #builderStep4 #step4SpecialtyGrid > p {

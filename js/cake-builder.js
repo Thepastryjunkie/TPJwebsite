@@ -12208,30 +12208,31 @@ function initializeRemainingPanelBehavior() {
     let active = null;
 
     function position() {
-        if (!active) return;
+    if (!active) return;
 
-        const box = active.anchor.getBoundingClientRect();
-        const area = step.getBoundingClientRect();
-        const width = active.popup.getBoundingClientRect().width;
+    const box = active.anchor.getBoundingClientRect();
+    const area = step.getBoundingClientRect();
+    const width = active.popup.getBoundingClientRect().width;
 
-        const left = Math.max(
-            12,
-            Math.min(box.left, innerWidth - width - 12)
-        );
+    const left = Math.max(
+        12,
+        Math.min(box.left, innerWidth - width - 12)
+    );
 
-        active.popup.style.left =
-            `${left - area.left + step.scrollLeft}px`;
+    active.popup.style.left =
+        `${left - area.left + step.scrollLeft}px`;
 
-        active.popup.style.top =
-            `${box.bottom - area.top + step.scrollTop + 6}px`;
-    }
+    active.popup.style.top =
+        `${box.top - area.top + step.scrollTop}px`;
+}
 
     function close(returnFocus = false) {
         if (!active) return;
 
         const old = active;
 
-        old.popup.hidden = true;
+     old.popup.hidden = true;
+old.anchor.classList.remove("tpj-popup-source-open");
 
         old.inputs.forEach(input => {
             input.setAttribute("aria-expanded", "false");
@@ -12257,9 +12258,10 @@ function initializeRemainingPanelBehavior() {
             return;
         }
 
-        close();
+close();
+step.querySelector("#step4SpecialtyPicker")?.removeAttribute("open");
 
-        document.querySelectorAll(".tpj-color-picker[open]")
+document.querySelectorAll(".tpj-color-picker[open]")
             .forEach(item => {
                 item.open = false;
             });
@@ -12269,8 +12271,9 @@ function initializeRemainingPanelBehavior() {
 
         if (!record.anchor) return;
 
-        record.panel.classList.remove("is-complete-collapsed");
-        record.popup.hidden = false;
+record.panel.classList.remove("is-complete-collapsed");
+record.popup.hidden = false;
+record.anchor.classList.add("tpj-popup-source-open");
 
         input.setAttribute("aria-expanded", "true");
 
