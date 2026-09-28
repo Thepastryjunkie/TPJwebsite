@@ -6230,12 +6230,32 @@ text-underline-offset: 4px;
     border-radius: 12px 12px 8px 8px;
     border-bottom: 2px solid #fdebf3;
 
-    box-shadow: 0 9px 13px #e890b84a;
+    box-shadow:
+    0 -10px 23px 4px rgba(255, 63, 159, 0.32),
+    0 9px 14px rgba(190, 66, 122, 0.22);
 
     clip-path: none;
     transform: none;
     filter: none;
 
+    pointer-events: none;
+}
+:is(#builderStep3, #builderStep4) .tpj-row-shelf::before {
+    content: "";
+    position: absolute;
+    left: 3%;
+    right: 3%;
+    bottom: 7px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 63, 159, 0.54) 0%,
+        rgba(240, 87, 151, 0.27) 45%,
+        transparent 76%
+    );
+    filter: blur(8px);
+    z-index: -1;
     pointer-events: none;
 }
 
@@ -6928,15 +6948,11 @@ body {
 width: 104% !important;
 max-width: 100%;
 
-    height: clamp(
-        152px,
-        14vw,
-        190px
-    ) !important;
+    height: 145px !important;
 
     aspect-ratio: auto !important;
 
-  margin: 0 0 6px 0 !important;
+  margin: 0 0 2px 0 !important;
     padding: 0;
 
     object-fit: contain;
@@ -7185,11 +7201,7 @@ margin-left: 0 !important;
 width: 110% !important;
 max-width: 100%;
 
-    height: clamp(
-        125px,
-        11vw,
-        160px
-    ) !important;
+    height: 66px !important;
 
     aspect-ratio: auto !important;
 
@@ -7426,8 +7438,12 @@ margin-left: 0 !important;
    Reserve that space inside the form, not in a full-page side strip.
    Existing preview width and both outer column definitions stay intact. */
 @media (min-width: 1180px) {
-    :is(#builderStep2,#builderStep3,#builderStep4,#builderStep5) {
+    :is(#builderStep2,#builderStep3,#builderStep5) {
         padding-right: 144px;
+    }
+
+    #builderStep4 {
+        padding-right: 48px;
     }
 }
 /* ==========================================================
@@ -10824,20 +10840,19 @@ label:has(input:focus-visible) {
     position: absolute;
     z-index: 100;
 
-    width: min(390px, calc(100vw - 24px));
-    max-height: min(540px, 70dvh);
-
-    overflow: auto;
     box-sizing: border-box;
+    width: max-content;
+    max-width: min(430px, calc(100vw - 24px));
+    height: auto;
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
 
-    padding: 14px;
+    padding: 12px 14px;
 
     background: #fdebf3;
     color: #4d1f16;
-
     border: 1px solid #edb9cf;
     border-radius: 10px;
-
     box-shadow: 0 10px 25px #4d1f1626;
 }
 
@@ -10846,7 +10861,7 @@ label:has(input:focus-visible) {
     .conditional-section,
     .form-field
 ) {
-    width: 100% !important;
+   width: auto !important;
     min-width: 0 !important;
 
     margin: 8px 0 !important;
@@ -10868,6 +10883,37 @@ label:has(input:focus-visible) {
 #builderStep4 .tpj-popup-title {
     display: block;
     font-size: 15px;
+}
+#builderStep4 .tpj-option-popup > fieldset > legend {
+    font-size: 20px;
+    margin-bottom: 7px;
+}
+
+#builderStep4 .tpj-option-popup .fieldset-description {
+    margin: 0 0 8px;
+}
+
+#builderStep4 .tpj-option-popup .swatch-subsection {
+    margin-top: 12px;
+}
+
+#builderStep4 .tpj-option-popup
+.swatch-subsection + .swatch-subsection {
+    margin-top: 14px;
+}
+
+#builderStep4 .tpj-option-popup .swatch-subheading {
+    margin-bottom: 6px;
+}
+
+#builderStep4 .tpj-option-popup .color-choice {
+    min-height: 0;
+    padding: 4px 2px;
+    gap: 3px;
+}
+
+#builderStep4 .tpj-option-popup .color-choice-grid {
+    min-width: min(310px, calc(100vw - 60px));
 }
 
 /* Color choices stay inside their compact dropdown. */
