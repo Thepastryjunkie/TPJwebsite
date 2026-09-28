@@ -1568,6 +1568,7 @@ input.defaultChecked = input.checked;
 
         name.textContent =
             color.name;
+  
 
         input.addEventListener(
             "change",
@@ -1841,6 +1842,14 @@ function getEffectiveCakeBorderBottomColor() {
 
     return builderState
         .cakeBorderBottomColor;
+}
+
+function getPlacementLabel(value) {
+    return {
+        top: "Top",
+        bottom: "Bottom",
+        both: "Both"
+    }[value] || String(value || "");
 }
 
 function getDisplayColorName(color) {
@@ -5989,14 +5998,6 @@ async function loadSelectedBorderAssets(
     isBento = false
 ) {
     builderState.ruffleUnderlay = false;
-
-    if (builderState.cakeFinish === "Vintage Piping") {
-        return {
-            top: null,
-            bottom: null,
-            middle: null
-        };
-    }
 
     return loadPrimaryBorderAssets(
         entryKey,
@@ -10275,8 +10276,8 @@ if (edibleImageToggle) {
             "heart-5-bento"
             ? `Up to ${includedCount} included · additional images $2 each`
             : isCupcakesOnly
-                ? "$2 each on standalone cupcakes"
-                : "$15 each on cakes"
+? "$2 each"
+: "$15 each"
     );
 
 
@@ -10723,6 +10724,30 @@ function getMaximumDateForField(stateKey) {
         : "";
 }
 
+function applyDateInputBounds(input, stateKey) {
+    const minimum =
+        getMinimumDateForField(stateKey);
+
+    const maximum =
+        getMaximumDateForField(stateKey);
+
+    // Avoid repeatedly resetting the
+    // mobile date picker while it is open.
+    if (input.getAttribute("min") !== minimum) {
+        input.min = minimum;
+    }
+
+    if (maximum) {
+        if (input.getAttribute("max") !== maximum) {
+            input.max = maximum;
+        }
+    } else {
+        // Event dates have no maximum.
+        input.removeAttribute("max");
+    }
+}
+
+
 function enforceDateMinimums() {
     [
         ["#eventDate", "eventDate"],
@@ -10731,8 +10756,7 @@ function enforceDateMinimums() {
         const input = getElement(selector);
         if (!input) return;
 
-        input.min = getMinimumDateForField(stateKey);
-        input.max = getMaximumDateForField(stateKey);
+applyDateInputBounds(input, stateKey);
         input.setCustomValidity("");
 
         if (
@@ -10752,8 +10776,7 @@ function enforceDateMinimums() {
 }
 
 function protectDateFromPast(input, stateKey) {
-    input.min = getMinimumDateForField(stateKey);
-    input.max = getMaximumDateForField(stateKey);
+applyDateInputBounds(input, stateKey);
     input.setCustomValidity("");
 
     const outsideRange =
@@ -11255,12 +11278,15 @@ if (
                 field.checked = checked;
             }
 
-            const eventName =
-                field.tagName === "SELECT" ||
-                field.type === "radio" ||
-                field.type === "checkbox"
-                    ? "change"
-                    : "input";
+
+const eventName =
+    field.tagName === "SELECT" ||
+    field.type === "radio" ||
+    field.type === "checkbox" ||
+    field.type === "date"
+        ? "change"
+        : "input";
+
 
             field.dispatchEvent(
                 new Event(eventName, { bubbles: true })
@@ -12067,179 +12093,7 @@ function placeInlinePanelAfter(
 
 
 function updateInlineCustomizationPanels() {
-    Object.entries(
-        inlineDetailPanelMap
-    ).forEach(
-        ([decorationId, panelSelector]) => {
-            const input = getElement(
-                `[data-decoration-id="${decorationId}"]`
-            );
-
-            if (!input?.checked) {
-                return;
-            }
-
-            placeInlinePanelAfter(
-                getElement(panelSelector),
-                input.closest(
-                    ".decoration-choice-card"
-                )
-            );
-        }
-    );
-
-    const borderCustomizer =
-        getElement(
-            "#cakeBorderCustomizer"
-        );
-
-    const borderGrid =
-        borderCustomizer?.querySelector(
-            ".text-choice-grid"
-        );
-
-    const borderControls =
-        getElement(
-            "#cakeBorderControls"
-        );
-
-    const sprinkleSection =
-        getElement(
-            "#cakeSprinkleSection"
-        );
-
-    const selectedBorderInput =
-        getElement(
-            'input[name="cakeBorderStyle"]:checked'
-        );
-
-    const selectedBorderCard =
-        selectedBorderInput?.closest(
-            ".text-choice-card"
-        );
-
-    if (
-        selectedBorderInput?.value &&
-        selectedBorderCard
-    ) {
-        placeInlinePanelAfter(
-            borderControls,
-            selectedBorderCard
-        );
-    } else if (
-        borderGrid &&
-        borderControls
-    ) {
-        borderControls.classList.add(
-            "inline-card-editor"
-        );
-
-        if (
-            borderGrid.nextElementSibling !==
-            borderControls
-        ) {
-            borderGrid.after(
-                borderControls
-            );
-        }
-    }
-
-    const finishControls =
-        getElement(
-            "#finishColorCustomizer"
-        );
-
-    const cakeFinishCustomizer =
-        getElement(
-            "#cakeFinishCustomizer"
-        );
-
-    const product =
-        getSelectedCakeProduct();
-
-    const usesNumberLetterColors =
-        product.shape ===
-            "numberLetter" &&
-        builderState.numberLetterStyle ===
-            "Layered Piped";
-
-    const selectedFinishInput =
-        usesNumberLetterColors
-            ? getElement(
-                'input[name="numberLetterStyle"]:checked'
-            )
-            : getElement(
-                'input[name="cakeFinish"]:checked'
-            );
-
-    const selectedFinishCard =
-        selectedFinishInput?.closest(
-            ".style-choice-card"
-        );
-
-    if (
-        finishControls &&
-        !finishControls.classList.contains(
-            "is-hidden"
-        ) &&
-        selectedFinishCard
-    ) {
-        placeInlinePanelAfter(
-            finishControls,
-            selectedFinishCard
-        );
-    } else if (
-        cakeFinishCustomizer &&
-        finishControls
-    ) {
-        finishControls.classList.add(
-            "inline-card-editor"
-        );
-
-        if (
-            cakeFinishCustomizer
-                .previousElementSibling !==
-            finishControls
-        ) {
-            cakeFinishCustomizer.before(
-                finishControls
-            );
-        }
-    }
-
-    if (
-        sprinkleSection &&
-        !sprinkleSection.classList.contains(
-            "is-hidden"
-        )
-    ) {
-        const sprinkleAnchor =
-            selectedBorderInput?.value
-                ? borderControls
-                : finishControls;
-
-        placeInlinePanelAfter(
-            sprinkleSection,
-            sprinkleAnchor
-        );
-    } else if (
-        borderCustomizer &&
-        sprinkleSection
-    ) {
-        sprinkleSection.classList.add(
-            "inline-card-editor"
-        );
-
-        if (
-            borderCustomizer
-                .nextElementSibling !==
-            sprinkleSection
-        ) {
-            borderCustomizer.after(
-                sprinkleSection
-            );
-        }
-    }
+    window.tpjDesignUI?.sync();
 }
     const flowerPanel =
         getElement("#flowerDetailOptions");
@@ -12270,10 +12124,15 @@ function collapseCompletedPanel(
         "is-complete-collapsed"
     );
 
+if (
+    !getElement(panelSelector)
+        ?.classList.contains("tpj-stage-editor")
+) {
     getElement(anchorSelector)?.scrollIntoView({
         behavior: "smooth",
         block: "nearest"
     });
+}
 }
 
 
@@ -12306,209 +12165,308 @@ function flowerDetailsAreComplete() {
     );
 }
 function initializeRemainingPanelBehavior() {
-    const panelRules = [
-        ["#cakeSprinkleOptions", "#cakeSprinkleSection"],
-        ["#cakeBorderControls", "#cakeBorderCustomizer"],
-        ["#finishColorCustomizer", "#cakeFinishCustomizer"],
-        ["#pearlDetailOptions", '[data-decoration-id="pearlsDecoration"]'],
-        ["#bowDetailOptions", '[data-decoration-id="ribbonDecoration"]'],
-        ["#butterflyDetailOptions", '[data-decoration-id="butterfliesDecoration"]'],
-        ["#metallicLeafDetailOptions", '[data-decoration-id="goldAccentDecoration"]'],
-        ["#cherryDetailOptions", '[data-decoration-id="cherriesDecoration"]'],
-        ["#macaronsDetailOptions", '[data-decoration-id="macaronsDecoration"]'],
-        ["#discoBallsDetailOptions", '[data-decoration-id="discoBallsDecoration"]'],
-        ["#flowerDetailOptions", '[data-decoration-id="flowersDecoration"]'],
-        ["#dripDetailOptions", '[data-decoration-id="chocolateDripDecoration"]'],
-        ["#edibleImageControls", "#edibleImageCustomizer"],
-        ["#topperTypeOptions", "#cakeTopperCustomizer"],
-        ["#toyFigurineDetailsField", "#toyFigurineCustomizer"],
-        ["#customSculptedDetailsField", "#customSculptedCustomizer"]
+    const step = document.querySelector("#builderStep4");
+
+    if (!step || window.tpjDesignUI) return;
+
+    const definitions = [
+        [
+            "#finishColorCustomizer",
+            'input[name="cakeFinish"], input[name="numberLetterStyle"]',
+            "Finish colors"
+        ],
+        [
+            "#cakeBorderControls",
+            'input[name="cakeBorderStyle"]',
+            "Coating border"
+        ],
+        [
+            "#cakeSprinkleOptions",
+            "#cakeBorderSprinkles",
+            "Sprinkles"
+        ],
+        [
+            "#edibleImageControls",
+            "#edibleImageEnabledToggle",
+            "Edible image"
+        ],
+        [
+            "#topperTypeOptions",
+            "#cakeTopperEnabledToggle",
+            "Cake topper"
+        ],
+        [
+            "#toyFigurineDetailsField",
+            "#toyFigurineEnabledToggle",
+            "Toy / Figurine Decorations"
+        ],
+        [
+            "#customSculptedDetailsField",
+            "#customSculptedEnabledToggle",
+            "3D / Sculpted Cake"
+        ]
     ];
 
-    function ready(selector) {
-        if (selector === "#flowerDetailOptions") {
-            return flowerDetailsAreComplete();
-        }
+    Object.entries(inlineDetailPanelMap).forEach(([id, panel]) => {
+        definitions.push([
+            panel,
+            `[data-decoration-id="${id}"]`,
+            "Cake detail"
+        ]);
+    });
 
-        if (selector === "#edibleImageControls") {
-            return edibleImagesAreComplete();
-        }
+    let active = null;
 
-        if (selector === "#topperTypeOptions") {
-            return Boolean(builderState.topperType);
-        }
+    function position() {
+        if (!active) return;
 
-        if (selector === "#toyFigurineDetailsField") {
-            return Boolean(
-                getElement("#toyFigurineDetails")?.value.trim()
-            );
-        }
+        const box = active.anchor.getBoundingClientRect();
+        const area = step.getBoundingClientRect();
+        const width = active.popup.getBoundingClientRect().width;
 
-        if (selector === "#customSculptedDetailsField") {
-            return Boolean(
-                getElement("#customSculptedDetails")?.value.trim()
-            );
-        }
-
-        return true;
-    }
-
-function closePanel(
-    selector,
-    anchor,
-    confirmedByDone = false
-) {
-    if (!confirmedByDone) {
-        return;
-    }
-        const panel = getElement(selector);
-
-        if (!panel || !ready(selector)) {
-            return;
-        }
-
-        const invalid = Array.from(
-            panel.querySelectorAll("input, select, textarea")
-        ).find((field) =>
-            field.getClientRects().length &&
-            !field.disabled &&
-            !field.checkValidity()
+        const left = Math.max(
+            12,
+            Math.min(box.left, innerWidth - width - 12)
         );
 
-        if (invalid) {
-            invalid.reportValidity();
-            return;
-        }
+        active.popup.style.left =
+            `${left - area.left + step.scrollLeft}px`;
 
-      collapseCompletedPanel(selector, anchor, true);
+        active.popup.style.top =
+            `${box.bottom - area.top + step.scrollTop + 6}px`;
     }
 
-    // Done lets customers accept existing/default choices.
-    panelRules.forEach(([selector, anchor]) => {
-        const panel = getElement(selector);
+    function close(returnFocus = false) {
+        if (!active) return;
 
-        if (!panel || panel.querySelector("[data-panel-done]")) {
-            return;
-        }
+        const old = active;
 
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "reset-cake-button";
-        button.dataset.panelDone = "true";
-        button.textContent = "Done";
+        old.popup.hidden = true;
 
-        button.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-           closePanel(selector, anchor, true); 
+        old.inputs.forEach(input => {
+            input.setAttribute("aria-expanded", "false");
         });
 
-        panel.appendChild(button);
-    });
+        old.popup.querySelectorAll("details[open]").forEach(item => {
+            item.open = false;
+        });
 
-    // These controls were missing automatic completion.
-    document.addEventListener("change", (event) => {
-        const target = event.target;
+        active = null;
 
-        if (!(target instanceof Element)) {
-            return;
+        if (returnFocus) {
+            old.input?.focus({ preventScroll: true });
         }
+    }
 
-        if (target.matches(
-            '#cherryColorSwatches input[type="radio"]'
-        )) {
-            closePanel(
-                "#cherryDetailOptions",
-                '[data-decoration-id="cherriesDecoration"]'
-            );
-        }
-
+    function open(record, input) {
         if (
-            target.matches(
-                '#flowerDetailOptions input[type="radio"]'
-            ) &&
-            flowerDetailsAreComplete()
-        ) {
-            closePanel(
-                "#flowerDetailOptions",
-                '[data-decoration-id="flowersDecoration"]'
-            );
-        }
-    });
-
-    document.addEventListener("focusout", (event) => {
-        const target = event.target;
-
-        if (!(target instanceof Element)) {
-            return;
-        }
-
-        const textPanels = {
-            toyFigurineDetails: [
-                "#toyFigurineDetailsField",
-                "#toyFigurineCustomizer"
-            ],
-            customSculptedDetails: [
-                "#customSculptedDetailsField",
-                "#customSculptedCustomizer"
-            ]
-        };
-
-        if (textPanels[target.id]) {
-            closePanel(...textPanels[target.id]);
-            return;
-        }
-
-        if (target.matches("[data-decoration-quantity]")) {
-            const id = target.dataset.decorationQuantity;
-            const selector = inlineDetailPanelMap[id];
-
-            if (selector) {
-                closePanel(
-                    selector,
-                    `[data-decoration-id="${id}"]`
-                );
-            }
-        }
-    });
-
-    // Reopen the upload, topper and description panels
-    // by tapping their selected toggle's text.
-    const togglePanels = {
-        cakeBorderSprinkles: "#cakeSprinkleOptions",
-        edibleImageEnabledToggle: "#edibleImageControls",
-        cakeTopperEnabledToggle: "#topperTypeOptions",
-        toyFigurineEnabledToggle: "#toyFigurineDetailsField",
-        customSculptedEnabledToggle: "#customSculptedDetailsField"
-    };
-
-    document.addEventListener("click", (event) => {
-        const target = event.target;
-
-        if (
-            !(target instanceof Element) ||
-            target.matches("input, button, a, textarea, select")
+            !input.checked ||
+            input.matches(":disabled") ||
+            record.panel.classList.contains("is-hidden")
         ) {
             return;
         }
 
-        const label = target.closest("label");
-        const toggle = label?.querySelector(
-            'input[type="checkbox"]'
+        close();
+
+        document.querySelectorAll(".tpj-color-picker[open]")
+            .forEach(item => {
+                item.open = false;
+            });
+
+        record.input = input;
+        record.anchor = input.closest("label");
+
+        if (!record.anchor) return;
+
+        record.panel.classList.remove("is-complete-collapsed");
+        record.popup.hidden = false;
+
+        input.setAttribute("aria-expanded", "true");
+
+        active = record;
+
+        position();
+    }
+
+    definitions.forEach(([selector, inputSelector, title]) => {
+        const panel = document.querySelector(selector);
+        const inputs = [...step.querySelectorAll(inputSelector)];
+
+        if (!panel || !inputs.length) return;
+
+        const popup = document.createElement("section");
+
+        popup.className = "tpj-option-popup";
+        popup.id = `tpj-popup-${panel.id}`;
+        popup.hidden = true;
+        popup.setAttribute("aria-label", title);
+
+        const heading = document.createElement("strong");
+
+        heading.className = "tpj-popup-title";
+        heading.textContent = title;
+
+        const actions = document.createElement("div");
+
+        actions.className = "tpj-popup-actions";
+
+        const done = document.createElement("button");
+
+        done.type = "button";
+        done.textContent = "Done";
+
+        actions.append(done);
+
+        panel.classList.remove(
+            "inline-card-editor",
+            "tpj-stage-editor",
+            "is-complete-collapsed"
         );
 
-        const selector = togglePanels[toggle?.id];
-        const panel = selector ? getElement(selector) : null;
+        panel.querySelectorAll("[data-panel-done]").forEach(button => {
+            button.remove();
+        });
 
+        popup.append(heading, panel, actions);
+        step.append(popup);
+
+        const record = {
+            panel,
+            popup,
+            inputs
+        };
+
+        done.addEventListener("click", () => {
+            close(true);
+        });
+
+        inputs.forEach(input => {
+            input.setAttribute("aria-controls", popup.id);
+            input.setAttribute("aria-expanded", "false");
+
+            const label = input.closest("label");
+
+            /*
+             * Only selected radio choices toggle their dropdown.
+             * Checkboxes retain their existing on/off behavior.
+             */
+            label?.addEventListener("click", event => {
+                if (
+                    input.type !== "radio" ||
+                    event.target === input ||
+                    input.matches(":disabled") ||
+                    !input.checked
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                if (active === record && record.input === input) {
+                    close();
+                } else {
+                    open(record, input);
+                }
+            });
+
+            input.addEventListener("keydown", event => {
+                if (
+                    input.type === "radio" &&
+                    input.checked &&
+                    (event.key === " " || event.key === "Enter")
+                ) {
+                    event.preventDefault();
+
+                    if (active === record && record.input === input) {
+                        close();
+                    } else {
+                        open(record, input);
+                    }
+                }
+            });
+
+            input.addEventListener("change", () => {
+                /*
+                 * Existing handlers update the selection, pricing,
+                 * visibility, and preview before the dropdown opens.
+                 */
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        if (input.checked) {
+                            open(record, input);
+                        } else if (active === record) {
+                            close();
+                        }
+                    });
+                });
+            });
+        });
+    });
+
+    function sync() {
         if (
-            toggle?.checked &&
-            panel?.classList.contains("is-complete-collapsed")
+            active &&
+            (
+                !active.input.checked ||
+                active.panel.classList.contains("is-hidden") ||
+                active.input.matches(":disabled") ||
+                !step.getClientRects().length
+            )
         ) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            reopenCompletedPanel(selector);
+            close();
         }
-    }, true);
+
+        position();
+    }
+
+    window.tpjDesignUI = { sync, close };
+
+    document.addEventListener("click", event => {
+        if (
+            active &&
+            !active.popup.contains(event.target) &&
+            !active.anchor.contains(event.target)
+        ) {
+            close();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            close(true);
+        }
+    });
+
+    window.addEventListener("resize", position);
+
+    new ResizeObserver(position).observe(step);
+
+    step.querySelectorAll(
+        'input[name="cakeBorderPlacement"][value="both"], ' +
+        'input[name="cakeBorderSprinklePlacement"][value="both"]'
+    ).forEach(input => {
+        const text = input.closest("label")?.querySelector("span");
+
+        if (text) {
+            text.textContent = "Top + Bottom";
+        }
+    });
+
+    const reset = document.querySelector("#resetCakeBuilder");
+
+    const stage = document.querySelector(
+        "#cakePreviewCard .cake-renderer-stage"
+    );
+
+    if (reset && stage) {
+        stage.after(reset);
+
+        reset.textContent = "Reset this page’s cake choices";
+
+        reset.title =
+            "Resets this page only. Choices on other pages stay saved.";
+    }
 }
 
 function initializeCompletedPanelBehavior() {
@@ -12921,7 +12879,14 @@ function initializeCompletedPanelBehavior() {
             if (!card) {
                 return;
             }
-
+// Preserve normal checkbox selection/deselection.
+// Border deselection uses the hidden empty option.
+if (
+    card.matches(".decoration-choice-card") ||
+    card.closest("#cakeBorderCustomizer")
+) {
+    return;
+}
             const input = card.querySelector(
                 'input[name="cakeBorderStyle"], ' +
                 'input[name="cakeFinish"], ' +
@@ -14536,7 +14501,12 @@ if (
             borderStyleNameMap[builderState.cakeBorderStyle]
         );
 
-        add("Border placement", builderState.cakeBorderPlacement);
+        
+add(
+    "Border placement",
+    getPlacementLabel(builderState.cakeBorderPlacement)
+);
+
 
         if (builderState.cakeBorderPlacement !== "bottom") {
             add(
@@ -14576,7 +14546,9 @@ if (
     if (builderState.cakeBorderSprinkles) {
         add(
             "Sprinkles",
-            `${builderState.cakeBorderSprinklePlacement} · ` +
+           
+`${getPlacementLabel(builderState.cakeBorderSprinklePlacement)} · ` +
+
             getDisplayColorName(builderState.cakeBorderSprinkleColor)
         );
     }
@@ -15318,7 +15290,7 @@ getElement(
 );
 
 getElement("#eventDate")?.addEventListener(
-    "input",
+    "change",
     (event) => {
         const accepted =
             protectDateFromPast(
@@ -15334,7 +15306,7 @@ getElement("#eventDate")?.addEventListener(
 
 
 getElement("#fulfillmentDate")?.addEventListener(
-    "input",
+    "change",
     (event) => {
         const accepted =
             protectDateFromPast(
@@ -15867,40 +15839,13 @@ function ensureNumberLetterBorderSelection() {
     });
 }
 function updateBorderControlsVisibility() {
-    const product =
-        getSelectedCakeProduct();
-    const vintageSelected =
-    builderState.cakeFinish === "Vintage Piping";
+    const product = getSelectedCakeProduct();
 
-const borderFieldset =
-    getElement("#cakeBorderCustomizer");
+    const underlayAllowed =
+        ["shell", "rope", "rosette"].includes(
+            builderState.cakeBorderStyle
+        );
 
-if (borderFieldset) {
-    borderFieldset.disabled = vintageSelected;
-}
-
-if (vintageSelected) {
-    builderState.cakeBorderStyle = "";
-    builderState.ruffleUnderlay = false;
-
-    getElements(
-        'input[name="cakeBorderStyle"]'
-    ).forEach((input) => {
-        input.checked = input.value === "";
-    });
-
-    const underlayToggle =
-        getElement("#ruffleUnderlayToggle");
-
-    if (underlayToggle) {
-        underlayToggle.checked = false;
-    }
-}   
-const underlayAllowed =
-    !vintageSelected &&
-    ["shell", "rope", "rosette"].includes(
-        builderState.cakeBorderStyle
-    );
 
 getElement("#ruffleUnderlayOption")
     ?.classList.toggle("is-hidden", !underlayAllowed);
@@ -19118,9 +19063,9 @@ matchTpjBuilderImageBackgrounds();
         const label = selected?.closest(".color-choice");
         const custom = selected?.value === "custom";
 
-        const name =
-            label?.querySelector("small")?.textContent?.trim() ||
-            "Choose a color";
+const name =
+    label?.querySelector("small")?.textContent?.trim() ||
+    "Natural / Original";
 
         const swatch = label?.querySelector(".color-swatch");
 
@@ -19180,10 +19125,7 @@ function enhanceGrid(grid) {
 
         const name = document.createElement("strong");
 
-        const hint = document.createElement("small");
-        hint.textContent = "Change color";
-
-        copy.append(name, hint);
+copy.append(name);
         summary.append(preview, copy);
 
         const panel = document.createElement("div");
@@ -19702,479 +19644,156 @@ for (
 })();
 /* PAGE 3 + PAGE 4 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
 (() => {
+    const selector = [
+        "#builderStep3 .text-choice-grid",
+        "#builderStep3 .upgrade-grid",
+        "#builderStep3 .description-choice-grid",
+        "#cakeFinishCustomizer .style-choice-grid",
+        "#cakeBorderCustomizer > .text-choice-grid",
+        "#cakeDetailsCustomizer .decoration-choice-grid"
+    ].join(",");
 
-    const shelfConfigurations = [
+    let pending = false;
 
-        {
-            stepId:
-                "builderStep3",
+    function draw() {
+        pending = false;
 
-            gridSelector:
-                ".text-choice-grid, " +
-                ".upgrade-grid, " +
-                ".description-choice-grid"
-        },
+        document.querySelectorAll(selector).forEach(grid => {
+            if (!grid.getClientRects().length) return;
 
+            const origin = grid.getBoundingClientRect();
+            const rows = [];
 
-        {
-            stepId:
-                "builderStep4",
+            [...grid.children].forEach(card => {
+                const img =
+                    card.matches("label") &&
+                    card.querySelector("img");
 
-            gridSelector:
-                "#cakeFinishCustomizer .style-choice-grid, " +
-                "#cakeBorderCustomizer > .text-choice-grid, " +
-                "#cakeDetailsCustomizer .decoration-choice-grid"
-        }
+                if (!img || !card.getClientRects().length) return;
 
-    ];
+                const box = card.getBoundingClientRect();
+                const top = box.top - origin.top;
 
+                let row = rows.find(item => {
+                    return Math.abs(item.top - top) < 8;
+                });
 
-    function installRowShelves(
-        stepId,
-        gridSelector
-    ) {
-
-        const step =
-            document.getElementById(
-                stepId
-            );
-
-
-        if (
-            !step ||
-            step.dataset
-                .tpjShelvesInstalled ===
-                "true"
-        ) {
-            return;
-        }
-
-
-        step.dataset
-            .tpjShelvesInstalled =
-            "true";
-
-
-        const grids = [
-            ...step.querySelectorAll(
-                gridSelector
-            )
-        ];
-
-
-        const displays =
-            grids.map(
-                (grid) => {
-
-                    grid.classList.add(
-                        "tpj-shelf-grid"
-                    );
-
-
-                    const layer =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    layer.className =
-                        "tpj-row-shelf-layer";
-
-
-                    layer.setAttribute(
-                        "aria-hidden",
-                        "true"
-                    );
-
-
-                    grid.appendChild(
-                        layer
-                    );
-
-
-                    return {
-                        grid,
-                        layer
+                if (!row) {
+                    row = {
+                        top,
+                        left: Infinity,
+                        right: 0,
+                        bottom: 0
                     };
+
+                    rows.push(row);
                 }
-            );
 
-
-        let pending = false;
-
-
-        function drawShelves() {
-
-            pending = false;
-
-
-            displays.forEach(
-                ({
-                    grid,
-                    layer
-                }) => {
-
-                    if (
-                        !grid
-                            .getClientRects()
-                            .length
-                    ) {
-                        layer.replaceChildren();
-
-                        return;
-                    }
-
-
-                    const gridBox =
-                        grid
-                            .getBoundingClientRect();
-
-
-                    const rows = [];
-
-
-                    /*
-                       EXACT SAME RULE AS PAGE 3:
-
-                       Only illustrated choices
-                       receive shelves.
-
-                       Text-only options such as
-                       "None" remain untouched.
-                    */
-
-                    [
-                        ...grid.children
-                    ].forEach(
-                        (card) => {
-
-                            if (
-                                !card.matches(
-                                    "label"
-                                ) ||
-
-                                !card.querySelector(
-                                    ":scope > img"
-                                ) ||
-
-                                !card
-                                    .getClientRects()
-                                    .length ||
-
-                                getComputedStyle(
-                                    card
-                                ).visibility ===
-                                    "hidden"
-                            ) {
-                                return;
-                            }
-
-
-                            const bounds =
-                                card
-                                    .getBoundingClientRect();
-
-
-                            const top =
-                                bounds.top -
-                                gridBox.top -
-                                grid.clientTop;
-
-
-                            const left =
-                                bounds.left -
-                                gridBox.left -
-                                grid.clientLeft;
-
-
-                            const right =
-                                left +
-                                bounds.width;
-
-
-                            const bottom =
-                                top +
-                                bounds.height;
-
-
-                            let row =
-                                rows.find(
-                                    (item) =>
-                                        Math.abs(
-                                            item.top -
-                                            top
-                                        ) < 5
-                                );
-
-
-                            if (!row) {
-
-                                row = {
-                                    top,
-                                    left,
-                                    right,
-                                    bottom
-                                };
-
-
-                                rows.push(
-                                    row
-                                );
-
-                            } else {
-
-                                row.left =
-                                    Math.min(
-                                        row.left,
-                                        left
-                                    );
-
-
-                                row.right =
-                                    Math.max(
-                                        row.right,
-                                        right
-                                    );
-
-
-                                row.bottom =
-                                    Math.max(
-                                        row.bottom,
-                                        bottom
-                                    );
-                            }
-                        }
-                    );
-
-
-                    const fragment =
-                        document
-                            .createDocumentFragment();
-
-
-                    rows.forEach(
-                        (row) => {
-
-                            const shelf =
-                                document
-                                    .createElement(
-                                        "div"
-                                    );
-
-
-                            shelf.className =
-                                "tpj-row-shelf";
-
-
-                            /*
-                               EXACT PAGE 3
-                               shelf sizing formula.
-                            */
-
-                            const height =
-                                Math.min(
-                                    64,
-
-                                    Math.max(
-                                        40,
-
-                                        (
-                                            row.bottom -
-                                            row.top
-                                        ) * 0.36
-                                    )
-                                );
-
-
-                            shelf.style.left =
-                                `${row.left}px`;
-
-
-                            shelf.style.width =
-                                `${
-                                    row.right -
-                                    row.left
-                                }px`;
-
-
-                            shelf.style.top =
-                                `${
-                                    row.bottom -
-                                    height +
-                                    4
-                                }px`;
-
-
-                            shelf.style.height =
-                                `${height}px`;
-
-
-                            fragment.appendChild(
-                                shelf
-                            );
-                        }
-                    );
-
-
-                    layer.replaceChildren(
-                        fragment
-                    );
-                }
-            );
-        }
-
-
-        function schedule() {
-
-            if (pending) {
-                return;
-            }
-
-
-            pending = true;
-
-
-            requestAnimationFrame(
-                drawShelves
-            );
-        }
-
-
-        const resizeObserver =
-            new ResizeObserver(
-                schedule
-            );
-
-
-        displays.forEach(
-            ({
-                grid
-            }) => {
-
-                resizeObserver.observe(
-                    grid
+                row.left = Math.min(
+                    row.left,
+                    box.left - origin.left
                 );
 
-
-                [
-                    ...grid.children
-                ].forEach(
-                    (child) => {
-
-                        if (
-                            child.matches(
-                                "label"
-                            )
-                        ) {
-                            resizeObserver.observe(
-                                child
-                            );
-                        }
-                    }
+                row.right = Math.max(
+                    row.right,
+                    box.right - origin.left
                 );
+
+                row.bottom = Math.max(
+                    row.bottom,
+                    box.bottom - origin.top
+                );
+            });
+
+            if (!rows.length) return;
+
+            if (!grid.classList.contains("tpj-shelf-grid")) {
+                grid.classList.add("tpj-shelf-grid");
             }
-        );
 
-
-        const visibilityObserver =
-            new MutationObserver(
-                schedule
+            let layer = grid.querySelector(
+                ":scope > .tpj-row-shelf-layer"
             );
 
+            if (!layer) {
+                layer = document.createElement("div");
+                layer.className = "tpj-row-shelf-layer";
+                layer.setAttribute("aria-hidden", "true");
 
-        visibilityObserver.observe(
-            step,
+                grid.append(layer);
+            }
+
+            const signature = JSON.stringify(rows);
+
+            if (layer.dataset.layout === signature) return;
+
+            layer.dataset.layout = signature;
+
+            layer.replaceChildren(
+                ...rows.map(row => {
+                    const shelf = document.createElement("div");
+
+                    shelf.className = "tpj-row-shelf";
+
+                    Object.assign(shelf.style, {
+                        left: `${row.left}px`,
+                        top: `${row.bottom - 36}px`,
+                        width: `${row.right - row.left}px`,
+                        height: "36px"
+                    });
+
+                    return shelf;
+                })
+            );
+        });
+    }
+
+    function schedule() {
+        if (pending) return;
+
+        pending = true;
+        requestAnimationFrame(draw);
+    }
+
+    function start() {
+        const resize = new ResizeObserver(schedule);
+
+        document.querySelectorAll(selector).forEach(grid => {
+            resize.observe(grid);
+        });
+
+        new MutationObserver(schedule).observe(
+            document.querySelector(".builder-main"),
             {
                 subtree: true,
-
+                childList: true,
                 attributes: true,
-
-                attributeFilter: [
-                    "hidden",
-                    "class"
-                ]
+                attributeFilter: ["class", "hidden"]
             }
         );
 
-
-        step.addEventListener(
-            "load",
-            schedule,
-            true
-        );
-
-
-        step.addEventListener(
-            "change",
-            schedule
-        );
-
-
-        window.addEventListener(
-            "resize",
-            schedule,
-            {
-                passive: true
-            }
-        );
-
-
-        if (document.fonts) {
-
-            document.fonts
-                .ready
-                .then(
-                    schedule
-                );
-        }
-
+        document.addEventListener("load", schedule, true);
+        window.addEventListener("resize", schedule);
+        document.fonts?.ready.then(schedule);
 
         schedule();
     }
 
-
-    function installAllRowShelves() {
-
-        shelfConfigurations
-            .forEach(
-                ({
-                    stepId,
-                    gridSelector
-                }) => {
-
-                    installRowShelves(
-                        stepId,
-                        gridSelector
-                    );
-                }
-            );
-    }
-
-
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            installAllRowShelves,
-            {
-                once: true
-            }
-        );
-
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, {
+            once: true
+        });
     } else {
-
-        installAllRowShelves();
+        start();
     }
-
 })();
+
+
 /* TPJ frosting pictures for existing color pickers */
 (() => {
-    const basePath = "../images/cake-builder/color-swatches/";
+    const base = "../images/cake-builder/color-swatches/";
 
-    const mainPickers = new Set([
+    const main = new Set([
         "mainCakeColorSwatches",
         "tierTopColorSwatches",
         "tierBottomColorSwatches",
@@ -20182,153 +19801,172 @@ for (
         "characterTwoColorSwatches"
     ]);
 
-    const borderPickers = new Set([
+    const borders = new Set([
         "cakeBorderColorSwatches",
         "cakeBorderBottomColorSwatches"
     ]);
 
-    const finishPickers = new Set([
+    const finishes = new Set([
         "finishAccentOneSwatches",
         "finishAccentTwoSwatches"
     ]);
 
-    const sprinklePickers = new Set([
-        "cakeBorderSprinkleColorSwatches"
-    ]);
+    const failed = new Set();
 
-    const colors = new Set([
-        "soft-pink", "hot-pink", "chocolate", "cream", "white",
-        "black", "lavender", "baby-blue", "sage", "yellow"
-    ]);
-
-    let scheduled = false;
+    let pending = false;
 
     function folderFor(grid) {
-        if (mainPickers.has(grid.id)) return "main";
-          if (borderPickers.has(grid.id)) return "border";
-        if (sprinklePickers.has(grid.id)) return "sprinkles";
+        if (main.has(grid.id)) return "main";
+        if (borders.has(grid.id)) return "border";
 
-        if (finishPickers.has(grid.id)) {
-            const finish =
-                document.querySelector('input[name="cakeFinish"]:checked')
-                    ?.value || "";
+        if (grid.id === "cakeBorderSprinkleColorSwatches") {
+            return "sprinkles";
+        }
 
-            if (finish === "Vintage Piping") return "vintage";
-            if (finish === "Watercolor Finish") return "watercolor";
-            if (finish === "Palette Knife Finish") return "palette-knife";
+        if (finishes.has(grid.id)) {
+            const finish = document.querySelector(
+                'input[name="cakeFinish"]:checked'
+            )?.value;
+
+            return {
+                "Vintage Piping": "vintage",
+                "Watercolor Finish": "watercolor",
+                "Palette Knife Finish": "palette-knife"
+            }[finish] || "main";
         }
 
         return null;
     }
 
-    function syncPictures() {
-        scheduled = false;
+    function setPicture(host, path, preview = false) {
+        const className = preview
+            ? "tpj-preview-picture"
+            : "tpj-swatch-picture";
 
-        document.querySelectorAll(".color-choice-grid").forEach((grid) => {
-            const relevant =
-                mainPickers.has(grid.id) ||
-                borderPickers.has(grid.id) ||
-                finishPickers.has(grid.id) ||
-                sprinklePickers.has(grid.id);
+        const hostClass = preview
+            ? "tpj-picture-preview"
+            : "tpj-picture-swatch";
 
-            if (!relevant) return;
+        let img = host.querySelector("." + className);
 
-            const folder = folderFor(grid);
+        if (!path || failed.has(path)) {
+            img?.remove();
 
-            grid.querySelectorAll("label.color-choice").forEach((label) => {
-                const swatch = label.querySelector(".color-swatch");
-                if (!swatch) return;
+            if (host.classList.contains(hostClass)) {
+                host.classList.remove(hostClass);
+            }
 
-                const color = label.querySelector("small")
-                    ?.textContent.trim().toLowerCase()
-                    .replace(/\s+/g, "-");
+            return;
+        }
 
-                const shouldShowPicture = folder && colors.has(color);
-                let picture = swatch.querySelector(".tpj-swatch-picture");
+        if (!img) {
+            img = document.createElement("img");
+            img.className = className;
+            img.alt = "";
 
-                if (!shouldShowPicture) {
-                    picture?.remove();
-                    swatch.classList.remove("tpj-picture-swatch");
-                    return;
+            img.addEventListener("error", () => {
+                const badPath = img.getAttribute("src");
+
+                failed.add(badPath);
+
+                console.warn(
+                    "TPJ color PNG could not load:",
+                    badPath
+                );
+
+                img.remove();
+
+                if (host.classList.contains(hostClass)) {
+                    host.classList.remove(hostClass);
                 }
 
-                const path = `${basePath}${folder}/${color}.png`;
-
-                if (!picture) {
-                    picture = document.createElement("img");
-                    picture.className = "tpj-swatch-picture";
-                    picture.alt = "";
-                    picture.decoding = "async";
-                    swatch.appendChild(picture);
-                }
-
-                if (picture.getAttribute("src") !== path) {
-                    picture.src = path;
-                }
-
-                swatch.classList.add("tpj-picture-swatch");
+                schedule();
             });
 
-            const preview = grid.closest(".tpj-color-picker")
-                ?.querySelector("summary .tpj-color-preview");
+            host.append(img);
+        }
 
-            if (!preview) return;
+        if (img.getAttribute("src") !== path) {
+            img.src = path;
+        }
 
-            const selected = grid.querySelector(
-                'input[type="radio"]:checked'
-            );
-
-            const selectedPicture = selected
-                ?.closest(".color-choice")
-                ?.querySelector(".tpj-swatch-picture");
-
-            let previewPicture = preview.querySelector(
-                ".tpj-preview-picture"
-            );
-
-            if (!selectedPicture) {
-                previewPicture?.remove();
-                preview.classList.remove("tpj-picture-preview");
-                return;
-            }
-
-            if (!previewPicture) {
-                previewPicture = document.createElement("img");
-                previewPicture.className = "tpj-preview-picture";
-                previewPicture.alt = "";
-                preview.appendChild(previewPicture);
-            }
-
-            const path = selectedPicture.getAttribute("src");
-
-            if (previewPicture.getAttribute("src") !== path) {
-                previewPicture.src = path;
-            }
-
-            preview.classList.add("tpj-picture-preview");
-        });
+        if (!host.classList.contains(hostClass)) {
+            host.classList.add(hostClass);
+        }
     }
 
-    function scheduleSync() {
-        if (scheduled) return;
-        scheduled = true;
-        requestAnimationFrame(syncPictures);
+    function sync() {
+        pending = false;
+
+        document.querySelectorAll(".color-choice-grid")
+            .forEach(grid => {
+                const folder = folderFor(grid);
+
+                if (!folder) return;
+
+                grid.querySelectorAll("label.color-choice")
+                    .forEach(label => {
+                        const swatch = label.querySelector(
+                            ".color-swatch"
+                        );
+
+                        const input = label.querySelector("input");
+
+                        if (!swatch || !input) return;
+
+                        const name = label.querySelector("small")
+                            ?.textContent.trim()
+                            .toLowerCase()
+                            .replace(/\s+/g, "-");
+
+                        const path = input.value === "custom"
+                            ? null
+                            : `${base}${folder}/${name}.png`;
+
+                        setPicture(swatch, path);
+                    });
+
+                const preview = grid.closest(".tpj-color-picker")
+                    ?.querySelector(".tpj-color-preview");
+
+                if (!preview) return;
+
+                const selected = grid.querySelector("input:checked");
+
+                const name = selected?.closest("label")
+                    ?.querySelector("small")
+                    ?.textContent.trim()
+                    .toLowerCase()
+                    .replace(/\s+/g, "-");
+
+                const path = selected?.value === "custom"
+                    ? null
+                    : `${base}${folder}/${name || "cream"}.png`;
+
+                setPicture(preview, path, true);
+            });
+    }
+
+    function schedule() {
+        if (pending) return;
+
+        pending = true;
+        requestAnimationFrame(sync);
     }
 
     function start() {
-        scheduleSync();
+        document.addEventListener("change", schedule);
 
-        // Covers color selections, changing finish, and reset.
-        document.addEventListener("change", scheduleSync);
         document.addEventListener("reset", () => {
-            setTimeout(scheduleSync, 0);
+            setTimeout(schedule, 0);
         });
 
-        // Covers palettes rebuilt by your existing builder code.
-        new MutationObserver(scheduleSync).observe(document.body, {
+        new MutationObserver(schedule).observe(document.body, {
             childList: true,
             subtree: true
         });
+
+        schedule();
     }
 
     if (document.readyState === "loading") {

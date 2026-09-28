@@ -21,7 +21,8 @@
 
 
 </head>
-<link rel="stylesheet" href="../cake-builder.css?v=20260918-page4-structure-2">
+<link rel="stylesheet" href="../cake-builder.css?v=20260928-dropdown-repair-1">
+
 
 <body>
 
@@ -3437,15 +3438,15 @@
 
     <div class="text-choice-grid">
 
-        <label class="text-choice-card">
-            <input
-                type="radio"
-                name="cakeBorderStyle"
-                value=""
-                checked
-            >
-            <strong>None</strong>
-        </label>
+<!-- Hidden empty selection for no border -->
+<label class="text-choice-card" hidden>
+    <input
+        type="radio"
+        name="cakeBorderStyle"
+        value=""
+        checked
+    >
+</label>
 
         <label class="text-choice-card">
             <input
@@ -3526,7 +3527,7 @@
                         value="both"
                         checked
                     >
-                    <span>Top + Bottom</span>
+                    <span>Both</span>
                 </label>
 
             </div>
@@ -3687,7 +3688,7 @@
                             value="both"
                             checked
                         >
-                        <span>Top + Bottom</span>
+                        <span>Both</span>
                     </label>
 
                 </div>
@@ -3932,7 +3933,7 @@
                     </strong>
 
                     <span id="edibleImagePriceNote">
-                        $15 each on cakes
+                        $15 per sheet
                     </span>
                 </div>
             </div>
@@ -5900,10 +5901,7 @@
 
                         </label>
 
-                        <fieldset id="toyFigurineCustomizer" class="builder-fieldset">
-                            <legend>
-                                Add Toy / Figurine Decorations?
-                            </legend>
+<fieldset id="toyFigurineCustomizer" class="builder-fieldset"></fieldset>
 
 <label class="design-text-toggle">
 
@@ -5952,11 +5950,8 @@
                             </p>
                         </fieldset>
 
-                        <fieldset id="customSculptedCustomizer" class="builder-fieldset">
-                            <legend>
-                                Add Custom 3D Sculpted Pieces?
-                            </legend>
 
+<fieldset id="customSculptedCustomizer" class="builder-fieldset">
                            <label class="design-text-toggle">
 
     <input
@@ -6831,6 +6826,7 @@
         </section>
 
     </div>
-<script src="../js/cake-builder.js?v=20260918-page4-structure-2"></script>
+<script src="../js/cake-builder.js?v=20260928-dropdown-repair-1"></script>
+
 </body>
 </html>

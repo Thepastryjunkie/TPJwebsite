@@ -279,11 +279,10 @@ fieldset {
     justify-content: center;
     gap: 9px;
 
-    border: 2px solid var(--chocolate);
-    border-radius: 999px;
-
-    background:var(--chocolate);
-    color: var(--cream);
+border: 0;
+border-radius: 0;
+background: transparent;
+color: var(--chocolate);
 
     cursor: pointer;
 
@@ -293,19 +292,21 @@ fieldset {
         transform 180ms ease;
 }
 .header-summary-button span {
-    color: var(--cream);
+    color: var(--chocolate);
 }
 
 .header-summary-button strong {
-    color: var(--signature-pink);
+    color: var(--chocolate);
 }
 .header-summary-button:hover,
 .header-summary-button:focus-visible {
-    border-color: var(--headline-pink);
+    background: transparent;
+    color: var(--chocolate);
 
-    background: rgba(252, 210, 240, 0.1);
-
-    transform: translateY(-2px);
+    text-decoration: underline;
+    text-decoration-color: var(--signature-pink);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
 }
 
 .header-summary-button span,
@@ -562,10 +563,9 @@ fieldset {
     min-height: 39px;
     padding: 8px 14px;
 
-    border: 2px solid var(--chocolate);
-    border-radius: 999px;
-
-    background: var(--cream);
+border: 0;
+border-radius: 0;
+background: transparent;
     color: var(--chocolate);
 
     text-transform: uppercase;
@@ -584,10 +584,13 @@ fieldset {
 
 .reset-cake-button:hover,
 .reset-cake-button:focus-visible {
-    background: var(--chocolate);
-    color: var(--cream);
+    background: transparent;
+    color: var(--chocolate);
 
-    transform: translateY(-2px);
+    text-decoration: underline;
+    text-decoration-color: var(--signature-pink);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
 }
 
 
@@ -3372,10 +3375,15 @@ margin-inline: auto;
     min-height: 47px;
     padding: 12px 21px;
 
-    border: 2px solid var(--signature-pink);
-    border-radius: 999px;
+border: 0;
+border-radius: 0;
+background: transparent;
+color: var(--chocolate);
 
-    background: var(--signature-pink);
+text-decoration: underline;
+text-decoration-color: var(--signature-pink);
+text-decoration-thickness: 3px;
+text-underline-offset: 5px;
     color: var(--white);
 
     text-transform: uppercase;
@@ -3393,9 +3401,9 @@ margin-inline: auto;
 
 .upload-select-button:hover,
 .upload-select-button:focus-visible {
-    background: #E73891;
-
-    transform: translateY(-2px);
+    background: transparent;
+    color: var(--signature-pink);
+    transform: none;
 }
 
 .inspiration-preview-grid {
@@ -3706,19 +3714,16 @@ margin-inline: auto;
     min-height: 62px;
     padding: 16px 24px;
 
-    border: 3px solid var(--signature-pink);
-    border-radius: 999px;
+border: 0;
+border-radius: 0;
+background: transparent;
+color: var(--chocolate);
+box-shadow: none;
 
-    background: var(--signature-pink);
-    color: var(--white);
-
-    text-transform: uppercase;
-
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-
-    box-shadow: 0 14px 28px rgba(255, 79, 163, 0.21);
+text-decoration: underline;
+text-decoration-color: var(--signature-pink);
+text-decoration-thickness: 3px;
+text-underline-offset: 6px;
 
     cursor: pointer;
 
@@ -3730,11 +3735,10 @@ margin-inline: auto;
 
 .submit-cake-vision-button:hover,
 .submit-cake-vision-button:focus-visible {
-    background: #E73891;
-
-    box-shadow: 0 18px 32px rgba(255, 79, 163, 0.28);
-
-    transform: translateY(-4px);
+    background: transparent;
+    color: var(--signature-pink);
+    box-shadow: none;
+    transform: none;
 }
 
 
@@ -4032,13 +4036,15 @@ margin-inline: auto;
     align-items: center;
     justify-content: center;
 
-    border: 2px solid var(--signature-pink);
-    border-radius: 999px;
+border: 0;
+border-radius: 0;
+background: transparent;
+color: var(--chocolate);
 
-    background: var(--signature-pink);
-    color: var(--white);
-
-    text-decoration: none;
+text-decoration: underline;
+text-decoration-color: var(--signature-pink);
+text-decoration-thickness: 3px;
+text-underline-offset: 5px;
     text-transform: uppercase;
 
     font-size: 10px;
@@ -4902,10 +4908,10 @@ margin-inline: auto;
 
     grid-template-columns: 26px 34px 26px;
 
-    border: 1px solid rgba(90, 42, 30, 0.24);
-    border-radius: 999px;
+border: 0;
+border-radius: 0;
 
-    background: rgba(255, 248, 242, 0.96);
+background: transparent;
 
     transform: translateX(-50%);
 }
@@ -5446,53 +5452,104 @@ margin-inline: auto;
     box-shadow: 0 8px 20px #78214808;
 }
 /* =========================================
-   PAGE 4 — FLOATING COLOR MENUS
+   PAGE 4 - COMPACT IN-PLACE COLOR PALETTE
 ========================================= */
 
 #builderStep4 .tpj-color-picker {
     position: relative;
-}
 
+    display: inline-block;
+
+    width: min(100%, 270px);
+
+    margin: 2px 0 8px;
+
+    vertical-align: top;
+}
 
 #builderStep4 .tpj-color-picker[open] {
-    z-index: 80;
+    z-index: 300;
 }
 
+#builderStep4 .tpj-color-picker > summary {
+    width: fit-content;
+    max-width: 100%;
 
-#builderStep4
-.tpj-color-picker
-> .tpj-color-panel {
+    min-height: 44px;
+    padding: 2px 23px 2px 0;
+
+    gap: 8px;
+
+    border: 0 !important;
+    border-radius: 0;
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#builderStep4 .tpj-color-picker > summary::after {
     position: absolute;
 
-    top: calc(100% + 5px);
-    left: 0;
-
-    z-index: 80;
-
-    width: min(430px, 100%);
-
-    max-height: 330px;
-
-    overflow-y: auto;
+    right: 2px;
+    top: 8px;
 
     margin: 0;
 
-    padding: 10px;
-
-    border:
-        1px solid
-        rgba(90, 42, 30, 0.14);
-
-    border-radius: 13px;
-
-    background:
-        rgba(255, 253, 249, 0.98);
-
-    box-shadow:
-        0 12px 28px
-        rgba(90, 42, 30, 0.12);
+    font-size: 15px;
 }
 
+#builderStep4 .tpj-color-preview {
+    flex: 0 0 43px;
+
+    width: 43px;
+    height: 43px;
+
+    border: 0;
+    box-shadow: none;
+}
+
+#builderStep4 .tpj-color-copy small {
+    display: none;
+}
+
+/* Hide the closed preview while the palette
+   occupies the same position. */
+
+#builderStep4
+.tpj-color-picker[open] > summary {
+    visibility: hidden;
+}
+
+/* Palette replaces the compact control. */
+
+#builderStep4
+.tpj-color-picker > .tpj-color-panel {
+    position: absolute;
+
+    z-index: 301;
+
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+
+    width: min(340px, 85vw);
+    max-height: 220px;
+
+    overflow: auto;
+
+    margin: 0;
+    padding: 7px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: #ffeaf2;
+
+    box-shadow:
+        0 6px 15px
+        rgba(90, 42, 30, 0.10);
+}
 
 #builderStep4
 .tpj-color-picker:not([open])
@@ -5598,10 +5655,16 @@ margin-inline: auto;
     font: inherit;
     font-size: 12px;
     font-weight: 700;
-    color: #fff7f2;
-    background: #592b20;
-    border: 0;
-    border-radius: 24px;
+color: var(--chocolate);
+background: transparent;
+
+border: 0;
+border-radius: 0;
+
+text-decoration: underline;
+text-decoration-color: var(--signature-pink);
+text-decoration-thickness: 3px;
+text-underline-offset: 4px;
     cursor: pointer;
 }
 
@@ -5609,178 +5672,198 @@ margin-inline: auto;
 .tpj-color-native[hidden] {
     display: none !important;
 }
-/* BORDER COLORS ONLY — COMPACT DROPDOWN */
+/* =========================================
+   BORDER COLORS - COMPACT PNG PICKER
+========================================= */
 
-:is(
-    #cakeBorderTopColorControls,
-    #cakeBorderBottomColorControls
-) {
-    min-width: 0;
-    margin-bottom: 12px;
-}
-
-:is(
-    #cakeBorderTopColorControls,
-    #cakeBorderBottomColorControls
-) > legend {
-    margin-bottom: 6px;
-    font-size: 14px;
-}
-
-/* Closed dropdown: compact, not stretched across the page. */
-#cakeBorderControls .tpj-color-picker {
+#builderStep4
+#cakeBorderControls
+.tpj-color-picker {
     position: relative;
-    box-sizing: border-box;
-    width: 280px;
-    max-width: 100%;
-    min-width: 0;
+
+    width: min(100%, 250px);
+
     margin: 0;
 }
 
-#cakeBorderControls .tpj-color-picker > summary {
-    box-sizing: border-box;
+#builderStep4
+#cakeBorderControls
+.tpj-color-picker > summary {
     display: flex;
+
     align-items: center;
-    gap: 9px;
+
+    width: fit-content;
     min-height: 44px;
-    padding: 8px 11px;
-    border: 1px solid #dfc9c2;
-    border-radius: 12px;
-    background: #fffdf9;
+
+    gap: 8px;
+
+    padding: 2px 22px 2px 0;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    box-shadow: none;
 }
 
-#cakeBorderControls .tpj-color-copy small {
+#builderStep4
+#cakeBorderControls
+.tpj-color-copy small {
     display: none;
 }
 
-#cakeBorderControls .tpj-color-copy strong {
-    color: #592b20;
-    font-size: 13px;
-    line-height: 1.2;
+#builderStep4
+#cakeBorderControls
+.tpj-color-preview {
+    width: 42px;
+    height: 42px;
+
+    border: 0;
+    box-shadow: none;
 }
 
-#cakeBorderControls .tpj-color-preview {
-    width: 24px;
-    height: 24px;
-}
-
-#cakeBorderControls .tpj-color-picker > summary::after {
-    margin-left: auto;
-    font-size: 16px;
-}
-
-/* Menu opens over the content, rather than creating a tall row. */
-#cakeBorderControls .tpj-color-picker[open] {
-    z-index: 30;
-}
-
-#cakeBorderControls .tpj-color-panel {
+#builderStep4
+#cakeBorderControls
+.tpj-color-picker > .tpj-color-panel {
     position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    z-index: 30;
 
-    box-sizing: border-box;
-    width: 100%;
-    max-height: 260px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    top: 0;
+    left: 0;
+
+    width: min(320px, 82vw);
+    max-height: 215px;
+
+    overflow: auto;
 
     margin: 0;
     padding: 5px;
 
-    border: 1px solid #edcdd9;
-    border-radius: 12px;
-    background: #fffdf9;
-    box-shadow: 0 8px 20px #592b201a;
+    border: 0;
+    border-radius: 6px;
+
+    background: #ffeaf2;
+
+    box-shadow:
+        0 6px 15px
+        rgba(90, 42, 30, 0.10);
 }
 
+/* Five colors per row */
+
+#builderStep4
 #cakeBorderControls
-.tpj-color-picker:not([open]) > .tpj-color-panel {
-    display: none !important;
+.tpj-color-panel .color-choice-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 3px;
 }
 
-/* One color per row: swatch + name. */
-#cakeBorderControls .tpj-color-panel .color-choice-grid {
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .color-choice {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-}
 
-#cakeBorderControls .tpj-color-panel .color-choice {
-    display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
+    justify-content: center;
 
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 44px;
+    min-width: 0;
+    min-height: 53px;
+
+    gap: 2px;
+    padding: 2px;
     margin: 0;
-    padding: 8px 10px;
 
     border: 0;
-    border-radius: 8px;
+    border-radius: 0;
+
     background: transparent;
     box-shadow: none;
-    transform: none;
-    text-align: left;
 }
 
-#cakeBorderControls .tpj-color-panel .color-choice:hover,
-#cakeBorderControls .tpj-color-panel
+/* Selected color gets a pink underline */
+
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel
 .color-choice:has(input:checked) {
-    background: #ffe4f0;
+    background: transparent;
+
+    border-bottom:
+        3px solid var(--signature-pink);
 }
 
-#cakeBorderControls .tpj-color-panel .color-swatch,
-#cakeBorderControls .tpj-color-panel .custom-shade-icon {
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .color-choice::after {
+    content: none;
 }
 
-#cakeBorderControls .tpj-color-panel .color-choice small {
-    color: #592b20;
-    font-size: 12px;
-    line-height: 1.2;
-    text-align: left;
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .color-swatch,
+
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .custom-shade-icon {
+    width: 33px;
+    height: 33px;
 }
 
-#cakeBorderControls .tpj-color-panel
-.color-choice:has(input:checked) .color-swatch {
-    outline: none;
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .color-choice small {
+    font-size: 9px;
+    line-height: 1.15;
+
+    text-align: center;
 }
 
-#cakeBorderControls .tpj-color-panel
-.color-choice:has(input:checked)::after {
-    content: "✓";
-    margin-left: auto;
-    color: #963960;
+/* Custom shade */
+
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .custom-shade-tile {
+    grid-column: 1 / -1;
+
+    flex-direction: row;
+
+    min-height: 35px;
+
+    border-top: 1px solid #e9bace;
 }
 
-/* Custom shade keeps its existing controls and Done button. */
-#cakeBorderControls .tpj-color-panel .custom-shade-tile {
-    border-top: 1px solid #ecdcd6;
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .custom-color-field {
+    margin: 3px 0;
+    padding: 2px;
+
+    border: 0;
+
+    background: transparent;
 }
 
-#cakeBorderControls .tpj-color-panel .custom-color-field {
-    margin: 6px 0;
-    padding: 8px;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-#cakeBorderControls .tpj-color-panel .tpj-color-done {
-    display: none;
-}
-
-#cakeBorderControls .tpj-color-panel:has(
-    .custom-shade-tile input:checked
-) .tpj-color-done {
+#builderStep4
+#cakeBorderControls
+.tpj-color-panel .tpj-color-done {
     display: block;
-    margin: 6px 0 0 auto;
+
+    margin: 3px 0 0 auto;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    color: var(--chocolate);
+
+    text-decoration: underline;
+    text-decoration-color: var(--signature-pink);
+    text-underline-offset: 4px;
 }
 /* BOARD COLOR — DROPDOWN LIST */
 
@@ -6113,136 +6196,51 @@ margin-inline: auto;
 }
 
 /* Each row gets a soft floating pink shadow plate. */
-/* ==========================================================
-   PAGE 3 — REFERENCE-STYLE FLOATING SHADOW PLATFORMS
-========================================================== */
+/* Continuous platform underneath each visual product row. */
 
-:is(
-    #builderStep3,
-    #builderStep4
-)
-.tpj-row-shelf {
+:is(#builderStep3, #builderStep4) .tpj-shelf-grid {
+    position: relative;
+    isolation: isolate;
+    row-gap: 22px;
+}
+
+:is(#builderStep3, #builderStep4) .tpj-shelf-grid > label {
+    position: relative;
+    z-index: 1;
+}
+
+:is(#builderStep3, #builderStep4) .tpj-row-shelf-layer {
     position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
 
+:is(#builderStep3, #builderStep4) .tpj-row-shelf {
+    position: absolute;
     box-sizing: border-box;
 
-    pointer-events: none;
-
-    overflow: visible;
-
-
-    /*
-       Very pale platform.
-       This should NOT read like a solid pink shelf.
-    */
-
- background:
-    linear-gradient(
-        180deg,
-        rgba(255, 252, 253, 0.42) 0%,
-        rgba(255, 246, 250, 0.32) 38%,
-        rgba(250, 226, 237, 0.22) 76%,
-        rgba(244, 200, 220, 0.10) 100%
-    );
-
-
-
-    /*
-       Reference has angled ends instead of
-       giant rounded capsule corners.
-    */
-
-    border-radius: 0;
-
-    clip-path:
-        polygon(
-            4% 0,
-            96% 0,
-            100% 100%,
-            0 100%
+    background:
+        linear-gradient(
+            180deg,
+            #f6c7da,
+            #f4b7d1
         );
 
+    border-radius: 12px 12px 8px 8px;
+    border-bottom: 2px solid #fdebf3;
 
-    /*
-       NO physical shelf tilt.
-    */
+    box-shadow: 0 9px 13px #e890b84a;
 
+    clip-path: none;
     transform: none;
-
-    transform-origin: center;
-
-
-    /*
-       Keep the actual platform clean.
-       The separate shadow is created below.
-    */
-
-    box-shadow: none;
-
     filter: none;
-}
-
-
-/*
-   SEPARATE SHADOW STRIP UNDER EACH ROW
-*/
-
-:is(
-    #builderStep3,
-    #builderStep4
-)
-.tpj-row-shelf::after {
-    content: "";
-
-    position: absolute;
-
-    left: 4%;
-    right: 4%;
-
-    bottom: -9px;
-
-    height: 10px;
-
-    border-radius: 50%;
-
-background: rgba(214, 118, 166, 0.12);
-filter: blur(12px);
-opacity: 0.72;
 
     pointer-events: none;
 }
 
-
-@media (max-width: 720px) {
-
-    #builderStep3 :is(
-        .text-choice-grid,
-        .upgrade-grid,
-        .description-choice-grid
-    ),
-
-    #builderStep4
-    #cakeFinishCustomizer
-    .style-choice-grid,
-
-    #builderStep4
-    #cakeBorderCustomizer
-    > .text-choice-grid,
-
-    #builderStep4
-    #cakeDetailsCustomizer
-    .decoration-choice-grid {
-        row-gap: 20px;
-    }
-
-
-    :is(
-        #builderStep3,
-        #builderStep4
-    )
-    .tpj-row-shelf {
-        border-radius: 0;
-    }
+:is(#builderStep3, #builderStep4) .tpj-row-shelf::after {
+    content: none;
 }
 #builderStep3 .custom-text-only-card {
     position: relative;
@@ -6323,13 +6321,27 @@ opacity: 0.72;
 }
 #builderStep2 .size-label { font-size: 30px; }
 #cakeBorderCustomizer .text-choice-card:has(>img) > img { aspect-ratio: 2 / 1; }
-#cakeBorderCustomizer .text-choice-card:not(:has(>img)) {
-    min-height: 44px;
+
+#cakeBorderCustomizer
+.text-choice-card:not(:has(> img)) {
+
+    min-height: 0;
+
     align-self: center;
-    border-radius: 999px;
-    padding: 10px;
-    border-width: 1px;
+    justify-self: center;
+
+    padding: 10px 12px 15px;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    overflow: visible;
+
 }
+
 
 /* Existing quantity inputs and customization panels remain in the DOM. */
 #builderStep5 .quantity-product-list {
@@ -6860,15 +6872,184 @@ body {
 
 /* Five finish styles across */
 
+
+/* =========================================
+   PAGE 4 - ENLARGED CAKE FINISHES
+========================================= */
+
 #builderStep4
 #cakeFinishCustomizer
 .style-choice-grid {
+
     grid-template-columns:
-        repeat(
-            5,
-            minmax(0, 1fr)
-        );
+        repeat(5, minmax(0, 1fr));
+
+    column-gap: 10px;
+    row-gap: 24px;
+
 }
+
+/* Transparent, clickable options */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-grid > .style-choice-card {
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    min-height: 0;
+
+    padding: 4px 3px 15px;
+    gap: 4px;
+
+    overflow: visible;
+
+    border: 0 !important;
+    border-radius: 0;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    text-align: center;
+}
+
+/* Bigger cake PNGs */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-card > .finish-card-image {
+
+    display: block;
+
+width: 104% !important;
+max-width: 100%;
+
+    height: clamp(
+        152px,
+        14vw,
+        190px
+    ) !important;
+
+    aspect-ratio: auto !important;
+
+  margin: 0 0 6px 0 !important;
+    padding: 0;
+
+    object-fit: contain;
+    object-position: center;
+
+    border: 0;
+    background: transparent !important;
+
+    filter:
+        drop-shadow(
+            0 7px 5px
+            rgba(90, 42, 30, 0.12)
+        );
+
+}
+
+/* Finish names */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-card > strong {
+
+    display: block;
+
+    width: 100%;
+    min-height: 0;
+
+    margin: 0;
+
+    color: var(--chocolate);
+
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.35;
+
+    text-align: center;
+
+}
+
+/* Descriptions below the names */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-card > small {
+
+    display: block;
+
+    width: 100%;
+    max-width: 170px;
+
+    margin: 2px 0 0;
+
+    color: var(--buttercream-brown);
+
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.45;
+
+    text-align: center;
+
+}
+
+/* Keep selected options transparent */
+
+#builderStep4
+#cakeFinishCustomizer
+.style-choice-card:is(
+    .is-selected,
+    :has(> input:checked)
+) {
+
+    border: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card > .finish-card-image {
+
+width: 100% !important;
+height: 135px !important;
+margin-left: 0 !important;
+
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card > strong {
+
+        font-size: 12px;
+
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card > small {
+
+        display: block;
+
+        font-size: 9px;
+        line-height: 1.35;
+
+    }
+
+}
+
 
 
 /* Five Cake Details across */
@@ -6963,34 +7144,145 @@ body {
    much easier to see.
 ========================= */
 
+
+/* =========================================
+   PAGE 4 - ENLARGED BORDER ARTWORK
+========================================= */
+
+#builderStep4
 #cakeBorderCustomizer
 .text-choice-card:has(> img) {
-    padding-left: 2px;
-    padding-right: 2px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    min-height: 0;
+
+    padding: 4px 0 15px;
+    gap: 4px;
+
+    overflow: visible;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
 }
 
+/* Large piped buttercream samples */
 
+#builderStep4
 #cakeBorderCustomizer
-.text-choice-card:has(> img)
-> img {
-    width: 112%;
-    max-width: none;
+.text-choice-card:has(> img) > img {
 
-    margin-left: -6%;
+    display: block;
 
-    aspect-ratio: 2 / 1;
+width: 110% !important;
+max-width: 100%;
+
+    height: clamp(
+        125px,
+        11vw,
+        160px
+    ) !important;
+
+    aspect-ratio: auto !important;
+
+   margin: 0 0 2px 0 !important;
+
+    object-fit: contain;
+    object-position: center;
+
+    border: 0;
+    background: transparent !important;
+
+    filter:
+        drop-shadow(
+            0 6px 5px
+            rgba(90, 42, 30, 0.12)
+        );
+
 }
 
+/* Border names */
 
-/* Five border choices across on roomy desktop */
+#builderStep4
+#cakeBorderCustomizer
+.text-choice-card:has(> img) > strong {
 
-@media (min-width: 1180px) {
+    display: block;
 
+    width: 100%;
+    margin: 0;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    line-height: 1.35;
+    text-align: center;
+
+}
+
+/* Preserve the floating selection style */
+
+#builderStep4
+#cakeBorderCustomizer
+.text-choice-card:has(> img):is(
+    .is-selected,
+    :has(> input:checked)
+) {
+
+    border: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+}
+
+/* Mobile border sizing */
+
+@media (max-width: 720px) {
+
+    #builderStep4
     #cakeBorderCustomizer
-    .text-choice-grid {
-        grid-template-columns:
-            repeat(5, minmax(0, 1fr));
+    .text-choice-card:has(> img) > img {
+
+width: 100% !important;
+height: 105px !important;
+margin-left: 0 !important;
+
     }
+
+    #builderStep4
+    #cakeBorderCustomizer
+    .text-choice-card:has(> img) > strong {
+
+        font-size: 12px;
+
+    }
+
+}
+/* Four visible border choices */
+
+#builderStep4
+#cakeBorderCustomizer > .text-choice-grid {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #cakeBorderCustomizer > .text-choice-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
 }
 
 
@@ -9468,67 +9760,346 @@ body {
 }
 
 /* Uniform, compact presentation for the existing Cake Detail choices */
-#builderStep4 #cakeDetailsCustomizer
+
+/* =========================================
+   FLOATING CAKE DETAIL PNGS
+========================================= */
+
+/* Display grid */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid {
+
+    column-gap: 12px;
+    row-gap: 20px;
+
+}
+
+/* Entire item remains clickable */
+
+#builderStep4
+#cakeDetailsCustomizer
 .decoration-choice-grid > .decoration-choice-card {
+
+    position: relative;
+
     display: flex;
     flex-direction: column;
+
     align-items: center;
+    justify-content: flex-start;
+
     min-width: 0;
-    min-height: 188px;
-    padding: 10px 8px 15px;
-    gap: 5px;
-    border: 1px solid rgba(77, 31, 22, 0.13) !important;
-    border-radius: 16px;
-    background: rgba(253, 235, 243, 0.78) !important;
-    box-shadow: 0 7px 17px rgba(77, 31, 22, 0.07);
+    min-height: 185px;
+
+    padding: 8px 5px 15px;
+    gap: 4px;
+
+    overflow: visible;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
     text-align: center;
+    cursor: pointer;
+
 }
 
-#builderStep4 #cakeDetailsCustomizer
-.decoration-choice-grid > .decoration-choice-card
-.decoration-card-image {
+/* Transparent decoration artwork */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid
+> .decoration-choice-card
+> .decoration-card-image {
+
     display: block;
+
     width: 100% !important;
-    height: 116px !important;
+
+    height: 125px !important;
+
     aspect-ratio: auto !important;
-    margin: 0 !important;
-    padding: 2px;
-    border: 0 !important;
-    background: transparent !important;
+
+    margin: 0 0 5px !important;
+    padding: 0;
+
     object-fit: contain;
     object-position: center;
-    filter: drop-shadow(0 6px 5px rgba(77, 31, 22, 0.13));
+
+    border: 0 !important;
+
+    background: transparent !important;
+
+    filter:
+        drop-shadow(
+            0 7px 6px
+            rgba(77, 31, 22, 0.12)
+        );
+
 }
 
-#builderStep4 #cakeDetailsCustomizer
-.decoration-choice-grid > .decoration-choice-card strong {
-    display: grid;
-    place-items: center;
-    min-height: 2.4em;
-    margin-top: auto;
+/* Decoration names */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid
+> .decoration-choice-card
+> strong {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 2.6em;
+
+    margin: 0;
+
+    color: var(--chocolate);
+
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+
     text-align: center;
+
 }
 
-#builderStep4 #cakeDetailsCustomizer
-.decoration-choice-grid > .decoration-choice-card small {
+/* Prices beneath names */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid
+> .decoration-choice-card
+> small {
+
+    display: block;
+
+    width: 100%;
+    margin: 0;
+
+    color: #8F4061;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+
     text-align: center;
+
+}
+
+/* Hover without creating a card */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-card:hover {
+
+    border: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+}
+
+/* Selected state stays transparent */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-card:is(
+    .is-selected,
+    :has(> input:checked)
+) {
+
+    border: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+}
+
+/* Mobile */
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid
+    > .decoration-choice-card {
+
+        min-height: 170px;
+
+        padding: 7px 4px 15px;
+
+    }
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-card
+    > .decoration-card-image {
+
+        height: 110px !important;
+
+    }
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-card
+    > strong {
+
+        font-size: 11px;
+
+    }
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-card
+    > small {
+
+        display: block;
+
+        font-size: 10px;
+
+    }
+
+}
+/* =========================================
+   IN-ARTWORK DECORATION EDITORS
+========================================= */
+
+/* Product grid */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid {
+    position: relative;
+
+    isolation: isolate;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    column-gap: 13px;
+    row-gap: 15px;
+}
+
+/* Floating decoration cards */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-grid
+> .decoration-choice-card {
+    min-height: 205px;
+
+    padding: 3px 3px 10px;
+    gap: 3px;
+
+    background: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Keep the PNG area consistent */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-card
+> .decoration-card-image {
+    display: block;
+
+    height: 145px !important;
+    max-height: 145px;
+
+    margin: 0 0 4px !important;
+
+    object-fit: contain;
+
+    background: transparent !important;
+}
+
+
+
+/* Product wording */
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-card > strong {
+    min-height: 0;
+
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+#builderStep4
+#cakeDetailsCustomizer
+.decoration-choice-card > small {
+    margin: 0;
+
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+
+
+/* =========================================
+   RESPONSIVE DECORATION GRID
+========================================= */
+
+@media (max-width: 900px) {
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 570px) {
+
+    #builderStep4
+    #cakeDetailsCustomizer
+    .decoration-choice-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
 }
 
 /* Toy and sculpted-cake questions use the same image presentation.
    The checkbox, description field, and quote-only behavior remain intact. */
-#builderStep4 #step4SpecialtyGrid .design-text-toggle {
+
+#builderStep4
+#step4SpecialtyGrid
+.design-text-toggle {
+
     display: flex !important;
     flex-direction: column;
+
     align-items: center !important;
+
     width: 100%;
+
     padding: 10px 8px 15px;
     gap: 6px;
-    border: 1px solid rgba(77, 31, 22, 0.13) !important;
-    border-radius: 16px !important;
-    background: rgba(253, 235, 243, 0.78) !important;
-    box-shadow: 0 7px 17px rgba(77, 31, 22, 0.07) !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
     text-align: center;
+
 }
+
 
 #builderStep4 #step4SpecialtyGrid
 .design-text-toggle .tpj-specialty-image {
@@ -9560,20 +10131,966 @@ body {
 }
 
 @media (max-width: 720px) {
-    #builderStep4 #cakeDetailsCustomizer
-    .decoration-choice-grid > .decoration-choice-card {
-        min-height: 156px;
-        padding: 8px 6px 13px;
-    }
+#builderStep4 #cakeDetailsCustomizer
+.decoration-choice-grid > .decoration-choice-card {
+    min-height: 185px;
+    padding: 4px 5px 10px;
+}
 
     #builderStep4 #cakeDetailsCustomizer
     .decoration-choice-grid > .decoration-choice-card
     .decoration-card-image {
-        height: 88px !important;
+        height: 135px !important;
     }
 
     #builderStep4 #step4SpecialtyGrid
     .design-text-toggle .tpj-specialty-image {
         height: 108px;
+    }
+}
+/* =========================================
+   COMPACT STEP 4 LAYOUT
+========================================= */
+
+/* Text-only action buttons */
+
+#builderStep4 .reset-cake-button,
+#builderStep4 .tpj-color-done,
+#builderStep4 .edible-image-secondary-button,
+#builderStep4 .upload-select-button,
+#builderStep4 .quantity-control button,
+#builderStep4 .tpj-stage-editor button {
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: var(--chocolate);
+
+    font:
+        700 11px
+        'Manrope', sans-serif;
+}
+
+/* Action hover and focus */
+
+#builderStep4
+:is(
+    .reset-cake-button,
+    .tpj-color-done,
+    .upload-select-button
+):is(:hover, :focus-visible) {
+    text-decoration: underline;
+    text-decoration-color: var(--signature-pink);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
+}
+
+/* Reduce the vertical gaps */
+
+#builderStep4 .builder-fieldset {
+    margin-bottom: 20px;
+}
+
+#builderStep4 .builder-fieldset > legend {
+    margin-bottom: 10px;
+}
+
+#builderStep4 .fieldset-description {
+    margin-bottom: 12px;
+}
+
+#builderStep4 .form-field {
+    margin-bottom: 12px;
+}
+
+/* Compact quantity controls */
+
+#builderStep4 .quantity-control {
+    gap: 4px;
+}
+
+#builderStep4 .quantity-control button {
+    width: 33px;
+    height: 33px;
+    min-height: 33px;
+}
+
+#builderStep4 .quantity-control input {
+    width: 36px;
+    min-width: 36px;
+}
+
+/* Compact Edible Image upload */
+
+#builderStep4
+#edibleImageControls
+.edible-image-upload-row {
+    max-width: 570px;
+}
+
+#builderStep4
+#edibleImageSlots
+.edible-image-upload-row {
+    grid-template-columns:
+        100px minmax(0, 1fr);
+
+    padding: 8px;
+    gap: 10px;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    box-shadow: none;
+}
+
+#builderStep4
+#edibleImageSlots
+.edible-image-thumbnail,
+
+#builderStep4
+#edibleImageSlots
+.edible-image-thumbnail img {
+    min-height: 95px;
+    height: 95px;
+}
+
+/* Specialty artwork */
+
+#builderStep4
+#step4SpecialtyGrid > fieldset > legend {
+    display: none;
+}
+
+#builderStep4
+#step4SpecialtyGrid
+.design-text-toggle {
+    padding: 5px 2px;
+}
+
+#builderStep4
+#step4SpecialtyGrid
+.tpj-specialty-image {
+    height: 125px;
+}
+
+@media (max-width: 570px) {
+
+    #builderStep4
+    #edibleImageSlots
+    .edible-image-upload-row {
+        grid-template-columns:
+            85px minmax(0, 1fr);
+    }
+
+}
+
+/* =========================================
+   TEXT SELECTIONS: PINK DASH ONLY
+========================================= */
+
+#builderStep4
+:is(
+    .compact-choice-row,
+    .description-choice-grid
+)
+label:has(input:checked) {
+    background: transparent !important;
+
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    color: var(--signature-pink);
+}
+
+#builderStep4
+.description-choice-grid > label {
+    min-height: 36px;
+
+    padding: 5px 3px 12px;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#builderStep4
+.description-choice-grid
+> label:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 15%;
+    right: 15%;
+    bottom: 3px;
+
+    height: 3px;
+
+    border-radius: 99px;
+
+    background: var(--signature-pink);
+}
+
+#builderStep4
+.design-text-toggle:has(input:checked) {
+    background: transparent !important;
+}
+/* =========================================
+   TPJ DESIGN POLISH
+   SECTION SEPARATION
+========================================= */
+
+#builderStep4 :is(
+    #cakeFinishCustomizer,
+    #cakeBorderCustomizer,
+    #sprinklesPearlsCustomizer,
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer,
+    #cakeDetailsCustomizer,
+    #step4SpecialtyHeading
+) {
+    margin-top: 34px;
+    padding-top: 26px;
+
+    border-top: 1px solid
+        rgba(90, 42, 30, 0.16);
+}
+
+
+
+
+/* =========================================
+   SHARED TEXT-ONLY PLACEMENT STYLE
+========================================= */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row {
+
+    display: flex !important;
+
+    flex-wrap: wrap;
+    align-items: center;
+
+    width: 100%;
+
+    column-gap: 24px;
+    row-gap: 6px;
+
+    background: transparent;
+
+}
+
+/* Remove the old radio-card styling */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row > label {
+
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+
+    margin: 0;
+    padding: 8px 2px 14px;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: #4D1F16;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+/* Visually hide original radio circles */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row input {
+
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+
+}
+
+/* Keep the words clean */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row span {
+
+    display: block;
+
+    padding: 0;
+
+    border: 0 !important;
+    background: transparent !important;
+
+    color: inherit;
+
+    font-size: inherit;
+    font-weight: inherit;
+
+    white-space: nowrap;
+
+}
+
+/* Selected text turns pink */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row
+label:has(input:checked) {
+
+    color: #FF3F9F;
+
+    background: transparent !important;
+    border-color: transparent !important;
+
+}
+
+/* Pink dash underneath selected option */
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row
+label:has(input:checked)::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 2px;
+    right: 2px;
+    bottom: 3px;
+
+    height: 3px;
+
+    border-radius: 99px;
+
+    background: #FF3F9F;
+
+}
+
+/* Keyboard accessibility */
+
+
+#builderStep4
+#edibleImageControls
+.edible-image-shape-row
+label:has(input:focus-visible) {
+
+    outline: 2px solid #4D1F16;
+    outline-offset: 3px;
+
+}
+
+/* =========================================
+   EDIBLE IMAGE REDESIGN
+========================================= */
+
+/* Overall control spacing */
+
+#builderStep4
+#edibleImageControls {
+
+    margin-top: 18px;
+
+    padding: 0;
+
+    background: transparent;
+
+}
+
+/* Quantity selector row */
+
+#builderStep4
+#edibleImageControls
+> .edible-image-upload-row {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+    gap: 14px;
+
+    margin-bottom: 15px;
+
+}
+
+/* Image upload containers */
+
+#builderStep4
+#edibleImageSlots
+.edible-image-upload-row {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(100px, 0.75fr)
+        minmax(140px, 1.25fr);
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 12px;
+    padding: 15px;
+
+    border: 1px solid
+        rgba(90, 42, 30, 0.15);
+
+    border-radius: 17px;
+
+    background: #FFF9F6;
+
+    box-shadow:
+        0 6px 16px
+        rgba(90, 42, 30, 0.045);
+
+}
+
+/* Actual image preview */
+
+#builderStep4
+#edibleImageSlots
+.edible-image-thumbnail {
+
+    min-height: 138px;
+
+    border: 2px dashed #E8BACD;
+    border-radius: 13px;
+
+    background: #FFF0F6;
+
+}
+
+/* Uploaded image */
+
+#builderStep4
+#edibleImageSlots
+.edible-image-thumbnail img {
+
+    width: 100%;
+    height: 138px;
+
+    object-fit: contain;
+
+    background: transparent;
+
+}
+
+/* Placement and shape groups */
+
+#builderStep4
+#edibleImageControls
+.edible-image-option-group {
+
+    margin-top: 22px;
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+}
+
+#builderStep4
+#edibleImageControls
+.edible-image-option-group > legend {
+
+    margin-bottom: 9px;
+
+    color: var(--chocolate);
+
+    font-family: 'Fraunces', Georgia, serif;
+
+    font-size: 20px;
+    font-weight: 500;
+
+}
+
+/* Keep explanatory text readable */
+
+#builderStep4
+#edibleImagePlacementTarget
+.fieldset-description {
+
+    max-width: 550px;
+
+    margin-bottom: 12px;
+
+    font-size: 11px;
+    line-height: 1.55;
+
+}
+
+/* Narrow-screen upload layout */
+
+@media (max-width: 620px) {
+
+    #builderStep4
+    #edibleImageSlots
+    .edible-image-upload-row {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    #builderStep4
+    #edibleImageControls
+    > .edible-image-upload-row {
+
+        align-items: flex-start;
+
+    }
+
+    #builderStep4
+    #edibleImageControls
+    .edible-image-shape-row {
+
+        flex-direction: row;
+        flex-wrap: wrap;
+
+    }
+
+}
+
+
+
+/* =========================================
+   CUSTOM CREATIONS
+========================================= */
+
+#builderStep4
+#step4SpecialtyHeading {
+
+    margin-bottom: 14px;
+
+}
+
+#builderStep4
+#step4SpecialtyHeading h3 {
+
+    margin: 0 0 8px;
+
+    color: var(--chocolate);
+
+    font-family: 'Fraunces', Georgia, serif;
+
+    font-size: 30px;
+    font-weight: 500;
+
+}
+
+#builderStep4
+#step4SpecialtyHeading p {
+
+    max-width: 550px;
+
+    margin: 0;
+
+    color: var(--buttercream-brown);
+
+    font-size: 11px;
+    line-height: 1.6;
+
+}
+
+/* Match specialty image cards to Cake Details */
+
+
+
+/* Keep the two specialty options together */
+
+#builderStep4
+#step4SpecialtyGrid {
+
+    margin-top: 0;
+
+    gap: 20px;
+
+}
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #step4SpecialtyGrid {
+
+        gap: 12px;
+
+    }
+
+    #builderStep4
+    .tpj-pearl-choice-grid {
+
+        grid-template-columns:
+            minmax(0, 165px);
+
+    }
+
+}
+/* TPJ dropdown repair */
+
+#builderStep4 {
+    position: relative;
+}
+
+#builderStep4 > .builder-fieldset,
+#builderStep4 > .conditional-section {
+    margin-top: 18px;
+}
+
+#builderStep4 :is(
+    #cakeFinishCustomizer,
+    #cakeBorderCustomizer,
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer,
+    #cakeDetailsCustomizer,
+    #step4SpecialtyHeading
+) {
+    margin-top: 18px;
+    padding-top: 12px;
+}
+
+/* Keep the color name, image, and arrow together. */
+
+#builderStep4 .tpj-color-picker {
+    width: fit-content !important;
+    max-width: 100%;
+}
+
+#builderStep4 .tpj-color-picker > summary {
+    display: flex !important;
+    justify-content: flex-start;
+
+    width: fit-content;
+    gap: 8px;
+
+    padding: 4px 6px !important;
+}
+
+#builderStep4 .tpj-color-copy {
+    flex: 0 1 auto;
+}
+
+#builderStep4 .tpj-color-picker > summary::after {
+    position: static !important;
+
+    margin: 0 0 0 5px !important;
+    flex: 0 0 auto;
+}
+
+/* Shared floating dropdown. */
+
+#builderStep4 .tpj-option-popup[hidden] {
+    display: none !important;
+}
+
+#builderStep4 .tpj-option-popup {
+    position: absolute;
+    z-index: 100;
+
+    width: min(390px, calc(100vw - 24px));
+    max-height: min(540px, 70dvh);
+
+    overflow: auto;
+    box-sizing: border-box;
+
+    padding: 14px;
+
+    background: #fdebf3;
+    color: #4d1f16;
+
+    border: 1px solid #edb9cf;
+    border-radius: 10px;
+
+    box-shadow: 0 10px 25px #4d1f1626;
+}
+
+#builderStep4 .tpj-option-popup > :is(
+    fieldset,
+    .conditional-section,
+    .form-field
+) {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 8px 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#builderStep4 .tpj-option-popup :is(
+    .swatch-subsection,
+    .form-field
+) {
+    margin-top: 10px;
+    padding: 0;
+}
+
+#builderStep4 .tpj-popup-title {
+    display: block;
+    font-size: 15px;
+}
+
+/* Color choices stay inside their compact dropdown. */
+
+#builderStep4 .tpj-option-popup
+.tpj-color-picker > .tpj-color-panel {
+    position: static !important;
+
+    width: 100% !important;
+    max-height: none !important;
+
+    margin: 6px 0;
+    padding: 6px 0;
+
+    overflow: visible;
+    box-shadow: none;
+}
+
+#builderStep4 .tpj-option-popup .tpj-color-picker[open] {
+    width: 100% !important;
+}
+
+#builderStep4 .tpj-option-popup
+.tpj-color-picker[open] > summary {
+    visibility: visible;
+}
+
+#builderStep4 .tpj-option-popup .color-choice-grid {
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr)) !important;
+
+    gap: 8px 4px !important;
+}
+
+/* Done action. */
+
+#builderStep4 .tpj-popup-actions {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 12px;
+    margin-top: 12px;
+}
+
+#builderStep4 .tpj-popup-actions button {
+    min-height: 36px;
+    padding: 6px 10px;
+
+    border: 0;
+    background: transparent;
+    color: #4d1f16;
+
+    font: inherit;
+    font-weight: 700;
+
+    text-decoration: underline #ff3f9f 3px;
+    text-underline-offset: 5px;
+
+    cursor: pointer;
+}
+
+#builderStep4 .tpj-popup-actions button[hidden] {
+    display: none;
+}
+
+#builderStep4 .tpj-popup-actions button:last-child {
+    margin-left: auto;
+}
+
+/* Matching text-only border and sprinkle placement. */
+
+#builderStep4 :is(
+    #cakeSprinkleOptions,
+    #cakeBorderPlacementControls
+) .compact-choice-row {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px 18px;
+    background: transparent;
+}
+
+#builderStep4 :is(
+    #cakeSprinkleOptions,
+    #cakeBorderPlacementControls
+) .compact-choice-row label {
+    position: relative;
+
+    width: auto;
+    min-height: 40px;
+
+    padding: 8px 2px;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: #4d1f16;
+    cursor: pointer;
+}
+
+#builderStep4 :is(
+    #cakeSprinkleOptions,
+    #cakeBorderPlacementControls
+) .compact-choice-row input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+}
+
+#builderStep4 :is(
+    #cakeSprinkleOptions,
+    #cakeBorderPlacementControls
+) .compact-choice-row label:has(input:checked)::after {
+    content: "";
+
+    position: absolute;
+
+    height: 3px;
+    left: 15%;
+    right: 15%;
+    bottom: 2px;
+
+    background: #ff3f9f;
+    border-radius: 3px;
+}
+
+#builderStep4 label:has(input:focus-visible),
+#builderStep4 summary:focus-visible {
+    outline: 2px solid #4d1f16;
+    outline-offset: 3px;
+}
+
+/* Compact edible-image, topper, and sprinkle triggers. */
+
+#builderStep4 :is(
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer,
+    #cakeSprinkleSection
+) .design-text-toggle {
+    width: fit-content !important;
+    max-width: 100%;
+
+    min-height: 44px;
+    padding: 6px 8px !important;
+}
+
+#builderStep4 :is(
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer,
+    #cakeSprinkleSection
+) .design-text-toggle-copy::after {
+    content: "⌄";
+
+    display: inline-block;
+    margin-left: 8px;
+
+    color: #4d1f16;
+}
+
+/* Smaller upload layout inside the edible-image dropdown. */
+
+#builderStep4 #edibleImageSlots .edible-image-upload-row {
+    grid-template-columns:
+        72px minmax(0, 1fr);
+
+    gap: 10px;
+    padding: 8px;
+    margin-top: 10px;
+}
+
+#builderStep4 #edibleImageSlots .edible-image-thumbnail,
+#builderStep4 #edibleImageSlots .edible-image-thumbnail img {
+    min-height: 72px;
+    height: 72px;
+}
+
+#builderStep4 #edibleImageControls .edible-image-option-group {
+    margin-top: 12px;
+}
+
+#builderStep4 .tpj-option-popup textarea {
+    width: 100%;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+
+/* Reset sits directly beneath the cake preview. */
+
+#cakePreviewCard #resetCakeBuilder {
+    position: static !important;
+    display: block;
+
+    width: fit-content;
+
+    margin: 8px auto 4px !important;
+    padding: 7px 12px;
+
+    font-size: 12px;
+    text-transform: none;
+}
+
+/* A failed PNG still leaves a usable color choice. */
+
+.color-choice
+.color-swatch:not(.tpj-picture-swatch):not(.custom-color-swatch) {
+    background: var(--swatch-color, #f7b6d2);
+}
+
+.tpj-swatch-picture,
+.tpj-preview-picture {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 480px) {
+    #builderStep4 .tpj-option-popup .color-choice-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
     }
 }
