@@ -8418,7 +8418,7 @@ if (
                     getEdibleImageArea(
                         product,
                         x,
-                        y + boardYOffset,
+                        originalY + boardYOffset,
                         size.width,
                         size.height
                     )
@@ -12190,20 +12190,10 @@ function initializeRemainingPanelBehavior() {
             "#edibleImageEnabledToggle",
             "Edible image"
         ],
-        [
+                [
             "#topperTypeOptions",
             "#cakeTopperEnabledToggle",
             "Cake topper"
-        ],
-        [
-            "#toyFigurineDetailsField",
-            "#toyFigurineEnabledToggle",
-            "Toy / Figurine Decorations"
-        ],
-        [
-            "#customSculptedDetailsField",
-            "#customSculptedEnabledToggle",
-            "3D / Sculpted Cake"
         ]
     ];
 
@@ -12460,12 +12450,9 @@ function initializeRemainingPanelBehavior() {
     );
 
     if (reset && stage) {
-        stage.after(reset);
-
-        reset.textContent = "Reset this page’s cake choices";
-
-        reset.title =
-            "Resets this page only. Choices on other pages stay saved.";
+        stage.append(reset);
+        reset.textContent = "Reset";
+        reset.removeAttribute("title");
     }
 }
 
@@ -18725,6 +18712,11 @@ function initializeBuilder() {
     buildBuilderColorControls();
     initializeExtraCustomizationPanels();
     initializeRemainingPanelBehavior();
+
+    getElement("#tpjSpecialtyDone")?.addEventListener("click", () => {
+        getElement("#step4SpecialtyPicker").open = false;
+    });
+
     initializeCupcakePreviewOffset();
 initializeVisibleBuilderSync();
 showCustomShadeControls(
@@ -19666,7 +19658,7 @@ for (
 
             [...grid.children].forEach(card => {
                 const img =
-                    card.matches("label") &&
+                      card.matches("label, details") &&
                     card.querySelector("img");
 
                 if (!img || !card.getClientRects().length) return;
@@ -19683,7 +19675,8 @@ for (
                         top,
                         left: Infinity,
                         right: 0,
-                        bottom: 0
+                        imageBottom: 0,
+                        captionTop: Infinity
                     };
 
                     rows.push(row);
@@ -19699,10 +19692,19 @@ for (
                     box.right - origin.left
                 );
 
-                row.bottom = Math.max(
-                    row.bottom,
-                    box.bottom - origin.top
+                row.imageBottom = Math.max(
+                    row.imageBottom,
+                    img.getBoundingClientRect().bottom - origin.top
                 );
+
+                const caption = card.querySelector(":scope > strong");
+
+                if (caption) {
+                    row.captionTop = Math.min(
+                        row.captionTop,
+                        caption.getBoundingClientRect().top - origin.top
+                    );
+                }
             });
 
             if (!rows.length) return;
@@ -19737,9 +19739,12 @@ for (
 
                     Object.assign(shelf.style, {
                         left: `${row.left}px`,
-                        top: `${row.bottom - 36}px`,
+                        top: `${Math.min(
+                            row.imageBottom - 10,
+                            row.captionTop - 19
+                        )}px`,
                         width: `${row.right - row.left}px`,
-                        height: "36px"
+                        height: "18px"
                     });
 
                     return shelf;
