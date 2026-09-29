@@ -7502,9 +7502,9 @@ background-image:
         repeat-y,
         repeat-y;
 
-    background-size:
-        clamp(64px, 7vw, 124px) auto,
-        clamp(64px, 7vw, 124px) auto;
+background-size:
+    190px auto,
+    190px auto;
 }
 
 @media (max-width: 720px) {
@@ -11681,4 +11681,93 @@ right: 0;
 ) .compact-choice-row label:has(input:focus-visible) {
     outline: 2px solid #4d1f16;
     outline-offset: 3px;
+}
+/* Three individually designed sprinkle patches for the top of Step 2 */
+.tpj-step2-scatter {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@media (min-width: 901px) {
+    .cake-builder-app:has(#builderStep2.is-active) .tpj-step2-scatter {
+        display: block;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Sprinkles-abovecakescatter.png"),
+            url("images/cake-builder/decor/TPJ-Sprinkles-besideyourcakecatter.png"),
+            url("images/cake-builder/decor/TPJ-Sprinkles-middlescatter.png");
+
+        background-repeat: no-repeat, no-repeat, no-repeat;
+
+        background-size:
+            100% auto,
+            100% auto,
+            100% auto;
+
+background-position:
+    calc(50% + 190px) -250px, /* above-cake scatter: right */
+    calc(50% - 30px) -155px, /* beside-your-cake scatter: right */
+    center 45px;              /* middle scatter: down below Make It Yours */
+    }
+}
+/* Sparse additions for the four yellow-marked gaps */
+@media (min-width: 1100px) {
+
+    .cake-builder-app:has(#builderStep2.is-active)
+    :is(#cakeBoardCustomizer, .builder-step-navigation) {
+        position: relative;
+    }
+
+    .cake-builder-app:has(#builderStep2.is-active) #cakePreviewCard::before,
+    .cake-builder-app:has(#builderStep2.is-active) #cakeBoardCustomizer::before,
+    .cake-builder-app:has(#builderStep2.is-active) #cakeBoardCustomizer::after,
+    .cake-builder-app:has(#builderStep2.is-active) .builder-step-navigation::before {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 130px;
+        pointer-events: none;
+
+        /* Show only a small cluster from the existing PNG */
+        background-image:
+            url("images/cake-builder/decor/TPJ-Sprinkles-abovecakescatter.png");
+        background-repeat: no-repeat;
+        background-size: 1218px 655px;
+        background-position: -864px -232px;
+    }
+
+    /* 1. Empty space above Make It Yours */
+    .cake-builder-app:has(#builderStep2.is-active)
+    #cakePreviewCard::before {
+        right: 24px;
+        top: -26px;
+        transform: rotate(-12deg);
+    }
+
+    /* 2. Preview-side gap when Cake Board comes into view */
+    .cake-builder-app:has(#builderStep2.is-active)
+    #cakeBoardCustomizer::before {
+        left: -178px;
+        top: -185px;
+        transform: rotate(70deg);
+    }
+
+    /* 3. Space above the board choices */
+    .cake-builder-app:has(#builderStep2.is-active)
+    #cakeBoardCustomizer::after {
+        left: 35%;
+        top: -6px;
+        transform: rotate(-10deg);
+    }
+
+    /* 4. Empty space below Previous / Continue */
+    .cake-builder-app:has(#builderStep2.is-active)
+    .builder-step-navigation::before {
+        left: 28%;
+        top: 42px;
+        transform: rotate(16deg);
+    }
 }
