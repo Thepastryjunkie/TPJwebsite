@@ -19366,6 +19366,7 @@ copy.append(name);
         host.appendChild(node);
         return node;
     }
+    layer(main, 'tpj-sprinkle-scene');
     const scene = layer(main, 'tpj-ref-scene');
     const headerArt = layer(header, 'tpj-ref-local');
     const previewArt = layer(preview, 'tpj-ref-local');
@@ -19406,9 +19407,11 @@ copy.append(name);
         el.style.top = `${Math.round(y)}px`;
     }
     function sugar(x, y, index, occupied, bounds) {
+        return; // Old decorative sprinkle generator disabled.
         const [sx, sy, sw, sh] = sugars[index % sugars.length];
         const scale = 0.40;
         const b = rect(x, y, sw * scale, sh * scale);
+        
         if (x < 0 || y < 0 || x + b.width > bounds.width ||
             y + b.height > bounds.height || occupied.some(r => overlap(b, r, 3))) return;
         const el = document.createElement('span');
@@ -19573,14 +19576,6 @@ for (
     );
 
 
-    /* Opposite edge of cake-preview side */
-    sugar(
-        pc.x + pc.width - 40,
-        y + 98,
-        n++,
-        occupied,
-        bounds
-    );
 
 
     /* Far right edge */
@@ -19593,26 +19588,6 @@ for (
     );
 
 
-    /* Gap between cake preview and form */
-    const gap =
-        form.x -
-        pc.x -
-        pc.width;
-
-    if (gap >= 32) {
-        sugar(
-            pc.x +
-            pc.width +
-            (gap - 30) / 2,
-
-            y + 73,
-
-            n++,
-
-            occupied,
-            bounds
-        );
-    }
 }
         [heading, ...legends].filter(Boolean).forEach((anchor, i) => {
             const a = box(anchor, origin);
