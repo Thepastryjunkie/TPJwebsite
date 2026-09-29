@@ -7673,7 +7673,7 @@ background-image:
 }
 
 .cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) .tpj-sprinkle-scene {
-    background-image: url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png");
+    background-image: url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png?v=20260929-1");
    background-repeat: repeat-y;
     background-position: center top;
     background-size: 100% auto;

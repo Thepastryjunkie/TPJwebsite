@@ -19366,7 +19366,7 @@ copy.append(name);
         host.appendChild(node);
         return node;
     }
-    layer(main, 'tpj-sprinkle-scene');
+
     const scene = layer(main, 'tpj-ref-scene');
     const headerArt = layer(header, 'tpj-ref-local');
     const previewArt = layer(preview, 'tpj-ref-local');
