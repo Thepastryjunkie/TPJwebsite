@@ -7663,77 +7663,20 @@ background-image:
     z-index: 0; 
     overflow: visible; 
 }
-/* =========================================
-   NEW TPJ DECORATIVE SPRINKLES
-   Steps 2–8 only
-   Separate from the buttercream artwork
-========================================= */
-
+/* One transparent sprinkle overlay for Page 2 */
 .tpj-sprinkle-scene {
     position: absolute;
     inset: 0;
-
     z-index: 0;
     pointer-events: none;
-
     background: none;
 }
 
-/* DESKTOP SPRINKLE PLACEMENT */
-
-.cake-builder-app:has(
-    .builder-step.is-active:not(#builderStep1)
-) .tpj-sprinkle-scene {
-
-    background-image:
-        url("images/cake-builder/decor/TPJ-Sprinkles-Left.png"),
-        url("images/cake-builder/decor/TPJ-Sprinkles-Right.png"),
-        url("images/cake-builder/decor/TPJ-Sprinkles-Center.png");
-
-    background-position:
-        left clamp(135px, 10vw, 190px) top,
-        right clamp(135px, 10vw, 190px) top,
-        right clamp(190px, 17vw, 340px) top 340px;
-
-    background-repeat:
-        repeat-y,
-        repeat-y,
-        no-repeat;
-
-    background-size:
-        clamp(160px, 15vw, 155px) auto,
-        clamp(160px, 15vw, 155px) auto,
-        clamp(440px, 38vw, 640px) auto;
-
-    opacity: 0.85;
-}
-
-/* MOBILE: FEWER, SMALLER SPRINKLES */
-
-@media (max-width: 720px) {
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    ) .tpj-sprinkle-scene {
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Sprinkles-Left.png"),
-            url("images/cake-builder/decor/TPJ-Sprinkles-Right.png");
-
-        background-position:
-            left 43px top 135px,
-            right 43px top 135px;
-
-        background-repeat:
-            no-repeat,
-            no-repeat;
-
-        background-size:
-            128px auto,
-            128px auto;
-
-        opacity: 0.55;
-    }
+.cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) .tpj-sprinkle-scene {
+    background-image: url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png");
+   background-repeat: repeat-y;
+    background-position: center top;
+    background-size: 100% auto;
 }
 .tpj-ref-local { 
     z-index: 2; 
