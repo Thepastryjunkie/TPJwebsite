@@ -7549,7 +7549,7 @@ background-image:
     z-index: -1;
     pointer-events: none;
 
-    background-repeat: no-repeat;
+    background-repeat: repeat-y;
     background-size: 190px auto;
     opacity: 1;
 }

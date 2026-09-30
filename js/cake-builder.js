@@ -19595,7 +19595,7 @@ const blocks = main.querySelectorAll(
             }
 
 
-            function besideHeading(anchor, text) {
+          function besideHeading(anchor, text, moveLeft = 0) {
                 if (!anchor) return;
 
                 const a = box(anchor, origin);
@@ -19605,17 +19605,18 @@ const blocks = main.querySelectorAll(
                     145,
                     24,
                     [
-                        [formBox.x + formBox.width - 160, a.y],
+[formBox.x + formBox.width - 160 - moveLeft, a.y],
                         [formBox.x - 165, a.y],
                         [formBox.x - 165, a.y + 70]
                     ]
                 );
             }
 
-            besideHeading(
-                find(/Coverage/i),
-                'How will it\nlook? ♡'
-            );
+besideHeading(
+    find(/Coverage/i),
+    'How will it\nlook? ♡',
+    85
+);
 
             besideHeading(
                 find(/Cake Size|Round Cake Size/i),
