@@ -660,14 +660,6 @@ background: transparent;
 
 .realistic-tint-layer {
     background: var(--realistic-tint, transparent);
-    -webkit-mask-image: var(--realistic-mask);
-    mask-image: var(--realistic-mask);
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
     mix-blend-mode: color;
     opacity: 0.82;
 }
@@ -7519,19 +7511,6 @@ margin-left: 0 !important;
 
     opacity: 1;
 
-    -webkit-mask-image: linear-gradient(
-        to bottom,
-        black 0%,
-        black 65%,
-        transparent 100%
-    );
-
-    mask-image: linear-gradient(
-        to bottom,
-        black 0%,
-        black 65%,
-        transparent 100%
-    );
 }
 
 /* TOP LEFT */
@@ -7585,34 +7564,6 @@ background-image:
         url("images/cake-builder/tpj-buttercream-middle-left.png");
 
     background-position: left top;
-
--webkit-mask-image:
-    linear-gradient(
-        to right,
-
-        black 0%,
-        black 68%,
-
-        rgba(0, 0, 0, 0.92) 76%,
-
-        rgba(0, 0, 0, 0.52) 90%,
-
-        transparent 100%
-    );
-
-mask-image:
-    linear-gradient(
-        to right,
-
-        black 0%,
-        black 68%,
-
-        rgba(0, 0, 0, 0.92) 76%,
-
-        rgba(0, 0, 0, 0.52) 90%,
-
-        transparent 100%
-    );
 }
 
 /* RIGHT: KEEP OUTER FROSTING SHARP,
@@ -7626,33 +7577,6 @@ mask-image:
 
     background-position: right top;
 
--webkit-mask-image:
-    linear-gradient(
-        to left,
-
-        black 0%,
-        black 68%,
-
-        rgba(0, 0, 0, 0.92) 76%,
-
-        rgba(0, 0, 0, 0.52) 90%,
-
-        transparent 100%
-    );
-
-mask-image:
-    linear-gradient(
-        to left,
-
-        black 0%,
-        black 68%,
-
-        rgba(0, 0, 0, 0.92) 76%,
-
-        rgba(0, 0, 0, 0.52) 90%,
-
-        transparent 100%
-    );
 }
 
 /* NO FROSTING ON BASICS */
@@ -7663,13 +7587,6 @@ mask-image:
 }
 
 /* MOBILE */
-
-@media (max-width: 720px) {
-    .tpj-buttercream-feather {
-        width: 40px;
-        background-size: 40px auto;
-    }
-}
 
 /* BOTTOM CORNERS: anchored to the document */
 
@@ -7689,21 +7606,8 @@ mask-image:
     background-repeat: no-repeat;
     background-size: 100% auto;
 
-    opacity: 0.85;
+    opacity: 1;
 
-    -webkit-mask-image: linear-gradient(
-        to top,
-        black 0%,
-        black 65%,
-        transparent 100%
-    );
-
-    mask-image: linear-gradient(
-        to top,
-        black 0%,
-        black 65%,
-        transparent 100%
-    );
 }
 
 /* BOTTOM LEFT: PIPING BAG */
@@ -7859,20 +7763,6 @@ mask-image:
 
 /* MOBILE */
 
-@media (max-width: 720px) {
-    .cake-builder-app::before,
-    .cake-builder-app::after {
-        width: 40px;
-        opacity: 0.65;
-    }
-
-    .builder-main::before,
-    .builder-main::after {
-        width: 75px;
-        height: 220px;
-        opacity: 0.65;
-    }
-}
 .builder-header-inner, #cakePreviewCard { position: relative; }
 .tpj-ref-scene, .tpj-ref-local {
     position: absolute;
@@ -7895,7 +7785,7 @@ mask-image:
 
 .cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) .tpj-sprinkle-scene {
     background-image: url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png?v=20260929-1");
-   background-repeat: repeat-y;
+   background-repeat: no-repeat;
     background-position: center top;
     background-size: 100% auto;
 }
@@ -7993,7 +7883,7 @@ mask-image:
     .preview-heading-row > div:first-child {
 
         margin-left:
-            clamp(68px, 5vw, 105px);
+            clamp(98px, 7vw, 135px);
 
         max-width:
             calc(100% - 155px);
@@ -11627,6 +11517,17 @@ label:has(input:focus-visible) {
     right: 8px;
     z-index: 10;
     margin: 0;
+
+    width: max-content;
+    height: auto;
+    min-height: 0;
+    padding: 6px 9px;
+
+    background: rgba(255, 241, 231, 0.65) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 2px 7px rgba(77, 31, 22, 0.08);
+    color: #4d1f16;
 }
 
 
@@ -12318,4 +12219,12 @@ background-position:
 .builder-step-navigation
 .continue-button:focus-visible::after {
     color: #D51B73 !important;
+}
+/* Move the cake-preview disclaimer away from the left frosting */
+@media (min-width: 981px) {
+    #cakePreviewDisclaimer {
+        box-sizing: border-box;
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
 }
