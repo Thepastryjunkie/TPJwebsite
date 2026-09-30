@@ -19744,6 +19744,11 @@ for (
             if (!grid.getClientRects().length) return;
 
             const origin = grid.getBoundingClientRect();
+
+            const isButtercreamShelf =
+    Boolean(
+        grid.closest("#builderStep3")
+    );
             const rows = [];
 
             [...grid.children].forEach(card => {
@@ -19827,15 +19832,38 @@ for (
 
                     shelf.className = "tpj-row-shelf";
 
-                    Object.assign(shelf.style, {
-                        left: `${row.left}px`,
-                        top: `${Math.min(
-                            row.imageBottom - 10,
-                            row.captionTop - 19
-                        )}px`,
-                        width: `${row.right - row.left}px`,
-                        height: "18px"
-                    });
+Object.assign(
+    shelf.style,
+    {
+        left:
+            `${row.left}px`,
+
+        top:
+            `${Math.min(
+                row.imageBottom -
+                    (
+                        isButtercreamShelf
+                            ? 8
+                            : 10
+                    ),
+
+                row.captionTop -
+                    (
+                        isButtercreamShelf
+                            ? 49
+                            : 19
+                    )
+            )}px`,
+
+        width:
+            `${row.right - row.left}px`,
+
+        height:
+            isButtercreamShelf
+                ? "52px"
+                : "18px"
+    }
+);
 
                     return shelf;
                 })

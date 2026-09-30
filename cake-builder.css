@@ -6213,47 +6213,127 @@ text-underline-offset: 4px;
     pointer-events: none;
 }
 
-:is(#builderStep3, #builderStep4) .tpj-row-shelf {
+/* ==========================================================
+   PAGE 3 — REAL BUTTERCREAM PRODUCT SHELVES
+========================================================== */
+
+#builderStep3 .tpj-row-shelf {
     position: absolute;
+
+    box-sizing: border-box;
+    overflow: visible;
+
+    border: 0;
+    border-radius: 0;
+
+    background-image:
+        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Middle.png");
+
+background-repeat: repeat-x;
+background-position: center bottom;
+background-size: auto 100%;
+    box-shadow: none;
+
+    filter:
+        drop-shadow(
+            0 7px 7px
+            rgba(90, 42, 30, 0.15)
+        );
+
+    pointer-events: none;
+}
+
+
+/* LEFT + RIGHT REAL PIPED ENDS */
+
+#builderStep3 .tpj-row-shelf::before,
+#builderStep3 .tpj-row-shelf::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: -6px;
+
+    width: 82px;
+    height: 62px;
+
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center bottom;
+
+    pointer-events: none;
+}
+
+
+/* LEFT ROSETTE */
+
+#builderStep3 .tpj-row-shelf::before {
+    left: -34px;
+
+    background-image:
+        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Left.png");
+}
+
+
+/* RIGHT ROSETTE */
+
+#builderStep3 .tpj-row-shelf::after {
+    right: -34px;
+
+    background-image:
+        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Right.png");
+}
+
+
+/* Give the real frosting shelves room to breathe */
+
+#builderStep3 .tpj-shelf-grid {
+    position: relative;
+    isolation: isolate;
+
+    row-gap: 32px;
+}
+
+
+/* Product cards remain ABOVE the frosting */
+
+#builderStep3 .tpj-shelf-grid > label {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* ==========================================================
+   PAGE 4
+   Keep its existing simple shelf for now,
+   but REMOVE the old pink glow
+========================================================== */
+
+#builderStep4 .tpj-row-shelf {
+    position: absolute;
+
     box-sizing: border-box;
 
-background: linear-gradient(
-    180deg,
-    rgba(246, 199, 218, 0.5),
-    rgba(244, 183, 209, 0.5)
-);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(246, 199, 218, 0.5),
+            rgba(244, 183, 209, 0.5)
+        );
 
     border-radius: 12px 12px 8px 8px;
-    border-bottom: 2px solid #fdebf3;
+    border-bottom: 2px solid #FDEBF3;
 
-box-shadow: 0 6px 12px rgba(190, 66, 122, 0.20);
-
-    clip-path: none;
-    transform: none;
-    filter: none;
+    box-shadow:
+        0 6px 12px
+        rgba(90, 42, 30, 0.11);
 
     pointer-events: none;
 }
-:is(#builderStep3, #builderStep4) .tpj-row-shelf::before {
-    content: "";
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    bottom: 14;
-    height: 54px;
-    border-radius: 50%;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(255, 63, 159, 0.62) 0%,
-        rgba(240, 87, 151, 0.34) 48%,
-        transparent 78%
-    );
-    filter: blur(9px);
-    z-index: 1;
-    pointer-events: none;
-}
 
-:is(#builderStep3, #builderStep4) .tpj-row-shelf::after {
+
+#builderStep4 .tpj-row-shelf::before,
+#builderStep4 .tpj-row-shelf::after {
     content: none;
 }
 #builderStep3 .custom-text-only-card {
