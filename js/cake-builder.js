@@ -15226,6 +15226,13 @@ previousStepButton?.addEventListener(
     "click",
     goToPreviousStep
 );
+getElement(".builder-header .builder-back-link")
+    ?.addEventListener("click", (event) => {
+        if (builderState.currentStep > 1) {
+            event.preventDefault();
+            showStep(1);
+        }
+    });
 
 getElements(".progress-step").forEach(
     (button) => {

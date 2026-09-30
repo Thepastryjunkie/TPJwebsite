@@ -120,8 +120,7 @@ fieldset {
     display: none !important;
 }
 /* Keep Step 1 notice space reserved while the notices are hidden */
-#builderStep1 #guestRecommendation.is-hidden,
-#builderStep1 #rushOrderNotice.is-hidden {
+#builderStep1 #guestRecommendation.is-hidden {
     display: block !important;
     visibility: hidden;
     pointer-events: none;
@@ -8304,9 +8303,9 @@ background-image:
     align-content: space-between;
 
     row-gap: clamp(
-        18px,
-        2.2vh,
-        28px
+        24px,
+        3vh,
+        36px
     );
 
     /*
@@ -8589,7 +8588,8 @@ background-image:
     width: fit-content;
     max-width: 600px;
     margin: 0;
-    padding: 8px 12px 8px 26px;
+    font-weight: 700;
+    padding: 8px 12px;
     position: relative;
 
     border: 0 !important;
@@ -8605,19 +8605,7 @@ background-image:
 
 
 #builderStep1 #rushOrderNotice::before {
-    content: "";
-
-    position: absolute;
-
-    left: 12;
-    top: 13px;
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: var(--signature-pink);
+    content: none;
 }
 
 
@@ -8634,7 +8622,7 @@ background-image:
 
 #builderStep1 #rushOrderNotice p {
     display: inline;
-
+font-weight: 700;
     margin: 0;
 }
 
@@ -12011,9 +11999,9 @@ background-position:
 .cake-builder-app:not(:has(#builderStep1.is-active))
 .builder-header .builder-back-link,
 
-.cake-builder-app:not(:has(#builderStep1.is-active))
+.cake-builder-app
 .builder-header .header-summary-button {
-    background: rgba(255, 241, 231, 0.58) !important;
+   background: rgba(255, 241, 231, 0.30) !important;
 
     border: 0 !important;
     border-radius: 4px !important;
@@ -12050,7 +12038,7 @@ background-position:
 
 /* PRICE */
 
-.cake-builder-app:not(:has(#builderStep1.is-active))
+.cake-builder-app
 .builder-header .header-summary-button strong {
     color: #D51B73 !important;
     font-weight: 800;
