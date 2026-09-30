@@ -7453,36 +7453,6 @@ margin-left: 0 !important;
     }
 
 
-    /* Quiet color field behind the entire preview side */
-
-    .cake-builder-app:not(:has(#builderStep1.is-active))
-    .cake-preview-column::before {
-        content: "";
-
-        position: absolute;
-
-        top: -32px;
-        bottom: -34px;
-        left: -75px;
-        right: -14px;
-
-        z-index: -1;
-        pointer-events: none;
-
-        background:
-            linear-gradient(
-                to right,
-
-                rgba(255, 249, 244, 0.52) 0%,
-
-                rgba(255, 246, 240, 0.42) 42%,
-
-                rgba(255, 239, 233, 0.22) 70%,
-
-                transparent 100%
-            );
-    }
-
 
     /* Very faint dividing thread between preview and choices */
 

@@ -19580,59 +19580,20 @@ const blocks = main.querySelectorAll(
 
             function placeClearWord(text, width, fontSize, candidates) {
                 const el = word(scene, text, width, fontSize);
-                const height = el.getBoundingClientRect().height;
+                const [x, y] = candidates[0];
 
-                const spot = candidates.find(([x, y]) => {
-                    const area = rect(x, y, width, height);
-
-                    return x >= 8 &&
-                        y >= 8 &&
-                        x + width <= bounds.width - 8 &&
-                        y + height <= bounds.height - 8 &&
-                        !occupied.some(item => overlap(area, item, 12));
-                });
-
-                if (!spot) {
-                    el.remove();
-                    return;
-                }
-
-                put(el, ...spot);
+                put(el, x, y);
 
                 occupied.push(
-                    rect(spot[0], spot[1], width, height)
+                    rect(
+                        x,
+                        y,
+                        width,
+                        el.getBoundingClientRect().height
+                    )
                 );
             }
 
-            /* Upper gap beside the preview heading. */
-            if (headingBox) {
-                placeClearWord(
-                    'Good Things Come\nin Cake! ♡',
-                    150,
-                    25,
-                    [
-                        [formBox.x - 170, headingBox.y + 8],
-                        [formBox.x - 170, headingBox.y - 65]
-                    ]
-                );
-            }
-
-            /* Empty space below the preview's small disclaimer. */
-            if (noteBox) {
-                const x =
-                    previewBox.x + (previewBox.width - 220) / 2;
-
-                placeClearWord(
-                    "There's a Piece of Love\nin Every Crumb. ♡",
-                    220,
-                    23,
-                    [
-                        [x, noteBox.y + noteBox.height + 24],
-                        [x, noteBox.y + noteBox.height + 84],
-                        [x, noteBox.y + noteBox.height + 144]
-                    ]
-                );
-            }
 
             function besideHeading(anchor, text) {
                 if (!anchor) return;
@@ -19751,7 +19712,6 @@ for (
     const resize = new ResizeObserver(schedule);
     [inner, header, preview, ...steps.filter(Boolean)].forEach(el => resize.observe(el));
     window.addEventListener('resize', schedule, {passive: true});
-    window.addEventListener('scroll', schedule, {passive: true});
     main.addEventListener('load', schedule, true);
     if (document.fonts) document.fonts.ready.then(schedule);
     schedule();
