@@ -19562,183 +19562,105 @@ const blocks = main.querySelectorAll(
         const heading = active.querySelector('.step-heading');
         const legends = [...active.querySelectorAll('legend')].filter(visible);
         const find = re => legends.find(el => re.test(el.textContent.trim()));
-        /* =========================================
-   STEP 2 HANDWRITING
-   Manual placement for the desktop layout
-========================================= */
+        /* STEP 2 HANDWRITING — place only in clear gaps */
+        if (step === 2 && window.innerWidth >= 1180) {
+            const formBox = box(active, origin);
+            const previewBox = box(preview, origin);
+            const headingBox = heading ? box(heading, origin) : null;
 
-if (
-    step === 2 &&
-    window.innerWidth >= 1180
-) {
+            const note = preview.querySelector('.preview-note');
+            const noteBox = visible(note) ? box(note, origin) : null;
 
-    const formBox =
-        box(
-            active,
-            origin
-        );
+            /* Reserve the existing Make It Yours area. */
+            previewArt.querySelectorAll('.tpj-ref-word').forEach(el => {
+                if (visible(el)) {
+                    occupied.push(box(el, origin));
+                }
+            });
 
-    const headingBox =
-        heading
-            ? box(
-                heading,
-                origin
-            )
-            : null;
+            function placeClearWord(text, width, fontSize, candidates) {
+                const el = word(scene, text, width, fontSize);
+                const height = el.getBoundingClientRect().height;
 
-    const coverageLegend =
-        find(/Coverage/i);
+                const spot = candidates.find(([x, y]) => {
+                    const area = rect(x, y, width, height);
 
-    const sizeLegend =
-        find(
-            /Cake Size|Round Cake Size/i
-        );
+                    return x >= 8 &&
+                        y >= 8 &&
+                        x + width <= bounds.width - 8 &&
+                        y + height <= bounds.height - 8 &&
+                        !occupied.some(item => overlap(area, item, 12));
+                });
 
+                if (!spot) {
+                    el.remove();
+                    return;
+                }
 
-    function placeStep2Word(
-        text,
-        x,
-        y,
-        width = 150,
-        fontSize = 24
-    ) {
+                put(el, ...spot);
 
-        const el =
-            word(
-                scene,
-                text,
-                width,
-                fontSize
+                occupied.push(
+                    rect(spot[0], spot[1], width, height)
+                );
+            }
+
+            /* Upper gap beside the preview heading. */
+            if (headingBox) {
+                placeClearWord(
+                    'Good Things Come\nin Cake! ♡',
+                    150,
+                    25,
+                    [
+                        [formBox.x - 170, headingBox.y + 8],
+                        [formBox.x - 170, headingBox.y - 65]
+                    ]
+                );
+            }
+
+            /* Empty space below the preview's small disclaimer. */
+            if (noteBox) {
+                const x =
+                    previewBox.x + (previewBox.width - 220) / 2;
+
+                placeClearWord(
+                    "There's a Piece of Love\nin Every Crumb. ♡",
+                    220,
+                    23,
+                    [
+                        [x, noteBox.y + noteBox.height + 24],
+                        [x, noteBox.y + noteBox.height + 84],
+                        [x, noteBox.y + noteBox.height + 144]
+                    ]
+                );
+            }
+
+            function besideHeading(anchor, text) {
+                if (!anchor) return;
+
+                const a = box(anchor, origin);
+
+                placeClearWord(
+                    text,
+                    145,
+                    24,
+                    [
+                        [formBox.x + formBox.width - 160, a.y],
+                        [formBox.x - 165, a.y],
+                        [formBox.x - 165, a.y + 70]
+                    ]
+                );
+            }
+
+            besideHeading(
+                find(/Coverage/i),
+                'How will it\nlook? ♡'
             );
 
-        const height =
-            el
-                .getBoundingClientRect()
-                .height;
-
-        const safeX =
-            Math.max(
-                8,
-                Math.min(
-                    x,
-                    bounds.width -
-                    width -
-                    8
-                )
+            besideHeading(
+                find(/Cake Size|Round Cake Size/i),
+                'Size It\nyour way! ♡'
             );
-
-        const safeY =
-            Math.max(
-                8,
-                Math.min(
-                    y,
-                    bounds.height -
-                    height -
-                    8
-                )
-            );
-
-        put(
-            el,
-            safeX,
-            safeY
-        );
-
-        occupied.push(
-            rect(
-                safeX,
-                safeY,
-                width,
-                height
-            )
-        );
-    }
-
-
-    /* GOOD THINGS COME IN CAKE
-       Moved inward where your arrow showed */
-
-    if (headingBox) {
-        placeStep2Word(
-            'Good Things Come\nin Cake! ♡',
-
-            formBox.x - 170,
-
-            headingBox.y + 68,
-
-            150,
-            25
-        );
-    }
-
-
-    /* Additional wording for the open space */
-
-    if (headingBox) {
-        placeStep2Word(
-            "There's a Piece of Love\nin Every Crumb. ♡",
-
-            formBox.x - 185,
-
-            headingBox.y + 170,
-
-            170,
-            21
-        );
-    }
-
-
-    /* HOW WILL IT LOOK
-       Pulled farther LEFT from the frosting edge */
-
-    if (coverageLegend) {
-
-        const coverageBox =
-            box(
-                coverageLegend,
-                origin
-            );
-
-        placeStep2Word(
-            'How will it\nlook? ♡',
-
-            formBox.x +
-            formBox.width -
-            215,
-
-            coverageBox.y - 6,
-
-            145,
-            24
-        );
-    }
-
-
-    /* SIZE IT YOUR WAY
-       Also pulled LEFT */
-
-    if (sizeLegend) {
-
-        const sizeBox =
-            box(
-                sizeLegend,
-                origin
-            );
-
-        placeStep2Word(
-            'Size It\nyour way! ♡',
-
-            formBox.x +
-            formBox.width -
-            215,
-
-            sizeBox.y - 4,
-
-            145,
-            24
-        );
-    }
-}
+        }
         const plans = {
             2: [],
         };
@@ -19829,6 +19751,7 @@ for (
     const resize = new ResizeObserver(schedule);
     [inner, header, preview, ...steps.filter(Boolean)].forEach(el => resize.observe(el));
     window.addEventListener('resize', schedule, {passive: true});
+    window.addEventListener('scroll', schedule, {passive: true});
     main.addEventListener('load', schedule, true);
     if (document.fonts) document.fonts.ready.then(schedule);
     schedule();

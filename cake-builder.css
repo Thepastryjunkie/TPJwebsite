@@ -7438,43 +7438,7 @@ margin-left: 0 !important;
     isolation: isolate;
 }
 
-/* Soft blurred atmosphere BEHIND the content.
-   Does not blur cake, text, products, or controls. */
 
-.cake-builder-app:not(:has(#builderStep1.is-active))
-.builder-main-inner::before {
-    content: "";
-
-    position: absolute;
-    inset: -55px -70px;
-
-    z-index: -1;
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            ellipse at 47% 16%,
-            rgba(255, 252, 248, 0.64) 0%,
-            rgba(255, 252, 248, 0.26) 18%,
-            transparent 36%
-        ),
-
-        radial-gradient(
-            ellipse at 82% 39%,
-            rgba(214, 105, 151, 0.13) 0%,
-            transparent 31%
-        ),
-
-        radial-gradient(
-            ellipse at 59% 72%,
-            rgba(255, 244, 237, 0.54) 0%,
-            transparent 34%
-        );
-
-    filter: blur(34px);
-
-    opacity: 0.92;
-}
 /* =========================================
    LEFT PREVIEW ZONE SEPARATION
    No box. No drop shadow.
