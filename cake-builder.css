@@ -7484,35 +7484,90 @@ background-image:
     background-position: right top;
 }
 /* =========================================
-   CONTINUOUS BUTTERCREAM SIDE TEXTURE
+   FEATHERED BUTTERCREAM SIDE TEXTURE
    Steps 2–8 only
 ========================================= */
 
-.cake-builder-app:not(:has(#builderStep1.is-active))
-.builder-main {
-    background-image:
-        url("images/cake-builder/tpj-buttercream-middle-left.png"),
-        url("images/cake-builder/tpj-buttercream-middle-right.png");
+.tpj-buttercream-feather {
+    position: absolute;
+    top: 0;
+    bottom: 0;
 
-    background-position:
-        left top,
-        right top;
+    width: 190px;
 
-    background-repeat:
-        repeat-y,
-        repeat-y;
+    z-index: -1;
+    pointer-events: none;
 
-background-size:
-    190px auto,
-    190px auto;
+    background-repeat: repeat-y;
+    background-size: 190px auto;
+    opacity: 1;
 }
 
+/* LEFT: KEEP OUTER FROSTING SHARP,
+   FADE INNER EDGE INTO THE PAGE */
+
+.tpj-buttercream-feather-left {
+    left: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-middle-left.png");
+
+    background-position: left top;
+
+    -webkit-mask-image: linear-gradient(
+        to right,
+        black 0%,
+        black 82%,
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to right,
+        black 0%,
+        black 82%,
+        transparent 100%
+    );
+}
+
+/* RIGHT: KEEP OUTER FROSTING SHARP,
+   FADE INNER EDGE INTO THE PAGE */
+
+.tpj-buttercream-feather-right {
+    right: 0;
+
+    background-image:
+        url("images/cake-builder/tpj-buttercream-middle-right.png");
+
+    background-position: right top;
+
+    -webkit-mask-image: linear-gradient(
+        to left,
+        black 0%,
+        black 82%,
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to left,
+        black 0%,
+        black 82%,
+        transparent 100%
+    );
+}
+
+/* NO FROSTING ON BASICS */
+
+.cake-builder-app:has(#builderStep1.is-active)
+.tpj-buttercream-feather {
+    display: none;
+}
+
+/* MOBILE */
+
 @media (max-width: 720px) {
-    .cake-builder-app:not(:has(#builderStep1.is-active))
-    .builder-main {
-        background-size:
-            40px auto,
-            40px auto;
+    .tpj-buttercream-feather {
+        width: 40px;
+        background-size: 40px auto;
     }
 }
 
@@ -7591,26 +7646,92 @@ background-size:
    Steps 2–8 only
 ========================================= */
 
-/* TOP HEADER: warm cream center, visible drip corners */
+/* =========================================
+   CHOCOLATE HEADER WITH VISIBLE DRIP CORNERS
+   Steps 2–8 only
+========================================= */
 
 .cake-builder-app:not(:has(#builderStep1.is-active))
 .builder-header {
-    background: linear-gradient(
-        to right,
-        rgba(255, 235, 228, 0.08) 0%,
-        rgba(255, 235, 228, 0.65) 11%,
-        rgba(255, 238, 231, 0.94) 21%,
-        rgba(255, 238, 231, 0.94) 79%,
-        rgba(255, 235, 228, 0.65) 89%,
-        rgba(255, 235, 228, 0.08) 100%
-    );
-
-    border-bottom: 1px solid rgba(90, 42, 30, 0.12);
-
-    box-shadow:
-        0 5px 18px rgba(119, 46, 70, 0.07);
-
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
     backdrop-filter: none;
+}
+
+/* SOFT BUTTERCREAM SPOTLIGHT BEHIND LOGO */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-logo-link {
+    position: relative;
+    isolation: isolate;
+}
+
+
+/* =========================================
+   WORDMARK SWITCH
+   Original: Step 1
+   Light: Steps 2–8
+========================================= */
+
+/* Hide light wordmark by default */
+.builder-header .builder-header-logo--light {
+    display: none;
+}
+
+/* Hide original on Steps 2–8 */
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-header-logo--original {
+    display: none;
+}
+
+/* Show light wordmark on Steps 2–8 */
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-header-logo--light {
+    display: block;
+    position: relative;
+    z-index: 1;
+    filter: none;
+}
+
+/* BRIGHTEN HANDWRITTEN HEADER SLOGANS ONLY */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .tpj-ref-word {
+    color: #f5b0df;
+}
+
+/* MAKE HEADER ACTIONS LEGIBLE */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link,
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button,
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button span {
+    color: #FFF1E7;
+
+    text-shadow:
+        0 1px 4px rgba(45, 15, 10, 0.75);
+}
+
+/* CAKE PRICE GETS A LITTLE STRAWBERRY CONTRAST */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button strong {
+    color: #FFC0DD;
+
+    text-shadow:
+        0 1px 4px rgba(45, 15, 10, 0.75);
+}
+
+/* HEADER HOVER */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link:hover,
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link:focus-visible {
+    color: #FFC0DD;
 }
 
 
@@ -11770,4 +11891,336 @@ background-position:
         top: 42px;
         transform: rotate(16deg);
     }
+}
+/* ==========================================================
+   TPJ FINAL CONTRAST POLISH
+   Steps 2–8
+========================================================== */
+
+
+/* ----------------------------------------------------------
+   1. HANDWRITTEN HEADER WORDS
+   Match "Make It Yours!"
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .tpj-ref-word {
+    color: #D51B73 !important;
+}
+
+
+/* ----------------------------------------------------------
+   2. HOME + YOUR CAKE TOTAL
+   Small translucent contrast tags over busy frosting/drips
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button {
+    background: rgba(255, 241, 231, 0.72) !important;
+
+    border: 1px solid rgba(77, 31, 22, 0.14) !important;
+    border-radius: 999px;
+
+    box-shadow:
+        0 3px 10px rgba(77, 31, 22, 0.12);
+
+    backdrop-filter: blur(7px);
+
+    color: #4D1F16 !important;
+}
+
+
+/* HOME text + arrow */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link,
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link span {
+    color: #4D1F16 !important;
+
+    text-shadow: none !important;
+}
+
+
+/* YOUR CAKE label */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button span {
+    color: #4D1F16 !important;
+
+    text-shadow: none !important;
+}
+
+
+/* TOTAL PRICE */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button strong {
+    color: #D51B73 !important;
+
+    text-shadow: none !important;
+
+    font-weight: 800;
+}
+
+
+/* ----------------------------------------------------------
+   3. CURRENT STEP
+   Remove the big pink block.
+   Chocolate number + raspberry underline instead.
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.progress-step.is-active {
+    background: rgba(255, 255, 255, 0.16) !important;
+
+    color: #4D1F16 !important;
+
+    box-shadow:
+        inset 0 -3px 0 #D51B73 !important;
+}
+
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.progress-step.is-active span {
+    background: #4D1F16 !important;
+
+    border-color: #4D1F16 !important;
+
+    color: #FFF1E7 !important;
+}
+
+
+/* ==========================================================
+   TPJ FINAL CONTRAST POLISH
+   Steps 2–8 only
+========================================================== */
+
+
+/* ----------------------------------------------------------
+   HEADER HANDWRITING
+   Match "Make It Yours!"
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .tpj-ref-word {
+    color: #D51B73 !important;
+}
+
+
+/* ----------------------------------------------------------
+   HOME + YOUR CAKE
+   Soft square-ish backing, edges barely visible
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button {
+    background: rgba(255, 241, 231, 0.58) !important;
+
+    border: 0 !important;
+    border-radius: 4px !important;
+
+    box-shadow:
+        0 3px 12px rgba(77, 31, 22, 0.08) !important;
+
+    backdrop-filter: blur(6px);
+
+    padding: 9px 14px;
+}
+
+
+/* HOME */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link span {
+    color: #4D1F16 !important;
+    text-shadow: none !important;
+}
+
+
+/* YOUR CAKE */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button span {
+    color: #4D1F16 !important;
+    text-shadow: none !important;
+}
+
+
+/* PRICE */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button strong {
+    color: #D51B73 !important;
+    font-weight: 800;
+    text-shadow: none !important;
+}
+
+
+/* Any hover underline on header actions = BROWN */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link:hover,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .builder-back-link:focus-visible,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button:hover,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-header .header-summary-button:focus-visible {
+    color: #4D1F16 !important;
+    text-decoration-color: #4D1F16 !important;
+}
+
+
+/* ----------------------------------------------------------
+   ACTIVE PAGE IN PROGRESS BAR
+   Small soft square area, raspberry number
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.progress-step.is-active {
+    background: rgba(255, 241, 231, 0.42) !important;
+
+    border-radius: 4px !important;
+
+    color: #4D1F16 !important;
+
+    box-shadow: none !important;
+}
+
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.progress-step.is-active span {
+    background: #D51B73 !important;
+    border-color: #D51B73 !important;
+
+    color: #FFFFFF !important;
+}
+
+
+/* ----------------------------------------------------------
+   PREVIOUS + CONTINUE
+   No boxes. Pull both into the clear content zone.
+---------------------------------------------------------- */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation {
+    padding-left: clamp(20px, 3vw, 50px);
+    padding-right: clamp(90px, 8vw, 150px);
+}
+
+
+/* PREVIOUS */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button {
+    background: transparent !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    color: #4D1F16 !important;
+
+    box-shadow: none !important;
+
+    text-decoration: none !important;
+}
+
+
+/* Previous arrow */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button::before {
+    color: #4D1F16 !important;
+
+    font-weight: 500;
+}
+
+
+/* CONTINUE */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button {
+    margin-left: auto;
+
+    background: transparent !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    color: #4D1F16 !important;
+
+    box-shadow: none !important;
+
+    text-decoration: none !important;
+}
+
+
+/* Continue arrow */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button::after {
+    color: #4D1F16 !important;
+
+    font-weight: 500;
+}
+
+
+/* Hover both */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button:hover,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button:focus-visible,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button:hover,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button:focus-visible {
+    color: #D51B73 !important;
+
+    background: transparent !important;
+}
+
+
+/* Hover arrows */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button:hover::before,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.previous-button:focus-visible::before,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button:hover::after,
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-step-navigation
+.continue-button:focus-visible::after {
+    color: #D51B73 !important;
 }
