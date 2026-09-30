@@ -19627,7 +19627,7 @@ besideHeading(
             besideHeading(
                 find(/Cake Size|Round Cake Size/i),
                 'Size It\nyour way! ♡',
-                75
+                50
             );
         }
         const plans = {
