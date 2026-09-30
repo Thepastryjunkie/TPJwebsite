@@ -12228,3 +12228,13 @@ background-position:
         width: calc(100% - 60px);
     }
 }
+/* Let the main builder fill the page on Steps 2–8 */
+.cake-builder-app:not(:has(#builderStep1.is-active)) {
+    display: flex;
+    flex-direction: column;
+}
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+> .builder-main {
+    flex: 1;
+}
