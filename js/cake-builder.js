@@ -11729,8 +11729,7 @@ function updateCakeBoardControls() {
 
         } else {
 
-            boardNotice.textContent =
-                "Choose a round, square, or rectangle board.";
+boardNotice.textContent = "";
         }
     }
 }
@@ -19615,12 +19614,13 @@ const blocks = main.querySelectorAll(
 besideHeading(
     find(/Coverage/i),
     'How will it\nlook? ♡',
-    85
+    160
 );
 
             besideHeading(
                 find(/Cake Size|Round Cake Size/i),
-                'Size It\nyour way! ♡'
+                'Size It\nyour way! ♡',
+                100
             );
         }
         const plans = {
