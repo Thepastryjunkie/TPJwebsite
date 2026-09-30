@@ -19446,22 +19446,80 @@ copy.append(name);
             put(el, left + (right - left - width) / 2, (origin.height - height) / 2);
         });
     }
-    function previewWords() {
-        const stage = preview.querySelector('.cake-renderer-stage');
-        if (!visible(preview) || !visible(stage)) return;
-        const origin = preview.getBoundingClientRect();
-        const s = box(stage, origin);
-        const rightSpace = origin.width - s.x - s.width - 12;
-        const leftSpace = s.x - 12;
-        const useRight = rightSpace >= leftSpace;
-        const available = useRight ? rightSpace : leftSpace;
-        if (available < 56) return;
-        const width = Math.min(124, available);
-        const el = word(previewArt, 'Make\nIt Yours!\n♡', width, width < 85 ? 21 : 28);
-        const height = el.getBoundingClientRect().height;
-        if (height > s.height - 12) { el.remove(); return; }
-        put(el, useRight ? s.x + s.width + 4 : 6, s.y + 8);
+function previewWords() {
+    const stage =
+        preview.querySelector(
+            '.cake-renderer-stage'
+        );
+
+    if (
+        !visible(preview) ||
+        !visible(stage)
+    ) {
+        return;
     }
+
+    const origin =
+        preview.getBoundingClientRect();
+
+    const s =
+        box(stage, origin);
+
+    /*
+        Force "Make It Yours!" toward the clean
+        RIGHT side of the preview instead of
+        allowing the script to choose the frosting side.
+    */
+
+    const width =
+        Math.min(
+            138,
+            Math.max(
+                112,
+                origin.width * 0.20
+            )
+        );
+
+    const el =
+        word(
+            previewArt,
+            'Make\nIt Yours!\n♡',
+            width,
+            27
+        );
+
+    const height =
+        el.getBoundingClientRect()
+            .height;
+
+    const x =
+        Math.max(
+            12,
+            origin.width -
+            width -
+            18
+        );
+
+    const y =
+        Math.max(
+            18,
+            s.y + 10
+        );
+
+    if (
+        y + height >
+        origin.height - 8
+    ) {
+        el.remove();
+        return;
+    }
+
+    put(
+        el,
+        x,
+        y
+    );
+}
     function textBoxes(el, origin) {
         const range = document.createRange();
         range.selectNodeContents(el);
@@ -19504,22 +19562,185 @@ const blocks = main.querySelectorAll(
         const heading = active.querySelector('.step-heading');
         const legends = [...active.querySelectorAll('legend')].filter(visible);
         const find = re => legends.find(el => re.test(el.textContent.trim()));
+        /* =========================================
+   STEP 2 HANDWRITING
+   Manual placement for the desktop layout
+========================================= */
+
+if (
+    step === 2 &&
+    window.innerWidth >= 1180
+) {
+
+    const formBox =
+        box(
+            active,
+            origin
+        );
+
+    const headingBox =
+        heading
+            ? box(
+                heading,
+                origin
+            )
+            : null;
+
+    const coverageLegend =
+        find(/Coverage/i);
+
+    const sizeLegend =
+        find(
+            /Cake Size|Round Cake Size/i
+        );
+
+
+    function placeStep2Word(
+        text,
+        x,
+        y,
+        width = 150,
+        fontSize = 24
+    ) {
+
+        const el =
+            word(
+                scene,
+                text,
+                width,
+                fontSize
+            );
+
+        const height =
+            el
+                .getBoundingClientRect()
+                .height;
+
+        const safeX =
+            Math.max(
+                8,
+                Math.min(
+                    x,
+                    bounds.width -
+                    width -
+                    8
+                )
+            );
+
+        const safeY =
+            Math.max(
+                8,
+                Math.min(
+                    y,
+                    bounds.height -
+                    height -
+                    8
+                )
+            );
+
+        put(
+            el,
+            safeX,
+            safeY
+        );
+
+        occupied.push(
+            rect(
+                safeX,
+                safeY,
+                width,
+                height
+            )
+        );
+    }
+
+
+    /* GOOD THINGS COME IN CAKE
+       Moved inward where your arrow showed */
+
+    if (headingBox) {
+        placeStep2Word(
+            'Good Things Come\nin Cake! ♡',
+
+            formBox.x - 170,
+
+            headingBox.y + 68,
+
+            150,
+            25
+        );
+    }
+
+
+    /* Additional wording for the open space */
+
+    if (headingBox) {
+        placeStep2Word(
+            "There's a Piece of Love\nin Every Crumb. ♡",
+
+            formBox.x - 185,
+
+            headingBox.y + 170,
+
+            170,
+            21
+        );
+    }
+
+
+    /* HOW WILL IT LOOK
+       Pulled farther LEFT from the frosting edge */
+
+    if (coverageLegend) {
+
+        const coverageBox =
+            box(
+                coverageLegend,
+                origin
+            );
+
+        placeStep2Word(
+            'How will it\nlook? ♡',
+
+            formBox.x +
+            formBox.width -
+            215,
+
+            coverageBox.y - 6,
+
+            145,
+            24
+        );
+    }
+
+
+    /* SIZE IT YOUR WAY
+       Also pulled LEFT */
+
+    if (sizeLegend) {
+
+        const sizeBox =
+            box(
+                sizeLegend,
+                origin
+            );
+
+        placeStep2Word(
+            'Size It\nyour way! ♡',
+
+            formBox.x +
+            formBox.width -
+            215,
+
+            sizeBox.y - 4,
+
+            145,
+            24
+        );
+    }
+}
         const plans = {
-            2: [[heading, 'Good Things Come\nin Cake! ♡'],
-                [find(/^Shape$/i), "What's your shape? ♡"],
-                [find(/Cake Size|Round Cake Size/i), 'Size\nIt your way! ♡'],
-                [find(/Coverage/i), 'How will it look? ♡']],
-            3: [[heading, 'Cake Dreams\nStart Here! ♡'],
-                [find(/^Cake Flavor$/i), 'So Many\nYummy Options! ♡'],
-                [find(/^Filling$/i), 'Filling =\nHappiness ♡'],
-                [find(/^Coating$/i), 'Finishing Touches\nMake It Magical! ♡']],
-            4: [[heading, 'Make It\nYours! ♡'],
-                [find(/Coating Border/i), 'Little Details.\nBig Happiness! ♡'],
-                [find(/Cake Details/i), 'Sprinkles Make\nEverything Happier! ♡']],
-            5: [[heading, 'Good Things Taste\nBetter Together! ♡'],
-                [find(/Cupcake Look/i), 'Cupcakes Make\nEverything Happier! ♡'],
-                [find(/Chocolate-Covered Treats/i), 'Little Details.\nBig Happiness! ♡'],
-                [find(/Dessert Jars/i), 'Happiness Comes\nin Layers! ♡']]
+            2: [],
         };
         for (const [anchor, text] of plans[step] || []) {
             if (!anchor) continue;

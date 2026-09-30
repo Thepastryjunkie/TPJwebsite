@@ -6467,28 +6467,41 @@ body {
             var(--tpj-blush-pink) 100%
         );
 }
-/* FROSTING-MATCHED BACKGROUND — STEPS 2–8 */
+/* =========================================
+   FROSTING-MATCHED BACKGROUND
+   Steps 2-8
+   Softer depth, no cake-specific pink halo
+========================================= */
 
 .cake-builder-app:has(
     .builder-step.is-active:not(#builderStep1)
 ) {
     background:
         radial-gradient(
-            ellipse at 5% 18%,
-            rgba(252, 187, 173, 0.30),
-            transparent 38%
-        ),
-
-        radial-gradient(
-            ellipse at 88% 28%,
-            rgba(255, 238, 230, 0.65),
+            ellipse at 40% 11%,
+            rgba(255, 249, 244, 0.62) 0%,
+            rgba(255, 249, 244, 0.25) 20%,
             transparent 42%
         ),
 
         radial-gradient(
-            ellipse at 55% 78%,
-            rgba(253, 177, 208, 0.20),
-            transparent 45%
+            ellipse at 79% 34%,
+            rgba(230, 139, 173, 0.16) 0%,
+            rgba(230, 139, 173, 0.07) 22%,
+            transparent 43%
+        ),
+
+        radial-gradient(
+            ellipse at 58% 72%,
+            rgba(255, 239, 231, 0.52) 0%,
+            rgba(255, 239, 231, 0.18) 25%,
+            transparent 46%
+        ),
+
+        radial-gradient(
+            ellipse at 28% 88%,
+            rgba(217, 116, 157, 0.10) 0%,
+            transparent 38%
         ),
 
         linear-gradient(
@@ -7414,9 +7427,134 @@ margin-left: 0 !important;
     }
 }
 /* TPJ reference decoration. No renderer sizing or grid-column changes. */
-.builder-main { position: relative; isolation: isolate; }
-.builder-main-inner { position: relative; z-index: 1; }
+.builder-main {
+    position: relative;
+    isolation: isolate;
+}
 
+.builder-main-inner {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+}
+
+/* Soft blurred atmosphere BEHIND the content.
+   Does not blur cake, text, products, or controls. */
+
+.cake-builder-app:not(:has(#builderStep1.is-active))
+.builder-main-inner::before {
+    content: "";
+
+    position: absolute;
+    inset: -55px -70px;
+
+    z-index: -1;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 47% 16%,
+            rgba(255, 252, 248, 0.64) 0%,
+            rgba(255, 252, 248, 0.26) 18%,
+            transparent 36%
+        ),
+
+        radial-gradient(
+            ellipse at 82% 39%,
+            rgba(214, 105, 151, 0.13) 0%,
+            transparent 31%
+        ),
+
+        radial-gradient(
+            ellipse at 59% 72%,
+            rgba(255, 244, 237, 0.54) 0%,
+            transparent 34%
+        );
+
+    filter: blur(34px);
+
+    opacity: 0.92;
+}
+/* =========================================
+   LEFT PREVIEW ZONE SEPARATION
+   No box. No drop shadow.
+========================================= */
+
+@media (min-width: 981px) {
+
+    .cake-builder-app:not(:has(#builderStep1.is-active))
+    .cake-preview-column {
+        position: relative;
+        isolation: isolate;
+    }
+
+
+    /* Quiet color field behind the entire preview side */
+
+    .cake-builder-app:not(:has(#builderStep1.is-active))
+    .cake-preview-column::before {
+        content: "";
+
+        position: absolute;
+
+        top: -32px;
+        bottom: -34px;
+        left: -75px;
+        right: -14px;
+
+        z-index: -1;
+        pointer-events: none;
+
+        background:
+            linear-gradient(
+                to right,
+
+                rgba(255, 249, 244, 0.52) 0%,
+
+                rgba(255, 246, 240, 0.42) 42%,
+
+                rgba(255, 239, 233, 0.22) 70%,
+
+                transparent 100%
+            );
+    }
+
+
+    /* Very faint dividing thread between preview and choices */
+
+    .cake-builder-app:not(:has(#builderStep1.is-active))
+    .cake-preview-column::after {
+        content: "";
+
+        position: absolute;
+
+        top: 7%;
+        bottom: 7%;
+
+        right: -20px;
+
+        width: 1px;
+
+        pointer-events: none;
+
+        background:
+            linear-gradient(
+                to bottom,
+
+                transparent 0%,
+
+                rgba(77, 31, 22, 0.07) 13%,
+
+                rgba(77, 31, 22, 0.14) 40%,
+
+                rgba(77, 31, 22, 0.14) 60%,
+
+                rgba(77, 31, 22, 0.07) 87%,
+
+                transparent 100%
+            );
+    }
+}
 /* =========================================
    TPJ BUTTERCREAM CORNER FRAME
    Steps 2–8 only
@@ -7514,17 +7652,31 @@ background-image:
 
     background-position: left top;
 
-    -webkit-mask-image: linear-gradient(
+-webkit-mask-image:
+    linear-gradient(
         to right,
+
         black 0%,
-        black 82%,
+        black 68%,
+
+        rgba(0, 0, 0, 0.92) 76%,
+
+        rgba(0, 0, 0, 0.52) 90%,
+
         transparent 100%
     );
 
-    mask-image: linear-gradient(
+mask-image:
+    linear-gradient(
         to right,
+
         black 0%,
-        black 82%,
+        black 68%,
+
+        rgba(0, 0, 0, 0.92) 76%,
+
+        rgba(0, 0, 0, 0.52) 90%,
+
         transparent 100%
     );
 }
@@ -7540,17 +7692,31 @@ background-image:
 
     background-position: right top;
 
-    -webkit-mask-image: linear-gradient(
+-webkit-mask-image:
+    linear-gradient(
         to left,
+
         black 0%,
-        black 82%,
+        black 68%,
+
+        rgba(0, 0, 0, 0.92) 76%,
+
+        rgba(0, 0, 0, 0.52) 90%,
+
         transparent 100%
     );
 
-    mask-image: linear-gradient(
+mask-image:
+    linear-gradient(
         to left,
+
         black 0%,
-        black 82%,
+        black 68%,
+
+        rgba(0, 0, 0, 0.92) 76%,
+
+        rgba(0, 0, 0, 0.52) 90%,
+
         transparent 100%
     );
 }
@@ -7880,6 +8046,24 @@ background-image:
 
     position: relative;
     z-index: 5;
+}
+/* =========================================
+   PREVIEW COPY
+   Pull away from left frosting edge
+========================================= */
+
+@media (min-width: 981px) {
+
+    .cake-builder-app:not(:has(#builderStep1.is-active))
+    #cakePreviewCard
+    .preview-heading-row > div:first-child {
+
+        margin-left:
+            clamp(68px, 5vw, 105px);
+
+        max-width:
+            calc(100% - 155px);
+    }
 }
 /* ==========================================================
    TPJ PAGE 2 — CAKE SIZE STRIP
@@ -11502,26 +11686,7 @@ label:has(input:focus-visible) {
 #cakePreviewCard .cake-renderer-stage {
     position: relative;
 }
-/* PINK GLOW BEHIND THE CAKE ONLY */
 
-#cakePreviewCard .cake-renderer-stage::before {
-    content: "";
-    position: absolute;
-
-    inset: 10% 3%;
-    z-index: 0;
-    pointer-events: none;
-
-    background: radial-gradient(
-        ellipse 58% 55% at 50% 45%,
-        rgba(255, 95, 176, 0.95) 0%,
-        rgba(224, 69, 137, 0.83) 20%,
-        rgba(135, 42, 83, 0.57) 44%,
-        transparent 78%
-    );
-
-    filter: blur(25px);
-}
 #cakePreviewCard .cake-renderer-stage > #resetCakeBuilder {
     position: absolute;
     top: 8px;
@@ -11529,11 +11694,7 @@ label:has(input:focus-visible) {
     z-index: 10;
     margin: 0;
 }
-#cakePreviewCard #realisticCakeRenderer {
-    filter:
-        drop-shadow(0 0 30px rgba(255, 63, 159, 0.65))
-        drop-shadow(0 0 38px rgba(255, 63, 159, 0.42));
-}
+
 
 /* A failed PNG still leaves a usable color choice. */
 
