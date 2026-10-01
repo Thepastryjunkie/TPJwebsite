@@ -9846,35 +9846,39 @@ const cupcakeStudio =
     }
 updateCupcakeAddOnStudioAvailability();
 
-    setText(
-        "#step3Eyebrow",
-        isCupcakesOnly ? "Inside The Cupcake" : "Inside The Cake"
-    );
-    setText(
-        "#step3Title",
-        isCupcakesOnly ? "Choose Your Cupcake Flavor." : "What Are You Craving?"
-    );
-    setText(
-        "#step3Description",
-        isCupcakesOnly
-            ? "Choose one flavor for the selected cupcake set."
-            : "Choose a favorite or describe the flavor combination you already have in mind."
-    );
-    setText(
-        "#flavorLegend",
-        isCupcakesOnly ? "Cupcake Flavor" : "Cake Flavor"
-    );
+setText(
+    "#step3Eyebrow",
+    isCupcakesOnly ? "Inside The Cupcake" : "BUILD THE BITE"
+);
 
-    setText(
-        "#step4Eyebrow",
-        isCupcakesOnly ? "Decorate The Cupcakes" : "Outside The Cake"
-    );
-    setText(
-        "#step4Description",
-        isCupcakesOnly
-            ? "Choose the liner, icing style, icing color, and finishing details."
-            : "Choose the color, coating finish, and details that fit the celebration."
-    );
+setText(
+    "#step3Title",
+    isCupcakesOnly ? "Choose Your Cupcake Flavor." : "Let’s Talk Layers."
+);
+
+setText(
+    "#step3Description",
+    isCupcakesOnly
+        ? "Choose one flavor for the selected cupcake set."
+        : "From the cake to the filling, this is where all the good stuff comes together."
+);
+
+setText(
+    "#flavorLegend",
+    isCupcakesOnly ? "Cupcake Flavor" : "Cake Flavor"
+);
+
+setText(
+    "#step4Eyebrow",
+    isCupcakesOnly ? "Decorate The Cupcakes" : "BRING IT TO LIFE"
+);
+
+setText(
+    "#step4Description",
+    isCupcakesOnly
+        ? "Choose the liner, icing style, icing color, and finishing details."
+        : "Pick your colors, choose your finish, and add the details you love."
+);
 
        setText(
         "#cupcakeStudioCaption",
@@ -19376,7 +19380,7 @@ copy.append(name);
     const scene = layer(main, 'tpj-ref-scene');
     const headerArt = layer(header, 'tpj-ref-local');
     const previewArt = layer(preview, 'tpj-ref-local');
-    const steps = [2, 3, 4, 5].map(n => document.getElementById(`builderStep${n}`));
+    const steps = [2, 3, 4, 5, 6, 7, 8].map(n => document.getElementById(`builderStep${n}`));
 
     // Source rectangles measured from the supplied 1254 x 1254 PNG.
     // CSS displays the original pixels; no replacement image is generated.
@@ -19539,8 +19543,10 @@ function previewWords() {
         const active = steps.find(el => el && !el.hidden && visible(el));
         if (!active) return;
         const step = Number(active.dataset.step);
-        headerWords(step);
-        previewWords();
+if (step <= 5) {
+    headerWords(step);
+    previewWords();
+}
         const origin = main.getBoundingClientRect();
         const bounds = {width: main.clientWidth, height: main.clientHeight};
         const occupied = [];
@@ -19555,7 +19561,7 @@ const blocks = main.querySelectorAll(
             if (visible(el)) occupied.push(...textBoxes(el, origin));
         });
         const summary = main.querySelector('.preview-summary');
-        if (visible(summary)) {
+        if (step <= 5 && visible(summary)) {
             const a = box(summary, origin);
             const el = word(scene, 'Sprinkles Make Everything Happier! ♡', 190, 25);
             const height = el.getBoundingClientRect().height;
@@ -19626,13 +19632,63 @@ besideHeading(
 
             besideHeading(
                 find(/Cake Size|Round Cake Size/i),
-                'Size It\nyour way! ♡',
+                'Made to fit\nthe moment ♡',
                 65
             );
         }
-        const plans = {
-            2: [],
-        };
+const plans = {
+    2: [],
+
+    3: [
+        [
+            find(/Cake Flavor|Cupcake Flavor/i),
+            'The best part\nmight be inside ♡'
+        ],
+        [
+            find(/Between the Layers/i),
+            'Layer by\nlayer ♡'
+        ]
+    ],
+
+    4: [
+        [
+            find(/Main Coating Color|Two-Tier Coating Colors|Number \/ Letter Cake Colors/i),
+            'A little color goes\na long way ♡'
+        ],
+        [
+            find(/NOW FOR THE DETAILS/i),
+            'Little touches,\nlots of love ♡'
+        ]
+    ],
+
+    5: [
+        [
+            find(/Gourmet Cupcakes/i),
+            'Good things taste\nbetter together ♡'
+        ]
+    ],
+
+    6: [
+        [
+            heading,
+            'Inspiration can come\nfrom anywhere ♡'
+        ]
+    ],
+
+    7: [
+        [
+            heading,
+            'The details\nmatter ♡'
+        ]
+    ],
+
+    8: [
+        [
+            heading,
+            'Now let’s make\nit real ♡'
+        ]
+    ]
+};
         for (const [anchor, text] of plans[step] || []) {
             if (!anchor) continue;
             const a = box(anchor, origin);
@@ -19724,6 +19780,7 @@ for (
     if (document.fonts) document.fonts.ready.then(schedule);
     schedule();
 })();
+
 /* PAGE 3 + PAGE 4 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
 (() => {
     const selector = [
@@ -19745,10 +19802,7 @@ for (
 
             const origin = grid.getBoundingClientRect();
 
-            const isButtercreamShelf =
-    Boolean(
-        grid.closest("#builderStep3")
-    );
+
             const rows = [];
 
             [...grid.children].forEach(card => {
@@ -19840,30 +19894,18 @@ Object.assign(
 
         top:
             `${Math.min(
-                row.imageBottom -
-                    (
-                        isButtercreamShelf
-                            ? 8
-                            : 10
-                    ),
-
-                row.captionTop -
-                    (
-                        isButtercreamShelf
-                            ? 49
-                            : 19
-                    )
+                row.imageBottom - 10,
+                row.captionTop - 19
             )}px`,
 
         width:
             `${row.right - row.left}px`,
 
         height:
-            isButtercreamShelf
-                ? "52px"
-                : "18px"
+            "18px"
     }
 );
+
 
                     return shelf;
                 })
@@ -19871,12 +19913,12 @@ Object.assign(
         });
     }
 
-    function schedule() {
-        if (pending) return;
+function schedule() {
+    if (pending) return;
 
-        pending = true;
-        requestAnimationFrame(draw);
-    }
+    pending = true;
+    requestAnimationFrame(draw);
+}
 
     function start() {
         const resize = new ResizeObserver(schedule);
@@ -19909,6 +19951,179 @@ Object.assign(
     } else {
         start();
     }
+})();
+/* PAGE 4: continuous right frosting with smooth outward movement */
+(() => {
+    const step = document.querySelector("#builderStep4");
+    const frosting = document.querySelector(
+        ".tpj-buttercream-feather-right"
+    );
+
+    if (!step || !frosting) return;
+
+    const background = getComputedStyle(frosting).backgroundImage;
+    const match = background.match(/^url\(["']?(.*?)["']?\)$/);
+
+    if (!match) return;
+
+    const image = new Image();
+    const canvas = document.createElement("canvas");
+
+    canvas.className = "tpj-right-frosting-canvas";
+    canvas.setAttribute("aria-hidden", "true");
+    frosting.append(canvas);
+
+    /* These are the two adjustable numbers. */
+    const outwardShift = 70;
+    const transitionDistance = 90;
+
+    let pending = false;
+
+    function smooth(value) {
+        const amount = Math.max(0, Math.min(1, value));
+        return amount * amount * (3 - 2 * amount);
+    }
+
+    function draw() {
+        pending = false;
+
+        if (!step.classList.contains("is-active")) {
+            frosting.classList.remove("tpj-continuous-ready");
+            return;
+        }
+
+        if (!image.naturalWidth) return;
+
+        const area = frosting.getBoundingClientRect();
+        const height = area.height;
+
+        if (!height) return;
+
+        const zones = [
+            "#cakeFinishCustomizer .style-choice-grid",
+            "#cakeBorderCustomizer > .text-choice-grid",
+            "#cakeDetailsCustomizer .decoration-choice-grid"
+        ].flatMap(selector => {
+            const grid = step.querySelector(selector);
+
+            if (!grid || !grid.getClientRects().length) return [];
+
+            const box = grid.getBoundingClientRect();
+
+            return [{
+                top: box.top - area.top,
+                bottom: box.bottom - area.top
+            }];
+        });
+
+        const width = 190;
+        const density = Math.min(
+            window.devicePixelRatio || 1,
+            2,
+            32000 / height
+        );
+
+        canvas.width = Math.ceil(width * density);
+        canvas.height = Math.ceil(height * density);
+        canvas.style.height = `${height}px`;
+
+        const context = canvas.getContext("2d");
+        if (!context) return;
+
+        context.setTransform(density, 0, 0, density, 0, 0);
+        context.clearRect(0, 0, width, height);
+
+        const sourceRatio = image.naturalWidth / width;
+        const tileHeight = image.naturalHeight / sourceRatio;
+        const rowHeight = 1 / density;
+
+        for (let row = 0; row < canvas.height; row++) {
+            const y = row / density;
+            const center = y + rowHeight / 2;
+
+            let movement = 0;
+
+            for (const zone of zones) {
+                const entering = smooth(
+                    (center - zone.top + transitionDistance) /
+                    transitionDistance
+                );
+
+                const leaving = smooth(
+                    (zone.bottom + transitionDistance - center) /
+                    transitionDistance
+                );
+
+                movement = Math.max(
+                    movement,
+                    Math.min(entering, leaving)
+                );
+            }
+
+            const x = outwardShift * movement;
+            const sourceY = (y % tileHeight) * sourceRatio;
+            const sourceHeight = rowHeight * sourceRatio;
+
+            const firstPart = Math.min(
+                sourceHeight,
+                image.naturalHeight - sourceY
+            );
+
+            const firstHeight = firstPart / sourceRatio;
+
+            context.drawImage(
+                image,
+                0, sourceY,
+                image.naturalWidth, firstPart,
+                x, y,
+                width, firstHeight
+            );
+
+            /* Continue the same repeat across a tile boundary. */
+            if (firstPart < sourceHeight) {
+                context.drawImage(
+                    image,
+                    0, 0,
+                    image.naturalWidth, sourceHeight - firstPart,
+                    x, y + firstHeight,
+                    width, rowHeight - firstHeight
+                );
+            }
+        }
+
+        frosting.classList.add("tpj-continuous-ready");
+    }
+
+    function schedule() {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(draw);
+    }
+
+    image.addEventListener("load", schedule);
+
+    image.addEventListener("error", () => {
+        frosting.classList.remove("tpj-continuous-ready");
+    });
+
+    image.src = match[1];
+
+    const resize = new ResizeObserver(schedule);
+    resize.observe(frosting);
+    resize.observe(step);
+
+    new MutationObserver(schedule).observe(step, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ["class", "hidden", "open"]
+    });
+
+    window.addEventListener("resize", schedule);
+    document.addEventListener("load", schedule, true);
+    document.fonts?.ready.then(schedule);
+
+    schedule();
 })();
 
 

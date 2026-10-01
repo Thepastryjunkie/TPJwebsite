@@ -6214,102 +6214,16 @@ text-underline-offset: 4px;
 }
 
 /* ==========================================================
-   PAGE 3 — REAL BUTTERCREAM PRODUCT SHELVES
+   PAGE 3 + PAGE 4
+   SHARED PRODUCT SHELVES
+   EXACT SAME SHELF STYLE
 ========================================================== */
 
-#builderStep3 .tpj-row-shelf {
-    position: absolute;
-
-    box-sizing: border-box;
-    overflow: visible;
-
-    border: 0;
-    border-radius: 0;
-
-    background-image:
-        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Middle.png");
-
-background-repeat: repeat-x;
-background-position: center bottom;
-background-size: auto 100%;
-    box-shadow: none;
-
-    filter:
-        drop-shadow(
-            0 7px 7px
-            rgba(90, 42, 30, 0.15)
-        );
-
-    pointer-events: none;
-}
-
-
-/* LEFT + RIGHT REAL PIPED ENDS */
-
-#builderStep3 .tpj-row-shelf::before,
-#builderStep3 .tpj-row-shelf::after {
-    content: "";
-
-    position: absolute;
-
-    bottom: -6px;
-
-    width: 82px;
-    height: 62px;
-
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center bottom;
-
-    pointer-events: none;
-}
-
-
-/* LEFT ROSETTE */
-
-#builderStep3 .tpj-row-shelf::before {
-    left: -34px;
-
-    background-image:
-        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Left.png");
-}
-
-
-/* RIGHT ROSETTE */
-
-#builderStep3 .tpj-row-shelf::after {
-    right: -34px;
-
-    background-image:
-        url("images/cake-builder/shelves/TPJ-Shelf-Buttercream-Right.png");
-}
-
-
-/* Give the real frosting shelves room to breathe */
-
-#builderStep3 .tpj-shelf-grid {
-    position: relative;
-    isolation: isolate;
-
-    row-gap: 32px;
-}
-
-
-/* Product cards remain ABOVE the frosting */
-
-#builderStep3 .tpj-shelf-grid > label {
-    position: relative;
-    z-index: 1;
-}
-
-
-/* ==========================================================
-   PAGE 4
-   Keep its existing simple shelf for now,
-   but REMOVE the old pink glow
-========================================================== */
-
-#builderStep4 .tpj-row-shelf {
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf {
     position: absolute;
 
     box-sizing: border-box;
@@ -6322,7 +6236,9 @@ background-size: auto 100%;
         );
 
     border-radius: 12px 12px 8px 8px;
-    border-bottom: 2px solid #FDEBF3;
+
+    border-bottom:
+        2px solid #FDEBF3;
 
     box-shadow:
         0 6px 12px
@@ -6332,10 +6248,24 @@ background-size: auto 100%;
 }
 
 
-#builderStep4 .tpj-row-shelf::before,
-#builderStep4 .tpj-row-shelf::after {
+/* NO BUTTERCREAM PNG ENDS
+   NO EXTRA GLOW
+*/
+
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf::before,
+
+:is(
+    #builderStep3,
+    #builderStep4
+)
+.tpj-row-shelf::after {
     content: none;
 }
+
 #builderStep3 .custom-text-only-card {
     position: relative;
 
@@ -7507,6 +7437,7 @@ margin-left: 0 !important;
 .builder-main {
     position: relative;
     isolation: isolate;
+    overflow-x: clip;
 }
 
 .builder-main-inner {
@@ -7662,6 +7593,42 @@ background-image:
 
     background-position: right top;
 
+}
+/* PAGE 4: one continuous right-side frosting pattern */
+
+/* Disable the previous restoration copy. */
+.tpj-buttercream-return-right {
+    display: none !important;
+}
+
+/* Keep the working outward position until the PNG loads. */
+.cake-builder-app:has(#builderStep4.is-active)
+.tpj-buttercream-feather-right {
+    transform: translateX(70px);
+    clip-path: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+/* The canvas replaces only Page 4's repeating background. */
+.tpj-right-frosting-canvas {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 190px;
+    pointer-events: none;
+}
+
+.cake-builder-app:has(#builderStep4.is-active)
+.tpj-buttercream-feather-right.tpj-continuous-ready {
+    transform: none;
+    background-image: none;
+}
+
+.cake-builder-app:has(#builderStep4.is-active)
+.tpj-continuous-ready > .tpj-right-frosting-canvas {
+    display: block;
 }
 
 /* NO FROSTING ON BASICS */
