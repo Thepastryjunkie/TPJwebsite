@@ -9361,6 +9361,7 @@ function updateSelectedCardStates() {
 function isCupcakesOnlyProduct() {
     return getSelectedCakeProduct().shape === "cupcakes";
 }
+
 function reorderStepFourControls() {
     const cupcakeSlot = getElement(
         "#cupcakeOnlyStudioSlot"
@@ -9378,30 +9379,21 @@ function reorderStepFourControls() {
         "#cakeBorderCustomizer"
     );
 
-    if (finish && borders) {
-        borders.before(finish);
-    }
+    const featuredAddOns = getElement(
+        "#featuredDesignAddOns"
+    );
 
-    if (finish && finishColors) {
-        finish.after(finishColors);
-    }
+    const sprinkles = getElement(
+        "#cakeSprinkleSection"
+    );
+
+    const edibleImage = getElement(
+        "#edibleImageCustomizer"
+    );
 
     const topperQuestion = getElement(
         "#cakeTopperCustomizer"
     );
-
-    const topperOptions = getElement(
-        "#topperTypeOptions"
-    );
-
-    if (
-        topperQuestion &&
-        topperOptions
-    ) {
-        topperQuestion.after(
-            topperOptions
-        );
-    }
 
     const cakeDetails = getElement(
         "#cakeDetailsCustomizer"
@@ -9415,8 +9407,62 @@ function reorderStepFourControls() {
         "#customSculptedCustomizer"
     );
 
+
+    /* Finish stays before Coating Border. */
+
+    if (finish && borders) {
+        borders.before(finish);
+    }
+
+
+    /* Finish Palette stays directly after Finish. */
+
+    if (finish && finishColors) {
+        finish.after(finishColors);
+    }
+
+
+    /*
+       Put the three featured add-ons
+       together directly after Coating Border.
+    */
+
+    if (featuredAddOns) {
+
+        if (borders) {
+            borders.after(
+                featuredAddOns
+            );
+        }
+
+
+        [
+            sprinkles,
+            edibleImage,
+            topperQuestion
+        ].forEach((section) => {
+
+            if (
+                section &&
+                section.parentElement !==
+                    featuredAddOns
+            ) {
+                featuredAddOns.appendChild(
+                    section
+                );
+            }
+
+        });
+    }
+
+
+    /*
+       NOW FOR THE DETAILS comes
+       directly after the three add-ons.
+    */
+
     const detailsAnchor =
-        topperOptions ||
+        featuredAddOns ||
         topperQuestion;
 
     if (
@@ -9428,69 +9474,69 @@ function reorderStepFourControls() {
         );
     }
 
-let specialtyGrid =
-    getElement(
-        "#step4SpecialtyGrid"
-    );
 
+    /*
+       Keep the existing specialty controls
+       after Cake Details.
+    */
 
-if (
-    !specialtyGrid &&
-    cakeDetails &&
-    (
-        toyFigurine ||
-        customSculpted
-    )
-) {
-
-    specialtyGrid =
-        document.createElement(
-            "div"
+    let specialtyGrid =
+        getElement(
+            "#step4SpecialtyGrid"
         );
 
 
-    specialtyGrid.id =
-        "step4SpecialtyGrid";
-
-
-    specialtyGrid.className =
-        "step4-specialty-grid";
-
-
-    cakeDetails.after(
-        specialtyGrid
-    );
-}
-
-
-if (specialtyGrid) {
-
-    if (toyFigurine) {
-
-        specialtyGrid.appendChild(
-            toyFigurine
-        );
-    }
-
-
-    if (customSculpted) {
-
-        specialtyGrid.appendChild(
+    if (
+        !specialtyGrid &&
+        cakeDetails &&
+        (
+            toyFigurine ||
             customSculpted
+        )
+    ) {
+
+        specialtyGrid =
+            document.createElement(
+                "div"
+            );
+
+        specialtyGrid.id =
+            "step4SpecialtyGrid";
+
+        specialtyGrid.className =
+            "step4-specialty-grid";
+
+        cakeDetails.after(
+            specialtyGrid
+        );
+    }
+
+
+    if (specialtyGrid) {
+
+        if (toyFigurine) {
+            specialtyGrid.appendChild(
+                toyFigurine
+            );
+        }
+
+        if (customSculpted) {
+            specialtyGrid.appendChild(
+                customSculpted
+            );
+        }
+    }
+
+
+    if (
+        cupcakeSlot &&
+        cakeDetails
+    ) {
+        cakeDetails.before(
+            cupcakeSlot
         );
     }
 }
-
-if (
-    cupcakeSlot &&
-    cakeDetails
-) {
-    cakeDetails.before(
-        cupcakeSlot
-    );
-}
-}
-
 
 function updateSurfaceOptionAvailability() {
     const product =
@@ -12225,8 +12271,15 @@ function initializeRemainingPanelBehavior() {
     active.popup.style.left =
         `${left - area.left + step.scrollLeft}px`;
 
-    active.popup.style.top =
-        `${box.top - area.top + step.scrollTop}px`;
+const popupTop =
+    active.anchor.classList.contains(
+        "featured-addon-card"
+    )
+        ? box.bottom + 8
+        : box.top;
+
+active.popup.style.top =
+    `${popupTop - area.top + step.scrollTop}px`;
 }
 
     function close(returnFocus = false) {
@@ -16033,8 +16086,27 @@ function updateSprinkleControlsVisibility() {
     const product =
         getSelectedCakeProduct();
 
+    /*
+       The Sprinkles card should always be visible
+       with the other featured add-ons for cakes.
+       Cupcakes use their own design path.
+    */
+    const showSprinkleCard =
+        product.shape !== "cupcakes";
+
+    section?.classList.toggle(
+        "is-hidden",
+        !showSprinkleCard
+    );
+
+
+    /*
+       Sprinkles themselves still require either
+       a coating border or Vintage Piping because
+       they attach to that piping.
+    */
     const canUseSprinkles =
-        product.shape !== "cupcakes" &&
+        showSprinkleCard &&
         (
             Boolean(
                 builderState.cakeBorderStyle
@@ -16043,25 +16115,12 @@ function updateSprinkleControlsVisibility() {
                 "Vintage Piping"
         );
 
-    section?.classList.toggle(
-        "is-hidden",
-        !canUseSprinkles
-    );
 
-    if (!canUseSprinkles) {
-        builderState.cakeBorderSprinkles =
-            false;
-
-        const toggle =
-            getElement(
-                "#cakeBorderSprinkles"
-            );
-
-        if (toggle) {
-            toggle.checked = false;
-        }
-    }
-
+    /*
+       Only show the sprinkle settings when
+       Sprinkles are actually selected AND
+       there is piping available for them.
+    */
     options?.classList.toggle(
         "is-hidden",
         !canUseSprinkles ||
@@ -19974,7 +20033,7 @@ function schedule() {
     frosting.append(canvas);
 
     /* These are the two adjustable numbers. */
-    const outwardShift = 70;
+    const outwardShift = 40;
     const transitionDistance = 90;
 
     let pending = false;

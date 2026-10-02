@@ -12263,3 +12263,618 @@ background-position:
 .cake-builder-app:not(:has(#builderStep1.is-active)) {
     overflow: clip;
 }
+/* =========================================
+   TPJ FINAL PAGE HEADING SYSTEM
+   Pages 2–8
+========================================= */
+
+/* Mini title */
+:is(
+    #builderStep2,
+    #builderStep3,
+    #builderStep4,
+    #builderStep5,
+    #builderStep6,
+    #builderStep7,
+    #builderStep8
+) .step-number {
+    margin: 0 0 7px !important;
+
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+}
+
+
+/* Main page title */
+:is(
+    #builderStep2,
+    #builderStep3,
+    #builderStep4,
+    #builderStep5,
+    #builderStep6,
+    #builderStep7,
+    #builderStep8
+) .step-heading h2 {
+    margin: 0 !important;
+
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-size: 52px !important;
+    font-weight: 400 !important;
+    line-height: 0.94 !important;
+    letter-spacing: -0.025em !important;
+}
+
+
+/* Intro beneath title */
+:is(
+    #builderStep2,
+    #builderStep3,
+    #builderStep4,
+    #builderStep5,
+    #builderStep6,
+    #builderStep7,
+    #builderStep8
+) .step-heading > p:last-child {
+    margin: 11px 0 0 !important;
+    max-width: 690px !important;
+
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+}
+
+
+/* Same spacing beneath every page heading */
+:is(
+    #builderStep2,
+    #builderStep3,
+    #builderStep4,
+    #builderStep5,
+    #builderStep6,
+    #builderStep7,
+    #builderStep8
+) .step-heading {
+    margin-bottom: 22px !important;
+}
+
+
+/* =========================================
+   MOBILE PAGE HEADINGS
+========================================= */
+
+@media (max-width: 720px) {
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5,
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ) .step-number {
+        margin-bottom: 3px !important;
+        font-size: 7px !important;
+    }
+
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5,
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ) .step-heading h2 {
+        font-size: 34px !important;
+        line-height: 0.94 !important;
+    }
+
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5,
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ) .step-heading > p:last-child {
+        margin-top: 6px !important;
+        font-size: 10px !important;
+        line-height: 1.35 !important;
+    }
+
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5,
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ) .step-heading {
+        margin-bottom: 12px !important;
+    }
+}
+/* =========================================================
+   PAGE 4 FEATURED ADD-ONS
+   Sprinkles + Edible Image + Cake Topper
+========================================================= */
+
+#builderStep4 #featuredDesignAddOns {
+    width: 100%;
+    margin: 26px 0 34px;
+    padding-top: 18px;
+
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    border-top: 1px solid
+        rgba(90, 42, 30, 0.14);
+}
+
+
+/* Remove the old stacked-section styling. */
+
+#builderStep4 #featuredDesignAddOns > :is(
+    #cakeSprinkleSection,
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer
+) {
+    min-width: 0;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    background: transparent !important;
+
+    box-shadow: none !important;
+}
+
+
+/* Sprinkles has one extra fieldset wrapper. */
+
+#builderStep4
+#featuredDesignAddOns
+#cakeSprinkleSection
+> .builder-fieldset {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+}
+
+
+/* The actual clickable visual choice. */
+
+#builderStep4 .featured-addon-card {
+    position: relative;
+
+    width: 100%;
+    min-height: 170px;
+
+    margin: 0;
+    padding: 0 6px 14px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    color: var(--chocolate);
+    text-align: center;
+
+    cursor: pointer;
+
+    transform: none !important;
+}
+
+
+/* Hide the real checkbox visually. */
+
+#builderStep4
+.featured-addon-card
+> input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* Artwork */
+
+#builderStep4
+.featured-addon-image {
+    width: 100%;
+    height: 105px;
+
+    margin: 0 auto 8px;
+
+    object-fit: contain;
+
+    pointer-events: none;
+
+    transition:
+        transform 180ms ease,
+        filter 180ms ease;
+}
+
+
+/* Title */
+
+#builderStep4
+.featured-addon-card
+> strong {
+    display: block;
+
+    color: var(--chocolate);
+
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.25;
+
+    transition:
+        color 180ms ease;
+}
+
+
+/* Description */
+
+#builderStep4
+.featured-addon-card
+> small {
+    display: block;
+
+    max-width: 150px;
+    margin-top: 4px;
+
+    color: var(--deep-berry);
+
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+
+/* Pink line beneath each option. */
+
+#builderStep4
+.featured-addon-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: 28%;
+    right: 28%;
+    bottom: 2px;
+
+    height: 3px;
+
+    background: transparent;
+
+    transition:
+        left 180ms ease,
+        right 180ms ease,
+        background-color 180ms ease;
+}
+
+
+/* Hover makes it obviously interactive. */
+
+#builderStep4
+.featured-addon-card:hover
+.featured-addon-image {
+    transform:
+        translateY(-4px)
+        scale(1.025);
+
+    filter:
+        drop-shadow(
+            0 7px 8px
+            rgba(90, 42, 30, 0.12)
+        );
+}
+
+#builderStep4
+.featured-addon-card:hover
+> strong {
+    color: var(--signature-pink);
+}
+
+#builderStep4
+.featured-addon-card:hover::after {
+    left: 20%;
+    right: 20%;
+
+    background:
+        rgba(255, 79, 163, 0.5);
+}
+
+
+/* Selected state */
+
+#builderStep4
+.featured-addon-card:has(input:checked)::after {
+    left: 15%;
+    right: 15%;
+
+    background:
+        var(--signature-pink);
+}
+
+
+/* Keyboard accessibility */
+
+#builderStep4
+.featured-addon-card:has(input:focus-visible) {
+    outline: 2px solid
+        var(--chocolate);
+
+    outline-offset: 4px;
+}
+
+
+/*
+   The old popup code hides its source trigger.
+   Keep these visual cards visible instead.
+*/
+
+#builderStep4
+#featuredDesignAddOns
+.tpj-popup-source-open {
+    visibility: visible !important;
+}
+
+
+/* =========================================================
+   REMOVE THE OLD V / CHEVRON
+========================================================= */
+
+#builderStep4
+.tpj-color-picker
+> summary::after,
+
+#builderStep4 :is(
+    #edibleImageCustomizer,
+    #cakeTopperCustomizer,
+    #cakeSprinkleSection
+)
+.design-text-toggle-copy::after {
+    content: none !important;
+    display: none !important;
+}
+
+
+/* =========================================================
+   MAIN COATING COLOR
+   Flat interactive selector, no pill, no V
+========================================================= */
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker {
+    width: min(320px, 100%) !important;
+}
+
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker
+> summary {
+    position: relative;
+
+    width: 100% !important;
+    min-height: 52px;
+
+    padding:
+        5px 4px 10px !important;
+
+    display: flex !important;
+    align-items: center;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        rgba(90, 42, 30, 0.24) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    cursor: pointer;
+}
+
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker
+> summary::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: -2px;
+
+    width: 28%;
+    height: 3px;
+
+    background:
+        rgba(255, 79, 163, 0.35);
+
+    transition:
+        width 180ms ease,
+        background-color 180ms ease;
+}
+
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker
+> summary:hover::before,
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker[open]
+> summary::before,
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker
+> summary:focus-visible::before {
+    width: 100%;
+
+    background:
+        var(--signature-pink);
+}
+
+
+/* =========================================================
+   FONDANT
+   Real checkbox cue instead of dropdown styling
+========================================================= */
+
+#builderStep4
+#fondantCoverageCustomizer
+.design-text-toggle {
+    position: relative;
+
+    min-height: 44px;
+
+    padding:
+        7px 4px 10px 31px !important;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        rgba(90, 42, 30, 0.22) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    cursor: pointer;
+}
+
+
+#builderStep4
+#fondantCoverageCustomizer
+.design-text-toggle::before {
+    content: "";
+
+    position: absolute;
+
+    left: 3px;
+    top: 8px;
+
+    width: 17px;
+    height: 17px;
+
+    border: 2px solid
+        var(--chocolate);
+
+    border-radius: 2px;
+
+    background: transparent;
+}
+
+
+/* Checked fondant */
+
+#builderStep4
+#fondantCoverageCustomizer
+.design-text-toggle:has(
+    input:checked
+)::before {
+    content: "✓";
+
+    display: grid;
+    place-items: center;
+
+    border-color:
+        var(--signature-pink);
+
+    background:
+        var(--signature-pink);
+
+    color: white;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+/* Replace the old tiny selected dash. */
+
+#builderStep4
+#fondantCoverageCustomizer
+.design-text-toggle:has(
+    input:checked
+)::after {
+    left: 0;
+    bottom: -2px;
+
+    width: 100%;
+
+    height: 3px;
+
+    background:
+        var(--signature-pink);
+}
+
+
+/* =========================================================
+   FEATURED ADD-ONS MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+
+    #builderStep4
+    #featuredDesignAddOns {
+        grid-template-columns:
+            repeat(3, minmax(125px, 1fr));
+
+        gap: 10px;
+
+        overflow-x: auto;
+        overflow-y: visible;
+
+        padding-bottom: 8px;
+    }
+
+
+    #builderStep4
+    .featured-addon-image {
+        height: 88px;
+    }
+
+
+    #builderStep4
+    .featured-addon-card
+    > small {
+        max-width: 125px;
+    }
+
+}

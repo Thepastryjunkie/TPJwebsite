@@ -23,7 +23,7 @@
 </head>
 <link
     rel="stylesheet"
-    href="../cake-builder.css?v=20260930-2033"
+  href="../cake-builder.css?v=20261002-featured-addons-1"
 >
 
 
@@ -3173,14 +3173,14 @@
                         <label class="form-field cake-only-inside">
 
                             <span>
-                                Coating Flavor (optional)
+                                Coating Flavor (Optional)
                             </span>
 
                             <input
                                 id="buttercreamFlavor"
                                 type="text"
                                 autocomplete="off"
-                                placeholder=Have a flavor in mind? Tell me here...
+                                placeholder="Have a flavor in mind? Tell me here..."
                             >
 
                         </label>
@@ -3662,30 +3662,32 @@
 
     <fieldset class="builder-fieldset">
 
-        <legend>
-            Sprinkles
-        </legend>
+<legend class="visually-hidden">
+    Sprinkles
+</legend>
 
-     <label class="design-text-toggle">
+<label class="featured-addon-card">
 
     <input
         id="cakeBorderSprinkles"
         type="checkbox"
     >
 
-    <span class="design-text-toggle-copy">
+    <img
+        class="featured-addon-image"
+        src="../images/cake-builder/cards/11-decorations/TPJ-Card-Detail-Sprinkles.png"
+        alt=""
+    >
 
-        <strong>
-            Add Sprinkles
-        </strong>
+    <strong>
+        Sprinkles
+    </strong>
 
-        <small>
-         Sometimes it just needs sprinkles.  
-        </small>
+    <small>
+        Sometimes it just needs sprinkles.
+    </small>
 
-    </span>
-
-</label> 
+</label>
 
         <div
             id="cakeSprinkleOptions"
@@ -3932,32 +3934,30 @@
     id="edibleImageCustomizer"
     class="builder-fieldset"
 >
-    <legend>
-        Edible Image
-    </legend>
+<legend class="visually-hidden">
+    Edible Image
+</legend>
 
-    <p class="fieldset-description">
-       Turn a photo or design into part of the cake.
-    </p>
-
-<label class="design-text-toggle">
+<label class="featured-addon-card">
 
     <input
         id="edibleImageEnabledToggle"
         type="checkbox"
     >
 
-    <span class="design-text-toggle-copy">
+    <img
+        class="featured-addon-image"
+        src="../images/cake-builder/cards/11-decorations/TPJ-Card-Detail-Edible-Image.png"
+        alt=""
+    >
 
-        <strong>
-            Add an Edible Image
-        </strong>
+    <strong>
+        Edible Image
+    </strong>
 
-        <small>
-            Upload the image and choose its placement.
-        </small>
-
-    </span>
+    <small>
+        Turn a photo or design into part of the cake.
+    </small>
 
 </label>
 
@@ -4121,48 +4121,54 @@
     id="cakeTopperCustomizer"
     class="builder-fieldset"
 >
-    <legend>Add a Cake Topper?</legend>
+    <legend class="visually-hidden">
+        Cake Topper
+    </legend>
 
-    <p class="fieldset-description">
-        A little something for the very top.
-    </p>
+    <label class="featured-addon-card">
 
-<label class="design-text-toggle">
+        <input
+            id="cakeTopperEnabledToggle"
+            type="checkbox"
+        >
 
-    <input
-        id="cakeTopperEnabledToggle"
-        type="checkbox"
-    >
-
-    <span class="design-text-toggle-copy">
+        <img
+            class="featured-addon-image"
+            src="../images/cake-builder/cards/11-decorations/TPJ-Card-Detail-Cake-Topper.png"
+            alt=""
+        >
 
         <strong>
-            Add a Cake Topper
+            Cake Topper
         </strong>
 
         <small>
-            Choose the topper material and wording.
+            A little something for the very top.
         </small>
 
-    </span>
-
-</label>
+    </label>
 </fieldset>
 
-                        <div id="cupcakeOnlyStudioSlot"></div>
+<div
+    id="featuredDesignAddOns"
+    class="featured-design-addons"
+    aria-label="Cake add-ons"
+></div>
 
-                        <fieldset
+<div id="cupcakeOnlyStudioSlot"></div>
+
+<fieldset
     id="cakeDetailsCustomizer"
     class="builder-fieldset"
 >
+    <legend>
+        NOW FOR THE DETAILS
+    </legend>
 
-<legend>
-    NOW FOR THE DETAILS
-</legend>
+    <p class="fieldset-description">
+        Pick the details that bring your whole look together.
+    </p>
 
-<p class="fieldset-description">
-    Pick the details that bring your whole look together.
-</p>
 
                             <div class="decoration-choice-grid">
 
@@ -6898,7 +6904,7 @@ Inspiration is completely optional. Share up to five photos that help show me wh
 
     </div>
 <script
-    src="../js/cake-builder.js?v=20261001-copy-refresh-1"
+src="../js/cake-builder.js?v=20261002-featured-addons-1"
 ></script>
 
 </body>
