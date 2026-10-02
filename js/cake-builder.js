@@ -9615,16 +9615,16 @@ function updateSurfaceOptionAvailability() {
         }
     }
 
-    setText(
-        "#fondantPriceLabel",
-        fondantAllowed
-            ? `Add for ${formatCurrency(
-                getSurfaceUpcharge(
-                    "fondant"
-                )
-            )}`
-            : "Unavailable for this selection"
-    );
+   setText(
+    "#fondantPriceLabel",
+    fondantAllowed
+        ? formatCurrency(
+            getSurfaceUpcharge(
+                "fondant"
+            )
+        )
+        : ""
+);
 }
 
 
@@ -12435,21 +12435,40 @@ record.anchor.classList.add("tpj-popup-source-open");
                 }
             });
 
-            input.addEventListener("change", () => {
-                /*
-                 * Existing handlers update the selection, pricing,
-                 * visibility, and preview before the dropdown opens.
-                 */
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        if (input.checked) {
-                            open(record, input);
-                        } else if (active === record) {
-                            close();
-                        }
-                    });
-                });
-            });
+input.addEventListener("change", () => {
+
+    /*
+       Sprinkles is a checkbox, but its options panel starts
+       hidden. Make its selection state and visibility update
+       BEFORE trying to open the popup.
+    */
+    if (input.id === "cakeBorderSprinkles") {
+
+        builderState.cakeBorderSprinkles =
+            input.checked;
+
+        updateSprinkleControlsVisibility();
+    }
+
+
+    requestAnimationFrame(() => {
+
+        if (
+            input.checked &&
+            !record.panel.classList.contains(
+                "is-hidden"
+            )
+        ) {
+            open(record, input);
+
+        } else if (
+            active === record
+        ) {
+            close();
+        }
+
+    });
+});
         });
     });
 
@@ -19842,14 +19861,15 @@ for (
 
 /* PAGE 3 + PAGE 4 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
 (() => {
-    const selector = [
-        "#builderStep3 .text-choice-grid",
-        "#builderStep3 .upgrade-grid",
-        "#builderStep3 .description-choice-grid",
-        "#cakeFinishCustomizer .style-choice-grid",
-        "#cakeBorderCustomizer > .text-choice-grid",
-        "#cakeDetailsCustomizer .decoration-choice-grid"
-    ].join(",");
+const selector = [
+    "#builderStep3 .text-choice-grid",
+    "#builderStep3 .upgrade-grid",
+    "#builderStep3 .description-choice-grid",
+    "#cakeFinishCustomizer .style-choice-grid",
+    "#cakeBorderCustomizer > .text-choice-grid",
+    "#featuredDesignAddOns",
+    "#cakeDetailsCustomizer .decoration-choice-grid"
+].join(",");
 
     let pending = false;
 
@@ -19864,12 +19884,25 @@ for (
 
             const rows = [];
 
-            [...grid.children].forEach(card => {
-                const img =
-                      card.matches("label, details") &&
-                    card.querySelector("img");
+[...grid.children].forEach(card => {
 
-                if (!img || !card.getClientRects().length) return;
+    const visualCard =
+        card.matches("label, details")
+            ? card
+            : card.querySelector(
+                ".featured-addon-card"
+            );
+
+    const img =
+        visualCard?.querySelector("img");
+
+    if (
+        !visualCard ||
+        !img ||
+        !card.getClientRects().length
+    ) {
+        return;
+    }
 
                 const box = card.getBoundingClientRect();
                 const top = box.top - origin.top;
@@ -19905,7 +19938,10 @@ for (
                     img.getBoundingClientRect().bottom - origin.top
                 );
 
-                const caption = card.querySelector(":scope > strong");
+const caption =
+    visualCard.querySelector(
+        ":scope > strong"
+    );
 
                 if (caption) {
                     row.captionTop = Math.min(
