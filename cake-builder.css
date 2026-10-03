@@ -1533,10 +1533,27 @@ background: transparent;
 }
 
 .builder-callout {
-    border: 2px solid rgba(55, 121, 91, 0.28);
+    width: fit-content;
+    max-width: 100%;
 
-    background: rgba(55, 121, 91, 0.09);
-    color: #24573F;
+    border: 0;
+
+    border-radius: 4px;
+
+    background:
+        rgba(255, 241, 231, 0.72);
+
+    color:
+        #4D1F16;
+
+    box-shadow:
+        0 3px 12px
+        rgba(77, 31, 22, 0.08);
+
+    font-weight: 600;
+
+    backdrop-filter:
+        blur(6px);
 }
 
 .builder-warning {
@@ -1580,10 +1597,40 @@ background: transparent;
 }
 
 .submission-message.is-success {
-    border: 2px solid rgba(55, 121, 91, 0.28);
+    width: fit-content;
+    max-width: 100%;
 
-    background: rgba(55, 121, 91, 0.09);
-    color: var(--success);
+    margin:
+        14px
+        0
+        18px;
+
+    padding:
+        8px
+        12px;
+
+    border: 0;
+
+    border-radius: 4px;
+
+    background:
+        rgba(255, 241, 231, 0.72);
+
+    color:
+        #4D1F16;
+
+    box-shadow:
+        0 3px 12px
+        rgba(77, 31, 22, 0.08);
+
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    text-align: left;
+
+    backdrop-filter:
+        blur(6px);
 }
 
 /* =========================================
@@ -2193,18 +2240,13 @@ background: transparent;
 
 
 .cupcake-swatch-section {
-    margin-top: 18px;
-    padding: 16px;
+    margin-top: 14px;
+    padding: 0;
 
-    border-radius: 16px;
+    border: 0;
+    border-radius: 0;
 
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            0.58
-        );
+    background: transparent;
 }
 
 
@@ -3275,27 +3317,45 @@ margin-inline: auto;
 
 
 /* =========================================
-   UPLOAD
+   INSPIRATION + DELIVERY SOFT PANELS
 ========================================= */
 
-.inspiration-upload-zone {
+.inspiration-upload-zone,
+.delivery-address-panel {
     position: relative;
 
-    min-height: 300px;
-    padding: 30px;
+    border:
+        2px dashed
+        rgba(90, 42, 30, 0.20);
 
-    display: grid;
-    place-items: center;
-
-    border: 3px dashed rgba(90, 42, 30, 0.32);
-    border-radius: 28px;
+    border-radius: 18px;
 
     background:
         linear-gradient(
             145deg,
-            rgba(247, 182, 210, 0.3),
-            rgba(252, 231, 241, 0.7)
+            #FDECF3 0%,
+            #FFF8F2 100%
         );
+
+    box-shadow:
+        0 7px 18px
+        rgba(90, 42, 30, 0.035);
+}
+
+
+/* =========================================
+   INSPIRATION UPLOAD
+========================================= */
+
+.inspiration-upload-zone {
+    min-height: 185px;
+
+    padding:
+        16px
+        24px;
+
+    display: grid;
+    place-items: center;
 
     transition:
         border-color 180ms ease,
@@ -3303,13 +3363,18 @@ margin-inline: auto;
         transform 180ms ease;
 }
 
+
 .inspiration-upload-zone.is-dragging {
-    border-color: var(--signature-pink);
+    border-color:
+        var(--signature-pink);
 
-    background: var(--headline-pink);
+    background:
+        #FCE7F1;
 
-    transform: scale(1.01);
+    transform:
+        scale(1.005);
 }
+
 
 .inspiration-upload-zone > input {
     position: absolute;
@@ -3318,26 +3383,36 @@ margin-inline: auto;
     height: 1px;
 
     opacity: 0;
+
     pointer-events: none;
 }
 
+
 .upload-zone-content {
-    max-width: 470px;
+    width: 100%;
+    max-width: 430px;
 
     text-align: center;
 }
 
+
 .upload-number {
     display: block;
 
-    margin-bottom: 11px;
+    margin-bottom: 3px;
 
-    color: var(--headline-pink);
+    color:
+        rgba(255, 79, 163, 0.25);
 
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 61px;
+    font-family:
+        'Fraunces',
+        Georgia,
+        serif;
+
+    font-size: 36px;
     line-height: 1;
 }
+
 
 .upload-zone-content strong,
 .upload-zone-content p,
@@ -3345,62 +3420,115 @@ margin-inline: auto;
     display: block;
 }
 
+
 .upload-zone-content strong {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 31px;
-    font-weight: 400;
+    color:
+        var(--chocolate);
+
+    font-family:
+        'Fraunces',
+        Georgia,
+        serif;
+
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.1;
 }
+
 
 .upload-zone-content p {
-    margin: 8px 0 17px;
+    margin:
+        5px
+        0
+        8px;
 
-    color: var(--buttercream-brown);
+    color:
+        var(--buttercream-brown);
 
-    font-size: 12px;
+    font-size: 10px;
+    line-height: 1.4;
 }
 
-.upload-zone-content small {
-    margin-top: 11px;
 
-    color: var(--deep-berry);
+.upload-zone-content small {
+    margin-top: 5px;
+
+    color:
+        var(--deep-berry);
 
     font-size: 8px;
     font-weight: 700;
 }
 
+
 .upload-select-button {
-    min-height: 47px;
-    padding: 12px 21px;
+    min-height: 32px;
 
-border: 0;
-border-radius: 0;
-background: transparent;
-color: var(--chocolate);
+    padding:
+        5px
+        4px;
 
-text-decoration: underline;
-text-decoration-color: var(--signature-pink);
-text-decoration-thickness: 3px;
-text-underline-offset: 5px;
-    color: var(--white);
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+
+    color:
+        var(--chocolate);
+
+    text-decoration: underline;
+    text-decoration-color:
+        var(--signature-pink);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
 
     text-transform: uppercase;
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.05em;
 
     cursor: pointer;
-
-    transition:
-        background-color 180ms ease,
-        transform 180ms ease;
 }
+
 
 .upload-select-button:hover,
 .upload-select-button:focus-visible {
+    color:
+        var(--signature-pink);
+
     background: transparent;
-    color: var(--signature-pink);
+
     transform: none;
+}
+
+
+/* =========================================
+   DELIVERY ADDRESS PANEL
+========================================= */
+
+.delivery-address-panel {
+    margin:
+        4px
+        0
+        26px;
+
+    padding:
+        20px
+        22px
+        12px;
+}
+
+
+.delivery-address-panel
+.two-column-fields {
+    margin-bottom: 0;
+}
+
+
+.delivery-address-panel
+.form-field {
+    margin-bottom: 14px;
 }
 
 .inspiration-preview-grid {
@@ -5449,10 +5577,15 @@ background: transparent;
     box-shadow: 0 8px 20px #78214808;
 }
 /* =========================================
-   PAGE 4 - COMPACT IN-PLACE COLOR PALETTE
+   SHARED COMPACT IN-PLACE COLOR PALETTE
+   Page 4 + Cupcake Studio
 ========================================= */
 
-#builderStep4 .tpj-color-picker {
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker {
     position: relative;
 
     display: inline-block;
@@ -5464,27 +5597,52 @@ background: transparent;
     vertical-align: top;
 }
 
-#builderStep4 .tpj-color-picker[open] {
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker[open] {
     z-index: 300;
 }
 
-#builderStep4 .tpj-color-picker > summary {
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker
+> summary {
     width: fit-content;
     max-width: 100%;
 
     min-height: 44px;
-    padding: 2px 23px 2px 0;
+
+    padding:
+        2px
+        23px
+        2px
+        0;
 
     gap: 8px;
 
     border: 0 !important;
     border-radius: 0;
 
-    background: transparent !important;
-    box-shadow: none !important;
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
 }
 
-#builderStep4 .tpj-color-picker > summary::after {
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker
+> summary::after {
     position: absolute;
 
     right: 2px;
@@ -5495,32 +5653,57 @@ background: transparent;
     font-size: 15px;
 }
 
-#builderStep4 .tpj-color-preview {
-    flex: 0 0 43px;
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-preview {
+    flex:
+        0
+        0
+        43px;
 
     width: 43px;
     height: 43px;
 
     border: 0;
+
     box-shadow: none;
 }
 
-#builderStep4 .tpj-color-copy small {
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-copy
+small {
     display: none;
 }
 
-/* Hide the closed preview while the palette
-   occupies the same position. */
 
-#builderStep4
-.tpj-color-picker[open] > summary {
+/* Hide closed selector while open palette
+   occupies the exact same position. */
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker[open]
+> summary {
     visibility: hidden;
 }
 
-/* Palette replaces the compact control. */
 
-#builderStep4
-.tpj-color-picker > .tpj-color-panel {
+/* Palette replaces selector in place. */
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
+.tpj-color-picker
+> .tpj-color-panel {
     position: absolute;
 
     z-index: 301;
@@ -5530,7 +5713,12 @@ background: transparent;
 
     box-sizing: border-box;
 
-    width: min(340px, 85vw);
+    width:
+        min(
+            340px,
+            85vw
+        );
+
     max-height: 220px;
 
     overflow: auto;
@@ -5544,14 +5732,26 @@ background: transparent;
     background: #ffeaf2;
 
     box-shadow:
-        0 6px 15px
-        rgba(90, 42, 30, 0.10);
+        0
+        6px
+        15px
+        rgba(
+            90,
+            42,
+            30,
+            0.10
+        );
 }
 
-#builderStep4
+
+:is(
+    #builderStep4,
+    #cupcakeStudio
+)
 .tpj-color-picker:not([open])
 > .tpj-color-panel {
-    display: none !important;
+    display:
+        none !important;
 }
 .tpj-color-panel .color-choice-grid {
     display: grid;
@@ -8105,10 +8305,12 @@ background-image:
         'Manrope',
         sans-serif;
 
-    font-size: 17px !important;
-    font-weight: 800;
+    font-size: 11px !important;
+    font-weight: 700;
 
-    line-height: 1;
+    line-height: 1.15;
+
+    white-space: nowrap;
 }
 
 
@@ -9403,38 +9605,114 @@ font-weight: 700;
 }
 
 
-/* Pink selection dash */
+/* Pink interaction line */
 
 #builderStep2
-.cake-height-selector:not(
-    :has(#extraLayerToggle:checked)
-)
-.height-choice-standard::after,
-
-#builderStep2
-.cake-height-selector:has(
-    #extraLayerToggle:checked
-)
-.height-choice-tall::after {
+.board-palette-choice::before {
     content: "";
 
     position: absolute;
 
-    left: 50%;
+    left: 6px;
+    right: 6px;
     bottom: 1px;
 
-    width: 54px;
+    height: 1px;
+
+    background:
+        rgba(90, 42, 30, 0.18);
+}
+
+
+#builderStep2
+.board-palette-choice::after {
+    content: "";
+
+    position: absolute;
+
+    left: 6px;
+    bottom: 0;
+
+    width: 30%;
     height: 3px;
 
-    border-radius: 999px;
+    background:
+        rgba(255, 79, 163, 0.38);
+
+    transition:
+        width 180ms ease,
+        background-color 180ms ease;
+}
+
+
+#builderStep2
+.board-palette-choice:hover::after,
+#builderStep2
+.board-palette-choice:focus-within::after,
+#builderStep2
+.board-palette-choice:has(
+    #matchBoardToCakePalette:checked
+)::after {
+    width:
+        calc(100% - 12px);
 
     background:
         var(--signature-pink);
+}
+/* Pink interaction line */
 
-    transform:
-        translateX(-50%);
+#builderStep2
+.board-palette-choice::before {
+    content: "";
+
+    position: absolute;
+
+    left: 6px;
+    right: 6px;
+    bottom: 1px;
+
+    height: 1px;
+
+    background:
+        rgba(90, 42, 30, 0.18);
 }
 
+
+#builderStep2
+.board-palette-choice::after {
+    content: "";
+
+    position: absolute;
+
+    left: 6px;
+    bottom: 0;
+
+    width: 30%;
+    height: 3px;
+
+    background:
+        rgba(255, 79, 163, 0.38);
+
+    transition:
+        width 180ms ease,
+        background-color 180ms ease;
+}
+
+
+#builderStep2
+.board-palette-choice:hover::after,
+#builderStep2
+.board-palette-choice:focus-within::after,
+#builderStep2
+.board-palette-choice:has(
+    #matchBoardToCakePalette:checked
+)::after {
+    width:
+        calc(100% - 12px);
+
+    background:
+        var(--signature-pink);
+}
 
 /* Hover */
 
@@ -11312,30 +11590,319 @@ label:has(input:focus-visible) {
     padding: 0;
 }
 
+/* =========================================================
+   PAGE 4 POPUP TYPOGRAPHY SYSTEM
+   Consistent hierarchy without enlarging popup boxes
+========================================================= */
+
+
+/* Generic popup names like:
+   Cake detail / Cake topper / Sprinkles / Finish colors
+   are redundant once the real question is visible.
+*/
+
 #builderStep4 .tpj-popup-title {
-    display: block;
-    font-size: 15px;
-}
-#builderStep4 .tpj-option-popup > fieldset > legend {
-    font-size: 20px;
-    margin-bottom: 7px;
+    display: none !important;
 }
 
-#builderStep4 .tpj-option-popup .fieldset-description {
-    margin: 0 0 8px;
+
+/* ---------------------------------------------------------
+   DEFAULT SECONDARY QUESTION
+   Used for the smaller follow-up decisions.
+--------------------------------------------------------- */
+
+#builderStep4
+.tpj-option-popup
+fieldset > legend,
+
+#builderStep4
+.tpj-option-popup
+.swatch-subheading,
+
+#builderStep4
+.tpj-option-popup
+.form-field > span,
+
+#builderStep4
+.tpj-option-popup
+.edible-image-option-group > legend {
+    margin: 0 0 6px !important;
+
+    color: var(--chocolate);
+
+    font-family:
+        'Manrope',
+        sans-serif !important;
+
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
 }
 
-#builderStep4 .tpj-option-popup .swatch-subsection {
-    margin-top: 12px;
+
+/* ---------------------------------------------------------
+   MAIN POPUP QUESTION
+   One primary heading per popup.
+--------------------------------------------------------- */
+
+#builderStep4
+.tpj-option-popup
+:is(
+
+    #finishColorCustomizer > legend,
+
+    #cakeBorderPlacementControls > legend,
+
+    #cakeSprinkleOptions
+    > .swatch-subsection:first-child
+    > .swatch-subheading,
+
+    #edibleImageControls
+    .quantity-product-info strong,
+
+    #topperTypeOptions
+    > fieldset:first-child
+    > legend,
+
+    #dripDetailOptions
+    > fieldset:first-child
+    > legend,
+
+    #pearlDetailOptions
+    > .fieldset-description,
+
+    #metallicLeafDetailOptions
+    > fieldset:first-child
+    > legend,
+
+    #bowDetailOptions
+    > .fieldset-description,
+
+    #butterflyDetailOptions
+    > .fieldset-description,
+
+    #cherryDetailOptions
+    > .fieldset-description,
+
+    #flowerDetailOptions
+    > fieldset:first-child
+    > legend,
+
+    #macaronsDetailOptions
+    > .swatch-subsection:first-child
+    > .swatch-subheading,
+
+    #discoBallsDetailOptions
+    > .form-field
+    > span
+) {
+    margin:
+        0
+        0
+        7px !important;
+
+    color:
+        var(--chocolate) !important;
+
+    font-family:
+        'Fraunces',
+        Georgia,
+        serif !important;
+
+    font-size:
+        16px !important;
+
+    font-weight:
+        600 !important;
+
+    line-height:
+        1.12 !important;
 }
 
-#builderStep4 .tpj-option-popup
-.swatch-subsection + .swatch-subsection {
-    margin-top: 14px;
+
+/* ---------------------------------------------------------
+   SECONDARY QUESTIONS
+--------------------------------------------------------- */
+
+#builderStep4
+.tpj-option-popup
+:is(
+
+    #finishColorCustomizer
+    .swatch-subheading,
+
+    #cakeBorderTopColorControls
+    > legend,
+
+    #cakeBorderBottomColorControls
+    > legend,
+
+    #cakeSprinkleOptions
+    > .swatch-subsection:not(:first-child)
+    > .swatch-subheading,
+
+    #edibleImageControls
+    .edible-image-option-group
+    > legend,
+
+    #topperTypeOptions
+    .form-field
+    > span,
+
+    #whiteChocolateColorQuestion
+    > legend,
+
+    #cherryDetailOptions
+    fieldset
+    > legend,
+
+    #cherryDetailOptions
+    .form-field
+    > span,
+
+    #bowDetailOptions
+    .form-field
+    > span,
+
+    #butterflyDetailOptions
+    .form-field
+    > span,
+
+    #flowerDetailOptions
+    .fieldset-description,
+
+    #flowerDetailOptions
+    fieldset:not(:first-child)
+    > legend,
+
+    #flowerDetailOptions
+    .form-field
+    > span,
+
+    #flowerSourceOptions
+    legend,
+
+    #macaronsDetailOptions
+    .form-field
+    > span
+) {
+    font-family:
+        'Manrope',
+        sans-serif !important;
+
+    font-size:
+        11px !important;
+
+    font-weight:
+        800 !important;
+
+    line-height:
+        1.25 !important;
 }
 
-#builderStep4 .tpj-option-popup .swatch-subheading {
-    margin-bottom: 6px;
+
+/* ---------------------------------------------------------
+   ACTUAL ANSWER OPTIONS
+   Match the boldness of Border Placement.
+--------------------------------------------------------- */
+
+#builderStep4
+.tpj-option-popup
+:is(
+    .compact-choice-row,
+    .description-choice-grid,
+    .upgrade-grid
+)
+label
+:is(
+    strong,
+    span
+) {
+    font-size:
+        12px !important;
+
+    font-weight:
+        800 !important;
+
+    line-height:
+        1.25 !important;
+}
+
+
+/* Descriptions inside choices stay quieter. */
+
+#builderStep4
+.tpj-option-popup
+.description-choice-card
+> span {
+    font-size:
+        9px !important;
+
+    font-weight:
+        500 !important;
+
+    line-height:
+        1.35 !important;
+}
+
+
+/* ---------------------------------------------------------
+   HELPER / EXPLANATORY COPY
+--------------------------------------------------------- */
+
+#builderStep4
+.tpj-option-popup
+.field-note {
+    font-size:
+        9px !important;
+
+    font-weight:
+        500 !important;
+
+    line-height:
+        1.4 !important;
+}
+
+
+/* Don't let ordinary helper descriptions inherit
+   the old large fieldset styling. */
+
+#builderStep4
+.tpj-option-popup
+.fieldset-description {
+    margin:
+        0
+        0
+        7px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        500;
+
+    line-height:
+        1.4;
+}
+
+
+/* Keep popup sections compact. */
+
+#builderStep4
+.tpj-option-popup
+.swatch-subsection {
+    margin-top:
+        10px;
+}
+
+
+#builderStep4
+.tpj-option-popup
+.swatch-subsection
++
+.swatch-subsection {
+    margin-top:
+        12px;
 }
 
 #builderStep4 .tpj-option-popup .color-choice {
@@ -12666,19 +13233,37 @@ background-position:
 
 
 /* =========================================================
-   MAIN COATING COLOR
-   Flat interactive selector, no pill, no V
+   PRIMARY COLOR SELECTORS
+   Main Coating + Cupcake Liner + Cupcake Frosting
 ========================================================= */
 
-#builderStep4
-#singleCakeColorCustomizer
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker {
-    width: min(320px, 100%) !important;
+    width:
+        min(
+            320px,
+            100%
+        ) !important;
 }
 
 
-#builderStep4
-#singleCakeColorCustomizer
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker
 > summary {
     position: relative;
@@ -12687,28 +13272,71 @@ background-position:
     min-height: 52px;
 
     padding:
-        5px 4px 10px !important;
+        5px
+        4px
+        10px !important;
 
-    display: flex !important;
+    display:
+        flex !important;
+
     align-items: center;
 
     border: 0 !important;
+
     border-bottom:
         1px solid
-        rgba(90, 42, 30, 0.24) !important;
+        rgba(
+            90,
+            42,
+            30,
+            0.24
+        ) !important;
 
-    border-radius: 0 !important;
+    border-radius:
+        0 !important;
 
-    background: transparent !important;
+    background:
+        transparent !important;
 
-    box-shadow: none !important;
+    box-shadow:
+        none !important;
 
     cursor: pointer;
 }
 
 
-#builderStep4
-#singleCakeColorCustomizer
+/* No V / chevron */
+
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
+.tpj-color-picker
+> summary::after {
+    content:
+        none !important;
+
+    display:
+        none !important;
+}
+
+
+/* Short pink line */
+
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker
 > summary::before {
     content: "";
@@ -12722,32 +13350,64 @@ background-position:
     height: 3px;
 
     background:
-        rgba(255, 79, 163, 0.35);
+        rgba(
+            255,
+            79,
+            163,
+            0.35
+        );
 
     transition:
-        width 180ms ease,
-        background-color 180ms ease;
+        width
+        180ms ease,
+        background-color
+        180ms ease;
 }
 
 
-#builderStep4
-#singleCakeColorCustomizer
+/* Line expands when interactive */
+
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker
 > summary:hover::before,
 
-#builderStep4
-#singleCakeColorCustomizer
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker[open]
 > summary::before,
 
-#builderStep4
-#singleCakeColorCustomizer
+:is(
+    #singleCakeColorCustomizer,
+    #cupcakeStudio
+    #cupcakeLinerColorSection,
+    #cupcakeStudio
+    .cupcake-swatch-section:has(
+        #cupcakeFrostingColorSwatches
+    )
+)
 .tpj-color-picker
 > summary:focus-visible::before {
     width: 100%;
 
     background:
-        var(--signature-pink);
+        var(
+            --signature-pink
+        );
 }
 
 
@@ -12994,47 +13654,228 @@ textarea {
         #fdebf3 !important;
 }
 /* =========================================
-   PAGE 4 FONDANT TITLE TOGGLE
+   PAGE 4 — FONDANT INSIDE FINISH
 ========================================= */
 
 #builderStep4
-#fondantCoverageCustomizer
-> legend {
-    margin-bottom: 7px !important;
+#fondantCoverageCustomizer {
+    width: 100%;
+
+    margin: -7px 0 12px;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
 }
 
+
+/* Entire fondant question is clickable */
+
 #builderStep4
-.fondant-title-toggle {
+.finish-fondant-toggle {
     display: inline-flex;
-    align-items: baseline;
-    gap: 6px;
+    flex-direction: column;
+    align-items: flex-start;
 
     width: fit-content;
-
-    color: var(--chocolate);
+    max-width: 100%;
 
     cursor: pointer;
 }
 
-#builderStep4
-.fondant-title-toggle
-> span {
-    font-family: 'Fraunces', Georgia, serif;
-    font: inherit;
-}
+
+/* Hide native checkbox */
 
 #builderStep4
-.fondant-inline-price {
+.finish-fondant-toggle
+> input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* Question + square switch */
+
+#builderStep4
+.finish-fondant-heading {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+#builderStep4
+.finish-fondant-heading
+> strong {
+    color: var(--chocolate);
+
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+
+/* NOT a pill */
+
+#builderStep4
+.fondant-square-switch {
+    position: relative;
+
+    width: 43px;
+    height: 22px;
+
+    flex: 0 0 auto;
+
+    border: 1.5px solid
+        rgba(90, 42, 30, 0.48);
+
+    border-radius: 2px;
+
+    background:
+        rgba(255, 248, 242, 0.68);
+
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease;
+}
+
+
+/* Square slider */
+
+#builderStep4
+.fondant-square-switch::after {
+    content: "";
+
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 1px;
+
+    background: var(--chocolate);
+
+    transition:
+        transform 180ms ease,
+        background-color 180ms ease;
+}
+
+
+/* ON state */
+
+#builderStep4
+.finish-fondant-toggle:has(
+    input:checked
+)
+.fondant-square-switch {
+    border-color:
+        var(--signature-pink);
+
+    background:
+        rgba(247, 182, 210, 0.32);
+}
+
+
+#builderStep4
+.finish-fondant-toggle:has(
+    input:checked
+)
+.fondant-square-switch::after {
+    transform:
+        translateX(20px);
+
+    background:
+        var(--signature-pink);
+}
+
+
+/* Helper text */
+
+#builderStep4
+.finish-fondant-description {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--buttercream-brown);
+
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+
+#builderStep4
+.finish-fondant-description
+b {
     color: var(--deep-berry);
 
-    font-family: 'Manrope', sans-serif;
-    font-size: 12px;
     font-weight: 700;
-    line-height: 1;
 }
 
+
+/* Hover only gives a small TPJ cue */
+
 #builderStep4
-#fondantCoverageCustomizer
-> .fieldset-description {
-    margin-top: 0 !important;
+.finish-fondant-toggle:hover
+.finish-fondant-heading
+> strong {
+    color: var(--signature-pink);
 }
+
+
+/* Keyboard focus */
+
+#builderStep4
+.finish-fondant-toggle:has(
+    input:focus-visible
+) {
+    outline: 2px solid
+        var(--deep-berry);
+
+    outline-offset: 4px;
+}
+/* =========================================
+   VISUAL REFERENCE NOTES
+   Finish + Gourmet Cupcakes
+========================================= */
+
+.visual-reference-note {
+    width: 100%;
+    max-width: 620px;
+
+    margin:
+        5px
+        auto
+        0;
+
+    color:
+        rgba(90, 42, 30, 0.58);
+
+    text-align: center;
+
+    font-size: 8px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+
+/* Give the cupcake note a little breathing room
+   before Style Your Swirl. */
+
+#builderStep5
+#gourmetCupcakeExtras
+.visual-reference-note {
+    margin-top: 7px;
+}
+

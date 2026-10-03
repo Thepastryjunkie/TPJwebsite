@@ -23,7 +23,7 @@
 </head>
 <link
     rel="stylesheet"
-  href="../cake-builder.css?v=20261002-page4-cleanup-2"
+ href="../cake-builder.css?v=20261003-desktop-polish-1"
 >
 
 
@@ -3427,37 +3427,7 @@
     </div>
 
 </fieldset>              
-<fieldset
-    id="fondantCoverageCustomizer"
-    class="builder-fieldset cake-only-look"
->
-    <legend>
-        <label class="fondant-title-toggle">
 
-            <input
-                id="fondantEnabledToggle"
-                type="checkbox"
-                class="visually-hidden"
-            >
-
-            <span>
-                A Fondant Finish?
-            </span>
-
-            <small
-                id="fondantPriceLabel"
-                class="fondant-inline-price"
-            >
-                $35
-            </small>
-
-        </label>
-    </legend>
-
-    <p class="fieldset-description">
-        Add a smooth fondant covering over your buttercream or ganache.
-    </p>
-</fieldset>
               <fieldset
     id="cakeBorderCustomizer"
     class="builder-fieldset cake-only-look"
@@ -3793,17 +3763,57 @@
     </div>
 
 </fieldset>
-                        <fieldset id="cakeFinishCustomizer"
-                        class="builder-fieldset cake-only-look">
+<fieldset
+    id="cakeFinishCustomizer"
+    class="builder-fieldset cake-only-look"
+>
 
-                            <legend>
-                                Finish
-                            </legend>
- <p class="fieldset-description">
-    Smooth, textured, piped, or painted. Pick the finish that feels right.
-</p>                           
+    <legend>
+        Finish
+    </legend>
 
-<div class="style-choice-grid">
+    <p class="fieldset-description">
+        Smooth, textured, piped, or painted. Pick the finish that feels right.
+    </p>
+
+
+    <!-- FONDANT OPTION -->
+    <div
+        id="fondantCoverageCustomizer"
+        class="finish-fondant-option cake-only-look"
+    >
+
+        <label class="finish-fondant-toggle">
+
+            <input
+                id="fondantEnabledToggle"
+                type="checkbox"
+            >
+
+            <span class="finish-fondant-heading">
+
+                <strong>
+                    A Fondant Finish?
+                </strong>
+
+                <span
+                    class="fondant-square-switch"
+                    aria-hidden="true"
+                ></span>
+
+            </span>
+
+            <small class="finish-fondant-description">
+                Add a smooth fondant covering over your buttercream or ganache.
+                <b>Starting at $35.</b>
+            </small>
+
+        </label>
+
+    </div>
+
+
+    <div class="style-choice-grid">
 
                                 <label class="style-choice-card">
 
@@ -3925,9 +3935,13 @@
 
 </label>
 
-                            </div>
+</div>
 
-                        </fieldset>
+<p class="visual-reference-note">
+    Finish images are for style reference only. Your final cake will be designed from your selected details.
+</p>
+
+</fieldset>
 <fieldset
     id="edibleImageCustomizer"
     class="builder-fieldset"
@@ -5199,12 +5213,11 @@
 
                                   <img
     class="cupcake-count-card-image"
-    src="../images/cake-builder/final/cakes/TPJ-Asset-028-Blank-4-Count-Cupcake-Box.png"
-    alt=""
+    src="../images/cake-builder/cards/12-cupcakes/TPJ-Card-Cupcake-4-Count.png"
 >
 
                                     <strong>
-                                        Gourmet Cupcakes
+                                    4 Gourmet Cupcakes
                                     </strong>
 
                                     <small>
@@ -5223,12 +5236,12 @@
 
                                    <img
     class="cupcake-count-card-image"
-    src="../images/cake-builder/final/cakes/TPJ-Asset-029-Blank-8-Count-Cupcake-Box.png"
+    src="../images/cake-builder/cards/12-cupcakes/TPJ-Card-Cupcake-8-Count.png"
     alt=""
 >
 
                                     <strong>
-                                        Gourmet Cupcakes
+                                    8 Gourmet Cupcakes
                                     </strong>
 
                                     <small>
@@ -5247,25 +5260,29 @@
 
                                    <img
     class="cupcake-count-card-image"
-    src="../images/cake-builder/final/cakes/TPJ-Asset-030-Blank-12-Count-Cupcake-Box.png"
+    src="../images/cake-builder/cards/12-cupcakes/TPJ-Card-Cupcake-12-Count.png"
     alt=""
 >
 
                                     <strong>
-                                        Gourmet Cupcakes
+                                    12 Gourmet Cupcakes
                                     </strong>
 
                                     <small>
                                         +$48
                                     </small>
 
-                                </label>
+</label>
 
-                            </div>
+</div>
 
-                        </fieldset>
+<p class="visual-reference-note">
+    Cupcake images are for style reference only. Your final cupcakes will be styled from your selections.
+</p>
 
-                        <div id="cupcakeAddOnStudioSlot">
+</fieldset>
+
+<div id="cupcakeAddOnStudioSlot">
                         <fieldset id="cupcakeStudio" class="builder-fieldset cupcake-studio">
                         <legend>Style Your Swirl.</legend>
 
@@ -6205,10 +6222,10 @@ Inspiration is completely optional. Share up to five photos that help show me wh
 
                         </fieldset>
 
-                        <div
-                            id="deliveryAddressFields"
-                            class="conditional-section is-hidden"
-                        >
+<div
+    id="deliveryAddressFields"
+    class="delivery-address-panel is-hidden"
+>
 
                             <div class="two-column-fields">
 
@@ -6289,10 +6306,7 @@ Inspiration is completely optional. Share up to five photos that help show me wh
 
                             </div>
 
-                            <p class="field-note">
-                                Automatic address-to-distance lookup will be
-                                connected after the visual builder is approved.
-                            </p>
+
 
                             <div
                                 id="deliveryEstimateNotice"
@@ -6902,7 +6916,7 @@ Inspiration is completely optional. Share up to five photos that help show me wh
 
     </div>
 <script
-src="../js/cake-builder.js?v=20261002-page4-cleanup-2"
+src="../js/cake-builder.js?v=20261003-cupcake-controls-1"
 ></script>
 
 </body>

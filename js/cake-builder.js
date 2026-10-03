@@ -1854,7 +1854,7 @@ function getPlacementLabel(value) {
 
 function getDisplayColorName(color) {
     if (!color || color === "original") {
-        return "Natural / Original";
+        return "Cream";
     }
 
 const knownColors = [
@@ -8794,7 +8794,7 @@ async function updateCupcakePreview() {
 
             ? `${selectedSet.name} · preview applies to every cupcake`
 
-            : "Select a 4-, 8-, or 12-count set above."
+            : "Select a 4, 8, or 12 count set above."
     );
 
 
@@ -9932,7 +9932,7 @@ setText(
             ? `These choices apply to all ${product.cupcakeCount} cupcakes in this order.`
             : isBento
             ? `These choices apply to all ${builderState.bentoCupcakeCount} cupcakes included in the bento box.`
-            : "These choices apply to whichever 4-, 8-, or 12-count cupcake set you select above."
+            : "These choices apply to whichever 4, 8, or 12 count cupcake set you select above."
     );
 
     updateSurfaceOptionAvailability();
@@ -12351,10 +12351,6 @@ record.anchor.classList.add("tpj-popup-source-open");
         popup.hidden = true;
         popup.setAttribute("aria-label", title);
 
-        const heading = document.createElement("strong");
-
-        heading.className = "tpj-popup-title";
-        heading.textContent = title;
 
         const actions = document.createElement("div");
 
@@ -12376,8 +12372,10 @@ record.anchor.classList.add("tpj-popup-source-open");
         panel.querySelectorAll("[data-panel-done]").forEach(button => {
             button.remove();
         });
-
-        popup.append(heading, panel, actions);
+popup.append(
+    panel,
+    actions
+);
         step.append(popup);
 
         const record = {
@@ -13087,6 +13085,12 @@ function updateCheckboxExtras() {
                 Number(input.dataset.price) ||
                 0
         }));
+
+    /*
+        Re-check the cupcake studio immediately
+        after a cupcake quantity is selected.
+    */
+    updateCupcakeAddOnStudioAvailability();
 
     renderCakePreview();
 }
@@ -16105,13 +16109,15 @@ function updateSprinkleControlsVisibility() {
     const product =
         getSelectedCakeProduct();
 
+
     /*
-       The Sprinkles card should always be visible
-       with the other featured add-ons for cakes.
+       Keep the Sprinkles card available
+       for every cake product.
        Cupcakes use their own design path.
     */
     const showSprinkleCard =
         product.shape !== "cupcakes";
+
 
     section?.classList.toggle(
         "is-hidden",
@@ -16120,30 +16126,21 @@ function updateSprinkleControlsVisibility() {
 
 
     /*
-       Sprinkles themselves still require either
-       a coating border or Vintage Piping because
-       they attach to that piping.
+       Once Sprinkles is selected,
+       always make its placement/color
+       controls available.
+
+       This allows the popup to open
+       immediately from the Sprinkles card.
     */
-    const canUseSprinkles =
+    const showSprinkleOptions =
         showSprinkleCard &&
-        (
-            Boolean(
-                builderState.cakeBorderStyle
-            ) ||
-            builderState.cakeFinish ===
-                "Vintage Piping"
-        );
+        builderState.cakeBorderSprinkles;
 
 
-    /*
-       Only show the sprinkle settings when
-       Sprinkles are actually selected AND
-       there is piping available for them.
-    */
     options?.classList.toggle(
         "is-hidden",
-        !canUseSprinkles ||
-        !builderState.cakeBorderSprinkles
+        !showSprinkleOptions
     );
 }
 function showCustomShadeControls(
@@ -19148,7 +19145,7 @@ matchTpjBuilderImageBackgrounds();
 
 const name =
     label?.querySelector("small")?.textContent?.trim() ||
-    "Natural / Original";
+    "Cream";
 
         const swatch = label?.querySelector(".color-swatch");
 
@@ -19160,14 +19157,14 @@ const name =
             : swatch
                 ? getComputedStyle(swatch)
                     .getPropertyValue("--swatch-color").trim()
-                : "#F7B6D2";
+                : "#F3E2C7";
 
         picker.name.textContent =
             custom ? "Custom Shade" : name;
 
         picker.preview.style.setProperty(
             "--tpj-selected-color",
-            color || "#F7B6D2"
+            color || "#F3E2C7"
         );
 
         picker.details.hidden =
@@ -20226,13 +20223,14 @@ function schedule() {
 (() => {
     const base = "../images/cake-builder/color-swatches/";
 
-    const main = new Set([
-        "mainCakeColorSwatches",
-        "tierTopColorSwatches",
-        "tierBottomColorSwatches",
-        "characterOneColorSwatches",
-        "characterTwoColorSwatches"
-    ]);
+const main = new Set([
+    "mainCakeColorSwatches",
+    "tierTopColorSwatches",
+    "tierBottomColorSwatches",
+    "characterOneColorSwatches",
+    "characterTwoColorSwatches",
+    "cupcakeFrostingColorSwatches"
+]);
 
     const borders = new Set([
         "cakeBorderColorSwatches",
