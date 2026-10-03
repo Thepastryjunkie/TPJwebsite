@@ -13724,3 +13724,21 @@ b {
 .visual-reference-note {
     margin-top: 7px;
 }
+/* =========================================================
+   RESTORE APPROVED PAGE 1 MOBILE BACKGROUND
+   Restored from the earlier approved CSS.
+========================================================= */
+
+@media (max-width: 720px) {
+
+    .cake-builder-app:has(#builderStep1.is-active)
+    .cake-preview-column {
+        background:
+            linear-gradient(
+                135deg,
+                var(--tpj-page-pink) 0%,
+                var(--tpj-panel-pink) 58%,
+                var(--tpj-blush-pink) 100%
+            );
+    }
+}
