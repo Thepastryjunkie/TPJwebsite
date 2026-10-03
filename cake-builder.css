@@ -5115,39 +5115,6 @@ background: transparent;
     margin-top: 0;
 }
 
-/* LARGER MOBILE CAKE PREVIEW */
-
-@media
-(max-width: 720px) and
-(orientation: portrait) {
-
-    #cakePreviewCard .cake-renderer-stage {
-        width: min(71vw, 287px);
-        max-width: 100%;
-        height: auto;
-        min-width: 0;
-        min-height: 0;
-        aspect-ratio: 1 / 1;
-
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr);
-    }
-
-    #cakePreviewCard #realisticCakeRenderer {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        min-width: 0;
-        min-height: 0;
-    }
-
-    #cakePreviewCard #realisticCakeCanvas {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-}
 /*
     Prevent iPhone Safari from automatically
     zooming when keyboard-entry fields receive focus.
@@ -5236,47 +5203,7 @@ background: transparent;
     padding: 11px 14px;
 }
 
-/* MOBILE CUPCAKE ADD-ON CUSTOMIZATION */
 
-@media (max-width: 720px) and (orientation: portrait) {
-    #cupcakeAddOnStudioSlot .cupcake-studio-layout {
-        display: block;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-live-preview {
-        position: sticky;
-
-        top: calc(
-            var(--builder-header-height, 0px) +
-            var(--builder-progress-height, 0px) +
-            var(--tpj-main-preview-height, 0px) +
-            8px
-        );
-
-        z-index: 20;
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        margin: 8px auto;
-        padding: 4px;
-        background: #fff8f2;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-composite {
-        width: min(27vw, 103px);
-        margin: 0 auto;
-    }
-
-    #cupcakeAddOnStudioSlot #cupcakeSetCaption {
-        margin: 4px 0 0;
-        font-size: 12px;
-        line-height: 1.3;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-swatch-section {
-        margin-top: 12px;
-    }
-}
 /* EXTRA ITEM CUSTOMIZATION */
 
 .extra-customization-panel {
@@ -5369,50 +5296,6 @@ background: transparent;
 }
 
 
-/* PHONE LANDSCAPE CUPCAKE ADD-ON PREVIEW */
-
-@media
-(max-width: 980px) and
-(max-height: 600px) and
-(orientation: landscape) {
-
-    #cupcakeAddOnStudioSlot .cupcake-studio-layout {
-        display: block;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-live-preview {
-        position: sticky;
-
-        top: calc(
-            var(--builder-header-height, 0px) +
-            var(--builder-progress-height, 0px) +
-            4px
-        );
-
-        z-index: 20;
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        margin: 6px auto;
-        padding: 3px;
-        background: #fff8f2;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-composite {
-        width: min(16vw, 88px);
-        margin: 0 auto;
-    }
-
-    #cupcakeAddOnStudioSlot #cupcakeSetCaption {
-        margin: 3px 0 0;
-        font-size: 11px;
-        line-height: 1.3;
-    }
-
-    #cupcakeAddOnStudioSlot .cupcake-swatch-section {
-        margin-top: 10px;
-    }
-}
 
 .quantity-product-description {
     display: block;
@@ -5466,28 +5349,7 @@ background: transparent;
         line-height: 1.35;
     }
 }
-/* COMPACT UPRIGHT CAKE PREVIEW ONLY */
-@media (max-width: 720px) and (orientation: portrait) {
 
-    .cake-preview-column {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    #cakePreviewCard.preview-visual-card {
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-    }
-
-    #cakePreviewCard .cake-renderer-stage {
-        width: min(52vw, 210px);
-        max-width: 100%;
-        height: auto;
-        aspect-ratio: 1 / 1;
-        margin: 4px auto 0;
-    }
-}
 /* =========================================
    CAKE PREVIEW VISUAL ZOOM ONLY
 ========================================= */
@@ -6782,19 +6644,7 @@ body {
     background: transparent;
 }
 
-/* MOBILE PREVIEW BACKGROUND — SAME PALETTE */
 
-@media (max-width: 720px) {
-    .cake-preview-column {
-        background:
-            linear-gradient(
-                135deg,
-                var(--tpj-page-pink) 0%,
-                var(--tpj-panel-pink) 58%,
-                var(--tpj-blush-pink) 100%
-            );
-    }
-}
 
 /* ==========================================================
    TPJ PLAYFUL REDESIGN — STEP 4
@@ -8815,68 +8665,6 @@ background-image:
         color:
             rgba(90, 42, 30, 0.38);
     }
-#builderStep1 #guestRecommendation {
-    width: fit-content;
-    max-width: 420px;
-    min-height: 1.4em;
-    margin: 0;
-    padding: 8px 12px;
-
-    border: 0 !important;
-    border-radius: 4px !important;
-    background: rgba(255, 241, 231, 0.58) !important;
-    box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
-    backdrop-filter: blur(6px);
-
-    color: #4D1F16;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.4;
-}
-#builderStep1 #rushOrderNotice {
-    width: fit-content;
-    max-width: 600px;
-    margin: 0;
-    font-weight: 700;
-    padding: 8px 12px;
-    position: relative;
-
-    border: 0 !important;
-    border-radius: 4px !important;
-    background: rgba(255, 241, 231, 0.58) !important;
-    box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
-    backdrop-filter: blur(6px);
-
-    color: #4D1F16;
-    font-size: 10px;
-    line-height: 1.4;
-}
-
-
-#builderStep1 #rushOrderNotice::before {
-    content: none;
-}
-
-
-#builderStep1 #rushOrderNotice strong {
-    display: inline;
-
-    margin-right: 5px;
-
-    color: var(--chocolate);
-
-    font-size: 10px;
-}
-
-
-#builderStep1 #rushOrderNotice p {
-    display: inline;
-font-weight: 700;
-    margin: 0;
-}
-
-
-
 
     /* ======================================================
        PAGE 1 NAVIGATION
@@ -9038,7 +8826,65 @@ font-weight: 700;
         outline-offset: 4px;
     }
 }
+#builderStep1 #guestRecommendation {
+    width: fit-content;
+    max-width: 420px;
+    min-height: 1.4em;
+    margin: 0;
+    padding: 8px 12px;
 
+    border: 0 !important;
+    border-radius: 4px !important;
+    background: rgba(255, 241, 231, 0.58) !important;
+    box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
+    backdrop-filter: blur(6px);
+
+    color: #4D1F16;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+#builderStep1 #rushOrderNotice {
+    width: fit-content;
+    max-width: 600px;
+    margin: 0;
+    font-weight: 700;
+    padding: 8px 12px;
+    position: relative;
+
+    border: 0 !important;
+    border-radius: 4px !important;
+    background: rgba(255, 241, 231, 0.58) !important;
+    box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
+    backdrop-filter: blur(6px);
+
+    color: #4D1F16;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+
+#builderStep1 #rushOrderNotice::before {
+    content: none;
+}
+
+
+#builderStep1 #rushOrderNotice strong {
+    display: inline;
+
+    margin-right: 5px;
+
+    color: var(--chocolate);
+
+    font-size: 10px;
+}
+
+
+#builderStep1 #rushOrderNotice p {
+    display: inline;
+font-weight: 700;
+    margin: 0;
+}
 
 /* ==========================================================
    STEP 1 TABLET / MOBILE
@@ -13879,3 +13725,638 @@ b {
     margin-top: 7px;
 }
 
+/* =========================================================
+   TPJ FINAL RESPONSIVE QA
+   Mobile + Tablet + Phone Landscape
+   Desktop remains untouched.
+========================================================= */
+
+
+/* =========================================================
+   TOUCH DEVICE BACKGROUND SYSTEM
+   Phones + iPads
+========================================================= */
+
+@media (max-width: 1280px) and (pointer: coarse) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+
+    body {
+        position: relative;
+
+        background:
+            #F8D7E7;
+    }
+
+
+    /*
+        New mobile/tablet TPJ background.
+
+        CSS file sits at the website root,
+        so use the website-relative path,
+        NOT the Windows C:\ path.
+    */
+
+    body::before {
+        content: "";
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 0;
+
+        pointer-events: none;
+
+        background-image:
+            url("images/cake-builder/tpj-buttercream-overlay.png");
+
+        background-repeat:
+            no-repeat;
+
+        background-position:
+            center center;
+
+        /*
+            Intentionally stretches the artwork
+            to the viewport.
+
+            This keeps both decorated edges visible
+            instead of letting portrait mode crop them off.
+        */
+        background-size:
+            100% 100%;
+    }
+
+
+    .cake-builder-app {
+        position: relative;
+
+        z-index: 1;
+
+        width: 100%;
+        max-width: none;
+        min-height: 100svh;
+
+        overflow-x: clip;
+
+        background:
+            transparent !important;
+    }
+
+
+    .builder-main,
+    .builder-main-inner,
+    .builder-form-column,
+    .builder-step {
+        background:
+            transparent !important;
+    }
+
+
+    .builder-header,
+    .builder-progress,
+    .builder-main,
+    .builder-header-inner,
+    .builder-progress-inner,
+    .builder-main-inner {
+        width: 100%;
+        max-width: none;
+    }
+
+
+    .builder-main-inner {
+        min-width: 0;
+
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+
+    /*
+        REMOVE DESKTOP DECORATIVE SYSTEM.
+
+        The new full background replaces:
+        - top frosting corners
+        - repeating side frosting
+        - bottom frosting
+        - sprinkle scene
+
+        This is what stops the mobile page
+        from looking chaotic.
+    */
+
+    .cake-builder-app::before,
+    .cake-builder-app::after,
+    .builder-main::before,
+    .builder-main::after,
+    .tpj-buttercream-feather,
+    .tpj-buttercream-return-right,
+    .tpj-sprinkle-scene,
+    .tpj-step2-scatter,
+    .tpj-right-frosting-canvas {
+        display:
+            none !important;
+    }
+
+
+    /*
+        Kill the old mobile cake-preview gradient.
+
+        The new page background should show behind it.
+    */
+
+    .cake-preview-column,
+    #cakePreviewCard,
+    #cakePreviewCard .cake-renderer-stage {
+        background:
+            transparent !important;
+    }
+
+
+    .cake-preview-column {
+        box-shadow:
+            none !important;
+    }
+
+
+    /* =====================================================
+       PAGE 1 NOTICES
+       Match the desktop cream notification style
+    ===================================================== */
+
+    #builderStep1
+    #rushOrderNotice {
+        width: 100%;
+        max-width: 100%;
+
+        margin:
+            8px 0
+            0 !important;
+
+        padding:
+            9px 12px !important;
+
+        border:
+            0 !important;
+
+        border-radius:
+            4px !important;
+
+        background:
+            rgba(
+                255,
+                241,
+                231,
+                0.72
+            ) !important;
+
+        color:
+            #4D1F16 !important;
+
+        box-shadow:
+            0 3px 12px
+            rgba(
+                77,
+                31,
+                22,
+                0.08
+            ) !important;
+
+        backdrop-filter:
+            blur(6px);
+
+        font-weight:
+            600 !important;
+    }
+
+
+    #builderStep1
+    #rushOrderNotice::before {
+        content:
+            none !important;
+    }
+
+
+    #builderStep1
+    #rushOrderNotice
+    strong,
+    #builderStep1
+    #rushOrderNotice
+    p {
+        color:
+            #4D1F16 !important;
+    }
+
+
+    /*
+        Keep Cupcake Studio controls
+        above preview artwork on touch devices.
+    */
+
+    #cupcakeStudio
+    .cupcake-control-grid,
+
+    #cupcakeStudio
+    .cupcake-control-grid
+    label,
+
+    #cupcakeStudio
+    .cupcake-control-grid
+    select {
+        position:
+            relative;
+
+        z-index:
+            60;
+    }
+
+
+    #cupcakeStudio
+    .cupcake-control-grid
+    select {
+        pointer-events:
+            auto !important;
+
+        touch-action:
+            manipulation;
+    }
+
+}
+
+
+
+/* =========================================================
+   PHONE PORTRAIT
+========================================================= */
+
+@media
+(max-width: 720px) and
+(orientation: portrait) {
+
+    /*
+        Prevent the right-side blank strip.
+
+        Everything uses the complete phone width.
+    */
+
+    .builder-main-inner {
+        width:
+            100% !important;
+
+        max-width:
+            100% !important;
+
+        padding-left:
+            10px !important;
+
+        padding-right:
+            10px !important;
+    }
+
+
+    .builder-form-column {
+        width:
+            100% !important;
+
+        max-width:
+            100% !important;
+
+        min-width:
+            0 !important;
+    }
+
+
+    /* -----------------------------------------
+       Cake preview
+    ----------------------------------------- */
+
+    .cake-preview-column {
+        width:
+            100% !important;
+
+        max-width:
+            100% !important;
+
+        background:
+            transparent !important;
+    }
+
+
+    #cakePreviewCard
+    .preview-heading-row {
+        position:
+            relative;
+
+        min-height:
+            32px;
+
+        padding-right:
+            58px;
+    }
+
+
+    /*
+        RESET gets its own safe corner.
+
+        Tall cakes can no longer visually
+        run into the button.
+    */
+
+    #cakePreviewCard
+    .reset-cake-button {
+        position:
+            absolute;
+
+        top:
+            1px;
+
+        right:
+            0;
+
+        z-index:
+            40;
+
+        min-height:
+            28px;
+
+        padding:
+            4px 7px !important;
+
+        background:
+            rgba(
+                255,
+                248,
+                242,
+                0.88
+            ) !important;
+
+        box-shadow:
+            0 2px 7px
+            rgba(
+                90,
+                42,
+                30,
+                0.06
+            ) !important;
+    }
+
+
+    #cakePreviewCard
+    .cake-renderer-stage {
+        width:
+            min(
+                66vw,
+                270px
+            ) !important;
+
+        height:
+            auto !important;
+
+        margin:
+            8px auto
+            0 !important;
+
+        aspect-ratio:
+            1 / 1;
+    }
+
+
+    /*
+        Keep the current cake sticky normally.
+    */
+
+    .cake-preview-column {
+        position:
+            sticky;
+
+        top:
+            calc(
+                var(--builder-header-height) +
+                var(--builder-progress-height) +
+                4px
+            );
+
+        z-index:
+            1000;
+    }
+
+
+    /*
+        PAGE 5 CUPCAKE HANDOFF
+
+        JS adds this class once Style Your Swirl
+        reaches the sticky zone.
+
+        Main cake releases.
+    */
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    .cake-preview-column {
+        position:
+            relative !important;
+
+        top:
+            auto !important;
+
+        z-index:
+            1 !important;
+    }
+
+
+    /*
+        Cupcake preview becomes the sticky preview instead.
+    */
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cupcakeAddOnStudioSlot
+    .cupcake-live-preview {
+        position:
+            sticky !important;
+
+        top:
+            calc(
+                var(--builder-header-height) +
+                var(--builder-progress-height) +
+                5px
+            ) !important;
+
+        z-index:
+            1000 !important;
+
+        margin:
+            6px 0
+            8px !important;
+    }
+
+}
+
+
+
+/* =========================================================
+   PHONE LANDSCAPE
+========================================================= */
+
+@media
+(max-width: 980px) and
+(max-height: 600px) and
+(orientation: landscape) {
+
+    /*
+        Page 1 script was way too large
+        in side view.
+    */
+
+    #builderStep1
+    .step-one-script-title {
+        max-width:
+            100% !important;
+
+        font-size:
+            clamp(
+                34px,
+                6vw,
+                48px
+            ) !important;
+
+        line-height:
+            0.88 !important;
+    }
+
+
+    #builderStep1
+    .step-one-intro {
+        margin-top:
+            5px !important;
+
+        font-size:
+            10px !important;
+
+        line-height:
+            1.3 !important;
+    }
+
+
+    /*
+        Give Page 1 a little more breathing room
+        in the narrow landscape column.
+    */
+
+    #builderStep1 {
+        padding-top:
+            5px !important;
+    }
+
+
+    /* -----------------------------------------
+       Page 4 Coating Borders
+       Increase artwork size in landscape.
+    ----------------------------------------- */
+
+    #builderStep4
+    #cakeBorderCustomizer
+    > .text-choice-grid {
+        grid-template-columns:
+            repeat(
+                4,
+                minmax(
+                    0,
+                    1fr
+                )
+            ) !important;
+
+        gap:
+            8px !important;
+    }
+
+
+    #builderStep4
+    #cakeBorderCustomizer
+    .text-choice-card:has(
+        > img
+    )
+    > img {
+        width:
+            100% !important;
+
+        height:
+            88px !important;
+
+        margin:
+            0 auto
+            3px !important;
+
+        object-fit:
+            contain !important;
+    }
+
+
+    #builderStep4
+    #cakeBorderCustomizer
+    .text-choice-card:has(
+        > img
+    )
+    > strong {
+        font-size:
+            11px !important;
+    }
+
+
+    /*
+        Make sure cupcake dropdowns sit
+        above the sticky preview layer.
+    */
+
+    #cupcakeStudio
+    .cupcake-control-grid {
+        position:
+            relative;
+
+        z-index:
+            1100;
+    }
+
+}
+
+
+
+/* =========================================================
+   TABLET PORTRAIT / LANDSCAPE POLISH
+========================================================= */
+
+@media
+(min-width: 721px) and
+(max-width: 1280px) and
+(pointer: coarse) {
+
+    .builder-main-inner {
+        width:
+            100% !important;
+
+        max-width:
+            100% !important;
+    }
+
+
+    .cake-preview-column {
+        background:
+            transparent !important;
+    }
+
+
+    #cakePreviewCard
+    .reset-cake-button {
+        position:
+            relative;
+
+        z-index:
+            20;
+    }
+
+}

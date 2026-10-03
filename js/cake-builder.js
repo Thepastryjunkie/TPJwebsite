@@ -10775,25 +10775,64 @@ function getMaximumDateForField(stateKey) {
 }
 
 function applyDateInputBounds(input, stateKey) {
+    const usesNativeTouchPicker =
+        window.matchMedia(
+            "(pointer: coarse)"
+        ).matches;
+
+    /*
+        Desktop keeps the exact native
+        3-day pickup window.
+
+        Phone / tablet only block past dates
+        inside the Apple/native picker.
+
+        Our normal builder validation still
+        enforces the actual 3-day business rule.
+    */
+
     const minimum =
-        getMinimumDateForField(stateKey);
+        stateKey === "fulfillmentDate" &&
+        usesNativeTouchPicker
+            ? getTodayForDateInput()
+            : getMinimumDateForField(
+                stateKey
+            );
 
     const maximum =
-        getMaximumDateForField(stateKey);
+        stateKey === "fulfillmentDate" &&
+        usesNativeTouchPicker
+            ? ""
+            : getMaximumDateForField(
+                stateKey
+            );
 
-    // Avoid repeatedly resetting the
-    // mobile date picker while it is open.
-    if (input.getAttribute("min") !== minimum) {
-        input.min = minimum;
+
+    if (
+        input.getAttribute("min") !==
+        minimum
+    ) {
+        input.min =
+            minimum;
     }
 
+
     if (maximum) {
-        if (input.getAttribute("max") !== maximum) {
-            input.max = maximum;
+
+        if (
+            input.getAttribute("max") !==
+            maximum
+        ) {
+            input.max =
+                maximum;
         }
+
     } else {
-        // Event dates have no maximum.
-        input.removeAttribute("max");
+
+        input.removeAttribute(
+            "max"
+        );
+
     }
 }
 
@@ -15380,21 +15419,78 @@ getElement("#eventDate")?.addEventListener(
     }
 );
 
-
-getElement("#fulfillmentDate")?.addEventListener(
+getElement(
+    "#fulfillmentDate"
+)?.addEventListener(
     "change",
     (event) => {
+
+        const input =
+            event.target;
+
         const accepted =
             protectDateFromPast(
-                event.target,
+                input,
                 "fulfillmentDate"
             );
 
-        if (accepted) {
-            updateRushFee();
+
+        if (!accepted) {
+            return;
         }
+
+
+        const eventDate =
+            getElement(
+                "#eventDate"
+            )?.value || "";
+
+
+        const pickupDate =
+            input.value;
+
+
+        /*
+            On touch devices the native calendar
+            stays flexible, but the TPJ business
+            rule is still enforced immediately.
+        */
+
+        if (
+            eventDate &&
+            pickupDate &&
+            (
+                pickupDate <
+                    getMinimumDateForField(
+                        "fulfillmentDate"
+                    ) ||
+                pickupDate >
+                    eventDate
+            )
+        ) {
+
+            input.setCustomValidity(
+                "Pickup or delivery must be within the three days before your event or on the event day, and cannot be in the past."
+            );
+
+            input.reportValidity();
+
+            return;
+        }
+
+
+        input.setCustomValidity(
+            ""
+        );
+
+        builderState
+            .fulfillmentDate =
+            pickupDate;
+
+        updateRushFee();
     }
 );
+
 
 
 window.addEventListener("pageshow", (event) => {
@@ -20407,4 +20503,131 @@ const main = new Set([
     } else {
         start();
     }
+})();
+/* =========================================================
+   MOBILE PAGE 5 PREVIEW HANDOFF
+   Cake preview -> cupcake preview
+========================================================= */
+
+(() => {
+
+    const app =
+        document.querySelector(
+            ".cake-builder-app"
+        );
+
+    const cupcakeStudio =
+        document.querySelector(
+            "#cupcakeAddOnStudioSlot"
+        );
+
+
+    if (
+        !app ||
+        !cupcakeStudio
+    ) {
+        return;
+    }
+
+
+    const portraitPhone =
+        window.matchMedia(
+            "(max-width: 720px) and (orientation: portrait)"
+        );
+
+
+    function syncCupcakePreviewMode() {
+
+        /*
+            Only Page 5 phone portrait needs
+            this handoff.
+        */
+
+        if (
+            !portraitPhone.matches ||
+            builderState.currentStep !== 5
+        ) {
+            app.classList.remove(
+                "tpj-cupcake-preview-mode"
+            );
+
+            return;
+        }
+
+
+        const progressBottom =
+            document
+                .querySelector(
+                    ".builder-progress"
+                )
+                ?.getBoundingClientRect()
+                .bottom || 0;
+
+
+        const studioTop =
+            cupcakeStudio
+                .getBoundingClientRect()
+                .top;
+
+
+        /*
+            Once Style Your Swirl reaches
+            the sticky-header area,
+            release the main cake and let
+            the cupcake preview take over.
+        */
+
+        app.classList.toggle(
+            "tpj-cupcake-preview-mode",
+            studioTop <=
+                progressBottom + 8
+        );
+    }
+
+
+    window.addEventListener(
+        "scroll",
+        syncCupcakePreviewMode,
+        {
+            passive: true
+        }
+    );
+
+
+    window.addEventListener(
+        "resize",
+        syncCupcakePreviewMode
+    );
+
+
+    portraitPhone.addEventListener?.(
+        "change",
+        syncCupcakePreviewMode
+    );
+
+
+    /*
+        Steps are shown/hidden dynamically,
+        so resync when the builder changes.
+    */
+
+    new MutationObserver(
+        syncCupcakePreviewMode
+    ).observe(
+        document.querySelector(
+            ".builder-form-column"
+        ),
+        {
+            subtree: true,
+            attributes: true,
+            attributeFilter: [
+                "class",
+                "hidden"
+            ]
+        }
+    );
+
+
+    syncCupcakePreviewMode();
+
 })();
