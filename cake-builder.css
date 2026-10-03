@@ -13725,20 +13725,313 @@ b {
     margin-top: 7px;
 }
 /* =========================================================
-   RESTORE APPROVED PAGE 1 MOBILE BACKGROUND
-   Restored from the earlier approved CSS.
+   TPJ PHONE-ONLY VISUAL REPAIR
+   Page 1 width repair + Pages 2–8 backgrounds
+   Phones only — does not affect tablet or desktop
 ========================================================= */
 
-@media (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
+
+    /* =====================================================
+       PAGE 1 — KEEP THE APPROVED HERO, FIX ITS CANVAS
+       The hero PNG is not resized, stretched, or replaced.
+    ===================================================== */
+
+    html:has(#builderStep1.is-active),
+    body:has(#builderStep1.is-active) {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip !important;
+    }
+
+    .cake-builder-app:has(#builderStep1.is-active) {
+        width: 100%;
+        max-width: none;
+        overflow-x: clip !important;
+    }
 
     .cake-builder-app:has(#builderStep1.is-active)
-    .cake-preview-column {
+    :is(
+        .builder-header,
+        .builder-progress,
+        .builder-main
+    ) {
+        width: 100%;
+        max-width: none;
+    }
+
+    .cake-builder-app:has(#builderStep1.is-active)
+    .builder-main {
         background:
             linear-gradient(
                 135deg,
                 var(--tpj-page-pink) 0%,
                 var(--tpj-panel-pink) 58%,
                 var(--tpj-blush-pink) 100%
-            );
+            ) !important;
+    }
+
+    .cake-builder-app:has(#builderStep1.is-active)
+    .builder-main-inner {
+        width: 100%;
+        max-width: none;
+    }
+
+    .cake-builder-app:has(#builderStep1.is-active)
+    .cake-preview-column {
+        width: 100%;
+        max-width: none;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--tpj-page-pink) 0%,
+                var(--tpj-panel-pink) 58%,
+                var(--tpj-blush-pink) 100%
+            ) !important;
+    }
+
+
+    /* =====================================================
+       PAGES 2–8 — SAME PINK FAMILY AS PAGE 1
+       Replaces the peach/buttercream mobile background.
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    ) {
+        background-color:
+            var(--tpj-page-pink) !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--tpj-page-pink) 0%,
+                var(--tpj-panel-pink) 58%,
+                var(--tpj-blush-pink) 100%
+            ) !important;
+
+        overflow-x: clip !important;
+    }
+
+
+    /* =====================================================
+       REMOVE THE OLD BUTTERCREAM MOBILE ARTWORK
+       This only hides it on phones while Pages 2–8 are open.
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )::before,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )::after,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-buttercream-feather,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-right-frosting-canvas {
+        display: none !important;
+    }
+
+
+    /* =====================================================
+       SMALL MESSY ACCENT TEXTURE
+       Reuses the existing non-clickable sprinkle-scene layer.
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-sprinkle-scene {
+        display: block !important;
+
+        position: absolute;
+        inset: 0;
+
+        z-index: 0;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261003-mobile-1") !important;
+
+        background-repeat:
+            repeat !important;
+
+        background-position:
+            center top !important;
+
+        background-size:
+            260px auto !important;
+
+        opacity: 0.16;
+
+        pointer-events: none !important;
+        user-select: none;
+    }
+
+
+    /* =====================================================
+       FLYING-DESSERT LAYER
+       Replaces the old bottom buttercream corner.
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-main {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-main::before {
+        content: "" !important;
+        display: block !important;
+
+        position: absolute !important;
+        inset: 0 !important;
+
+        width: 100% !important;
+        height: 100% !important;
+
+        z-index: 0 !important;
+
+        background-color:
+            transparent !important;
+
+        background-repeat:
+            repeat-y !important;
+
+        background-position:
+            center top !important;
+
+        background-size:
+            100% auto !important;
+
+        opacity: 0.34;
+
+        pointer-events: none !important;
+        user-select: none;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-main::after {
+        content: none !important;
+        display: none !important;
+    }
+
+
+    /* ARRANGEMENT A — Pages 2, 4, 6 and 8 */
+
+    .cake-builder-app:has(#builderStep2.is-active)
+    .builder-main::before,
+
+    .cake-builder-app:has(#builderStep4.is-active)
+    .builder-main::before,
+
+    .cake-builder-app:has(#builderStep6.is-active)
+    .builder-main::before,
+
+    .cake-builder-app:has(#builderStep8.is-active)
+    .builder-main::before {
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-1") !important;
+    }
+
+
+    /* ARRANGEMENT B — Pages 3, 5 and 7 */
+
+    .cake-builder-app:has(#builderStep3.is-active)
+    .builder-main::before,
+
+    .cake-builder-app:has(#builderStep5.is-active)
+    .builder-main::before,
+
+    .cake-builder-app:has(#builderStep7.is-active)
+    .builder-main::before {
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-1") !important;
+    }
+
+
+    /* Keep all builder content above the decoration. */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-main-inner {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    /* =====================================================
+       FROSTED PREVIEW SEPARATION
+       Keeps transparent cake PNGs readable over the artwork.
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    #cakePreviewCard.preview-visual-card {
+        background:
+            rgba(253, 235, 243, 0.82) !important;
+
+        border:
+            1px solid rgba(77, 31, 22, 0.12) !important;
+
+        box-shadow:
+            0 8px 28px rgba(77, 31, 22, 0.13),
+            inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+
+        -webkit-backdrop-filter:
+            blur(18px) saturate(1.08);
+
+        backdrop-filter:
+            blur(18px) saturate(1.08);
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    #cakePreviewCard
+    .cake-renderer-stage {
+        background:
+            rgba(255, 248, 242, 0.34) !important;
+
+        -webkit-backdrop-filter:
+            blur(8px);
+
+        backdrop-filter:
+            blur(8px);
+    }
+
+
+    /* =====================================================
+       DECORATIONS CAN NEVER BLOCK MOBILE CONTROLS
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    :is(
+        .tpj-sprinkle-scene,
+        .tpj-buttercream-feather,
+        .tpj-right-frosting-canvas
+    ) {
+        pointer-events: none !important;
     }
 }
