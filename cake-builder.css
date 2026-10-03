@@ -13726,637 +13726,273 @@ b {
 }
 
 /* =========================================================
-   TPJ FINAL RESPONSIVE QA
-   Mobile + Tablet + Phone Landscape
-   Desktop remains untouched.
-========================================================= */
-
-
-/* =========================================================
-   TOUCH DEVICE BACKGROUND SYSTEM
-   Phones + iPads
+   TPJ MOBILE / TABLET REPAIR
+   Page 1 keeps its existing design.
+   New background applies to Pages 2–8 only.
 ========================================================= */
 
 @media (max-width: 1280px) and (pointer: coarse) {
 
-    html,
-    body {
+    html:has(.builder-step.is-active:not(#builderStep1)),
+    body:has(.builder-step.is-active:not(#builderStep1)) {
         width: 100%;
         max-width: 100%;
-        overflow-x: hidden;
+        overflow-x: clip;
     }
 
-
-    body {
+    body:has(.builder-step.is-active:not(#builderStep1)) {
         position: relative;
-
-        background:
-            #F8D7E7;
+        background: #F8D7E7;
     }
 
-
-    /*
-        New mobile/tablet TPJ background.
-
-        CSS file sits at the website root,
-        so use the website-relative path,
-        NOT the Windows C:\ path.
-    */
-
-    body::before {
+    body:has(.builder-step.is-active:not(#builderStep1))::before {
         content: "";
-
         position: fixed;
-
         inset: 0;
-
         z-index: 0;
-
         pointer-events: none;
 
         background-image:
             url("images/cake-builder/tpj-buttercream-overlay.png");
 
-        background-repeat:
-            no-repeat;
-
-        background-position:
-            center center;
-
-        /*
-            Intentionally stretches the artwork
-            to the viewport.
-
-            This keeps both decorated edges visible
-            instead of letting portrait mode crop them off.
-        */
-        background-size:
-            100% 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
     }
 
-
-    .cake-builder-app {
+    .cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) {
         position: relative;
-
         z-index: 1;
-
         width: 100%;
         max-width: none;
         min-height: 100svh;
-
         overflow-x: clip;
-
-        background:
-            transparent !important;
+        background: transparent !important;
     }
 
-
-    .builder-main,
-    .builder-main-inner,
-    .builder-form-column,
-    .builder-step {
-        background:
-            transparent !important;
+    body:has(.builder-step.is-active:not(#builderStep1))
+    :is(
+        .builder-main,
+        .builder-main-inner,
+        .builder-form-column,
+        .builder-step,
+        .cake-preview-column,
+        #cakePreviewCard,
+        #cakePreviewCard .cake-renderer-stage
+    ) {
+        background: transparent !important;
     }
 
-
-    .builder-header,
-    .builder-progress,
-    .builder-main,
-    .builder-header-inner,
-    .builder-progress-inner,
-    .builder-main-inner {
+    body:has(.builder-step.is-active:not(#builderStep1))
+    :is(
+        .builder-header,
+        .builder-progress,
+        .builder-main,
+        .builder-header-inner,
+        .builder-progress-inner,
+        .builder-main-inner
+    ) {
         width: 100%;
         max-width: none;
     }
 
-
+    body:has(.builder-step.is-active:not(#builderStep1))
     .builder-main-inner {
         min-width: 0;
-
         margin-left: 0;
         margin-right: 0;
     }
 
-
-    /*
-        REMOVE DESKTOP DECORATIVE SYSTEM.
-
-        The new full background replaces:
-        - top frosting corners
-        - repeating side frosting
-        - bottom frosting
-        - sprinkle scene
-
-        This is what stops the mobile page
-        from looking chaotic.
-    */
-
+    body:has(.builder-step.is-active:not(#builderStep1))
     .cake-builder-app::before,
+
+    body:has(.builder-step.is-active:not(#builderStep1))
     .cake-builder-app::after,
+
+    body:has(.builder-step.is-active:not(#builderStep1))
     .builder-main::before,
+
+    body:has(.builder-step.is-active:not(#builderStep1))
     .builder-main::after,
-    .tpj-buttercream-feather,
-    .tpj-buttercream-return-right,
-    .tpj-sprinkle-scene,
-    .tpj-step2-scatter,
-    .tpj-right-frosting-canvas {
-        display:
-            none !important;
+
+    body:has(.builder-step.is-active:not(#builderStep1))
+    :is(
+        .tpj-buttercream-feather,
+        .tpj-buttercream-return-right,
+        .tpj-sprinkle-scene,
+        .tpj-step2-scatter,
+        .tpj-right-frosting-canvas
+    ) {
+        display: none !important;
     }
 
-
-    /*
-        Kill the old mobile cake-preview gradient.
-
-        The new page background should show behind it.
-    */
-
-    .cake-preview-column,
-    #cakePreviewCard,
-    #cakePreviewCard .cake-renderer-stage {
-        background:
-            transparent !important;
-    }
-
-
+    body:has(.builder-step.is-active:not(#builderStep1))
     .cake-preview-column {
-        box-shadow:
-            none !important;
+        box-shadow: none !important;
     }
 
-
-    /* =====================================================
-       PAGE 1 NOTICES
-       Match the desktop cream notification style
-    ===================================================== */
-
-    #builderStep1
-    #rushOrderNotice {
-        width: 100%;
-        max-width: 100%;
-
-        margin:
-            8px 0
-            0 !important;
-
-        padding:
-            9px 12px !important;
-
-        border:
-            0 !important;
-
-        border-radius:
-            4px !important;
-
-        background:
-            rgba(
-                255,
-                241,
-                231,
-                0.72
-            ) !important;
-
-        color:
-            #4D1F16 !important;
-
-        box-shadow:
-            0 3px 12px
-            rgba(
-                77,
-                31,
-                22,
-                0.08
-            ) !important;
-
-        backdrop-filter:
-            blur(6px);
-
-        font-weight:
-            600 !important;
+    #cupcakeStudio .cupcake-control-grid,
+    #cupcakeStudio .cupcake-control-grid label,
+    #cupcakeStudio .cupcake-control-grid select {
+        position: relative;
+        z-index: 60;
     }
 
-
-    #builderStep1
-    #rushOrderNotice::before {
-        content:
-            none !important;
+    #cupcakeStudio .cupcake-control-grid select {
+        pointer-events: auto !important;
+        touch-action: manipulation;
     }
 
-
-    #builderStep1
-    #rushOrderNotice
-    strong,
-    #builderStep1
-    #rushOrderNotice
-    p {
-        color:
-            #4D1F16 !important;
-    }
-
-
-    /*
-        Keep Cupcake Studio controls
-        above preview artwork on touch devices.
-    */
-
-    #cupcakeStudio
-    .cupcake-control-grid,
-
-    #cupcakeStudio
-    .cupcake-control-grid
-    label,
-
-    #cupcakeStudio
-    .cupcake-control-grid
-    select {
-        position:
-            relative;
-
-        z-index:
-            60;
-    }
-
-
-    #cupcakeStudio
-    .cupcake-control-grid
-    select {
-        pointer-events:
-            auto !important;
-
-        touch-action:
-            manipulation;
-    }
-
-}
-
-
-
-/* =========================================================
-   PHONE PORTRAIT
-========================================================= */
-
-@media
-(max-width: 720px) and
-(orientation: portrait) {
-
-    /*
-        Prevent the right-side blank strip.
-
-        Everything uses the complete phone width.
-    */
-
-    .builder-main-inner {
-        width:
-            100% !important;
-
-        max-width:
-            100% !important;
-
-        padding-left:
-            10px !important;
-
-        padding-right:
-            10px !important;
-    }
-
-
-    .builder-form-column {
-        width:
-            100% !important;
-
-        max-width:
-            100% !important;
-
-        min-width:
-            0 !important;
-    }
-
-
-    /* -----------------------------------------
-       Cake preview
-    ----------------------------------------- */
-
-    .cake-preview-column {
-        width:
-            100% !important;
-
-        max-width:
-            100% !important;
-
-        background:
-            transparent !important;
-    }
-
-
-    #cakePreviewCard
-    .preview-heading-row {
-        position:
-            relative;
-
-        min-height:
-            32px;
-
-        padding-right:
-            58px;
-    }
-
-
-    /*
-        RESET gets its own safe corner.
-
-        Tall cakes can no longer visually
-        run into the button.
-    */
-
-    #cakePreviewCard
-    .reset-cake-button {
-        position:
-            absolute;
-
-        top:
-            1px;
-
-        right:
-            0;
-
-        z-index:
-            40;
-
-        min-height:
-            28px;
-
-        padding:
-            4px 7px !important;
-
-        background:
-            rgba(
-                255,
-                248,
-                242,
-                0.88
-            ) !important;
-
-        box-shadow:
-            0 2px 7px
-            rgba(
-                90,
-                42,
-                30,
-                0.06
-            ) !important;
-    }
-
-
-    #cakePreviewCard
-    .cake-renderer-stage {
-        width:
-            min(
-                66vw,
-                270px
-            ) !important;
-
-        height:
-            auto !important;
-
-        margin:
-            8px auto
-            0 !important;
-
-        aspect-ratio:
-            1 / 1;
-    }
-
-
-    /*
-        Keep the current cake sticky normally.
-    */
-
-    .cake-preview-column {
-        position:
-            sticky;
-
-        top:
-            calc(
-                var(--builder-header-height) +
-                var(--builder-progress-height) +
-                4px
-            );
-
-        z-index:
-            1000;
-    }
-
-
-    /*
-        PAGE 5 CUPCAKE HANDOFF
-
-        JS adds this class once Style Your Swirl
-        reaches the sticky zone.
-
-        Main cake releases.
-    */
+    /* Release the main cake during the cupcake handoff. */
 
     .cake-builder-app.tpj-cupcake-preview-mode
     .cake-preview-column {
-        position:
-            relative !important;
-
-        top:
-            auto !important;
-
-        z-index:
-            1 !important;
+        position: relative !important;
+        top: auto !important;
+        z-index: 1 !important;
     }
 
+    /* Show the cupcake preview before its controls. */
 
-    /*
-        Cupcake preview becomes the sticky preview instead.
-    */
+    #cupcakeAddOnStudioSlot .cupcake-live-preview,
+    #cupcakeAddOnStudioSlot .tpj-cupcake-preview-placeholder {
+        order: -1;
+    }
 
-    .cake-builder-app.tpj-cupcake-preview-mode
+    /* JS supplies the preview's screen position. */
+
     #cupcakeAddOnStudioSlot
-    .cupcake-live-preview {
-        position:
-            sticky !important;
-
-        top:
-            calc(
-                var(--builder-header-height) +
-                var(--builder-progress-height) +
-                5px
-            ) !important;
-
-        z-index:
-            1000 !important;
-
-        margin:
-            6px 0
-            8px !important;
+    .cupcake-live-preview.tpj-cupcake-pinned {
+        position: fixed !important;
+        top: var(--tpj-cupcake-top) !important;
+        left: var(--tpj-cupcake-left) !important;
+        width: var(--tpj-cupcake-width) !important;
+        max-width: none !important;
+        margin: 0 !important;
+        z-index: 1001 !important;
+        background: rgba(255, 248, 242, 0.96);
     }
 
+    #cupcakeAddOnStudioSlot
+    .cupcake-live-preview .cupcake-composite {
+        width: min(38vw, 170px, 23svh);
+        margin-top: 0;
+    }
+
+    #cupcakeAddOnStudioSlot
+    .cupcake-live-preview #cupcakeSetCaption {
+        margin: 4px 0 0;
+        font-size: 10px;
+    }
 }
 
+/* PHONE PORTRAIT — PAGES 2–8 */
 
+@media (max-width: 720px)
+and (orientation: portrait)
+and (pointer: coarse) {
 
-/* =========================================================
-   PHONE LANDSCAPE
-========================================================= */
-
-@media
-(max-width: 980px) and
-(max-height: 600px) and
-(orientation: landscape) {
-
-    /*
-        Page 1 script was way too large
-        in side view.
-    */
-
-    #builderStep1
-    .step-one-script-title {
-        max-width:
-            100% !important;
-
-        font-size:
-            clamp(
-                34px,
-                6vw,
-                48px
-            ) !important;
-
-        line-height:
-            0.88 !important;
-    }
-
-
-    #builderStep1
-    .step-one-intro {
-        margin-top:
-            5px !important;
-
-        font-size:
-            10px !important;
-
-        line-height:
-            1.3 !important;
-    }
-
-
-    /*
-        Give Page 1 a little more breathing room
-        in the narrow landscape column.
-    */
-
-    #builderStep1 {
-        padding-top:
-            5px !important;
-    }
-
-
-    /* -----------------------------------------
-       Page 4 Coating Borders
-       Increase artwork size in landscape.
-    ----------------------------------------- */
-
-    #builderStep4
-    #cakeBorderCustomizer
-    > .text-choice-grid {
-        grid-template-columns:
-            repeat(
-                4,
-                minmax(
-                    0,
-                    1fr
-                )
-            ) !important;
-
-        gap:
-            8px !important;
-    }
-
-
-    #builderStep4
-    #cakeBorderCustomizer
-    .text-choice-card:has(
-        > img
-    )
-    > img {
-        width:
-            100% !important;
-
-        height:
-            88px !important;
-
-        margin:
-            0 auto
-            3px !important;
-
-        object-fit:
-            contain !important;
-    }
-
-
-    #builderStep4
-    #cakeBorderCustomizer
-    .text-choice-card:has(
-        > img
-    )
-    > strong {
-        font-size:
-            11px !important;
-    }
-
-
-    /*
-        Make sure cupcake dropdowns sit
-        above the sticky preview layer.
-    */
-
-    #cupcakeStudio
-    .cupcake-control-grid {
-        position:
-            relative;
-
-        z-index:
-            1100;
-    }
-
-}
-
-
-
-/* =========================================================
-   TABLET PORTRAIT / LANDSCAPE POLISH
-========================================================= */
-
-@media
-(min-width: 721px) and
-(max-width: 1280px) and
-(pointer: coarse) {
-
+    body:has(.builder-step.is-active:not(#builderStep1))
     .builder-main-inner {
-        width:
-            100% !important;
-
-        max-width:
-            100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
     }
 
+    body:has(.builder-step.is-active:not(#builderStep1))
+    .builder-form-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
 
+    body:has(.builder-step.is-active:not(#builderStep1))
     .cake-preview-column {
-        background:
-            transparent !important;
+        position: sticky;
+        top: calc(
+            var(--builder-header-height) +
+            var(--builder-progress-height) +
+            4px
+        );
+        z-index: 1000;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-
-    #cakePreviewCard
-    .reset-cake-button {
-        position:
-            relative;
-
-        z-index:
-            20;
+    #cakePreviewCard .preview-heading-row {
+        position: relative;
+        min-height: 32px;
+        padding-right: 58px;
     }
 
+    #cakePreviewCard .reset-cake-button {
+        position: absolute;
+        top: 1px;
+        right: 0;
+        z-index: 40;
+        min-height: 28px;
+        padding: 4px 7px !important;
+        background: rgba(255, 248, 242, 0.88) !important;
+        box-shadow: 0 2px 7px rgba(90, 42, 30, 0.06) !important;
+    }
+
+    #cakePreviewCard .cake-renderer-stage {
+        width: min(66vw, 270px) !important;
+        height: auto !important;
+        margin: 8px auto 0 !important;
+        aspect-ratio: 1 / 1;
+    }
+}
+
+/* PHONE LANDSCAPE */
+
+@media (max-width: 980px)
+and (max-height: 600px)
+and (orientation: landscape)
+and (pointer: coarse) {
+
+    #builderStep4
+    #cakeBorderCustomizer > .text-choice-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    #builderStep4
+    #cakeBorderCustomizer
+    .text-choice-card:has(> img) > img {
+        width: 100% !important;
+        height: 88px !important;
+        margin: 0 auto 3px !important;
+        object-fit: contain !important;
+    }
+
+    #builderStep4
+    #cakeBorderCustomizer
+    .text-choice-card:has(> img) > strong {
+        font-size: 11px !important;
+    }
+
+    #cupcakeStudio .cupcake-control-grid {
+        position: relative;
+        z-index: 1100;
+    }
+}
+
+/* TABLET */
+
+@media (min-width: 721px)
+and (max-width: 1280px)
+and (pointer: coarse) {
+
+    body:has(.builder-step.is-active:not(#builderStep1))
+    .builder-main-inner {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #cakePreviewCard .reset-cake-button {
+        position: relative;
+        z-index: 20;
+    }
 }

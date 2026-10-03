@@ -20505,129 +20505,167 @@ const main = new Set([
     }
 })();
 /* =========================================================
-   MOBILE PAGE 5 PREVIEW HANDOFF
-   Cake preview -> cupcake preview
+   MOBILE / TABLET PAGE 5 PREVIEW HANDOFF
 ========================================================= */
 
 (() => {
+    function start() {
 
-    const app =
-        document.querySelector(
-            ".cake-builder-app"
-        );
-
-    const cupcakeStudio =
-        document.querySelector(
-            "#cupcakeAddOnStudioSlot"
-        );
-
-
-    if (
-        !app ||
-        !cupcakeStudio
-    ) {
-        return;
-    }
-
-
-    const portraitPhone =
-        window.matchMedia(
-            "(max-width: 720px) and (orientation: portrait)"
-        );
-
-
-    function syncCupcakePreviewMode() {
-
-        /*
-            Only Page 5 phone portrait needs
-            this handoff.
-        */
-
-        if (
-            !portraitPhone.matches ||
-            builderState.currentStep !== 5
-        ) {
-            app.classList.remove(
-                "tpj-cupcake-preview-mode"
-            );
-
+        /* Leave non-touch desktop behavior alone. */
+        if (!matchMedia("(pointer: coarse)").matches) {
             return;
         }
 
+        const app = document.querySelector(".cake-builder-app");
+        const slot = document.querySelector("#cupcakeAddOnStudioSlot");
+        const studio = document.querySelector("#cupcakeStudio");
+        const preview = studio?.querySelector(".cupcake-live-preview");
 
-        const progressBottom =
-            document
-                .querySelector(
-                    ".builder-progress"
-                )
-                ?.getBoundingClientRect()
-                .bottom || 0;
+        if (!app || !slot || !studio || !preview) {
+            return;
+        }
 
-
-        const studioTop =
-            cupcakeStudio
-                .getBoundingClientRect()
-                .top;
-
-
-        /*
-            Once Style Your Swirl reaches
-            the sticky-header area,
-            release the main cake and let
-            the cupcake preview take over.
-        */
-
-        app.classList.toggle(
-            "tpj-cupcake-preview-mode",
-            studioTop <=
-                progressBottom + 8
+        const mobileTablet = matchMedia(
+            "(max-width: 1280px) and (pointer: coarse)"
         );
+
+        const placeholder = document.createElement("div");
+
+        placeholder.className = "tpj-cupcake-preview-placeholder";
+        placeholder.hidden = true;
+        placeholder.setAttribute("aria-hidden", "true");
+
+        preview.before(placeholder);
+
+        let pinned = false;
+        let pending = false;
+
+        function releasePreview() {
+            if (!pinned) return;
+
+            pinned = false;
+
+            preview.classList.remove("tpj-cupcake-pinned");
+            app.classList.remove("tpj-cupcake-preview-mode");
+
+            placeholder.hidden = true;
+        }
+
+        function syncPreview() {
+            pending = false;
+
+            const activePage = document.querySelector(
+                "#builderStep5.is-active:not([hidden])"
+            );
+
+            if (
+                !mobileTablet.matches ||
+                !activePage ||
+                studio.parentElement !== slot ||
+                !studio.getClientRects().length ||
+                !preview.getClientRects().length
+            ) {
+                releasePreview();
+                return;
+            }
+
+            const headerBottom =
+                document.querySelector(".builder-header")
+                    ?.getBoundingClientRect().bottom || 0;
+
+            const progressBottom =
+                document.querySelector(".builder-progress")
+                    ?.getBoundingClientRect().bottom || 0;
+
+            const stickyTop =
+                Math.max(0, headerBottom, progressBottom) + 5;
+
+            const anchor = (
+                pinned ? placeholder : preview
+            ).getBoundingClientRect();
+
+            const previewHeight =
+                preview.getBoundingClientRect().height;
+
+            const studioBottom =
+                studio.getBoundingClientRect().bottom;
+
+            if (
+                anchor.top > stickyTop + 8 ||
+                studioBottom <= stickyTop + previewHeight + 8
+            ) {
+                releasePreview();
+                return;
+            }
+
+            preview.style.setProperty(
+                "--tpj-cupcake-top",
+                `${stickyTop}px`
+            );
+
+            preview.style.setProperty(
+                "--tpj-cupcake-left",
+                `${anchor.left}px`
+            );
+
+            preview.style.setProperty(
+                "--tpj-cupcake-width",
+                `${anchor.width}px`
+            );
+
+            placeholder.style.height = `${previewHeight}px`;
+            placeholder.style.width = "100%";
+            placeholder.style.maxWidth = "380px";
+            placeholder.style.marginInline = "auto";
+
+            if (!pinned) {
+                pinned = true;
+                placeholder.hidden = false;
+
+                preview.classList.add("tpj-cupcake-pinned");
+                app.classList.add("tpj-cupcake-preview-mode");
+            }
+        }
+
+        function scheduleSync() {
+            if (pending) return;
+
+            pending = true;
+            requestAnimationFrame(syncPreview);
+        }
+
+        window.addEventListener("scroll", scheduleSync, {
+            passive: true
+        });
+
+        window.addEventListener("resize", scheduleSync);
+        document.addEventListener("change", scheduleSync);
+
+        mobileTablet.addEventListener("change", scheduleSync);
+
+        const formColumn = document.querySelector(
+            ".builder-form-column"
+        );
+
+        if (formColumn) {
+            new MutationObserver(scheduleSync).observe(formColumn, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ["class", "hidden"]
+            });
+        }
+
+        new ResizeObserver(scheduleSync).observe(studio);
+
+        scheduleSync();
     }
 
-
-    window.addEventListener(
-        "scroll",
-        syncCupcakePreviewMode,
-        {
-            passive: true
-        }
-    );
-
-
-    window.addEventListener(
-        "resize",
-        syncCupcakePreviewMode
-    );
-
-
-    portraitPhone.addEventListener?.(
-        "change",
-        syncCupcakePreviewMode
-    );
-
-
-    /*
-        Steps are shown/hidden dynamically,
-        so resync when the builder changes.
-    */
-
-    new MutationObserver(
-        syncCupcakePreviewMode
-    ).observe(
-        document.querySelector(
-            ".builder-form-column"
-        ),
-        {
-            subtree: true,
-            attributes: true,
-            attributeFilter: [
-                "class",
-                "hidden"
-            ]
-        }
-    );
-
-
-    syncCupcakePreviewMode();
-
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, {
+            once: true
+        });
+    } else {
+        start();
+    }
 })();
