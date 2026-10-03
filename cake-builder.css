@@ -13845,8 +13845,8 @@ and (pointer: coarse) {
 
 
     /* =====================================================
-       SMALL MESSY ACCENT TEXTURE
-       Reuses the existing non-clickable sprinkle-scene layer.
+       MOBILE DECORATIVE SCENE
+       One proven layer with two independent backgrounds.
     ===================================================== */
 
     .cake-builder-app:has(
@@ -13855,75 +13855,141 @@ and (pointer: coarse) {
     .tpj-sprinkle-scene {
         display: block !important;
 
-        position: absolute;
-        inset: 0;
-
-        z-index: 0;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261003-mobile-1") !important;
-
-        background-repeat:
-            repeat !important;
-
-        background-position:
-            center top !important;
-
-        background-size:
-            260px auto !important;
-
-        opacity: 0.16;
-
-        pointer-events: none !important;
-        user-select: none;
-    }
-
-
-    /* =====================================================
-       FLYING-DESSERT LAYER
-       Replaces the old bottom buttercream corner.
-    ===================================================== */
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .builder-main {
-        position: relative;
-        isolation: isolate;
-    }
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .builder-main::before {
-        content: "" !important;
-        display: block !important;
-
         position: absolute !important;
         inset: 0 !important;
 
-        width: 100% !important;
-        height: 100% !important;
-
         z-index: 0 !important;
 
-        background-color:
-            transparent !important;
+        overflow: hidden;
 
-        background-repeat:
-            repeat-y !important;
-
-        background-position:
-            center top !important;
-
-        background-size:
-            100% auto !important;
-
-        opacity: 0.34;
+        background: none !important;
+        opacity: 1 !important;
 
         pointer-events: none !important;
         user-select: none;
     }
+
+
+    /* Both decorative layers remain non-interactive. */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-sprinkle-scene::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+
+        top:
+            calc(
+                var(--builder-header-height) +
+                var(--builder-progress-height)
+            );
+
+        bottom: 0;
+
+        pointer-events: none !important;
+        user-select: none;
+    }
+
+
+    /* -----------------------------------------------------
+       LARGE FLYING-DESSERT ARRANGEMENT
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-sprinkle-scene::before {
+        z-index: 1;
+
+        background-repeat:
+            repeat-y;
+
+        background-position:
+            center top;
+
+        background-size:
+            100% auto;
+
+        opacity: 0.38;
+    }
+
+
+    /* Arrangement A — Pages 2, 4, 6 and 8 */
+
+    .cake-builder-app:has(#builderStep2.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep4.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep6.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep8.is-active)
+    .tpj-sprinkle-scene::before {
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-2") !important;
+    }
+
+
+    /* Arrangement B — Pages 3, 5 and 7 */
+
+    .cake-builder-app:has(#builderStep3.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep5.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep7.is-active)
+    .tpj-sprinkle-scene::before {
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-2") !important;
+    }
+
+
+    /* -----------------------------------------------------
+       SMALL MESSY SPRINKLE/FROSTING TEXTURE
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .tpj-sprinkle-scene::after {
+        z-index: 2;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261003-mobile-2");
+
+        background-repeat:
+            repeat;
+
+        background-position:
+            center top;
+
+        background-size:
+            260px auto;
+
+        opacity: 0.14;
+    }
+
+
+    /* Disable the old builder-main buttercream corners.
+       Decoration now comes entirely from tpj-sprinkle-scene. */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-main::before,
 
     .cake-builder-app:has(
         .builder-step.is-active:not(#builderStep1)
@@ -13931,52 +13997,19 @@ and (pointer: coarse) {
     .builder-main::after {
         content: none !important;
         display: none !important;
+        background-image: none !important;
     }
 
 
-    /* ARRANGEMENT A — Pages 2, 4, 6 and 8 */
-
-    .cake-builder-app:has(#builderStep2.is-active)
-    .builder-main::before,
-
-    .cake-builder-app:has(#builderStep4.is-active)
-    .builder-main::before,
-
-    .cake-builder-app:has(#builderStep6.is-active)
-    .builder-main::before,
-
-    .cake-builder-app:has(#builderStep8.is-active)
-    .builder-main::before {
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-1") !important;
-    }
-
-
-    /* ARRANGEMENT B — Pages 3, 5 and 7 */
-
-    .cake-builder-app:has(#builderStep3.is-active)
-    .builder-main::before,
-
-    .cake-builder-app:has(#builderStep5.is-active)
-    .builder-main::before,
-
-    .cake-builder-app:has(#builderStep7.is-active)
-    .builder-main::before {
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-1") !important;
-    }
-
-
-    /* Keep all builder content above the decoration. */
+    /* Keep the actual builder above both decorations. */
 
     .cake-builder-app:has(
         .builder-step.is-active:not(#builderStep1)
     )
     .builder-main-inner {
         position: relative;
-        z-index: 2;
+        z-index: 3;
     }
-
 
     /* =====================================================
        FROSTED PREVIEW SEPARATION
