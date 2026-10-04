@@ -20504,3 +20504,296 @@ const main = new Set([
         start();
     }
 })();
+/* =========================================================
+   PAGE 5 PHONE CUPCAKE-PREVIEW HANDOFF
+   Phones only — tablet and desktop remain untouched.
+========================================================= */
+
+(() => {
+    "use strict";
+
+    function startPhoneCupcakeHandoff() {
+        const phoneOnly = window.matchMedia(
+            "(max-width: 480px) and (hover: none) and (pointer: coarse)"
+        );
+
+        const app =
+            document.querySelector(
+                ".cake-builder-app"
+            );
+
+        const slot =
+            document.querySelector(
+                "#cupcakeAddOnStudioSlot"
+            );
+
+        const studio =
+            document.querySelector(
+                "#cupcakeStudio"
+            );
+
+        const preview =
+            studio?.querySelector(
+                ".cupcake-live-preview"
+            );
+
+        if (
+            !app ||
+            !slot ||
+            !studio ||
+            !preview
+        ) {
+            return;
+        }
+
+
+        let placeholder =
+            studio.querySelector(
+                ".tpj-cupcake-preview-placeholder"
+            );
+
+        if (!placeholder) {
+            placeholder =
+                document.createElement("div");
+
+            placeholder.className =
+                "tpj-cupcake-preview-placeholder";
+
+            placeholder.hidden = true;
+
+            placeholder.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            preview.before(
+                placeholder
+            );
+        }
+
+
+        let pinned = false;
+        let pending = false;
+
+
+        function releasePreview() {
+            if (!pinned) {
+                return;
+            }
+
+            pinned = false;
+
+            preview.classList.remove(
+                "tpj-cupcake-pinned"
+            );
+
+            app.classList.remove(
+                "tpj-cupcake-preview-mode"
+            );
+
+            placeholder.hidden = true;
+            placeholder.style.height = "";
+            placeholder.style.width = "";
+        }
+
+
+        function syncPreview() {
+            pending = false;
+
+            const activePage =
+                document.querySelector(
+                    "#builderStep5.is-active:not([hidden])"
+                );
+
+            const studioIsOnExtrasPage =
+                studio.parentElement === slot;
+
+            /*
+                Keep the original control lock:
+                the sticky cupcake does not begin until
+                a cupcake count has unlocked the studio.
+            */
+
+            if (
+                !phoneOnly.matches ||
+                !activePage ||
+                !studioIsOnExtrasPage ||
+                studio.disabled ||
+                !studio.getClientRects().length ||
+                !preview.getClientRects().length
+            ) {
+                releasePreview();
+                return;
+            }
+
+
+            const headerBottom =
+                document.querySelector(
+                    ".builder-header"
+                )?.getBoundingClientRect().bottom || 0;
+
+            const progressBottom =
+                document.querySelector(
+                    ".builder-progress"
+                )?.getBoundingClientRect().bottom || 0;
+
+            const stickyTop =
+                Math.max(
+                    0,
+                    headerBottom,
+                    progressBottom
+                ) + 5;
+
+
+            const anchor =
+                (
+                    pinned
+                        ? placeholder
+                        : preview
+                ).getBoundingClientRect();
+
+            const previewHeight =
+                preview.getBoundingClientRect().height;
+
+            const studioBottom =
+                studio.getBoundingClientRect().bottom;
+
+
+            /*
+                Do not take over until the cupcake reaches
+                the sticky area. Release it at the bottom
+                of Style Your Swirl.
+            */
+
+            if (
+                anchor.top > stickyTop + 8 ||
+                studioBottom <=
+                    stickyTop +
+                    previewHeight +
+                    8
+            ) {
+                releasePreview();
+                return;
+            }
+
+
+            preview.style.setProperty(
+                "--tpj-cupcake-top",
+                `${stickyTop}px`
+            );
+
+            preview.style.setProperty(
+                "--tpj-cupcake-left",
+                `${anchor.left}px`
+            );
+
+            preview.style.setProperty(
+                "--tpj-cupcake-width",
+                `${anchor.width}px`
+            );
+
+            placeholder.style.height =
+                `${previewHeight}px`;
+
+            placeholder.style.width =
+                "100%";
+
+            placeholder.style.maxWidth =
+                "380px";
+
+            placeholder.style.marginInline =
+                "auto";
+
+
+            if (!pinned) {
+                pinned = true;
+
+                placeholder.hidden = false;
+
+                preview.classList.add(
+                    "tpj-cupcake-pinned"
+                );
+
+                app.classList.add(
+                    "tpj-cupcake-preview-mode"
+                );
+            }
+        }
+
+
+        function scheduleSync() {
+            if (pending) {
+                return;
+            }
+
+            pending = true;
+
+            window.requestAnimationFrame(
+                syncPreview
+            );
+        }
+
+
+        window.addEventListener(
+            "scroll",
+            scheduleSync,
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "resize",
+            scheduleSync
+        );
+
+        document.addEventListener(
+            "change",
+            scheduleSync
+        );
+
+        phoneOnly.addEventListener(
+            "change",
+            scheduleSync
+        );
+
+
+        new ResizeObserver(
+            scheduleSync
+        ).observe(
+            studio
+        );
+
+
+        new MutationObserver(
+            scheduleSync
+        ).observe(
+            studio,
+            {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: [
+                    "class",
+                    "hidden",
+                    "disabled"
+                ]
+            }
+        );
+
+
+        scheduleSync();
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            startPhoneCupcakeHandoff,
+            { once: true }
+        );
+    } else {
+        startPhoneCupcakeHandoff();
+    }
+})();
