@@ -13724,10 +13724,13 @@ b {
 .visual-reference-note {
     margin-top: 7px;
 }
+
 /* =========================================================
-   TPJ PHONE-ONLY VISUAL REPAIR
-   Page 1 width repair + Pages 2–8 backgrounds
-   Phones only — does not affect tablet or desktop
+   TPJ FINAL PHONE-ONLY DESIGN
+   Page 1 remains approved
+   Pages 2–5 use sprinkle background
+   Pages 6–8 keep flying desserts
+   Tablet and desktop remain untouched
 ========================================================= */
 
 @media screen
@@ -13736,8 +13739,7 @@ and (hover: none)
 and (pointer: coarse) {
 
     /* =====================================================
-       PAGE 1 — KEEP THE APPROVED HERO, FIX ITS CANVAS
-       The hero PNG is not resized, stretched, or replaced.
+       PAGE 1 — KEEP APPROVED VERSION
     ===================================================== */
 
     html:has(#builderStep1.is-active),
@@ -13796,8 +13798,7 @@ and (pointer: coarse) {
 
 
     /* =====================================================
-       PAGES 2–8 — SAME PINK FAMILY AS PAGE 1
-       Replaces the peach/buttercream mobile background.
+       PAGES 2–8 — PINK BASE
     ===================================================== */
 
     .cake-builder-app:has(
@@ -13818,10 +13819,7 @@ and (pointer: coarse) {
     }
 
 
-    /* =====================================================
-       REMOVE THE OLD BUTTERCREAM MOBILE ARTWORK
-       This only hides it on phones while Pages 2–8 are open.
-    ===================================================== */
+    /* Remove the older buttercream artwork on phones. */
 
     .cake-builder-app:has(
         .builder-step.is-active:not(#builderStep1)
@@ -13845,8 +13843,7 @@ and (pointer: coarse) {
 
 
     /* =====================================================
-       MOBILE DECORATIVE SCENE
-       One proven layer with two independent backgrounds.
+       SHARED DECORATIVE SCENE
     ===================================================== */
 
     .cake-builder-app:has(
@@ -13868,9 +13865,6 @@ and (pointer: coarse) {
         pointer-events: none !important;
         user-select: none;
     }
-
-
-    /* Both decorative layers remain non-interactive. */
 
     .cake-builder-app:has(
         .builder-step.is-active:not(#builderStep1)
@@ -13901,14 +13895,10 @@ and (pointer: coarse) {
     }
 
 
-    /* -----------------------------------------------------
-       PAGES 2–5 — CROPPED CORNER DESSERTS
-
-       Each pseudo-element is now a narrow edge window.
-       Most of each PNG remains outside the visible layout,
-       preventing the diagonal artwork from crossing through
-       the choices.
-    ----------------------------------------------------- */
+    /* =====================================================
+       PAGES 2–5 — SPRINKLE BACKGROUND
+       No white film and no flying-dessert clusters
+    ===================================================== */
 
     .cake-builder-app:has(
         :is(
@@ -13918,154 +13908,45 @@ and (pointer: coarse) {
             #builderStep5.is-active
         )
     )
-    .tpj-sprinkle-scene::before,
+    .tpj-sprinkle-scene::before {
+        left: 0 !important;
+        right: 0 !important;
 
-    .cake-builder-app:has(
-        :is(
-            #builderStep2.is-active,
-            #builderStep3.is-active,
-            #builderStep4.is-active,
-            #builderStep5.is-active
-        )
-    )
-    .tpj-sprinkle-scene::after {
-        display: block !important;
-        content: "";
+        width: auto !important;
 
-        width: 38% !important;
-
-        left: auto !important;
-        right: auto !important;
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261004-pages2-5-1") !important;
 
         background-repeat:
-            no-repeat !important;
+            repeat-y !important;
 
         background-size:
-            250% auto !important;
-
-        opacity: 0.94;
-
-        pointer-events:
-            none !important;
-    }
-
-
-    /* PAGE 2
-       Upper-left + lower-right. */
-
-    .cake-builder-app:has(#builderStep2.is-active)
-    .tpj-sprinkle-scene::before {
-        left: 0 !important;
-        right: auto !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-corners-1") !important;
+            100% auto !important;
 
         background-position:
-            left top 34px !important;
+            center top !important;
+
+        opacity: 0.58;
     }
 
-    .cake-builder-app:has(#builderStep2.is-active)
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
     .tpj-sprinkle-scene::after {
-        left: auto !important;
-        right: 0 !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-corners-1") !important;
-
-        background-position:
-            right bottom 55px !important;
+        content: none !important;
+        display: none !important;
+        background: none !important;
     }
 
 
-    /* PAGE 3
-       Upper-right + lower-left. */
-
-    .cake-builder-app:has(#builderStep3.is-active)
-    .tpj-sprinkle-scene::before {
-        left: auto !important;
-        right: 0 !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            right top 38px !important;
-    }
-
-    .cake-builder-app:has(#builderStep3.is-active)
-    .tpj-sprinkle-scene::after {
-        left: 0 !important;
-        right: auto !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            left bottom 60px !important;
-    }
-
-
-    /* PAGE 4
-       Matches the approved reference:
-       upper-right + lower-left. */
-
-    .cake-builder-app:has(#builderStep4.is-active)
-    .tpj-sprinkle-scene::before {
-        left: auto !important;
-        right: 0 !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            right top 70px !important;
-    }
-
-    .cake-builder-app:has(#builderStep4.is-active)
-    .tpj-sprinkle-scene::after {
-        left: 0 !important;
-        right: auto !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            left bottom 55px !important;
-    }
-
-
-    /* PAGE 5
-       Upper-right + lower-left with extra breathing room. */
-
-    .cake-builder-app:has(#builderStep5.is-active)
-    .tpj-sprinkle-scene::before {
-        left: auto !important;
-        right: 0 !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            right top 80px !important;
-    }
-
-    .cake-builder-app:has(#builderStep5.is-active)
-    .tpj-sprinkle-scene::after {
-        left: 0 !important;
-        right: auto !important;
-
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
-
-        background-position:
-            left bottom 75px !important;
-    }
-
-
-    /* -----------------------------------------------------
-       PAGES 6–8 — PRESERVE THEIR CURRENT APPEARANCE
-    ----------------------------------------------------- */
+    /* =====================================================
+       PAGES 6 AND 8 — FLYING DESSERTS
+    ===================================================== */
 
     .cake-builder-app:has(#builderStep6.is-active)
     .tpj-sprinkle-scene::before,
@@ -14078,8 +13959,8 @@ and (pointer: coarse) {
         width: auto !important;
 
         background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-3"),
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-3") !important;
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-pages6-8-1"),
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-pages6-8-1") !important;
 
         background-repeat:
             no-repeat,
@@ -14097,6 +13978,8 @@ and (pointer: coarse) {
     }
 
 
+    /* PAGE 7 — REVERSED DIRECTION */
+
     .cake-builder-app:has(#builderStep7.is-active)
     .tpj-sprinkle-scene::before {
         left: 0 !important;
@@ -14105,8 +13988,8 @@ and (pointer: coarse) {
         width: auto !important;
 
         background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-3"),
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-3") !important;
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-pages6-8-1"),
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-pages6-8-1") !important;
 
         background-repeat:
             no-repeat,
@@ -14123,7 +14006,6 @@ and (pointer: coarse) {
         opacity: 0.68;
     }
 
-
     .cake-builder-app:has(
         :is(
             #builderStep6.is-active,
@@ -14137,43 +14019,116 @@ and (pointer: coarse) {
         background: none !important;
     }
 
-       /* =====================================================
-       FROSTED PREVIEW SEPARATION
-       Pages 2–8 only.
+
+    /* =====================================================
+       PAGES 2–5 — REMOVE LARGE FROSTED SECTION PANELS
+    ===================================================== */
+
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+    > .builder-fieldset,
+
+    #builderStep4.is-active
+    > #featuredDesignAddOns,
+
+    #builderStep5.is-active
+    #cupcakeAddOnStudioSlot
+    > #cupcakeStudio {
+        background:
+            transparent !important;
+
+        border-color:
+            transparent !important;
+
+        box-shadow:
+            none !important;
+
+        -webkit-backdrop-filter:
+            none !important;
+
+        backdrop-filter:
+            none !important;
+    }
+
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+    > .builder-fieldset::after,
+
+    #builderStep4.is-active
+    > #featuredDesignAddOns::after,
+
+    #builderStep5.is-active
+    #cupcakeAddOnStudioSlot
+    > #cupcakeStudio::after {
+        content:
+            none !important;
+
+        display:
+            none !important;
+    }
+
+
+    /* =====================================================
+       PAGES 2–5 — LIGHT PINK PREVIEW SEPARATION
+       Localized to the cake preview only
+       No backdrop blur
     ===================================================== */
 
     .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
     )
     .cake-preview-column {
-        background: transparent !important;
+        background:
+            transparent !important;
     }
 
-
     .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
     )
     #cakePreviewCard.preview-visual-card {
         background:
-            rgba(253, 235, 243, 0.46) !important;
+            rgba(247, 182, 210, 0.28) !important;
 
         border:
-            1px solid rgba(90, 42, 30, 0.16) !important;
+            1px solid
+            rgba(90, 42, 30, 0.17) !important;
 
         box-shadow:
-            0 10px 30px rgba(90, 42, 30, 0.14),
-            inset 0 1px 0 rgba(255, 255, 255, 0.68) !important;
+            0 9px 24px
+            rgba(90, 42, 30, 0.12) !important;
 
         -webkit-backdrop-filter:
-            blur(18px) saturate(1.12);
+            none !important;
 
         backdrop-filter:
-            blur(18px) saturate(1.12);
+            none !important;
     }
 
-
     .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
     )
     #cakePreviewCard
     .cake-renderer-stage {
@@ -14186,11 +14141,41 @@ and (pointer: coarse) {
         backdrop-filter:
             none !important;
     }
-        /* =====================================================
-       PAGES 2–5 — FROSTED SECTION SHELVES
 
-       These panels sit behind complete content groups.
-       Nested controls remain unboxed.
+
+    /* Pages 6–8 retain the current frosted preview. */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep6.is-active,
+            #builderStep7.is-active,
+            #builderStep8.is-active
+        )
+    )
+    #cakePreviewCard.preview-visual-card {
+        background:
+            rgba(253, 235, 243, 0.46) !important;
+
+        border:
+            1px solid
+            rgba(90, 42, 30, 0.16) !important;
+
+        box-shadow:
+            0 10px 30px
+            rgba(90, 42, 30, 0.14) !important;
+
+        -webkit-backdrop-filter:
+            blur(18px)
+            saturate(1.12);
+
+        backdrop-filter:
+            blur(18px)
+            saturate(1.12);
+    }
+
+
+    /* =====================================================
+       PAGES 2–5 — CHOCOLATE PRODUCT SHELVES
     ===================================================== */
 
     :is(
@@ -14199,58 +14184,13 @@ and (pointer: coarse) {
         #builderStep4,
         #builderStep5
     )
-    > .builder-fieldset,
+    .tpj-shelf-grid {
+        position:
+            relative;
 
-    #builderStep4
-    > #featuredDesignAddOns,
-
-    #builderStep5
-    > #cupcakeAddOnStudioSlot
-    > #cupcakeStudio {
-        position: relative;
-        z-index: 4;
-
-        margin:
-            0
-            0
-            16px !important;
-
-        padding:
-            14px
-            12px
-            18px !important;
-
-        border:
-            1px solid
-            rgba(90, 42, 30, 0.13) !important;
-
-        border-radius:
-            15px !important;
-
-        background:
-            linear-gradient(
-                145deg,
-                rgba(253, 235, 243, 0.64),
-                rgba(255, 244, 248, 0.46)
-            ) !important;
-
-        box-shadow:
-            0 8px 24px
-            rgba(90, 42, 30, 0.10),
-            inset 0 1px 0
-            rgba(255, 255, 255, 0.65) !important;
-
-        -webkit-backdrop-filter:
-            blur(15px)
-            saturate(1.08);
-
-        backdrop-filter:
-            blur(15px)
-            saturate(1.08);
+        isolation:
+            isolate;
     }
-
-
-    /* Darker pink shelf edge beneath each section. */
 
     :is(
         #builderStep2,
@@ -14258,36 +14198,439 @@ and (pointer: coarse) {
         #builderStep4,
         #builderStep5
     )
-    > .builder-fieldset::after,
+    .tpj-shelf-grid
+    > :is(label, details) {
+        position:
+            relative;
 
-    #builderStep4
-    > #featuredDesignAddOns::after,
+        z-index:
+            1;
+    }
 
-    #builderStep5
-    > #cupcakeAddOnStudioSlot
-    > #cupcakeStudio::after {
-        content: "";
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    )
+    .tpj-row-shelf-layer {
+        position:
+            absolute;
 
-        position: absolute;
+        inset:
+            0;
 
-        left: 12px;
-        right: 12px;
-        bottom: -1px;
-
-        height: 3px;
-
-        border-radius:
-            999px;
-
-        background:
-            rgba(216, 76, 139, 0.52);
+        z-index:
+            0;
 
         pointer-events:
             none;
     }
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    )
+    .tpj-row-shelf {
+        position:
+            absolute;
+
+        box-sizing:
+            border-box;
+
+        background:
+            linear-gradient(
+                180deg,
+                #9A6048 0%,
+                #7A3F2A 56%,
+                #65301F 100%
+            ) !important;
+
+        border:
+            1px solid
+            rgba(66, 26, 18, 0.38);
+
+        border-bottom:
+            2px solid
+            rgba(255, 240, 230, 0.76);
+
+        border-radius:
+            9px 9px 6px 6px;
+
+        box-shadow:
+            0 7px 12px
+            rgba(66, 26, 18, 0.19),
+            inset 0 1px 0
+            rgba(255, 230, 215, 0.34);
+
+        pointer-events:
+            none;
+    }
+
+
     /* =====================================================
-       DECORATIONS CAN NEVER BLOCK MOBILE CONTROLS
+       PAGES 2–5 — STRONGER WORD CONTRAST
+       Localized pink halo instead of a panel
     ===================================================== */
+
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+    :is(
+        .step-heading h2,
+        .step-number,
+        .builder-fieldset > legend,
+        h3,
+        .swatch-subheading
+    ) {
+        color:
+            #421A12 !important;
+
+        font-weight:
+            750;
+
+        text-shadow:
+            0 1px 0
+            rgba(248, 213, 226, 0.96),
+            0 0 7px
+            rgba(248, 213, 226, 0.90);
+    }
+
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+    :is(
+        .step-heading > p:last-child,
+        .fieldset-description,
+        .field-note,
+        .visual-reference-note
+    ) {
+        color:
+            rgba(66, 26, 18, 0.88) !important;
+
+        font-weight:
+            650;
+
+        text-shadow:
+            0 1px 2px
+            rgba(248, 213, 226, 0.94);
+    }
+
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+    :is(
+        .shape-choice-card,
+        .image-choice-card,
+        .description-choice-card,
+        .upgrade-card,
+        .style-choice-card,
+        .decoration-choice-card,
+        .extra-product-card,
+        .text-choice-card
+    )
+    > strong {
+        color:
+            #421A12 !important;
+
+        font-weight:
+            850 !important;
+
+        text-shadow:
+            0 1px 2px
+            rgba(248, 213, 226, 0.92);
+    }
+
+
+    /* =====================================================
+       PAGES 2–8 — STRAWBERRY-MILK NAVIGATION BARS
+       Page 1 remains unchanged
+    ===================================================== */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-progress {
+        background:
+            linear-gradient(
+                90deg,
+                #F6CCDC 0%,
+                #FDE8EF 50%,
+                #F6CCDC 100%
+            ) !important;
+
+        border-bottom:
+            1px solid
+            rgba(122, 63, 42, 0.28) !important;
+
+        box-shadow:
+            0 5px 14px
+            rgba(90, 42, 30, 0.08) !important;
+
+        -webkit-backdrop-filter:
+            none !important;
+
+        backdrop-filter:
+            none !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-progress-inner {
+        background:
+            transparent !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .progress-step {
+        color:
+            rgba(77, 31, 22, 0.68) !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .progress-step.is-active {
+        background:
+            rgba(255, 241, 231, 0.48) !important;
+
+        color:
+            #4D1F16 !important;
+
+        box-shadow:
+            none !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .progress-step.is-active
+    span {
+        background:
+            #D51B73 !important;
+
+        border-color:
+            #D51B73 !important;
+
+        color:
+            #FFFFFF !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .progress-step.is-complete
+    span {
+        background:
+            #762448 !important;
+
+        border-color:
+            #762448 !important;
+
+        color:
+            #FFFFFF !important;
+    }
+
+
+    /* Bottom Previous / Continue bar. */
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-step-navigation {
+        margin-left:
+            -8px !important;
+
+        margin-right:
+            -8px !important;
+
+        padding:
+            7px 14px !important;
+
+        border-top:
+            1px solid
+            rgba(122, 63, 42, 0.28) !important;
+
+        background:
+            linear-gradient(
+                90deg,
+                #F6CCDC 0%,
+                #FDE8EF 50%,
+                #F6CCDC 100%
+            ) !important;
+
+        box-shadow:
+            0 -5px 14px
+            rgba(90, 42, 30, 0.08) !important;
+
+        -webkit-backdrop-filter:
+            none !important;
+
+        backdrop-filter:
+            none !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-step-navigation
+    .previous-button,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-step-navigation
+    .previous-button::before {
+        color:
+            #4D1F16 !important;
+    }
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-step-navigation
+    .continue-button,
+
+    .cake-builder-app:has(
+        .builder-step.is-active:not(#builderStep1)
+    )
+    .builder-step-navigation
+    .continue-button::after {
+        color:
+            #D51B73 !important;
+    }
+
+
+    /* =====================================================
+       PAGE 5 — SINGLE-SHELL CUPCAKE HANDOFF
+       Uses the approved cake sticky container
+       No second fixed card
+    ===================================================== */
+
+    #cupcakeAddOnStudioSlot
+    .cupcake-live-preview,
+
+    #cupcakeAddOnStudioSlot
+    .tpj-cupcake-preview-home {
+        order:
+            -1;
+    }
+
+    #cupcakeAddOnStudioSlot
+    .tpj-cupcake-preview-home {
+        width:
+            100%;
+
+        max-width:
+            380px;
+
+        margin-inline:
+            auto;
+    }
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cakePreviewCard
+    .preview-heading-row,
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cakePreviewCard
+    .cake-renderer-stage {
+        display:
+            none !important;
+    }
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cakePreviewCard
+    > .cupcake-live-preview {
+        display:
+            grid !important;
+
+        width:
+            100% !important;
+
+        max-width:
+            none !important;
+
+        margin:
+            0 !important;
+
+        padding:
+            4px !important;
+
+        border:
+            0 !important;
+
+        border-radius:
+            0 !important;
+
+        background:
+            transparent !important;
+
+        box-shadow:
+            none !important;
+
+        -webkit-backdrop-filter:
+            none !important;
+
+        backdrop-filter:
+            none !important;
+
+        pointer-events:
+            none !important;
+    }
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cakePreviewCard
+    .cupcake-composite {
+        width:
+            min(
+                46vw,
+                175px,
+                23svh
+            );
+
+        margin:
+            0 auto;
+    }
+
+    .cake-builder-app.tpj-cupcake-preview-mode
+    #cakePreviewCard
+    #cupcakeSetCaption {
+        margin:
+            3px 0 0;
+
+        color:
+            #4D1F16;
+
+        font-size:
+            9px;
+
+        font-weight:
+            750;
+
+        line-height:
+            1.3;
+
+        text-align:
+            center;
+    }
+
+
+    /* Decorative artwork can never block controls. */
 
     .cake-builder-app:has(
         .builder-step.is-active:not(#builderStep1)
@@ -14297,92 +14640,7 @@ and (pointer: coarse) {
         .tpj-buttercream-feather,
         .tpj-right-frosting-canvas
     ) {
-        pointer-events: none !important;
-    }
-        /* =====================================================
-       PAGE 5 — STICKY CUPCAKE PREVIEW HANDOFF
-       Phones only.
-    ===================================================== */
-
-    /* Release the main cake when the cupcake takes over. */
-
-    .cake-builder-app.tpj-cupcake-preview-mode
-    .cake-preview-column {
-        position: relative !important;
-        top: auto !important;
-        z-index: 1 !important;
-    }
-
-
-    /* Cupcake preview comes before its controls. */
-
-    #cupcakeAddOnStudioSlot
-    .cupcake-live-preview,
-
-    #cupcakeAddOnStudioSlot
-    .tpj-cupcake-preview-placeholder {
-        order: -1;
-    }
-
-
-    /* The cupcake becomes the sticky preview. */
-
-    #cupcakeAddOnStudioSlot
-    .cupcake-live-preview.tpj-cupcake-pinned {
-        position: fixed !important;
-
-        top: var(--tpj-cupcake-top) !important;
-        left: var(--tpj-cupcake-left) !important;
-
-        width: var(--tpj-cupcake-width) !important;
-        max-width: none !important;
-
-        margin: 0 !important;
-        padding: 8px !important;
-
-        z-index: 1001 !important;
-
-        border:
-            1px solid rgba(90, 42, 30, 0.16);
-
-        border-radius: 16px;
-
-        background:
-            rgba(253, 235, 243, 0.68);
-
-        box-shadow:
-            0 10px 28px rgba(90, 42, 30, 0.14);
-
-        -webkit-backdrop-filter:
-            blur(18px) saturate(1.1);
-
-        backdrop-filter:
-            blur(18px) saturate(1.1);
-
-        pointer-events: none !important;
-    }
-
-
-    #cupcakeAddOnStudioSlot
-    .cupcake-live-preview
-    .cupcake-composite {
-        width:
-            min(
-                48vw,
-                180px,
-                24svh
-            );
-
-        margin: 0 auto;
-    }
-
-
-    #cupcakeAddOnStudioSlot
-    .cupcake-live-preview
-    #cupcakeSetCaption {
-        margin: 4px 0 0;
-
-        font-size: 9px;
-        line-height: 1.3;
+        pointer-events:
+            none !important;
     }
 }

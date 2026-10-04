@@ -19955,15 +19955,26 @@ for (
 /* PAGE 3 + PAGE 4 — ONE DECORATIVE SHELF PER ACTUAL PRODUCT ROW */
 (() => {
 const selector = [
+    /* PAGE 2 */
+    "#builderStep2 .shape-choice-grid",
+    "#builderStep2 .description-choice-grid",
+    "#builderStep2 .text-choice-grid",
+    "#builderStep2 .upgrade-grid",
+
+    /* PAGE 3 */
     "#builderStep3 .text-choice-grid",
     "#builderStep3 .upgrade-grid",
     "#builderStep3 .description-choice-grid",
+
+    /* PAGE 4 */
     "#cakeFinishCustomizer .style-choice-grid",
     "#cakeBorderCustomizer > .text-choice-grid",
     "#featuredDesignAddOns",
-    "#cakeDetailsCustomizer .decoration-choice-grid"
-].join(",");
+    "#cakeDetailsCustomizer .decoration-choice-grid",
 
+    /* PAGE 5 */
+    "#builderStep5 #gourmetCupcakeExtras .extra-product-grid"
+].join(",");
     let pending = false;
 
     function draw() {
@@ -20506,16 +20517,18 @@ const main = new Set([
 })();
 /* =========================================================
    PAGE 5 PHONE CUPCAKE-PREVIEW HANDOFF
-   Phones only — tablet and desktop remain untouched.
+   Reuses the approved sticky cake-preview shell.
+   No second fixed preview.
 ========================================================= */
 
 (() => {
     "use strict";
 
     function startPhoneCupcakeHandoff() {
-        const phoneOnly = window.matchMedia(
-            "(max-width: 480px) and (hover: none) and (pointer: coarse)"
-        );
+        const phoneOnly =
+            window.matchMedia(
+                "(max-width: 480px) and (hover: none) and (pointer: coarse)"
+            );
 
         const app =
             document.querySelector(
@@ -20532,68 +20545,110 @@ const main = new Set([
                 "#cupcakeStudio"
             );
 
-        const preview =
+        const cupcakePreview =
             studio?.querySelector(
                 ".cupcake-live-preview"
+            );
+
+        const cakeCard =
+            document.querySelector(
+                "#cakePreviewCard"
             );
 
         if (
             !app ||
             !slot ||
             !studio ||
-            !preview
+            !cupcakePreview ||
+            !cakeCard
         ) {
             return;
         }
 
 
-        let placeholder =
+        /*
+         * This marker remembers the cupcake preview's
+         * original location and preserves its space
+         * during the handoff.
+         */
+
+        let home =
             studio.querySelector(
-                ".tpj-cupcake-preview-placeholder"
+                ".tpj-cupcake-preview-home"
             );
 
-        if (!placeholder) {
-            placeholder =
+        if (!home) {
+            home =
                 document.createElement("div");
 
-            placeholder.className =
-                "tpj-cupcake-preview-placeholder";
+            home.className =
+                "tpj-cupcake-preview-home";
 
-            placeholder.hidden = true;
+            home.hidden = true;
 
-            placeholder.setAttribute(
+            home.setAttribute(
                 "aria-hidden",
                 "true"
             );
 
-            preview.before(
-                placeholder
-            );
+            cupcakePreview.before(home);
         }
 
 
-        let pinned = false;
+        let cupcakeMode = false;
         let pending = false;
+        let originalCakeCardHeight = 0;
 
 
-        function releasePreview() {
-            if (!pinned) {
-                return;
+        function restoreCakePreview() {
+            if (
+                cupcakePreview.parentElement ===
+                cakeCard
+            ) {
+                home.after(cupcakePreview);
             }
 
-            pinned = false;
-
-            preview.classList.remove(
-                "tpj-cupcake-pinned"
-            );
+            cupcakeMode = false;
+            originalCakeCardHeight = 0;
 
             app.classList.remove(
                 "tpj-cupcake-preview-mode"
             );
 
-            placeholder.hidden = true;
-            placeholder.style.height = "";
-            placeholder.style.width = "";
+            home.hidden = true;
+            home.style.height = "";
+            home.style.width = "";
+        }
+
+
+        function showCupcakeInStickyCard() {
+            if (cupcakeMode) {
+                return;
+            }
+
+            const cupcakeRect =
+                cupcakePreview.getBoundingClientRect();
+
+            originalCakeCardHeight =
+                Math.ceil(
+                    cakeCard.getBoundingClientRect().height
+                );
+
+            home.style.height =
+                `${Math.ceil(cupcakeRect.height)}px`;
+
+            home.style.width =
+                "100%";
+
+            home.hidden = false;
+
+            cakeCard.append(cupcakePreview);
+
+            app.classList.add(
+                "tpj-cupcake-preview-mode"
+            );
+
+            cupcakeMode = true;
         }
 
 
@@ -20609,20 +20664,19 @@ const main = new Set([
                 studio.parentElement === slot;
 
             /*
-                Keep the original control lock:
-                the sticky cupcake does not begin until
-                a cupcake count has unlocked the studio.
-            */
+             * Count selection still controls availability.
+             * Nothing becomes active while the fieldset
+             * remains disabled.
+             */
 
             if (
                 !phoneOnly.matches ||
                 !activePage ||
                 !studioIsOnExtrasPage ||
                 studio.disabled ||
-                !studio.getClientRects().length ||
-                !preview.getClientRects().length
+                !studio.getClientRects().length
             ) {
-                releasePreview();
+                restoreCakePreview();
                 return;
             }
 
@@ -20645,81 +20699,48 @@ const main = new Set([
                 ) + 5;
 
 
-            const anchor =
-                (
-                    pinned
-                        ? placeholder
-                        : preview
-                ).getBoundingClientRect();
+            if (!originalCakeCardHeight) {
+                originalCakeCardHeight =
+                    Math.ceil(
+                        cakeCard.getBoundingClientRect().height
+                    );
+            }
 
-            const previewHeight =
-                preview.getBoundingClientRect().height;
 
-            const studioBottom =
-                studio.getBoundingClientRect().bottom;
-
+            const studioRect =
+                studio.getBoundingClientRect();
 
             /*
-                Do not take over until the cupcake reaches
-                the sticky area. Release it at the bottom
-                of Style Your Swirl.
-            */
+             * The cupcake takes over when Style Your Swirl
+             * reaches the bottom of the approved sticky card.
+             */
 
-const cupcakeReachedStickyArea =
-    anchor.top <= stickyTop + 8;
-
-const cupcakeStudioStillVisible =
-    studioBottom > stickyTop + 96;
-
-if (
-    !cupcakeReachedStickyArea ||
-    !cupcakeStudioStillVisible
-) {
-    releasePreview();
-    return;
-}
-
-
-            preview.style.setProperty(
-                "--tpj-cupcake-top",
-                `${stickyTop}px`
-            );
-
-            preview.style.setProperty(
-                "--tpj-cupcake-left",
-                `${anchor.left}px`
-            );
-
-            preview.style.setProperty(
-                "--tpj-cupcake-width",
-                `${anchor.width}px`
-            );
-
-            placeholder.style.height =
-                `${previewHeight}px`;
-
-            placeholder.style.width =
-                "100%";
-
-            placeholder.style.maxWidth =
-                "380px";
-
-            placeholder.style.marginInline =
-                "auto";
-
-
-            if (!pinned) {
-                pinned = true;
-
-                placeholder.hidden = false;
-
-                preview.classList.add(
-                    "tpj-cupcake-pinned"
+            const handoffDistance =
+                Math.max(
+                    180,
+                    Math.min(
+                        originalCakeCardHeight,
+                        window.innerHeight * 0.58
+                    )
                 );
 
-                app.classList.add(
-                    "tpj-cupcake-preview-mode"
-                );
+            const handoffLine =
+                stickyTop + handoffDistance;
+
+            const studioHasReachedPreview =
+                studioRect.top <= handoffLine;
+
+            const studioStillHasContent =
+                studioRect.bottom > stickyTop + 120;
+
+
+            if (
+                studioHasReachedPreview &&
+                studioStillHasContent
+            ) {
+                showCupcakeInStickyCard();
+            } else {
+                restoreCakePreview();
             }
         }
 
@@ -20748,6 +20769,11 @@ if (
             scheduleSync
         );
 
+        window.addEventListener(
+            "pageshow",
+            scheduleSync
+        );
+
         document.addEventListener(
             "change",
             scheduleSync
@@ -20761,15 +20787,17 @@ if (
 
         new ResizeObserver(
             scheduleSync
-        ).observe(
-            studio
-        );
+        ).observe(studio);
+
+        new ResizeObserver(
+            scheduleSync
+        ).observe(cakeCard);
 
 
         new MutationObserver(
             scheduleSync
         ).observe(
-            studio,
+            app,
             {
                 subtree: true,
                 childList: true,
