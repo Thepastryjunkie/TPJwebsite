@@ -13901,16 +13901,181 @@ and (pointer: coarse) {
     }
 
 
-       /* -----------------------------------------------------
-       PAGES 2–8 — TWO NON-REPEATING DESSERT MOMENTS
-       No wallpaper effect and no white scatter film.
+    /* -----------------------------------------------------
+       PAGES 2–5 — CROPPED CORNER DESSERTS
+
+       Each pseudo-element is now a narrow edge window.
+       Most of each PNG remains outside the visible layout,
+       preventing the diagonal artwork from crossing through
+       the choices.
     ----------------------------------------------------- */
 
     .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
     )
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene::after {
+        display: block !important;
+        content: "";
+
+        width: 38% !important;
+
+        left: auto !important;
+        right: auto !important;
+
+        background-repeat:
+            no-repeat !important;
+
+        background-size:
+            250% auto !important;
+
+        opacity: 0.94;
+
+        pointer-events:
+            none !important;
+    }
+
+
+    /* PAGE 2
+       Upper-left + lower-right. */
+
+    .cake-builder-app:has(#builderStep2.is-active)
     .tpj-sprinkle-scene::before {
-        z-index: 1;
+        left: 0 !important;
+        right: auto !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-corners-1") !important;
+
+        background-position:
+            left top 34px !important;
+    }
+
+    .cake-builder-app:has(#builderStep2.is-active)
+    .tpj-sprinkle-scene::after {
+        left: auto !important;
+        right: 0 !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261004-corners-1") !important;
+
+        background-position:
+            right bottom 55px !important;
+    }
+
+
+    /* PAGE 3
+       Upper-right + lower-left. */
+
+    .cake-builder-app:has(#builderStep3.is-active)
+    .tpj-sprinkle-scene::before {
+        left: auto !important;
+        right: 0 !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            right top 38px !important;
+    }
+
+    .cake-builder-app:has(#builderStep3.is-active)
+    .tpj-sprinkle-scene::after {
+        left: 0 !important;
+        right: auto !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            left bottom 60px !important;
+    }
+
+
+    /* PAGE 4
+       Matches the approved reference:
+       upper-right + lower-left. */
+
+    .cake-builder-app:has(#builderStep4.is-active)
+    .tpj-sprinkle-scene::before {
+        left: auto !important;
+        right: 0 !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            right top 70px !important;
+    }
+
+    .cake-builder-app:has(#builderStep4.is-active)
+    .tpj-sprinkle-scene::after {
+        left: 0 !important;
+        right: auto !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            left bottom 55px !important;
+    }
+
+
+    /* PAGE 5
+       Upper-right + lower-left with extra breathing room. */
+
+    .cake-builder-app:has(#builderStep5.is-active)
+    .tpj-sprinkle-scene::before {
+        left: auto !important;
+        right: 0 !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            right top 80px !important;
+    }
+
+    .cake-builder-app:has(#builderStep5.is-active)
+    .tpj-sprinkle-scene::after {
+        left: 0 !important;
+        right: auto !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261004-corners-1") !important;
+
+        background-position:
+            left bottom 75px !important;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGES 6–8 — PRESERVE THEIR CURRENT APPEARANCE
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(#builderStep6.is-active)
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(#builderStep8.is-active)
+    .tpj-sprinkle-scene::before {
+        left: 0 !important;
+        right: 0 !important;
+
+        width: auto !important;
 
         background-image:
             url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-3"),
@@ -13932,31 +14097,39 @@ and (pointer: coarse) {
     }
 
 
-    /* Swap the direction on Pages 3, 5 and 7. */
-
-    .cake-builder-app:has(#builderStep3.is-active)
-    .tpj-sprinkle-scene::before,
-
-    .cake-builder-app:has(#builderStep5.is-active)
-    .tpj-sprinkle-scene::before,
-
     .cake-builder-app:has(#builderStep7.is-active)
     .tpj-sprinkle-scene::before {
+        left: 0 !important;
+        right: 0 !important;
+
+        width: auto !important;
+
         background-image:
             url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-B.png?v=20261003-mobile-3"),
             url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Flying-Desserts-A.png?v=20261003-mobile-3") !important;
 
+        background-repeat:
+            no-repeat,
+            no-repeat !important;
+
+        background-size:
+            105% auto,
+            105% auto !important;
+
         background-position:
             right -24px top 24px,
             left -24px bottom 55px !important;
+
+        opacity: 0.68;
     }
 
 
-    /* Remove the repeating scatter layer.
-       The flying PNGs already contain sprinkles and pearls. */
-
     .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
+        :is(
+            #builderStep6.is-active,
+            #builderStep7.is-active,
+            #builderStep8.is-active
+        )
     )
     .tpj-sprinkle-scene::after {
         content: none !important;
@@ -14012,6 +14185,105 @@ and (pointer: coarse) {
 
         backdrop-filter:
             none !important;
+    }
+        /* =====================================================
+       PAGES 2–5 — FROSTED SECTION SHELVES
+
+       These panels sit behind complete content groups.
+       Nested controls remain unboxed.
+    ===================================================== */
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    )
+    > .builder-fieldset,
+
+    #builderStep4
+    > #featuredDesignAddOns,
+
+    #builderStep5
+    > #cupcakeAddOnStudioSlot
+    > #cupcakeStudio {
+        position: relative;
+        z-index: 4;
+
+        margin:
+            0
+            0
+            16px !important;
+
+        padding:
+            14px
+            12px
+            18px !important;
+
+        border:
+            1px solid
+            rgba(90, 42, 30, 0.13) !important;
+
+        border-radius:
+            15px !important;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(253, 235, 243, 0.64),
+                rgba(255, 244, 248, 0.46)
+            ) !important;
+
+        box-shadow:
+            0 8px 24px
+            rgba(90, 42, 30, 0.10),
+            inset 0 1px 0
+            rgba(255, 255, 255, 0.65) !important;
+
+        -webkit-backdrop-filter:
+            blur(15px)
+            saturate(1.08);
+
+        backdrop-filter:
+            blur(15px)
+            saturate(1.08);
+    }
+
+
+    /* Darker pink shelf edge beneath each section. */
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    )
+    > .builder-fieldset::after,
+
+    #builderStep4
+    > #featuredDesignAddOns::after,
+
+    #builderStep5
+    > #cupcakeAddOnStudioSlot
+    > #cupcakeStudio::after {
+        content: "";
+
+        position: absolute;
+
+        left: 12px;
+        right: 12px;
+        bottom: -1px;
+
+        height: 3px;
+
+        border-radius:
+            999px;
+
+        background:
+            rgba(216, 76, 139, 0.52);
+
+        pointer-events:
+            none;
     }
     /* =====================================================
        DECORATIONS CAN NEVER BLOCK MOBILE CONTROLS

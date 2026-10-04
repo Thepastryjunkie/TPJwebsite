@@ -20665,16 +20665,19 @@ const main = new Set([
                 of Style Your Swirl.
             */
 
-            if (
-                anchor.top > stickyTop + 8 ||
-                studioBottom <=
-                    stickyTop +
-                    previewHeight +
-                    8
-            ) {
-                releasePreview();
-                return;
-            }
+const cupcakeReachedStickyArea =
+    anchor.top <= stickyTop + 8;
+
+const cupcakeStudioStillVisible =
+    studioBottom > stickyTop + 96;
+
+if (
+    !cupcakeReachedStickyArea ||
+    !cupcakeStudioStillVisible
+) {
+    releasePreview();
+    return;
+}
 
 
             preview.style.setProperty(
