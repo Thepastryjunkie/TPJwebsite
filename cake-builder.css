@@ -14500,3 +14500,319 @@ and (pointer: coarse) {
             auto !important;
     }
 }
+/* =========================================================
+   TPJ FINAL PHONE-ONLY ADJUSTMENTS
+   Pages 2–8 only
+   Tablet and desktop remain untouched
+========================================================= */
+
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
+
+    /* -----------------------------------------------------
+       PAGES 2–5: RESTORE THE SPRINKLE BACKGROUND
+       No white overlay or white cast.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene {
+        display: block !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png?v=20261005-1") !important;
+
+        background-repeat:
+            repeat-y !important;
+
+        background-position:
+            center top !important;
+
+        background-size:
+            100% auto !important;
+
+        background-color:
+            transparent !important;
+
+        opacity: 1 !important;
+
+        pointer-events:
+            none !important;
+    }
+
+    /* Remove the flying-dessert layers on Pages 2–5 only. */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene::after {
+        content: none !important;
+        display: none !important;
+        background: none !important;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGES 2–8: DARKER/BOLDER SMALL COPY
+       Font sizes are not changed.
+    ----------------------------------------------------- */
+
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5,
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ).is-active
+    :is(
+        .fieldset-description,
+        .field-note,
+        .visual-reference-note,
+        .quantity-product-description,
+        small,
+        p
+    ) {
+        color: #4D1F16 !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       RESTORE THE WORDMARK BETWEEN HOME AND YOUR CAKE
+       Pages 2–8 only.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-header-inner {
+        grid-template-columns:
+            92px
+            minmax(82px, 1fr)
+            auto !important;
+
+        gap: 4px !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-logo-link {
+        display: flex !important;
+
+        width: 100% !important;
+        height: 34px !important;
+
+        min-width: 0;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-header-logo {
+        width: 100% !important;
+        max-width: 118px !important;
+        height: 34px !important;
+
+        object-fit: contain;
+
+        transform: none !important;
+    }
+
+
+    /* -----------------------------------------------------
+       CHOCOLATE PROGRESS BAR
+       It scrolls away and is not part of the cake sticky.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-progress {
+        position: relative !important;
+        top: auto !important;
+
+        background: #4D1F16 !important;
+        border-color: #35140F !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step {
+        color: #FFF1E7 !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step span {
+        color: #FFF1E7 !important;
+        border-color: rgba(255, 241, 231, 0.72) !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step.is-active {
+        color: #FFF1E7 !important;
+        background: rgba(255, 241, 231, 0.14) !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step.is-active span {
+        color: #FFFFFF !important;
+        background: #D51B73 !important;
+        border-color: #D51B73 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       CHOCOLATE PREVIOUS / CONTINUE BAR
+    ----------------------------------------------------- */
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-step-navigation {
+        background: #4D1F16 !important;
+        border-color: #35140F !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-step-navigation
+    :is(
+        .previous-button,
+        .continue-button
+    ) {
+        color: #FFF1E7 !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-step-navigation
+    .previous-button::before,
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-step-navigation
+    .continue-button::after {
+        color: #FFF1E7 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       CAKE STICKY: PAGES 2, 3, AND 4 ONLY
+       The progress bar is not included in the top offset.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active
+        )
+    )
+    .cake-preview-column {
+        position: sticky !important;
+
+        top:
+            calc(
+                var(--builder-header-height) + 4px
+            ) !important;
+
+        z-index: 1000 !important;
+        align-self: start !important;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGES 5–8: MAIN CAKE STAYS AT THE TOP
+       It does not become sticky.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep5.is-active,
+            #builderStep6.is-active,
+            #builderStep7.is-active,
+            #builderStep8.is-active
+        )
+    )
+    .cake-preview-column {
+        position: relative !important;
+        top: auto !important;
+        z-index: 1 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGE 5: CUPCAKE IS THE ONLY STICKY PREVIEW
+       It activates only after the studio is enabled by a
+       selected cupcake count.
+    ----------------------------------------------------- */
+
+    #builderStep5.is-active
+    #cupcakeStudio
+    .cupcake-live-preview {
+        order: -1;
+
+        position: relative !important;
+        top: auto !important;
+
+        left: auto !important;
+        width: min(100%, 380px) !important;
+
+        margin-inline: auto !important;
+
+        transform: none !important;
+    }
+
+    #builderStep5.is-active
+    #cupcakeStudio:not(:disabled)
+    .cupcake-live-preview {
+        position: sticky !important;
+
+        top:
+            calc(
+                var(--builder-header-height) + 4px
+            ) !important;
+
+        z-index: 1000 !important;
+        align-self: start !important;
+    }
+}

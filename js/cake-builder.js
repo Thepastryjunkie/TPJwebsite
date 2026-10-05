@@ -12298,24 +12298,49 @@ function initializeRemainingPanelBehavior() {
     function position() {
     if (!active) return;
 
-    const box = active.anchor.getBoundingClientRect();
-    const area = step.getBoundingClientRect();
-    const width = active.popup.getBoundingClientRect().width;
+const box =
+    active.anchor.getBoundingClientRect();
 
-    const left = Math.max(
+const area =
+    step.getBoundingClientRect();
+
+const popupBox =
+    active.popup.getBoundingClientRect();
+
+const width =
+    popupBox.width;
+
+const left =
+    Math.max(
         12,
-        Math.min(box.left, innerWidth - width - 12)
+        Math.min(
+            box.left,
+            innerWidth - width - 12
+        )
     );
 
-    active.popup.style.left =
-        `${left - area.left + step.scrollLeft}px`;
+active.popup.style.left =
+    `${left - area.left + step.scrollLeft}px`;
+
+const phoneCakeDetail =
+    window.matchMedia(
+        "(max-width: 480px) and (hover: none) and (pointer: coarse)"
+    ).matches &&
+    active.anchor.closest(
+        "#cakeDetailsCustomizer"
+    );
 
 const popupTop =
     active.anchor.classList.contains(
         "featured-addon-card"
     )
         ? box.bottom + 8
-        : box.top;
+        : phoneCakeDetail
+            ? Math.max(
+                box.top,
+                box.bottom - popupBox.height
+            )
+            : box.top;
 
 active.popup.style.top =
     `${popupTop - area.top + step.scrollTop}px`;
