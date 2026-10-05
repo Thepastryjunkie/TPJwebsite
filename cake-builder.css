@@ -14816,3 +14816,354 @@ and (pointer: coarse) {
         align-self: start !important;
     }
 }
+/* =========================================================
+   TPJ FINAL SMALL PHONE FIXES
+   Keep this as the final CSS block.
+========================================================= */
+
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
+
+    /* Header, page numbers, and navigation scroll normally. */
+
+    .cake-builder-app:not(:has(#builderStep1.is-active))
+    :is(
+        .builder-header,
+        .builder-progress,
+        .builder-step-navigation
+    ) {
+        position: relative !important;
+        top: auto !important;
+        bottom: auto !important;
+    }
+
+
+    /* Pages 2–5: correct sprinkle background. */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene {
+        display: block !important;
+
+        background-image:
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261005-2") !important;
+
+        background-repeat: repeat-y !important;
+        background-position: center top !important;
+        background-size: 100% auto !important;
+        background-color: transparent !important;
+
+        opacity: 1 !important;
+    }
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene::before,
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active,
+            #builderStep5.is-active
+        )
+    )
+    .tpj-sprinkle-scene::after {
+        content: none !important;
+        display: none !important;
+        background: none !important;
+    }
+
+
+    /* Only the cake preview sticks on Pages 2–4. */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep2.is-active,
+            #builderStep3.is-active,
+            #builderStep4.is-active
+        )
+    )
+    .cake-preview-column {
+        position: sticky !important;
+        top: 4px !important;
+        z-index: 1000 !important;
+        align-self: start !important;
+    }
+
+
+    /* Main cake does not stick on Pages 5–8. */
+
+    .cake-builder-app:has(
+        :is(
+            #builderStep5.is-active,
+            #builderStep6.is-active,
+            #builderStep7.is-active,
+            #builderStep8.is-active
+        )
+    )
+    .cake-preview-column {
+        position: relative !important;
+        top: auto !important;
+        z-index: 1 !important;
+    }
+
+
+    /* Page 5: cupcake preview sticks only after a count is selected. */
+
+    #builderStep5.is-active
+    #cupcakeStudio
+    .cupcake-live-preview {
+        order: -1;
+
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+
+        width: min(100%, 380px) !important;
+        margin-inline: auto !important;
+
+        transform: none !important;
+    }
+
+    #builderStep5.is-active
+    #cupcakeStudio:not(:disabled)
+    .cupcake-live-preview {
+        position: sticky !important;
+        top: 4px !important;
+        z-index: 1000 !important;
+        align-self: start !important;
+    }
+
+
+    /* Move Reset slightly farther right. */
+
+    #cakePreviewCard
+    .cake-renderer-stage
+    > #resetCakeBuilder {
+        right: -10px !important;
+    }
+
+
+    /* Page 3: keep both custom answers inside their grid cells. */
+
+    #builderStep3 .custom-text-only-card {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #builderStep3 .custom-text-only-card strong {
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+        text-align: center;
+    }
+
+
+    /* Page 2: eight cake shapes = four across, two rows. */
+
+    #builderStep2
+    > .builder-fieldset:first-of-type
+    > .shape-choice-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+    }
+
+
+    /* Page 3: four coatings = two-by-two. */
+
+    #builderStep3
+    > .builder-fieldset.cake-only-inside
+    > .description-choice-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+
+    /* Page 4: all five finishes on one even row. */
+
+    #builderStep4
+    #cakeFinishCustomizer
+    > .style-choice-grid {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr)) !important;
+
+        gap: 4px !important;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card {
+        min-width: 0 !important;
+        padding-inline: 1px !important;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card
+    > .finish-card-image {
+        width: 100% !important;
+        height: 72px !important;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card
+    > :is(strong, small) {
+        overflow-wrap: anywhere;
+    }
+
+
+    /* Page 5: three dessert jars on one even row. */
+
+    #builderStep5 .dessert-jar-list {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+
+        gap: 8px !important;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-product {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between;
+
+        min-width: 0 !important;
+        padding-inline: 3px !important;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-product-info {
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100%;
+        min-width: 0;
+
+        text-align: center;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-product-info
+    :is(strong, span, small) {
+        overflow-wrap: anywhere;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-control {
+        grid-template-columns:
+            28px 24px 28px !important;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-control button {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    #builderStep5
+    .dessert-jar-list
+    .quantity-control input {
+        width: 24px !important;
+        height: 28px !important;
+    }
+
+
+    /* Pages 6–8: grouped frosted readability panels.
+       Their existing backgrounds are not changed. */
+
+    :is(
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ).is-active
+    > .step-heading,
+
+    #builderStep6.is-active
+    > :is(
+        .inspiration-upload-zone,
+        .policy-check
+    ),
+
+    #builderStep6.is-active
+    > #inspirationPreviewGrid:not(:empty),
+
+    #builderStep7.is-active
+    > :is(
+        .two-column-fields,
+        .form-field,
+        .builder-fieldset,
+        .delivery-address-panel,
+        .builder-warning
+    ),
+
+    #builderStep8.is-active
+    .review-grid
+    > .review-section,
+
+    #builderStep8.is-active
+    > :is(
+        .review-section-heading,
+        .review-price-card,
+        .review-disclaimer,
+        .review-acknowledgments
+    ) {
+        background:
+            rgba(253, 235, 243, 0.58) !important;
+
+        border:
+            1px solid rgba(77, 31, 22, 0.14) !important;
+
+        border-radius: 16px;
+
+        -webkit-backdrop-filter:
+            blur(12px) saturate(1.08);
+
+        backdrop-filter:
+            blur(12px) saturate(1.08);
+    }
+
+    :is(
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ).is-active
+    > .step-heading,
+
+    #builderStep7.is-active
+    > :is(
+        .two-column-fields,
+        .form-field,
+        .delivery-address-panel,
+        .builder-warning
+    ),
+
+    #builderStep8.is-active
+    > :is(
+        .review-section-heading,
+        .review-disclaimer
+    ) {
+        box-sizing: border-box;
+        padding: 12px !important;
+    }
+}

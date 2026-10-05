@@ -335,6 +335,14 @@ const builderState = {
     eventDate: "",
     fulfillmentDate: "",
     guestCount: 0,
+    stepTwoConfirmed: {
+    shape: false,
+    coverage: false,
+    size: false,
+    height: false,
+    boardStyle: false,
+    boardColor: false
+},
 
     cakeShape: "round",
     cakeProductId: "round-6",
@@ -10775,10 +10783,13 @@ function getMaximumDateForField(stateKey) {
 }
 
 function applyDateInputBounds(input, stateKey) {
-    const usesNativeTouchPicker =
-        window.matchMedia(
-            "(pointer: coarse)"
-        ).matches;
+const usesFlexibleTouchBounds =
+    window.matchMedia(
+        "(pointer: coarse)"
+    ).matches &&
+    !window.matchMedia(
+        "(max-width: 480px) and (hover: none) and (pointer: coarse)"
+    ).matches;
 
     /*
         Desktop keeps the exact native
@@ -10793,7 +10804,7 @@ function applyDateInputBounds(input, stateKey) {
 
     const minimum =
         stateKey === "fulfillmentDate" &&
-        usesNativeTouchPicker
+       usesFlexibleTouchBounds
             ? getTodayForDateInput()
             : getMinimumDateForField(
                 stateKey
@@ -10801,7 +10812,7 @@ function applyDateInputBounds(input, stateKey) {
 
     const maximum =
         stateKey === "fulfillmentDate" &&
-        usesNativeTouchPicker
+       usesFlexibleTouchBounds
             ? ""
             : getMaximumDateForField(
                 stateKey
@@ -10951,9 +10962,99 @@ function validateStepOne() {
 
 
 function validateStepTwo() {
-    if (!builderState.cakeProductId) {
+    const confirmed =
+        builderState.stepTwoConfirmed || {};
+
+    const isVisible = (selector) => {
+        const element = getElement(selector);
+
+        return Boolean(
+            element &&
+            !element.classList.contains("is-hidden") &&
+            !element.closest(".is-hidden") &&
+            element.getClientRects().length
+        );
+    };
+
+    if (!confirmed.shape) {
+        showValidationMessage(
+            "Choose a cake shape before continuing."
+        );
+
+        return false;
+    }
+
+    if (
+        isVisible("#cakeCoverageOptions") &&
+        !confirmed.coverage
+    ) {
+        showValidationMessage(
+            "Choose the cake coverage before continuing."
+        );
+
+        return false;
+    }
+
+    if (
+        !builderState.cakeProductId ||
+        !confirmed.size
+    ) {
         showValidationMessage(
             "Choose a cake size before continuing."
+        );
+
+        return false;
+    }
+
+    if (
+        isVisible(".cake-height-selector") &&
+        !confirmed.height
+    ) {
+        showValidationMessage(
+            "Choose Standard or Tall cake height before continuing."
+        );
+
+        return false;
+    }
+
+    const boardIsVisible =
+        isVisible("#cakeBoardCustomizer");
+
+    const selectableBoardChoices =
+        getElements(
+            'input[name="cakeBoardStyle"]'
+        ).filter((input) => {
+            const card = input.closest("label");
+
+            return (
+                !input.disabled &&
+                card &&
+                card.getClientRects().length
+            );
+        });
+
+    /*
+     * A forced board, such as a sheet or number cake board,
+     * does not require an unnecessary extra click.
+     */
+    if (
+        boardIsVisible &&
+        selectableBoardChoices.length > 1 &&
+        !confirmed.boardStyle
+    ) {
+        showValidationMessage(
+            "Choose a cake board shape before continuing."
+        );
+
+        return false;
+    }
+
+    if (
+        boardIsVisible &&
+        !confirmed.boardColor
+    ) {
+        showValidationMessage(
+            "Choose a cake board color before continuing."
         );
 
         return false;
@@ -12322,25 +12423,12 @@ const left =
 active.popup.style.left =
     `${left - area.left + step.scrollLeft}px`;
 
-const phoneCakeDetail =
-    window.matchMedia(
-        "(max-width: 480px) and (hover: none) and (pointer: coarse)"
-    ).matches &&
-    active.anchor.closest(
-        "#cakeDetailsCustomizer"
-    );
-
 const popupTop =
     active.anchor.classList.contains(
         "featured-addon-card"
     )
         ? box.bottom + 8
-        : phoneCakeDetail
-            ? Math.max(
-                box.top,
-                box.bottom - popupBox.height
-            )
-            : box.top;
+        : box.top;
 
 active.popup.style.top =
     `${popupTop - area.top + step.scrollTop}px`;
@@ -15566,7 +15654,70 @@ getElement("#guestCount")?.addEventListener(
 /* =========================================
    CAKE EVENTS
 ========================================= */
+document.addEventListener("click", (event) => {
+    const target = event.target;
 
+    if (
+        !(target instanceof Element) ||
+        !target.closest("#builderStep2")
+    ) {
+        return;
+    }
+
+    const heightChoice =
+        target.closest("[data-height-choice]");
+
+    if (heightChoice) {
+        builderState.stepTwoConfirmed.height = true;
+        return;
+    }
+
+    const label =
+        target.closest("label");
+
+    const input =
+        target instanceof HTMLInputElement
+            ? target
+            : label?.querySelector("input");
+
+    if (!(input instanceof HTMLInputElement)) {
+        return;
+    }
+
+    switch (input.name) {
+        case "cakeShape":
+            builderState.stepTwoConfirmed.shape = true;
+
+            /*
+             * A new shape chooses a sample size and may change
+             * the available height and board choices.
+             */
+            builderState.stepTwoConfirmed.size = false;
+            builderState.stepTwoConfirmed.height = false;
+            builderState.stepTwoConfirmed.boardStyle = false;
+            break;
+
+        case "cakeCoverage":
+            builderState.stepTwoConfirmed.coverage = true;
+            break;
+
+        case "cakeSize":
+            builderState.stepTwoConfirmed.size = true;
+            break;
+
+        case "cakeBoardStyle":
+            builderState.stepTwoConfirmed.boardStyle = true;
+            break;
+
+        case "cakeBoardColorChoice":
+            builderState.stepTwoConfirmed.boardColor = true;
+            break;
+    }
+
+    if (input.id === "matchBoardToCakePalette") {
+        builderState.stepTwoConfirmed.boardColor = true;
+    }
+});
 getElements(
     'input[name="cakeShape"]'
 ).forEach((input) => {
