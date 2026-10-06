@@ -14198,12 +14198,18 @@ and (pointer: coarse) {
     )
     > .builder-fieldset,
 
-    #builderStep4
-    > #featuredDesignAddOns,
+#builderStep4
+> #featuredDesignAddOns,
 
-    #builderStep5
-    > #cupcakeAddOnStudioSlot
-    > #cupcakeStudio {
+/* Cupcakes Only studio on Page 4 */
+#builderStep4
+> #cupcakeOnlyStudioSlot
+> #cupcakeStudio,
+
+/* Cupcake add-on studio on Page 5 */
+#builderStep5
+> #cupcakeAddOnStudioSlot
+> #cupcakeStudio {
         position: relative;
         z-index: 4;
 
@@ -14257,12 +14263,18 @@ backdrop-filter:
     )
     > .builder-fieldset::after,
 
-    #builderStep4
-    > #featuredDesignAddOns::after,
+#builderStep4
+> #featuredDesignAddOns::after,
 
-    #builderStep5
-    > #cupcakeAddOnStudioSlot
-    > #cupcakeStudio::after {
+/* Cupcakes Only studio on Page 4 */
+#builderStep4
+> #cupcakeOnlyStudioSlot
+> #cupcakeStudio::after,
+
+/* Cupcake add-on studio on Page 5 */
+#builderStep5
+> #cupcakeAddOnStudioSlot
+> #cupcakeStudio::after {
         content: "";
 
         position: absolute;
@@ -15038,12 +15050,20 @@ and (pointer: coarse) {
 
     /* Move Reset slightly farther right. */
 
-    #cakePreviewCard
-    .cake-renderer-stage
-    > #resetCakeBuilder {
-        right: -10px !important;
-    }
+#cakePreviewCard
+.cake-renderer-stage
+> #resetCakeBuilder {
+    top: 8px !important;
 
+    /*
+        Move from the centered square stage
+        to the right edge of the full preview box.
+    */
+    right:
+        calc(
+            (100vw - 100%) / -2 + 10px
+        ) !important;
+}
 
     /* Page 3: keep both custom answers inside their grid cells. */
 

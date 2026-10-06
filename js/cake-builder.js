@@ -7545,7 +7545,7 @@ function fitRealisticPreviewToArtwork() {
         Smaller = closer.
         Larger = more breathing room.
     */
-    const safetyPadding = 10;
+    const safetyPadding = 4;
 
     const availableSize =
         probeSize -
@@ -7569,7 +7569,7 @@ function fitRealisticPreviewToArtwork() {
     */
     previewScale =
         Math.min(
-            1.13,
+            1.38,
             previewScale
         );
 
