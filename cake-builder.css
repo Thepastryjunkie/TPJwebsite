@@ -7886,7 +7886,7 @@ background-image:
 }
 
 .cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) .tpj-sprinkle-scene {
-    background-image: url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png?v=20260929-1");
+    background-image: url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20260929-1");
    background-repeat: no-repeat;
     background-position: center top;
     background-size: 100% auto;
@@ -14528,7 +14528,7 @@ and (pointer: coarse) {
         display: block !important;
 
         background-image:
-            url("images/cake-builder/decor/TPJ-Sprinkles-Page2.png?v=20261005-1") !important;
+            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261005-1") !important;
 
         background-repeat:
             repeat-y !important;
@@ -14840,53 +14840,77 @@ and (pointer: coarse) {
     }
 
 
-    /* Pages 2–5: correct sprinkle background. */
+/* Pages 2–5: put the sprinkle image directly on the page. */
 
-    .cake-builder-app:has(
-        :is(
-            #builderStep2.is-active,
-            #builderStep3.is-active,
-            #builderStep4.is-active,
-            #builderStep5.is-active
-        )
+.cake-builder-app:has(
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
     )
-    .tpj-sprinkle-scene {
-        display: block !important;
+) {
+    background-color: #F9D8E6 !important;
 
-        background-image:
-            url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261005-2") !important;
+    background-image:
+        url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20261005-3"),
+        linear-gradient(
+            135deg,
+            #F9D8E6 0%,
+            #FDEBF3 58%,
+            #F6C7DA 100%
+        ) !important;
 
-        background-repeat: repeat-y !important;
-        background-position: center top !important;
-        background-size: 100% auto !important;
-        background-color: transparent !important;
+    background-repeat:
+        repeat-y,
+        no-repeat !important;
 
-        opacity: 1 !important;
-    }
+    background-position:
+        center top,
+        center !important;
 
-    .cake-builder-app:has(
-        :is(
-            #builderStep2.is-active,
-            #builderStep3.is-active,
-            #builderStep4.is-active,
-            #builderStep5.is-active
-        )
+    background-size:
+        100% auto,
+        cover !important;
+}
+
+
+/* Prevent the older scene rules from covering or duplicating it. */
+
+.cake-builder-app:has(
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
     )
-    .tpj-sprinkle-scene::before,
+)
+.tpj-sprinkle-scene {
+    background: none !important;
+}
 
-    .cake-builder-app:has(
-        :is(
-            #builderStep2.is-active,
-            #builderStep3.is-active,
-            #builderStep4.is-active,
-            #builderStep5.is-active
-        )
+.cake-builder-app:has(
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
     )
-    .tpj-sprinkle-scene::after {
-        content: none !important;
-        display: none !important;
-        background: none !important;
-    }
+)
+.tpj-sprinkle-scene::before,
+
+.cake-builder-app:has(
+    :is(
+        #builderStep2.is-active,
+        #builderStep3.is-active,
+        #builderStep4.is-active,
+        #builderStep5.is-active
+    )
+)
+.tpj-sprinkle-scene::after {
+    content: none !important;
+    display: none !important;
+}
 
 
     /* Only the cake preview sticks on Pages 2–4. */
@@ -15070,23 +15094,38 @@ and (pointer: coarse) {
     #builderStep5
     .dessert-jar-list
     .quantity-control {
-        grid-template-columns:
-            28px 24px 28px !important;
+grid-template-columns:
+    30px 34px 30px !important;
     }
 
-    #builderStep5
-    .dessert-jar-list
-    .quantity-control button {
-        width: 28px !important;
-        height: 28px !important;
-    }
+#builderStep5
+.dessert-jar-list
+.quantity-control button {
+    width: 30px !important;
+    height: 30px !important;
+}
 
-    #builderStep5
-    .dessert-jar-list
-    .quantity-control input {
-        width: 24px !important;
-        height: 28px !important;
-    }
+#builderStep5
+.dessert-jar-list
+.quantity-control input {
+    box-sizing: border-box;
+
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 30px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    -webkit-appearance: none;
+    appearance: textfield;
+
+    font-size: 13px !important;
+    line-height: 30px !important;
+    text-align: center !important;
+}
 
 
     /* Pages 6–8: grouped frosted readability panels.
@@ -15165,5 +15204,101 @@ and (pointer: coarse) {
     ) {
         box-sizing: border-box;
         padding: 12px !important;
+    }
+  #cakePreviewCard .preview-heading-row {
+    width: 100% !important;
+    display: block !important;
+}
+
+#cakePreviewCard .preview-heading-row > div {
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+#cakePreviewCard .preview-heading-row h1 {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    overflow: visible !important;
+
+    white-space: normal !important;
+    text-overflow: clip !important;
+} 
+ #builderStep4
+#singleCakeColorCustomizer {
+    overflow: visible !important;
+}
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker[open] {
+    display: block !important;
+    width: 100% !important;
+}
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker[open]
+> summary {
+    display: none !important;
+}
+
+#builderStep4
+#singleCakeColorCustomizer
+.tpj-color-picker
+> .tpj-color-panel {
+    position: static !important;
+
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+
+    margin: 8px 0 0 !important;
+
+    overflow: visible !important;
+}
+}
+/* PAGE 4: five finishes — 3 on top, 2 centered below */
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        column-gap: 10px !important;
+        row-gap: 22px !important;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card {
+        grid-column: span 2;
+        width: 100% !important;
+    }
+
+    /* Center the two finishes on the second row */
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card:nth-child(4) {
+        grid-column: 2 / span 2;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .style-choice-card:nth-child(5) {
+        grid-column: 4 / span 2;
+    }
+
+    #builderStep4
+    #cakeFinishCustomizer
+    .finish-card-image {
+        width: 100% !important;
+        height: 120px !important;
+        object-fit: contain !important;
     }
 }

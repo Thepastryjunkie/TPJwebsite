@@ -15526,9 +15526,43 @@ getElement("#eventDate")?.addEventListener(
                 "eventDate"
             );
 
-        if (accepted) {
-            enforceDateMinimums();
-        }
+if (accepted) {
+    enforceDateMinimums();
+
+    const fulfillmentInput =
+        getElement("#fulfillmentDate");
+
+    if (
+        fulfillmentInput &&
+        event.target.value
+    ) {
+        /*
+         * Give the iPhone picker a valid future starting
+         * point instead of allowing it to open on today.
+         */
+        const earliestAllowedDate =
+            getMinimumDateForField(
+                "fulfillmentDate"
+            );
+
+        fulfillmentInput.value =
+            earliestAllowedDate;
+
+        builderState.fulfillmentDate =
+            earliestAllowedDate;
+
+        applyDateInputBounds(
+            fulfillmentInput,
+            "fulfillmentDate"
+        );
+
+        fulfillmentInput.setCustomValidity(
+            ""
+        );
+    }
+
+    updateRushFee();
+}
     }
 );
 
@@ -15731,11 +15765,22 @@ getElements(
                 input.value
             );
 
-            chooseDefaultCakeForShape(
-                input.value
-            );
+chooseDefaultCakeForShape(
+    input.value
+);
 
-            renderCakePreview();
+/*
+ * Keep the sample cake in the renderer,
+ * but require the customer to choose a size.
+ */
+getElements(
+    'input[name="cakeSize"]'
+).forEach((sizeInput) => {
+    sizeInput.checked = false;
+});
+
+updateSelectedCardStates();
+renderCakePreview();
         }
     );
 });
@@ -19052,11 +19097,17 @@ function prepareFreshBuilderForm() {
     });
 
     // The initial cake is a sample, not a confirmed selection.
-    getElements(
-        'input[name="cakeShape"], input[name="cakeSize"]'
-    ).forEach((input) => {
-        input.checked = false;
-    });
+getElements(
+    [
+        'input[name="cakeShape"]',
+        'input[name="cakeCoverage"]',
+        'input[name="cakeSize"]',
+        'input[name="cakeBoardStyle"]',
+        'input[name="cakeBoardColorChoice"]'
+    ].join(",")
+).forEach((input) => {
+    input.checked = false;
+});
 }
 function initializeBuilder() {
     prepareFreshBuilderForm();
