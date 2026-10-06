@@ -2,8 +2,7 @@
 
 
 
-@import url('https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@500;600;700&family=Fraunces:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Caveat:wght@500;600;700&family=Fraunces:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 /* =========================================
    BRAND VARIABLES
@@ -8472,7 +8471,7 @@ background-image:
 
     color: var(--chocolate);
 
-    font-family: 'Allura', cursive;
+ font-family: 'Parisienne', cursive;   
 
     font-size: clamp(
         44px,
@@ -8979,9 +8978,7 @@ font-weight: 700;
     #builderStep1 .step-one-script-title {
         max-width: 100%;
 
-        font-family:
-            'Allura',
-            cursive;
+font-family: 'Parisienne', cursive;
 
         font-size:
             clamp(

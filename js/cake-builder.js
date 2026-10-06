@@ -6918,6 +6918,79 @@ async function loadCupcakeExtraAssets() {
     return loadedAssets.filter(Boolean);
 }
 
+/*
+    CUPCAKE-ONLY DECORATION PLACEMENT
+
+    x: negative = left, positive = right
+    y: negative = higher, positive = lower
+    scale: smaller than 1 makes the decoration smaller
+
+    These adjustments activate only when the customer
+    combines more than one cupcake decoration.
+*/
+const cupcakeExtraPlacementMap = {
+    pearlsDecoration: {
+        x: -0.035,
+        y: 0.045,
+        scale: 0.96
+    },
+
+    ribbonDecoration: {
+        x: 0.045,
+        y: 0.025,
+        scale: 0.94
+    },
+
+    butterfliesDecoration: {
+        x: -0.055,
+        y: -0.045,
+        scale: 0.94
+    },
+
+    goldAccentDecoration: {
+        x: 0.045,
+        y: 0.055,
+        scale: 0.96
+    },
+
+    silverLeafDecoration: {
+        x: 0.045,
+        y: 0.055,
+        scale: 0.96
+    },
+
+    flowersDecoration: {
+        x: -0.045,
+        y: 0.015,
+        scale: 0.94
+    },
+
+    cherriesDecoration: {
+        x: 0.045,
+        y: -0.025,
+        scale: 0.94
+    },
+
+    /*
+        Macarons move toward the upper-left.
+    */
+    macaronsDecoration: {
+        x: -0.085,
+        y: -0.025,
+        scale: 0.90
+    },
+
+    /*
+        Disco balls move toward the lower-right.
+    */
+    discoBallsDecoration: {
+        x: 0.085,
+        y: 0.055,
+        scale: 0.86
+    }
+};
+
+
 function drawCupcakeExtraAssets(
     context,
     assets,
@@ -6928,28 +7001,58 @@ function drawCupcakeExtraAssets(
         return;
     }
 
-    const shouldStagger =
+    const shouldSeparate =
         assets.length > 1;
 
     assets.forEach((asset) => {
-        const drawBox =
-            getCakeForegroundExtraDrawBox(
-                asset,
-                0,
-                0,
-                width,
-                height,
-                shouldStagger
+        const placement =
+            cupcakeExtraPlacementMap[
+                asset.id
+            ] || {
+                x: 0,
+                y: 0,
+                scale: 1
+            };
+
+        /*
+            A decoration remains in its original
+            registered position when selected alone.
+        */
+        const scale =
+            shouldSeparate
+                ? placement.scale
+                : 1;
+
+        const drawWidth =
+            width * scale;
+
+        const drawHeight =
+            height * scale;
+
+        const drawX =
+            (width - drawWidth) / 2 +
+            (
+                shouldSeparate
+                    ? width * placement.x
+                    : 0
+            );
+
+        const drawY =
+            (height - drawHeight) / 2 +
+            (
+                shouldSeparate
+                    ? height * placement.y
+                    : 0
             );
 
         context.save();
 
         context.drawImage(
             getRenderedExtraLayer(asset),
-            drawBox.x,
-            drawBox.y,
-            drawBox.width,
-            drawBox.height
+            drawX,
+            drawY,
+            drawWidth,
+            drawHeight
         );
 
         context.restore();
