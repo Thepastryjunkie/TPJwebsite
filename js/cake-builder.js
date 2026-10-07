@@ -6527,7 +6527,83 @@ function getRealisticExtraColor(
 
     return colorMap[decorationId] || null;
 }
+const partialTintCompositeCache =
+    new WeakMap();
 
+function makeTintedLayerWithNaturalDetails(
+    image,
+    mask,
+    color
+) {
+    const tintedLayer =
+        makeTintedLayer(
+            image,
+            mask,
+            color
+        );
+
+    if (tintedLayer === image) {
+        return image;
+    }
+
+    if (
+        partialTintCompositeCache.has(
+            tintedLayer
+        )
+    ) {
+        return partialTintCompositeCache.get(
+            tintedLayer
+        );
+    }
+
+    const width =
+        image.naturalWidth ||
+        image.width;
+
+    const height =
+        image.naturalHeight ||
+        image.height;
+
+    const combinedCanvas =
+        document.createElement("canvas");
+
+    combinedCanvas.width = width;
+    combinedCanvas.height = height;
+
+    const combinedContext =
+        combinedCanvas.getContext("2d");
+
+    /*
+        First draw the complete original artwork.
+        This preserves the natural green leaves.
+    */
+    combinedContext.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    /*
+        Then place the recolored rose-only
+        mask over the original roses.
+    */
+    combinedContext.drawImage(
+        tintedLayer,
+        0,
+        0,
+        width,
+        height
+    );
+
+    partialTintCompositeCache.set(
+        tintedLayer,
+        combinedCanvas
+    );
+
+    return combinedCanvas;
+}
 function getRenderedExtraLayer(asset) {
     const selectedColor =
         getRealisticExtraColor(
@@ -6571,11 +6647,27 @@ function getRenderedExtraLayer(asset) {
         Pearls.
         Everything recolorable.
     */
-    return makeTintedLayer(
+/*
+    Flowers preserve their original leaves.
+    Only the rose area included in the mask
+    receives the selected color.
+*/
+if (
+    asset.id ===
+        "flowersDecoration"
+) {
+    return makeTintedLayerWithNaturalDetails(
         asset.strokes,
         asset.mask,
         selectedColor
     );
+}
+
+return makeTintedLayer(
+    asset.strokes,
+    asset.mask,
+    selectedColor
+);
 }
 function getDripDrawBox(
     dripAsset,
@@ -7784,7 +7876,26 @@ drawBentoColorPreview(
     standaloneImage,
     transform
 );             
- drawRealisticCakeFinish(
+/*
+    Vintage piping must cover the chocolate drip.
+    Other finishes retain their normal layer order.
+*/
+const bentoUsesVintagePiping =
+    standaloneFinishAssets?.type ===
+        "vintagePiping";
+
+if (bentoUsesVintagePiping) {
+    drawCakeDripExtra(
+        context,
+        standaloneExtraAssets,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
+
+drawRealisticCakeFinish(
     context,
     standaloneFinishAssets,
     transform.x,
@@ -7793,12 +7904,10 @@ drawBentoColorPreview(
     transform.height
 );
 
-
 /*
     The Bento top and bottom borders require
     separate registration boxes.
 */
-
 const bentoTopBorderBox =
     getBentoBorderDrawBox(
         transform,
@@ -7811,19 +7920,20 @@ const bentoBottomBorderBox =
         "bottom"
     );
 
-
 /*
-    Drip uses the full Bento canvas.
+    Non-Vintage finishes retain the normal
+    chocolate-drip layer order.
 */
-
-drawCakeDripExtra(
-    context,
-    standaloneExtraAssets,
-    transform.x,
-    transform.y,
-    transform.width,
-    transform.height
-);
+if (!bentoUsesVintagePiping) {
+    drawCakeDripExtra(
+        context,
+        standaloneExtraAssets,
+        transform.x,
+        transform.y,
+        transform.width,
+        transform.height
+    );
+}
 
 
 if (standaloneBorderAssets?.bottom) {
@@ -8357,29 +8467,48 @@ drawRecoloredAsset(
         x, y, and size only exist inside this loop.
     */
 
-  drawRealisticCakeFinish(
-    context,
-    finishAssetSets[index],
-    x,
-    y + boardYOffset,
-    size.width,
-    size.height
-);
+const finishAssets =
+    finishAssetSets[index];
 
+const usesVintagePiping =
+    finishAssets?.type ===
+        "vintagePiping";
 
 /*
-    Chocolate drip belongs underneath
-    the buttercream border.
+    Vintage piping must cover the chocolate drip.
+    Regular coating borders are drawn afterward
+    and therefore also cover the drip.
 */
+if (usesVintagePiping) {
+    drawCakeDripExtra(
+        context,
+        extraAssetSets[index],
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 
-drawCakeDripExtra(
+drawRealisticCakeFinish(
     context,
-    extraAssetSets[index],
+    finishAssets,
     x,
     y + boardYOffset,
     size.width,
     size.height
 );
+
+if (!usesVintagePiping) {
+    drawCakeDripExtra(
+        context,
+        extraAssetSets[index],
+        x,
+        y + boardYOffset,
+        size.width,
+        size.height
+    );
+}
 
 
 const borderAssets =
@@ -8473,7 +8602,7 @@ drawCakeForegroundExtras(
     y + boardYOffset,
     size.width,
     size.height,
-    false,
+    true,
     entry.key
 );
 
@@ -11068,31 +11197,9 @@ function validateStepTwo() {
     const confirmed =
         builderState.stepTwoConfirmed || {};
 
-    const isVisible = (selector) => {
-        const element = getElement(selector);
-
-        return Boolean(
-            element &&
-            !element.classList.contains("is-hidden") &&
-            !element.closest(".is-hidden") &&
-            element.getClientRects().length
-        );
-    };
-
     if (!confirmed.shape) {
         showValidationMessage(
             "Choose a cake shape before continuing."
-        );
-
-        return false;
-    }
-
-    if (
-        isVisible("#cakeCoverageOptions") &&
-        !confirmed.coverage
-    ) {
-        showValidationMessage(
-            "Choose the cake coverage before continuing."
         );
 
         return false;
@@ -11109,63 +11216,8 @@ function validateStepTwo() {
         return false;
     }
 
-    if (
-        isVisible(".cake-height-selector") &&
-        !confirmed.height
-    ) {
-        showValidationMessage(
-            "Choose Standard or Tall cake height before continuing."
-        );
-
-        return false;
-    }
-
-    const boardIsVisible =
-        isVisible("#cakeBoardCustomizer");
-
-    const selectableBoardChoices =
-        getElements(
-            'input[name="cakeBoardStyle"]'
-        ).filter((input) => {
-            const card = input.closest("label");
-
-            return (
-                !input.disabled &&
-                card &&
-                card.getClientRects().length
-            );
-        });
-
-    /*
-     * A forced board, such as a sheet or number cake board,
-     * does not require an unnecessary extra click.
-     */
-    if (
-        boardIsVisible &&
-        selectableBoardChoices.length > 1 &&
-        !confirmed.boardStyle
-    ) {
-        showValidationMessage(
-            "Choose a cake board shape before continuing."
-        );
-
-        return false;
-    }
-
-    if (
-        boardIsVisible &&
-        !confirmed.boardColor
-    ) {
-        showValidationMessage(
-            "Choose a cake board color before continuing."
-        );
-
-        return false;
-    }
-
     return true;
 }
-
 
 function validateStepThree() {
     if (!builderState.cakeFlavor) {
@@ -16364,16 +16416,28 @@ if (ruffleToggle) {
     const isCupcakesOnly =
         product.shape === "cupcakes";
 
-    const fullyFrostedNumberLetter =
-        isNumberLetter &&
-        isFullyFrostedNumberLetterStyle();
+const fullyFrostedNumberLetter =
+    isNumberLetter &&
+    isFullyFrostedNumberLetterStyle();
 
-    const borderSelectionAllowed =
-        !isCupcakesOnly &&
-        (
-            !isNumberLetter ||
-            fullyFrostedNumberLetter
-        );
+const vintagePipingSelected =
+    builderState.cakeFinish ===
+        "Vintage Piping";
+
+const borderSelectionAllowed =
+    !isCupcakesOnly &&
+    !vintagePipingSelected &&
+    (
+        !isNumberLetter ||
+        fullyFrostedNumberLetter
+    );
+
+if (
+    vintagePipingSelected &&
+    builderState.cakeBorderStyle
+) {
+    clearCakeBorderSelection();
+}
 
     if (
         isNumberLetter &&
@@ -19198,15 +19262,15 @@ function prepareFreshBuilderForm() {
             field.value = field.defaultValue;
         }
     });
-
-    // The initial cake is a sample, not a confirmed selection.
+/*
+    Shape and size require a customer selection.
+    Coverage, board style, board color and height
+    keep their defaults.
+*/
 getElements(
     [
         'input[name="cakeShape"]',
-        'input[name="cakeCoverage"]',
-        'input[name="cakeSize"]',
-        'input[name="cakeBoardStyle"]',
-        'input[name="cakeBoardColorChoice"]'
+        'input[name="cakeSize"]'
     ].join(",")
 ).forEach((input) => {
     input.checked = false;
