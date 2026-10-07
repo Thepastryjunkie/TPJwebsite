@@ -7884,12 +7884,6 @@ background-image:
     background: none;
 }
 
-.cake-builder-app:has(.builder-step.is-active:not(#builderStep1)) .tpj-sprinkle-scene {
-    background-image: url("images/cake-builder/decor/TPJ-Mobile-Pages2-8-Messy-Scatter.png?v=20260929-1");
-   background-repeat: no-repeat;
-    background-position: center top;
-    background-size: 100% auto;
-}
 .tpj-ref-local { 
     z-index: 2; 
     overflow: visible; 
