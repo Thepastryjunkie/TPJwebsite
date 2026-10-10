@@ -1278,12 +1278,6 @@
         rgba(118, 61, 74, 0.08);
 
     background:
-        radial-gradient(
-            circle at 94% 24%,
-            rgba(222, 82, 132, 0.21) 0%,
-            rgba(222, 82, 132, 0.09) 25%,
-            transparent 48%
-        ),
 
         radial-gradient(
             circle at 2% 10%,
@@ -1306,22 +1300,7 @@
 ========================================================= */
 
 .apple-section::before {
-    content: "";
-
-    position: absolute;
-
-    width: 520px;
-    height: 520px;
-
-    right: -230px;
-    top: 80px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(201, 75, 118, 0.08);
-
-    pointer-events: none;
+    display: none;
 }
 
 
@@ -1464,17 +1443,20 @@
    crashing into the right corner */
 
 .apple-feature-main {
-    width: 470px;
+    width: 410px;
 
-    right: -55px;
+    right: -120px;
 
     top: auto;
-    bottom: 75px;
+    bottom: -35px;
 
     z-index: 3;
 
     transform:
-        rotate(5deg);
+        rotate(-17deg);
+
+    transform-origin:
+        bottom right;
 }
 
 /* =========================================================
@@ -1510,30 +1492,7 @@
 
 
 .apple-showcase::after {
-    content: "";
-
-    position: absolute;
-
-    width: 460px;
-    height: 460px;
-
-    right: -125px;
-    top: 80px;
-
-    border-radius:
-        45% 55% 42% 58% /
-        56% 43% 57% 44%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(177, 46, 82, 0.18),
-            rgba(177, 46, 82, 0.06) 57%,
-            transparent 73%
-        );
-
-    transform:
-        rotate(14deg);
+    display: none;
 }
 
 
@@ -1626,11 +1585,20 @@
     }
 
 
-    .apple-feature-main {
-        width: 620px;
+.apple-feature-main {
+    width: 450px;
 
-        right: -160px;
-    }
+    right: -145px;
+
+    top: auto;
+    bottom: 0;
+
+    transform:
+        rotate(-17deg);
+
+    transform-origin:
+        bottom right;
+}
 
 
     .apple-feature-left {
@@ -1677,12 +1645,18 @@
 
 
 .apple-feature-main {
-    width: 340px;
+    width: 315px;
 
-    right: -70px;
+    right: -105px;
 
     top: auto;
-    bottom: 75px;
+    bottom: 10px;
+
+    transform:
+        rotate(-16deg);
+
+    transform-origin:
+        bottom right;
 }
 
 
