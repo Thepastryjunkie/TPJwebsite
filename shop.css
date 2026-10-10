@@ -1,0 +1,1881 @@
+/* =========================================================
+   THE PASTRY JUNKIE
+   SHOP PAGE
+========================================================= */
+
+
+/* =========================================================
+   SHOP CONTENT
+========================================================= */
+
+.shop-content {
+    width: 100%;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   GENERAL DESSERT SECTION
+========================================================= */
+
+.dessert-section {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+}
+
+
+.dessert-section-inner {
+    position: relative;
+    z-index: 2;
+
+    width: min(1440px, calc(100% - 80px));
+
+    margin: 0 auto;
+
+    padding: 120px 0 130px;
+}
+
+
+/* =========================================================
+   LOADED CUPCAKES
+========================================================= */
+
+.cupcake-section {
+    position: relative;
+
+    min-height: 1000px;
+
+    background:
+        radial-gradient(
+            circle at 92% 5%,
+            rgba(116, 67, 51, 0.18) 0%,
+            rgba(116, 67, 51, 0.09) 21%,
+            transparent 43%
+        ),
+
+        radial-gradient(
+            circle at 3% 48%,
+            rgba(233, 150, 177, 0.16) 0%,
+            rgba(233, 150, 177, 0.07) 23%,
+            transparent 45%
+        ),
+
+        linear-gradient(
+            180deg,
+            #fffaf6 0%,
+            #fff5f1 52%,
+            #fffaf7 100%
+        );
+}
+
+
+/* Soft oversized background shapes */
+
+.cupcake-section::before {
+    content: "";
+
+    position: absolute;
+
+    width: 520px;
+    height: 520px;
+
+    right: -160px;
+    top: 40px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(108, 57, 42, 0.08);
+
+    filter: blur(2px);
+
+    pointer-events: none;
+}
+
+
+.cupcake-section::after {
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    left: -160px;
+    bottom: 80px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(228, 134, 166, 0.10);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   SECTION INTRO
+========================================================= */
+
+.dessert-section-intro {
+    position: relative;
+    z-index: 5;
+
+    max-width: 580px;
+
+    min-height: 500px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.dessert-section-kicker {
+    margin: 0 0 15px;
+
+    color: #8a4b3e;
+
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    letter-spacing: 0.22em;
+
+    text-transform: uppercase;
+}
+
+
+.dessert-section-title {
+    margin: 0;
+
+    color: #4b2924;
+
+    font-size: clamp(4rem, 7vw, 7.7rem);
+
+    font-weight: 900;
+
+    line-height: 0.82;
+
+    letter-spacing: -0.055em;
+
+    text-transform: uppercase;
+}
+
+
+.dessert-section-title span {
+    display: block;
+
+    color: #de5e95;
+}
+
+
+.dessert-section-description {
+    max-width: 520px;
+
+    margin: 32px 0 0;
+
+    color: #6d4b43;
+
+    font-size: clamp(1rem, 1.35vw, 1.22rem);
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   HUGE DECORATIVE CUPCAKES
+========================================================= */
+
+.cupcake-showcase {
+    position: absolute;
+
+    z-index: 1;
+
+    top: 5px;
+    right: max(-50px, calc((100vw - 1550px) / 2));
+
+    width: 760px;
+    height: 650px;
+
+    pointer-events: none;
+}
+
+
+.cupcake-feature {
+    position: absolute;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 24px 30px
+            rgba(70, 35, 27, 0.18)
+        );
+}
+
+
+/* Giant hero cupcake */
+
+.cupcake-feature-main {
+    width: 500px;
+
+    right: -15px;
+    top: 45px;
+
+    z-index: 3;
+
+    transform:
+        rotate(2deg);
+}
+
+
+/* Floating strawberry cupcake */
+
+.cupcake-feature-left {
+    width: 280px;
+
+    left: 35px;
+    top: 20px;
+
+    z-index: 2;
+
+    transform:
+        rotate(-11deg);
+}
+
+
+/* Floating banana pudding cupcake */
+
+.cupcake-feature-bottom {
+    width: 260px;
+
+    right: 370px;
+    bottom: 0;
+
+    z-index: 4;
+
+    transform:
+        rotate(9deg);
+}
+
+
+/* =========================================================
+   PRODUCT GRID
+========================================================= */
+
+.dessert-product-grid {
+    position: relative;
+    z-index: 5;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 65px 30px;
+
+    margin-top: 45px;
+}
+
+
+/* Product is intentionally NOT a card */
+
+.dessert-product {
+    position: relative;
+
+    min-width: 0;
+
+    text-align: center;
+}
+
+
+.dessert-product-image-wrap {
+    position: relative;
+
+    width: 100%;
+
+    height: 350px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    overflow: visible;
+}
+
+
+/* Soft grounding shadow */
+
+.dessert-product-image-wrap::after {
+    content: "";
+
+    position: absolute;
+
+    z-index: -1;
+
+    width: 63%;
+    height: 18px;
+
+    left: 50%;
+    bottom: 4px;
+
+    transform:
+        translateX(-50%);
+
+    border-radius: 50%;
+
+    background:
+        rgba(80, 42, 33, 0.13);
+
+    filter: blur(12px);
+}
+
+
+.dessert-product-image {
+    display: block;
+
+    width: 100%;
+    max-width: 300px;
+
+    max-height: 350px;
+
+    object-fit: contain;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease;
+
+    filter:
+        drop-shadow(
+            0 16px 16px
+            rgba(77, 41, 32, 0.08)
+        );
+}
+
+
+.dessert-product:hover
+.dessert-product-image {
+    transform:
+        translateY(-10px)
+        scale(1.035);
+
+    filter:
+        drop-shadow(
+            0 22px 20px
+            rgba(77, 41, 32, 0.14)
+        );
+}
+
+
+.dessert-product h3 {
+    margin: 20px 0 0;
+
+    color: #4e2b25;
+
+    font-size: clamp(
+        1rem,
+        1.25vw,
+        1.22rem
+    );
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+
+/* Little pink underline instead of card decoration */
+
+.dessert-product h3::after {
+    content: "";
+
+    display: block;
+
+    width: 28px;
+    height: 3px;
+
+    margin: 11px auto 0;
+
+    border-radius: 50px;
+
+    background: #e2679b;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1500px) {
+
+    .dessert-product-image-wrap {
+        height: 390px;
+    }
+
+
+    .dessert-product-image {
+        max-width: 340px;
+        max-height: 390px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET / SMALL LAPTOP
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .dessert-section-inner {
+        width: min(
+            100% - 48px,
+            1050px
+        );
+
+        padding:
+            90px 0
+            110px;
+    }
+
+
+    .dessert-section-intro {
+        max-width: 500px;
+
+        min-height: 440px;
+    }
+
+
+    .cupcake-showcase {
+        width: 560px;
+        height: 520px;
+
+        right: -100px;
+    }
+
+
+    .cupcake-feature-main {
+        width: 385px;
+
+        right: 0;
+        top: 75px;
+    }
+
+
+    .cupcake-feature-left {
+        width: 210px;
+
+        left: 10px;
+        top: 35px;
+    }
+
+
+    .cupcake-feature-bottom {
+        width: 190px;
+
+        right: 290px;
+        bottom: 25px;
+    }
+
+
+    .dessert-product-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap:
+            55px 28px;
+    }
+
+
+    .dessert-product-image-wrap {
+        height: 320px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .dessert-section-inner {
+        width:
+            calc(100% - 32px);
+
+        padding:
+            65px 0
+            90px;
+    }
+
+
+    .dessert-section-intro {
+        min-height: auto;
+
+        max-width: 100%;
+
+        text-align: center;
+    }
+
+
+    .dessert-section-kicker {
+        font-size: 0.72rem;
+    }
+
+
+    .dessert-section-title {
+        font-size:
+            clamp(
+                3.3rem,
+                17vw,
+                5.3rem
+            );
+
+        line-height: 0.87;
+    }
+
+
+    .dessert-section-description {
+        max-width: 450px;
+
+        margin:
+            24px auto 0;
+
+        font-size: 0.98rem;
+    }
+
+
+    /* Decorative dessert cluster
+       moves underneath title */
+
+    .cupcake-showcase {
+        position: relative;
+
+        top: auto;
+        right: auto;
+
+        width: 100%;
+        height: 390px;
+
+        margin:
+            20px auto 0;
+    }
+
+
+    .cupcake-feature-main {
+        width: 320px;
+
+        max-width: 82vw;
+
+        left: 50%;
+        right: auto;
+        top: 40px;
+
+        transform:
+            translateX(-50%)
+            rotate(1deg);
+    }
+
+
+    .cupcake-feature-left {
+        width: 165px;
+
+        left: -32px;
+        top: 15px;
+
+        opacity: 0.92;
+
+        transform:
+            rotate(-12deg);
+    }
+
+
+    .cupcake-feature-bottom {
+        width: 155px;
+
+        right: -30px;
+        bottom: 8px;
+
+        opacity: 0.94;
+
+        transform:
+            rotate(10deg);
+    }
+
+
+    .dessert-product-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap:
+            45px 16px;
+
+        margin-top: 15px;
+    }
+
+
+    .dessert-product-image-wrap {
+        height: 235px;
+    }
+
+
+    .dessert-product-image {
+        max-width: 210px;
+
+        max-height: 235px;
+    }
+
+
+    .dessert-product h3 {
+        margin-top: 13px;
+
+        font-size: 0.94rem;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .cupcake-showcase {
+        height: 330px;
+    }
+
+
+    .cupcake-feature-main {
+        width: 270px;
+    }
+
+
+    .cupcake-feature-left {
+        width: 135px;
+    }
+
+
+    .cupcake-feature-bottom {
+        width: 130px;
+    }
+
+
+    .dessert-product-image-wrap {
+        height: 205px;
+    }
+
+
+    .dessert-product-image {
+        max-height: 205px;
+    }
+
+}
+/* =========================================================
+   LOADED CHEESECAKE JARS
+========================================================= */
+
+.jar-section {
+    position: relative;
+
+    min-height: 1000px;
+
+    border-top:
+        1px solid
+        rgba(105, 59, 48, 0.08);
+
+    background:
+        radial-gradient(
+            circle at 2% 12%,
+            rgba(231, 103, 151, 0.16) 0%,
+            rgba(231, 103, 151, 0.07) 22%,
+            transparent 43%
+        ),
+
+        radial-gradient(
+            circle at 98% 14%,
+            rgba(88, 45, 34, 0.18) 0%,
+            rgba(88, 45, 34, 0.08) 24%,
+            transparent 44%
+        ),
+
+        linear-gradient(
+            180deg,
+            #fffaf7 0%,
+            #fdf3ef 48%,
+            #fff8f5 100%
+        );
+}
+
+
+/* =========================================================
+   SOFT BACKGROUND BLOBS
+========================================================= */
+
+.jar-section::before {
+    content: "";
+
+    position: absolute;
+
+    width: 470px;
+    height: 470px;
+
+    left: -230px;
+    top: 70px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(230, 117, 158, 0.09);
+
+    pointer-events: none;
+}
+
+
+.jar-section::after {
+    content: "";
+
+    position: absolute;
+
+    width: 560px;
+    height: 560px;
+
+    right: -280px;
+    top: 15px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(101, 58, 46, 0.08);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   JAR SECTION INNER
+========================================================= */
+
+.jar-section-inner {
+    padding-top: 105px;
+}
+
+
+/* =========================================================
+   CENTERED JAR HEADING
+========================================================= */
+
+.jar-section-intro {
+    position: relative;
+
+    z-index: 5;
+
+    max-width: 900px;
+    min-height: 390px;
+
+    margin: 0 auto;
+
+    justify-content: center;
+
+    text-align: center;
+}
+
+
+.jar-section-kicker {
+    color: #8a4b3e;
+}
+
+
+.jar-section-title {
+    font-size:
+        clamp(
+            4rem,
+            6vw,
+            6.7rem
+        );
+
+    line-height: 0.9;
+}
+
+
+.jar-section-title span {
+    margin-bottom: 8px;
+}
+
+
+.jar-section-description {
+    margin:
+        26px auto 0;
+
+    max-width: 560px;
+}
+
+
+/* =========================================================
+   HUGE EDGE JARS
+========================================================= */
+
+.jar-showcase {
+    position: absolute;
+
+    z-index: 3;
+
+    top: 15px;
+    left: 0;
+
+    width: 100%;
+    height: 570px;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+
+.jar-feature {
+    position: absolute;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 28px 30px
+            rgba(69, 37, 29, 0.18)
+        );
+}
+
+
+/* Strawberry jar exploding in from left */
+
+.jar-feature-left {
+    width: 430px;
+
+    left: -125px;
+    top: 20px;
+
+    transform:
+        rotate(-8deg);
+}
+
+
+/* Cookies & Cream jar exploding in from right */
+
+.jar-feature-right {
+    width: 445px;
+
+    right: -130px;
+    top: 15px;
+
+    transform:
+        rotate(8deg);
+}
+
+
+/* =========================================================
+   LITTLE SPLASH HAZES BEHIND LARGE JARS
+========================================================= */
+
+.jar-showcase::before {
+    content: "";
+
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    left: -90px;
+    top: 120px;
+
+    border-radius: 44% 56% 52% 48% / 54% 44% 56% 46%;
+
+    background:
+        radial-gradient(
+            circle at 60% 45%,
+            rgba(241, 98, 145, 0.24),
+            rgba(241, 98, 145, 0.08) 55%,
+            transparent 72%
+        );
+
+    transform:
+        rotate(-17deg);
+}
+
+
+.jar-showcase::after {
+    content: "";
+
+    position: absolute;
+
+    width: 360px;
+    height: 360px;
+
+    right: -110px;
+    top: 100px;
+
+    border-radius: 53% 47% 42% 58% / 46% 55% 45% 54%;
+
+    background:
+        radial-gradient(
+            circle at 40% 50%,
+            rgba(91, 45, 33, 0.23),
+            rgba(91, 45, 33, 0.08) 56%,
+            transparent 72%
+        );
+
+    transform:
+        rotate(13deg);
+}
+
+
+/* =========================================================
+   JAR PRODUCT GRID
+
+   First row = 5
+   Second row = 6
+========================================================= */
+
+.jar-product-grid {
+    grid-template-columns:
+        repeat(30, minmax(0, 1fr));
+
+    gap:
+        58px 20px;
+
+    margin-top: 5px;
+}
+
+
+/* First five jars */
+
+.jar-product:nth-child(-n + 5) {
+    grid-column:
+        span 6;
+}
+
+
+/* Remaining six jars */
+
+.jar-product:nth-child(n + 6) {
+    grid-column:
+        span 5;
+}
+
+
+/* =========================================================
+   JAR PRODUCT IMAGES
+========================================================= */
+
+.jar-product-image-wrap {
+    height: 330px;
+}
+
+
+.jar-product-image {
+    max-width: 285px;
+    max-height: 330px;
+}
+
+
+/* slightly smaller name size because some jar names are long */
+
+.jar-product h3 {
+    max-width: 220px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1500px) {
+
+    .jar-product-image-wrap {
+        height: 370px;
+    }
+
+
+    .jar-product-image {
+        max-width: 320px;
+        max-height: 370px;
+    }
+
+
+    .jar-feature-left {
+        width: 475px;
+
+        left: -115px;
+    }
+
+
+    .jar-feature-right {
+        width: 490px;
+
+        right: -115px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET / SMALL LAPTOP
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .jar-section-inner {
+        padding-top: 85px;
+    }
+
+
+    .jar-section-intro {
+        max-width: 650px;
+
+        min-height: 380px;
+    }
+
+
+    .jar-section-title {
+        font-size:
+            clamp(
+                3.8rem,
+                7vw,
+                5.5rem
+            );
+    }
+
+
+    .jar-feature-left {
+        width: 330px;
+
+        left: -125px;
+        top: 70px;
+    }
+
+
+    .jar-feature-right {
+        width: 345px;
+
+        right: -130px;
+        top: 70px;
+    }
+
+
+    .jar-product-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap:
+            55px 28px;
+    }
+
+
+    .jar-product:nth-child(n) {
+        grid-column: auto;
+    }
+
+
+    .jar-product-image-wrap {
+        height: 310px;
+    }
+
+
+    .jar-product-image {
+        max-width: 275px;
+        max-height: 310px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .jar-section-inner {
+        padding-top: 55px;
+    }
+
+
+    .jar-section-intro {
+        max-width: 100%;
+
+        min-height: auto;
+
+        padding:
+            0 4px;
+    }
+
+
+    .jar-section-title {
+        font-size:
+            clamp(
+                3rem,
+                15vw,
+                4.8rem
+            );
+
+        line-height: 0.9;
+    }
+
+
+    .jar-section-description {
+        margin-top: 22px;
+    }
+
+
+    /* Large jars become a visual cluster
+       underneath the heading on phones */
+
+    .jar-showcase {
+        position: relative;
+
+        top: auto;
+
+        width: 100%;
+        height: 370px;
+
+        margin-top: 15px;
+    }
+
+
+    .jar-feature-left {
+        width: 255px;
+
+        left: -65px;
+        top: 25px;
+
+        transform:
+            rotate(-8deg);
+    }
+
+
+    .jar-feature-right {
+        width: 265px;
+
+        right: -70px;
+        top: 40px;
+
+        transform:
+            rotate(8deg);
+    }
+
+
+    .jar-showcase::before {
+        width: 235px;
+        height: 235px;
+
+        left: -65px;
+        top: 80px;
+    }
+
+
+    .jar-showcase::after {
+        width: 250px;
+        height: 250px;
+
+        right: -75px;
+        top: 95px;
+    }
+
+
+    .jar-product-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap:
+            45px 16px;
+
+        margin-top: 10px;
+    }
+
+
+    .jar-product:nth-child(n) {
+        grid-column: auto;
+    }
+
+
+    .jar-product-image-wrap {
+        height: 235px;
+    }
+
+
+    .jar-product-image {
+        max-width: 210px;
+        max-height: 235px;
+    }
+
+
+    .jar-product h3 {
+        max-width: 165px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .jar-showcase {
+        height: 315px;
+    }
+
+
+    .jar-feature-left {
+        width: 215px;
+
+        left: -65px;
+    }
+
+
+    .jar-feature-right {
+        width: 220px;
+
+        right: -65px;
+    }
+
+
+    .jar-product-image-wrap {
+        height: 205px;
+    }
+
+
+    .jar-product-image {
+        max-height: 205px;
+    }
+
+}
+/* =========================================================
+   LOADED CHEESECAKE APPLES
+========================================================= */
+
+.apple-section {
+    position: relative;
+
+    min-height: 1000px;
+
+    border-top:
+        1px solid
+        rgba(118, 61, 74, 0.08);
+
+    background:
+        radial-gradient(
+            circle at 94% 24%,
+            rgba(222, 82, 132, 0.21) 0%,
+            rgba(222, 82, 132, 0.09) 25%,
+            transparent 48%
+        ),
+
+        radial-gradient(
+            circle at 2% 10%,
+            rgba(255, 183, 199, 0.25) 0%,
+            rgba(255, 183, 199, 0.10) 27%,
+            transparent 47%
+        ),
+
+        linear-gradient(
+            180deg,
+            #fff8f6 0%,
+            #fdebed 48%,
+            #fff6f3 100%
+        );
+}
+
+
+/* =========================================================
+   SOFT BACKGROUND SHAPES
+========================================================= */
+
+.apple-section::before {
+    content: "";
+
+    position: absolute;
+
+    width: 520px;
+    height: 520px;
+
+    right: -230px;
+    top: 80px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(201, 75, 118, 0.08);
+
+    pointer-events: none;
+}
+
+
+.apple-section::after {
+    content: "";
+
+    position: absolute;
+
+    width: 370px;
+    height: 370px;
+
+    left: -185px;
+    top: 120px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 174, 190, 0.13);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   APPLE SECTION INNER
+========================================================= */
+
+.apple-section-inner {
+    padding-top: 105px;
+}
+
+
+/* =========================================================
+   APPLE SECTION HEADING
+========================================================= */
+
+.apple-section-intro {
+    position: relative;
+
+    z-index: 5;
+
+    max-width: 850px;
+    min-height: 390px;
+
+    margin: 0 auto;
+
+    justify-content: center;
+
+    text-align: center;
+}
+
+
+.apple-section-kicker {
+    color: #88483f;
+}
+
+
+.apple-section-title {
+    font-size:
+        clamp(
+            4rem,
+            6vw,
+            6.8rem
+        );
+
+    line-height: 0.89;
+}
+
+
+.apple-section-title span {
+    margin-bottom: 8px;
+
+    color: #db4f88;
+}
+
+
+.apple-section-description {
+    margin:
+        26px auto 0;
+
+    max-width: 550px;
+}
+
+
+/* =========================================================
+   HUGE DECORATIVE APPLES
+========================================================= */
+
+.apple-showcase {
+    position: absolute;
+
+    z-index: 3;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: auto;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+
+.apple-feature {
+    position: absolute;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 28px 30px
+            rgba(79, 35, 39, 0.18)
+        );
+}
+
+
+/* Smaller Strawberry Crunch apple
+   peeking in from the left */
+
+.apple-feature-left {
+    width: 310px;
+
+    left: -115px;
+    top: 115px;
+
+    z-index: 2;
+
+    transform:
+        rotate(-10deg);
+}
+
+
+/* Huge Red Velvet apple
+   crashing into the right corner */
+
+.apple-feature-main {
+    width: 470px;
+
+    right: -55px;
+
+    top: auto;
+    bottom: 75px;
+
+    z-index: 3;
+
+    transform:
+        rotate(5deg);
+}
+
+/* =========================================================
+   COLOR HAZE BEHIND GIANT APPLES
+========================================================= */
+
+.apple-showcase::before {
+    content: "";
+
+    position: absolute;
+
+    width: 290px;
+    height: 290px;
+
+    left: -70px;
+    top: 160px;
+
+    border-radius:
+        52% 48% 61% 39% /
+        45% 57% 43% 55%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 113, 148, 0.19),
+            rgba(242, 113, 148, 0.05) 60%,
+            transparent 74%
+        );
+
+    transform:
+        rotate(-12deg);
+}
+
+
+.apple-showcase::after {
+    content: "";
+
+    position: absolute;
+
+    width: 460px;
+    height: 460px;
+
+    right: -125px;
+    top: 80px;
+
+    border-radius:
+        45% 55% 42% 58% /
+        56% 43% 57% 44%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(177, 46, 82, 0.18),
+            rgba(177, 46, 82, 0.06) 57%,
+            transparent 73%
+        );
+
+    transform:
+        rotate(14deg);
+}
+
+
+/* =========================================================
+   APPLE PRODUCT GRID
+
+   Row 1 = 4
+   Row 2 = 3 centered
+========================================================= */
+.apple-product-grid {
+    z-index: 6;
+} 
+
+.apple-product-grid {
+    grid-template-columns:
+        repeat(12, minmax(0, 1fr));
+
+    gap:
+        65px 28px;
+
+    margin-top: 10px;
+}
+
+
+/* First four apples */
+
+.apple-product:nth-child(-n + 4) {
+    grid-column:
+        span 3;
+}
+
+
+/* Last three apples */
+
+.apple-product:nth-child(5) {
+    grid-column:
+        2 / span 3;
+}
+
+
+.apple-product:nth-child(6) {
+    grid-column:
+        5 / span 3;
+}
+
+
+.apple-product:nth-child(7) {
+    grid-column:
+        8 / span 3;
+}
+
+
+/* =========================================================
+   APPLE PRODUCT IMAGES
+========================================================= */
+
+.apple-product-image-wrap {
+    height: 345px;
+}
+
+
+.apple-product-image {
+    max-width: 300px;
+    max-height: 345px;
+}
+
+
+.apple-product h3 {
+    max-width: 215px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1500px) {
+
+    .apple-product-image-wrap {
+        height: 385px;
+    }
+
+
+    .apple-product-image {
+        max-width: 335px;
+        max-height: 385px;
+    }
+
+
+    .apple-feature-main {
+        width: 620px;
+
+        right: -160px;
+    }
+
+
+    .apple-feature-left {
+        width: 345px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET / SMALL LAPTOP
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .apple-section-inner {
+        padding-top: 85px;
+    }
+
+
+    .apple-section-intro {
+        max-width: 650px;
+
+        min-height: 380px;
+    }
+
+
+    .apple-section-title {
+        font-size:
+            clamp(
+                3.8rem,
+                7vw,
+                5.6rem
+            );
+    }
+
+
+    .apple-feature-left {
+        width: 250px;
+
+        left: -110px;
+        top: 130px;
+    }
+
+
+.apple-feature-main {
+    width: 340px;
+
+    right: -70px;
+
+    top: auto;
+    bottom: 75px;
+}
+
+
+    .apple-product-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap:
+            55px 28px;
+    }
+
+
+    .apple-product:nth-child(n) {
+        grid-column: auto;
+    }
+
+
+    .apple-product-image-wrap {
+        height: 315px;
+    }
+
+
+    .apple-product-image {
+        max-width: 275px;
+        max-height: 315px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .apple-section-inner {
+        padding-top: 55px;
+    }
+
+
+    .apple-section-intro {
+        min-height: auto;
+
+        max-width: 100%;
+
+        padding:
+            0 4px;
+    }
+
+
+    .apple-section-title {
+        font-size:
+            clamp(
+                3rem,
+                14.5vw,
+                4.7rem
+            );
+
+        line-height: 0.9;
+    }
+
+
+    .apple-section-description {
+        margin-top: 22px;
+    }
+
+
+    /* Decorative apples move underneath
+       the title on mobile */
+
+.apple-showcase {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: auto;
+
+    margin: 0;
+}
+
+.apple-feature-left {
+    width: 165px;
+
+    left: -60px;
+    top: 135px;
+
+    transform:
+        rotate(-10deg);
+}
+
+
+
+.apple-feature-main {
+    width: 235px;
+
+    right: -65px;
+
+    top: auto;
+    bottom: 45px;
+
+    transform:
+        rotate(5deg);
+}
+
+    .apple-showcase::before {
+        width: 200px;
+        height: 200px;
+
+        left: -45px;
+        top: 120px;
+    }
+
+
+    .apple-showcase::after {
+        width: 300px;
+        height: 300px;
+
+        right: -80px;
+        top: 60px;
+    }
+
+
+    .apple-product-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap:
+            45px 16px;
+
+        margin-top: 10px;
+    }
+
+
+    .apple-product:nth-child(n) {
+        grid-column: auto;
+    }
+
+
+    .apple-product-image-wrap {
+        height: 235px;
+    }
+
+
+    .apple-product-image {
+        max-width: 210px;
+        max-height: 235px;
+    }
+
+
+    .apple-product h3 {
+        max-width: 165px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .apple-showcase {
+        height: 325px;
+    }
+
+
+    .apple-feature-left {
+        width: 165px;
+
+        left: -55px;
+    }
+
+
+    .apple-feature-main {
+        width: 285px;
+
+        right: -85px;
+    }
+
+
+    .apple-product-image-wrap {
+        height: 205px;
+    }
+
+
+    .apple-product-image {
+        max-height: 205px;
+    }
+
+}
