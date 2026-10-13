@@ -11,17 +11,15 @@
 ========================================================= */
 
 @media (min-width: 1200px) {
-
     body.shop-page {
         zoom: 1;
     }
 
     body.shop-page main {
-        width: 200%;
+        width: auto;
         max-width: none;
         zoom: 0.5;
     }
-
 }
 /* =========================================================
    SHOP CONTENT
