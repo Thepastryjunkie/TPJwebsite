@@ -3543,27 +3543,34 @@ body.shop-page .tpj-banner {
   width: auto;
   max-width: none;
   min-height: 0;
+  aspect-ratio: 2048 / 590;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   background: #f5e9e6;
   container-type: inline-size;
 }
 
 body.shop-page .tpj-banner-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
   display: block;
   width: 100%;
   max-width: none;
   height: auto;
   margin: 0;
   padding: 0;
+  pointer-events: none;
 }
 
 body.shop-page .tpj-banner-copy {
   position: absolute;
   top: 12%;
-  left: 5%;
-  width: 43%;
+  left: 22%;
+  z-index: 2;
+  width: 35%;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -3626,10 +3633,16 @@ body.shop-page .tpj-banner-handwriting {
 
 /* Phones: centered text above the complete banner */
 @media (max-width: 700px) {
-  body.shop-page .tpj-banner {
-    display: flex;
-    flex-direction: column;
-  }
+body.shop-page .tpj-banner {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: auto;
+}
+
+body.shop-page .tpj-banner-image {
+  position: relative;
+  margin-bottom: -36.914%;
+}
 
   body.shop-page .tpj-banner-copy {
     position: static;
@@ -3662,4 +3675,36 @@ body.shop-page .tpj-banner-handwriting {
     margin-top: 12px;
     font-size: 30px;
   }
+}
+/* Connected hero and cupcake chocolate artwork */
+
+body.shop-page main {
+  isolation: isolate;
+  background: #fff5f1;
+}
+
+body.shop-page .shop-content {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+body.shop-page .cupcake-section {
+  isolation: isolate;
+  background: transparent;
+}
+
+body.shop-page .cupcake-section::before,
+body.shop-page .cupcake-section::after {
+  content: none;
+}
+
+body.shop-page .cupcake-showcase {
+  isolation: isolate;
+  z-index: 1;
+}
+
+body.shop-page .cupcake-section > .dessert-section-inner {
+  position: relative;
+  z-index: 2;
 }
