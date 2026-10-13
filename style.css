@@ -307,9 +307,9 @@ main,
     text-transform: uppercase;
     white-space: nowrap;
 
-    font-size: 13px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.045em;
+    letter-spacing: 0.04em;
 }
 
 .main-navigation a::after {

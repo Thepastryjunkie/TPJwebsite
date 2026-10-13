@@ -288,9 +288,9 @@
     display: grid;
 
     grid-template-columns:
-        repeat(5, minmax(0, 1fr));
+        repeat(3, minmax(0, 1fr));
 
-    gap: 65px 30px;
+    gap: 85px 55px;
 
     margin-top: 45px;
 }
@@ -312,7 +312,7 @@
 
     width: 100%;
 
-    height: 350px;
+    height: 580px;
 
     display: flex;
     align-items: flex-end;
@@ -352,10 +352,11 @@
 .dessert-product-image {
     display: block;
 
-    width: 100%;
-    max-width: 300px;
+    width: auto;
+    height: auto;
 
-    max-height: 350px;
+    max-width: 470px;
+    max-height: 580px;
 
     object-fit: contain;
 
@@ -431,13 +432,12 @@
 @media (min-width: 1500px) {
 
     .dessert-product-image-wrap {
-        height: 390px;
+        height: 620px;
     }
 
-
     .dessert-product-image {
-        max-width: 340px;
-        max-height: 390px;
+        max-width: 510px;
+        max-height: 620px;
     }
 
 }
@@ -509,9 +509,14 @@
     }
 
 
-    .dessert-product-image-wrap {
-        height: 320px;
-    }
+.dessert-product-image-wrap {
+    height: 320px;
+}
+
+.dessert-product-image {
+    max-width: 275px;
+    max-height: 310px;
+}
 
 }
 
@@ -961,28 +966,28 @@
 
 .jar-product-grid {
     grid-template-columns:
-        repeat(30, minmax(0, 1fr));
+        repeat(6, minmax(0, 1fr));
 
     gap:
-        58px 20px;
+        85px 55px;
 
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
+/* Three jars across */
 
-/* First five jars */
-
-.jar-product:nth-child(-n + 5) {
-    grid-column:
-        span 6;
+.jar-product:nth-child(n) {
+    grid-column: span 2;
 }
 
+/* Center the final two jars */
 
-/* Remaining six jars */
+.jar-product:nth-child(10) {
+    grid-column: 2 / span 2;
+}
 
-.jar-product:nth-child(n + 6) {
-    grid-column:
-        span 5;
+.jar-product:nth-child(11) {
+    grid-column: 4 / span 2;
 }
 
 
@@ -991,13 +996,15 @@
 ========================================================= */
 
 .jar-product-image-wrap {
-    height: 330px;
+    height: 580px;
 }
 
-
 .jar-product-image {
-    max-width: 285px;
-    max-height: 330px;
+    width: auto;
+    height: auto;
+
+    max-width: 470px;
+    max-height: 580px;
 }
 
 
@@ -1017,15 +1024,14 @@
 
 @media (min-width: 1500px) {
 
-    .jar-product-image-wrap {
-        height: 370px;
-    }
+.jar-product-image-wrap {
+    height: 620px;
+}
 
-
-    .jar-product-image {
-        max-width: 320px;
-        max-height: 370px;
-    }
+.jar-product-image {
+    max-width: 510px;
+    max-height: 620px;
+}
 
 
     .jar-feature-left {
@@ -1516,45 +1522,28 @@
    Row 2 = 3 centered
 ========================================================= */
 .apple-product-grid {
+    position: relative;
     z-index: 6;
-} 
 
-.apple-product-grid {
     grid-template-columns:
-        repeat(12, minmax(0, 1fr));
+        repeat(6, minmax(0, 1fr));
 
     gap:
-        65px 28px;
+        85px 55px;
 
     margin-top: 10px;
 }
 
+/* Three apples across */
 
-/* First four apples */
-
-.apple-product:nth-child(-n + 4) {
-    grid-column:
-        span 3;
+.apple-product:nth-child(n) {
+    grid-column: span 2;
 }
 
-
-/* Last three apples */
-
-.apple-product:nth-child(5) {
-    grid-column:
-        2 / span 3;
-}
-
-
-.apple-product:nth-child(6) {
-    grid-column:
-        5 / span 3;
-}
-
+/* Center the final apple */
 
 .apple-product:nth-child(7) {
-    grid-column:
-        8 / span 3;
+    grid-column: 3 / span 2;
 }
 
 
@@ -1563,13 +1552,15 @@
 ========================================================= */
 
 .apple-product-image-wrap {
-    height: 345px;
+    height: 580px;
 }
 
-
 .apple-product-image {
-    max-width: 300px;
-    max-height: 345px;
+    width: auto;
+    height: auto;
+
+    max-width: 470px;
+    max-height: 580px;
 }
 
 
@@ -1587,15 +1578,14 @@
 
 @media (min-width: 1500px) {
 
-    .apple-product-image-wrap {
-        height: 385px;
-    }
+.apple-product-image-wrap {
+    height: 620px;
+}
 
-
-    .apple-product-image {
-        max-width: 335px;
-        max-height: 385px;
-    }
+.apple-product-image {
+    max-width: 510px;
+    max-height: 620px;
+}
 
 
 .apple-feature-main {
@@ -2840,11 +2830,11 @@
     position: relative;
     z-index: 2;
 
-    width:
-        min(
-            1600px,
-            calc(100% - 80px)
-        );
+width:
+    min(
+        1800px,
+        calc(100% - 80px)
+    );
 
     margin:
         0 auto;
@@ -2977,7 +2967,9 @@
 
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 55px 35px;
+
+    gap: 65px 70px;
+
     align-items: start;
 }
 
@@ -2999,8 +2991,9 @@
 
 .chocolate-collection-image-wrap {
     position: relative;
+
     width: 100%;
-    height: 430px;
+    height: 580px;
 
     display: flex;
     align-items: flex-end;
@@ -3192,15 +3185,16 @@
 
 @media (min-width: 1500px) {
 
-    .chocolate-collection-image-wrap {
-        height: 650px;
-    }
+.chocolate-collection-image-wrap {
+    height: 620px;
+}
 
+.chocolate-collection-image {
+    width: 122%;
 
-    .chocolate-collection-image {
-        max-width: 570px;
-        max-height: 620px;
-    }
+    max-width: 600px;
+    max-height: 620px;
+}
 
 }
 
@@ -3316,10 +3310,31 @@
 }
 
 
-    .chocolate-collection-image {
-        max-width: 245px;
-        max-height: 260px;
-    }
+.chocolate-collection-image {
+    display: block;
+
+    width: 122%;
+    height: auto;
+
+    max-width: 560px;
+    max-height: 580px;
+
+    object-fit: contain;
+
+    margin: 0 auto;
+
+    transform: scale(1);
+
+    filter:
+        drop-shadow(
+            0 24px 26px
+            rgba(72, 36, 30, 0.11)
+        );
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease;
+}
 
 
 .chocolate-collection-product-copy {
