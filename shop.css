@@ -6,13 +6,19 @@
 /* =========================================================
    DESKTOP SHOP SCALE
 
-   Makes normal 100% browser view feel like the
-   more pulled-back / editorial desktop layout.
+   Keep the dessert/menu area pulled back,
+   but DO NOT shrink the website header.
 ========================================================= */
 
 @media (min-width: 1200px) {
 
     body.shop-page {
+        zoom: 1;
+    }
+
+    body.shop-page main {
+        width: 200%;
+        max-width: none;
         zoom: 0.5;
     }
 
@@ -295,7 +301,10 @@
     margin-top: 45px;
 }
 
-
+/* Center the final cupcake on its own row */
+.cupcake-section .dessert-product:nth-child(10) {
+    grid-column: 2;
+}
 /* Product is intentionally NOT a card */
 
 .dessert-product {
@@ -389,9 +398,13 @@
         );
 }
 
-
 .dessert-product h3 {
+    position: relative;
+
+    min-height: 54px;
+
     margin: 20px 0 0;
+    padding-bottom: 18px;
 
     color: #4e2b25;
 
@@ -404,6 +417,8 @@
     font-weight: 800;
 
     line-height: 1.2;
+
+    text-align: center;
 }
 
 
@@ -412,18 +427,22 @@
 .dessert-product h3::after {
     content: "";
 
-    display: block;
+    position: absolute;
 
     width: 28px;
     height: 3px;
 
-    margin: 11px auto 0;
+    left: 50%;
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    margin: 0;
 
     border-radius: 50px;
 
     background: #e2679b;
 }
-
 
 /* =========================================================
    LARGE DESKTOP
