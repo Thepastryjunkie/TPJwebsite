@@ -3535,3 +3535,131 @@ body.shop-page .chocolate-collection-product-copy h3 {
     aspect-ratio: 1;
   }
 }
+/* HERO — Finished Autumn banner */
+
+body.shop-page .tpj-banner {
+  position: relative;
+  display: block;
+  width: auto;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f5e9e6;
+  container-type: inline-size;
+}
+
+body.shop-page .tpj-banner-image {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+body.shop-page .tpj-banner-copy {
+  position: absolute;
+  top: 12%;
+  left: 5%;
+  width: 43%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: #421a12;
+}
+
+body.shop-page .tpj-banner-eyebrow {
+  margin: 0 0 1.2cqw;
+  font-size: clamp(9px, 0.85cqw, 15px);
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+body.shop-page .tpj-banner-title {
+  margin: 0;
+  padding: 0;
+  font-family: "Lilita One", sans-serif;
+  font-size: clamp(28px, 3.65cqw, 76px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: #421a12;
+  text-shadow: none;
+}
+
+body.shop-page .tpj-banner-title span {
+  display: block;
+  margin-top: 0.3cqw;
+  color: #ed0870;
+}
+
+body.shop-page .tpj-banner-description {
+  width: 90%;
+  max-width: 460px;
+  margin: 1.25cqw auto 0;
+  font-size: clamp(11px, 1.05cqw, 19px);
+  line-height: 1.6;
+  color: #542e26;
+}
+
+body.shop-page .tpj-banner-handwriting {
+  margin: 0.8cqw 0 0;
+  font-family: "Caveat", cursive;
+  font-size: clamp(22px, 2.3cqw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #d71969;
+}
+
+/* Matches the existing desktop main zoom */
+@media (min-width: 1200px) {
+  body.shop-page .tpj-banner {
+    zoom: 2;
+  }
+}
+
+/* Phones: centered text above the complete banner */
+@media (max-width: 700px) {
+  body.shop-page .tpj-banner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  body.shop-page .tpj-banner-copy {
+    position: static;
+    order: -1;
+    width: 100%;
+    padding: 32px 20px 24px;
+  }
+
+  body.shop-page .tpj-banner-eyebrow {
+    margin-bottom: 14px;
+    font-size: 10px;
+  }
+
+  body.shop-page .tpj-banner-title {
+    font-size: clamp(30px, 7.5vw, 48px);
+  }
+
+  body.shop-page .tpj-banner-title span {
+    margin-top: 4px;
+  }
+
+  body.shop-page .tpj-banner-description {
+    width: 100%;
+    max-width: 370px;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  body.shop-page .tpj-banner-handwriting {
+    margin-top: 12px;
+    font-size: 30px;
+  }
+}
