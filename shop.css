@@ -3563,6 +3563,7 @@ body.shop-page .tpj-banner-image {
   margin: 0;
   padding: 0;
   pointer-events: none;
+
 }
 
 body.shop-page .tpj-banner-copy {
@@ -3692,11 +3693,48 @@ body.shop-page .shop-content {
 body.shop-page .cupcake-section {
   isolation: isolate;
   background: transparent;
+  container-type: inline-size;
 }
 
 body.shop-page .cupcake-section::before,
 body.shop-page .cupcake-section::after {
   content: none;
+}
+
+/* Continue the left pour to the bottom of the cupcake section */
+body.shop-page .cupcake-left-extension {
+  position: absolute;
+  top: 28.914cqw;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+  
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 8cqw
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 8cqw
+    
+  );
+}
+
+body.shop-page .cupcake-left-extension img {
+  position: absolute;
+  top: -25.333%;
+  left: -1%;
+  display: block;
+  height: 120%;
+  width: auto;
+  max-width: none;
+  max-height: none;
 }
 
 body.shop-page .cupcake-showcase {
