@@ -919,58 +919,92 @@
 
 
 /* =========================================================
-   LITTLE SPLASH HAZES BEHIND LARGE JARS
+   SIDE JARS WITH SPLASHES INCLUDED
 ========================================================= */
 
-.jar-showcase::before {
-    content: "";
+@media (min-width: 701px) {
+    .jar-showcase {
+        overflow: visible;
+        clip-path: none;
+    }
 
-    position: absolute;
+    .jar-showcase .jar-feature-left,
+    .jar-showcase .jar-feature-right {
+        max-width: none;
+        height: auto;
+        top: 20px;
+        transform-origin: center top;
+        z-index: 2;
+    }
 
-    width: 330px;
-    height: 330px;
+    /* Strawberry: larger jar body, leaning inward RIGHT */
+    .jar-showcase .jar-feature-left {
+        width: 740px;
+        left: -90px;
+        transform: rotate(12deg);
+    }
 
-    left: -90px;
-    top: 120px;
+    /* Oreo: larger jar body, leaning inward LEFT */
+    .jar-showcase .jar-feature-right {
+        width: 760px;
+        right: -90px;
+        transform: rotate(-12deg);
+    }
 
-    border-radius: 44% 56% 52% 48% / 54% 44% 56% 46%;
+    .jar-showcase::before,
+    .jar-showcase::after {
+        content: none;
+    }
+}
 
-    background:
-        radial-gradient(
+@media (min-width: 701px) and (max-width: 1100px) {
+    .jar-showcase .jar-feature-left {
+        width: 520px;
+        left: -100px;
+        top: 70px;
+    }
+
+    .jar-showcase .jar-feature-right {
+        width: 535px;
+        right: -100px;
+        top: 70px;
+    }
+}
+/* Preserve the existing phone decoration for now */
+@media (max-width: 700px) {
+    .jar-showcase::before {
+        content: "";
+        position: absolute;
+        width: 330px;
+        height: 330px;
+        left: -90px;
+        top: 120px;
+        border-radius: 44% 56% 52% 48% / 54% 44% 56% 46%;
+        background: radial-gradient(
             circle at 60% 45%,
             rgba(241, 98, 145, 0.24),
             rgba(241, 98, 145, 0.08) 55%,
             transparent 72%
         );
+        transform: rotate(-17deg);
+    }
 
-    transform:
-        rotate(-17deg);
-}
-
-
-.jar-showcase::after {
-    content: "";
-
-    position: absolute;
-
-    width: 360px;
-    height: 360px;
-
-    right: -110px;
-    top: 100px;
-
-    border-radius: 53% 47% 42% 58% / 46% 55% 45% 54%;
-
-    background:
-        radial-gradient(
+    .jar-showcase::after {
+        content: "";
+        position: absolute;
+        width: 360px;
+        height: 360px;
+        right: -110px;
+        top: 100px;
+        border-radius: 53% 47% 42% 58% / 46% 55% 45% 54%;
+        background: radial-gradient(
             circle at 40% 50%,
             rgba(91, 45, 33, 0.23),
             rgba(91, 45, 33, 0.08) 56%,
             transparent 72%
         );
-
-    transform:
-        rotate(13deg);
+        transform: rotate(13deg);
+    }
 }
 
 
@@ -3686,7 +3720,7 @@ body.shop-page main {
 
 body.shop-page .shop-content {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   background: transparent;
 }
 
