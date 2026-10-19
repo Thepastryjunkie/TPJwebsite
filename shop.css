@@ -3363,9 +3363,10 @@
 }
 /* SHOP HEADER — desktop */
 @media (min-width: 1101px) {
-  body.shop-page .site-header {
+body.shop-page .site-header {
     height: auto;
-  }
+    background:  #2b140e;
+}
 
   body.shop-page .header-inner {
     width: 100%;
@@ -3672,40 +3673,6 @@ body.shop-page .cupcake-section::after {
 }
 
 /* Continue the left pour to the bottom of the cupcake section */
-body.shop-page .cupcake-left-extension {
-  position: absolute;
-  top: 28.914cqw;
-  bottom: 40px;
-  left: 0;
-  width: 100%;
-  z-index: 0;
-  overflow: visible;
-  pointer-events: none;
-  
-
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    #000 8cqw
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    #000 8cqw
-    
-  );
-}
-
-body.shop-page .cupcake-left-extension img {
-  position: absolute;
-  top: -25.333%;
-  left: -1%;
-  display: block;
-  height: 120%;
-  width: auto;
-  max-width: none;
-  max-height: none;
-}
 
 body.shop-page .cupcake-showcase {
   isolation: isolate;
