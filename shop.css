@@ -91,46 +91,6 @@
 
 /* Soft oversized background shapes */
 
-.cupcake-section::before {
-    content: "";
-
-    position: absolute;
-
-    width: 520px;
-    height: 520px;
-
-    right: -160px;
-    top: 40px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(108, 57, 42, 0.08);
-
-    filter: blur(2px);
-
-    pointer-events: none;
-}
-
-
-.cupcake-section::after {
-    content: "";
-
-    position: absolute;
-
-    width: 350px;
-    height: 350px;
-
-    left: -160px;
-    bottom: 80px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(228, 134, 166, 0.10);
-
-    pointer-events: none;
-}
 
 
 /* =========================================================
@@ -757,44 +717,7 @@
    SOFT BACKGROUND BLOBS
 ========================================================= */
 
-.jar-section::before {
-    content: "";
 
-    position: absolute;
-
-    width: 470px;
-    height: 470px;
-
-    left: -230px;
-    top: 70px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(230, 117, 158, 0.09);
-
-    pointer-events: none;
-}
-
-
-.jar-section::after {
-    content: "";
-
-    position: absolute;
-
-    width: 560px;
-    height: 560px;
-
-    right: -280px;
-    top: 15px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(101, 58, 46, 0.08);
-
-    pointer-events: none;
-}
 
 
 /* =========================================================
@@ -1369,29 +1292,7 @@
    SOFT BACKGROUND SHAPES
 ========================================================= */
 
-.apple-section::before {
-    display: none;
-}
 
-
-.apple-section::after {
-    content: "";
-
-    position: absolute;
-
-    width: 370px;
-    height: 370px;
-
-    left: -185px;
-    top: 120px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255, 174, 190, 0.13);
-
-    pointer-events: none;
-}
 
 
 /* =========================================================
@@ -1945,6 +1846,42 @@
 
 .signature-cake-section-inner {
     padding-top: 110px;
+}
+
+/* Corner artwork stays hidden on mobile for now. */
+.cake-corner-art {
+    display: none;
+}
+
+@media (min-width: 701px) {
+    .cake-corner-art {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .cake-corner {
+        position: absolute;
+        display: block;
+        height: auto;
+        max-width: none;
+    }
+
+    .cake-corner-chocolate {
+        width: 28%;
+        max-width: 780px;
+        top: 0;
+        left: 0;
+    }
+
+    .cake-corner-vanilla {
+        width: 27%;
+        max-width: 750px;
+        right: 0;
+        bottom: 0;
+    }
 }
 
 
@@ -2880,19 +2817,56 @@
 .chocolate-collection-inner {
     position: relative;
     z-index: 2;
+    width: min(1800px, calc(100% - 80px));
+    margin: 0 auto;
+    padding: 125px 0 155px;
+}
 
-width:
-    min(
-        1800px,
-        calc(100% - 80px)
-    );
+/* Decorative splashes — mobile stays hidden for now. */
+.treat-splash-art {
+    display: none;
+}
 
-    margin:
-        0 auto;
+@media (min-width: 701px) {
+    .treat-splash-art {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
 
-    padding:
-        125px 0
-        155px;
+    .treat-splash {
+        position: absolute;
+        display: block;
+        height: auto;
+        max-width: none;
+    }
+
+    /* Chocolate: upper-left corner */
+    .treat-splash-chocolate {
+        width: 28%;
+        max-width: 800px;
+        top: 0;
+        left: 0;
+    }
+
+    /* Vanilla: right edge, vertically centered */
+    .treat-splash-vanilla {
+        width: 25%;
+        max-width: 700px;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+    }
+
+    /* Pink: lower-left corner */
+    .treat-splash-pink {
+        width: 24%;
+        max-width: 680px;
+        bottom: 0;
+        left: 0;
+    }
 }
 
 
@@ -3190,44 +3164,6 @@ width:
    BACKGROUND DECORATION
 ========================================================= */
 
-.chocolate-collection::before {
-    content: "";
-
-    position: absolute;
-
-    width: 520px;
-    height: 520px;
-
-    left: -260px;
-    top: 320px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(226, 92, 145, 0.09);
-
-    pointer-events: none;
-}
-
-
-.chocolate-collection::after {
-    content: "";
-
-    position: absolute;
-
-    width: 590px;
-    height: 590px;
-
-    right: -300px;
-    bottom: 20px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(83, 42, 34, 0.07);
-
-    pointer-events: none;
-}
 
 
 /* =========================================================
