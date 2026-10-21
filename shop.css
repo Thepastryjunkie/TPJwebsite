@@ -3683,3 +3683,31 @@ body.shop-page .cupcake-section > .dessert-section-inner {
   position: relative;
   z-index: 2;
 }
+/* SHOP ONLY — match the footer's light pink */
+body.shop-page .dessert-section-title span,
+body.shop-page .apple-section-title span,
+body.shop-page .signature-cake-tagline,
+body.shop-page .chocolate-treat-title span,
+body.shop-page .chocolate-treat-product-name h3,
+body.shop-page .seasonal-title span,
+body.shop-page .chocolate-collection-title span,
+body.shop-page .chocolate-collection-flavors span,
+body.shop-page .tpj-banner-title span,
+body.shop-page .tpj-banner-handwriting {
+    color: var(--headline-pink, #FCD2F0);
+}
+@media (min-width: 701px) {
+    body.shop-page .cupcake-section .dessert-section-intro {
+        margin-top: 140px;
+    }
+}
+/* Chocolate outline around the light-pink display lettering */
+body.shop-page .dessert-section-title span,
+body.shop-page .apple-section-title span,
+body.shop-page .chocolate-treat-title span,
+body.shop-page .seasonal-title span,
+body.shop-page .chocolate-collection-title span,
+body.shop-page .tpj-banner-title span {
+    -webkit-text-stroke: 1px #421A12;
+    paint-order: stroke fill;
+}
