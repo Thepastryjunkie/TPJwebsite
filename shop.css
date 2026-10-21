@@ -3708,6 +3708,6 @@ body.shop-page .chocolate-treat-title span,
 body.shop-page .seasonal-title span,
 body.shop-page .chocolate-collection-title span,
 body.shop-page .tpj-banner-title span {
-    -webkit-text-stroke: 1px #421A12;
+    -webkit-text-stroke: 4px #421A12;
     paint-order: stroke fill;
 }
