@@ -3762,3 +3762,55 @@ body.shop-page .tpj-banner-title span {
             drop-shadow(0 22px 20px rgba(77, 41, 32, 0.14));
     }
 }
+/* Move menu cupcakes and jars closer to their names */
+@media (min-width: 1101px) {
+    body.shop-page .cupcake-section .dessert-product-image,
+    body.shop-page .jar-product .jar-product-image {
+        translate: 0 36px;
+    }
+
+    /* These jars have low-hanging crumbs:
+       leave more clearance above their names. */
+    body.shop-page .jar-product
+    .jar-product-image[src$="/Birthday Cake Cheesecake Jar.png"],
+    body.shop-page .jar-product
+    .jar-product-image[src$="/Peach Cobbler Cheesecake Jar.png"] {
+        translate: 0 8px;
+    }
+}
+/* Upper decorative apple: Red Velvet on the left */
+@media (min-width: 701px) {
+    body.shop-page .apple-showcase .apple-feature-left {
+        left: -90px;
+        right: auto;
+        top: 115px;
+        bottom: auto;
+        transform: rotate(10deg);
+        transform-origin: center;
+    }
+}
+@media (min-width: 1101px) {
+    /* Move the Birthday Cake item upward */
+    body.shop-page .apple-product-grid > .apple-product:last-child {
+        position: relative;
+        top: -80px;
+    }
+
+    /* Give the name extra clearance below the decorations */
+    body.shop-page .apple-product-grid > .apple-product:last-child h3 {
+        margin-top: 44px;
+    }
+}
+/* Chocolate outlines for the two pink phrases */
+body.shop-page .tpj-banner-handwriting,
+body.shop-page .signature-cake-tagline {
+    -webkit-text-stroke: 1px #421A12;
+    paint-order: stroke fill;
+}
+
+/* Match the visible thickness in the scaled cake section */
+@media (min-width: 1200px) {
+    body.shop-page .signature-cake-tagline {
+        -webkit-text-stroke-width: 2px;
+    }
+}
