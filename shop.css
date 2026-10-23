@@ -3701,6 +3701,12 @@ body.shop-page .tpj-banner-handwriting {
         margin-top: 140px;
     }
 }
+
+@media (min-width: 1200px) {
+    body.shop-page .cupcake-section .dessert-section-intro {
+        margin-top: 420px;
+    }
+}
 /* Chocolate outline around the light-pink display lettering */
 body.shop-page .dessert-section-title span,
 body.shop-page .apple-section-title span,
@@ -3710,4 +3716,49 @@ body.shop-page .chocolate-collection-title span,
 body.shop-page .tpj-banner-title span {
     -webkit-text-stroke: 4px #421A12;
     paint-order: stroke fill;
+}
+/* Compensate for the desktop section scaling */
+@media (min-width: 1200px) {
+    body.shop-page .dessert-section-title span,
+    body.shop-page .apple-section-title span,
+    body.shop-page .chocolate-treat-title span,
+    body.shop-page .seasonal-title span,
+    body.shop-page .chocolate-collection-title span {
+        -webkit-text-stroke-width: 8px;
+    }
+}
+/* Desktop menu apples: larger, grounded, then lift on hover */
+@media (min-width: 1101px) {
+    body.shop-page .apple-product {
+        --apple-scale: 1.18;
+        --apple-rest-y: 12%;
+        --apple-lift: 60px;
+    }
+
+    body.shop-page .apple-product .apple-product-image {
+        transform-origin: center bottom;
+
+        transform:
+            translateY(var(--apple-rest-y))
+            scale(var(--apple-scale));
+
+        filter:
+            drop-shadow(0 5px 6px rgba(77, 41, 32, 0.12));
+
+        transition:
+            transform 0.35s ease,
+            filter 0.35s ease;
+    }
+
+    body.shop-page .apple-product:hover .apple-product-image,
+    body.shop-page .apple-product:focus-within .apple-product-image {
+        transform:
+            translateY(
+                calc(var(--apple-rest-y) - var(--apple-lift))
+            )
+            scale(var(--apple-scale));
+
+        filter:
+            drop-shadow(0 22px 20px rgba(77, 41, 32, 0.14));
+    }
 }
