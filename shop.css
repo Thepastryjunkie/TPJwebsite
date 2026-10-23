@@ -3814,3 +3814,45 @@ body.shop-page .signature-cake-tagline {
         -webkit-text-stroke-width: 2px;
     }
 }
+@media (min-width: 1101px) {
+    body.shop-page .cupcake-section .dessert-section-title {
+        font-size: clamp(4.8rem, 8.4vw, 9.24rem);
+    }
+}
+@media (min-width: 1101px) {
+    body.shop-page .cupcake-section
+    .dessert-product-grid > .dessert-product:first-child h3,
+
+    body.shop-page .apple-product-grid
+    > .apple-product:first-child h3 {
+        margin-top: 32px;
+    }
+}
+/* Remove the separate oval beneath each menu jar */
+body.shop-page .jar-product-image-wrap::after {
+    content: none;
+}
+
+/* Keep the resting shadow close to the visible artwork */
+body.shop-page .jar-product .jar-product-image {
+    filter: drop-shadow(
+        0 3px 4px rgba(77, 41, 32, 0.14)
+    );
+}
+
+/* A softer shadow when the jar lifts on hover */
+body.shop-page .jar-product:hover .jar-product-image {
+    filter: drop-shadow(
+        0 12px 10px rgba(77, 41, 32, 0.16)
+    );
+}
+/* Match all dessert section heading sizes on desktop */
+@media (min-width: 1101px) {
+    body.shop-page .dessert-section-title,
+    body.shop-page .jar-section-title,
+    body.shop-page .apple-section-title,
+    body.shop-page .signature-cake-title,
+    body.shop-page .chocolate-collection-title {
+        font-size: clamp(4.8rem, 8.4vw, 9.24rem);
+    }
+}
