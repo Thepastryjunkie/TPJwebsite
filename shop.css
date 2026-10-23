@@ -3856,3 +3856,253 @@ body.shop-page .jar-product:hover .jar-product-image {
         font-size: clamp(4.8rem, 8.4vw, 9.24rem);
     }
 }
+/* =====================================================
+   SHOP — PORTRAIT PHONES ONLY
+===================================================== */
+@media (max-width: 700px) and (orientation: portrait) {
+
+    /* Hide oversized decorative product clusters */
+    body.shop-page .cupcake-showcase,
+    body.shop-page .jar-showcase,
+    body.shop-page .apple-showcase {
+        display: none;
+    }
+
+
+    /* -----------------------------------------------
+       MOBILE HERO
+       Existing artwork, enlarged proportionally.
+    ----------------------------------------------- */
+    body.shop-page .tpj-banner {
+        display: block;
+        position: relative;
+        isolation: isolate;
+        width: 100%;
+        height: calc(110px + 98.6vw);
+        min-height: 460px;
+        aspect-ratio: auto;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #f5e9e6;
+    }
+
+    body.shop-page .tpj-banner-image {
+        position: absolute;
+        top: auto;
+        bottom: 0;
+        left: -40%;
+        width: 150%;
+        max-width: none;
+        height: auto;
+        margin: 0;
+        z-index: 0;
+    }
+
+    body.shop-page .tpj-banner-copy {
+        position: absolute;
+        top: 24px;
+        left: 5%;
+        width: 62%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        z-index: 2;
+        text-align: center;
+    }
+
+    body.shop-page .tpj-banner-eyebrow {
+        margin: 0 0 10px;
+        font-size: 8px;
+        line-height: 1.5;
+        letter-spacing: 0.1em;
+    }
+
+    body.shop-page .tpj-banner-title {
+        font-size: clamp(24px, 6.4vw, 40px);
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+    }
+
+    body.shop-page .tpj-banner-title span {
+        margin-top: 4px;
+        -webkit-text-stroke-width: 2px;
+    }
+
+    body.shop-page .tpj-banner-description {
+        width: 100%;
+        max-width: none;
+        margin: 12px auto 0;
+        font-size: clamp(11px, 2.8vw, 16px);
+        line-height: 1.5;
+    }
+
+    body.shop-page .tpj-banner-handwriting {
+        margin: 10px 0 0;
+        font-size: clamp(23px, 6vw, 36px);
+        line-height: 1.15;
+        -webkit-text-stroke-width: 0.75px;
+    }
+
+
+    /* -----------------------------------------------
+       SECTION SPACING
+    ----------------------------------------------- */
+    body.shop-page .cupcake-section,
+    body.shop-page .jar-section,
+    body.shop-page .apple-section {
+        min-height: 0;
+    }
+
+    body.shop-page .cupcake-section > .dessert-section-inner,
+    body.shop-page .jar-section-inner,
+    body.shop-page .apple-section-inner,
+    body.shop-page .signature-cake-section-inner {
+        width: calc(100% - 24px);
+        padding: 48px 0 60px;
+    }
+
+    body.shop-page .cupcake-section .dessert-section-intro,
+    body.shop-page .jar-section-intro,
+    body.shop-page .apple-section-intro {
+        width: 100%;
+        max-width: 100%;
+        min-height: 0;
+        margin: 0 auto 30px;
+        padding: 0 8px;
+        text-align: center;
+    }
+
+    body.shop-page .cupcake-section .dessert-section-description,
+    body.shop-page .jar-section-description,
+    body.shop-page .apple-section-description {
+        margin: 20px auto 0;
+    }
+
+
+    /* -----------------------------------------------
+       TWO PRODUCTS PER ROW
+
+       Four grid tracks let each product span two,
+       with an odd final product centered.
+    ----------------------------------------------- */
+    body.shop-page .cupcake-section .dessert-product-grid,
+    body.shop-page .jar-product-grid,
+    body.shop-page .apple-product-grid,
+    body.shop-page .signature-cake-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 32px 12px;
+        margin-top: 0;
+        align-items: start;
+    }
+
+    body.shop-page .cupcake-section
+    .dessert-product-grid > .dessert-product:nth-child(n),
+
+    body.shop-page .jar-product-grid
+    > .jar-product:nth-child(n),
+
+    body.shop-page .apple-product-grid
+    > .apple-product:nth-child(n),
+
+    body.shop-page .signature-cake-grid
+    > .signature-cake-product:nth-child(n) {
+        grid-column: span 2;
+        min-width: 0;
+        position: relative;
+        top: auto;
+    }
+
+    body.shop-page .cupcake-section
+    .dessert-product-grid > .dessert-product:last-child:nth-child(odd),
+
+    body.shop-page .jar-product-grid
+    > .jar-product:last-child:nth-child(odd),
+
+    body.shop-page .apple-product-grid
+    > .apple-product:last-child:nth-child(odd),
+
+    body.shop-page .signature-cake-grid
+    > .signature-cake-product:last-child:nth-child(odd) {
+        grid-column: 2 / span 2;
+    }
+
+
+    /* -----------------------------------------------
+       PRODUCT IMAGES
+       Fill the available column without spilling over.
+    ----------------------------------------------- */
+    body.shop-page .cupcake-section .dessert-product-image-wrap,
+    body.shop-page .jar-product-image-wrap,
+    body.shop-page .apple-product-image-wrap,
+    body.shop-page .signature-cake-image-wrap {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 5;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        overflow: visible;
+    }
+
+    body.shop-page .cupcake-section .dessert-product-image,
+    body.shop-page .jar-product .jar-product-image,
+    body.shop-page .apple-product .apple-product-image,
+    body.shop-page .signature-cake-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
+        margin: 0;
+        translate: none;
+        scale: none;
+        transform: none;
+    }
+
+    /* Prevent sticky hover enlargement on touchscreens */
+    body.shop-page .cupcake-section
+    .dessert-product:hover .dessert-product-image,
+
+    body.shop-page .jar-product:hover .jar-product-image,
+
+    body.shop-page .apple-product:hover .apple-product-image,
+
+    body.shop-page .signature-cake-product:hover
+    .signature-cake-image {
+        transform: none;
+    }
+
+
+    /* -----------------------------------------------
+       PRODUCT NAMES
+    ----------------------------------------------- */
+    body.shop-page .cupcake-section .dessert-product h3,
+    body.shop-page .jar-product h3,
+    body.shop-page .apple-product h3,
+    body.shop-page .signature-cake-product h3 {
+        max-width: 100%;
+        min-height: 0;
+        margin: 16px auto 0;
+        font-size: clamp(12px, 3.2vw, 17px);
+        line-height: 1.35;
+        overflow-wrap: break-word;
+    }
+
+    /* A little extra clearance for Oreo decorations */
+    body.shop-page .cupcake-section
+    .dessert-product:first-child h3,
+
+    body.shop-page .apple-product-grid
+    > .apple-product:first-child h3 {
+        margin-top: 22px;
+    }
+
+    body.shop-page .apple-product-grid
+    > .apple-product:last-child h3 {
+        margin-top: 20px;
+    }
+}
