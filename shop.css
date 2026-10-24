@@ -4106,3 +4106,92 @@ body.shop-page .jar-product:hover .jar-product-image {
         margin-top: 20px;
     }
 }
+/* Final portrait-mobile hero */
+@media (max-width: 700px) and (orientation: portrait) {
+
+    body.shop-page .tpj-banner {
+        display: block;
+        position: relative;
+        isolation: isolate;
+        container-type: inline-size;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        aspect-ratio: auto;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #fff5f1;
+    }
+
+    body.shop-page .tpj-banner-picture {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        line-height: 0;
+    }
+
+    body.shop-page .tpj-banner-image {
+        display: block;
+        position: relative;
+        inset: auto;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 1500 / 1900;
+        margin: 0;
+        padding: 0;
+        transform: none;
+        z-index: 0;
+    }
+
+    body.shop-page .tpj-banner-copy {
+        position: absolute;
+        top: 3cqw;
+        left: 5%;
+        width: 90%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        z-index: 2;
+        text-align: center;
+    }
+
+    body.shop-page .tpj-banner-eyebrow {
+        margin: 0 0 2cqw;
+        font-size: 2.3cqw;
+        line-height: 1.4;
+        letter-spacing: 0.08em;
+    }
+
+    body.shop-page .tpj-banner-title {
+        margin: 0;
+        padding: 0;
+        font-size: 8cqw;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+    }
+
+    body.shop-page .tpj-banner-title span {
+        margin-top: 1cqw;
+        -webkit-text-stroke-width: 1.5px;
+        paint-order: stroke fill;
+    }
+
+    body.shop-page .tpj-banner-description {
+        width: 94%;
+        max-width: none;
+        margin: 2.5cqw auto 0;
+        font-size: 3.2cqw;
+        line-height: 1.5;
+    }
+
+    body.shop-page .tpj-banner-handwriting {
+        margin: 2cqw 0 0;
+        font-size: 6.8cqw;
+        line-height: 1.15;
+        -webkit-text-stroke-width: 0.75px;
+        paint-order: stroke fill;
+    }
+}
