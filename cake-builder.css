@@ -8432,14 +8432,11 @@ background-image:
        Content begins at the orange-line area.
        Hero stays COMPLETELY untouched.
     */
-    box-sizing: border-box;
-    min-width: 0;
-
     padding:
         clamp(20px, 2.6vh, 30px)
         28px
         10px
-        24px;
+        clamp(280px, 19vw, 340px);
 
     margin: 0;
 
@@ -8510,8 +8507,7 @@ background-image:
 
     letter-spacing: 0;
 
-        white-space: normal;
-    overflow-wrap: break-word;
+    white-space: nowrap;
 }
 
 #builderStep1 .step-one-intro {
