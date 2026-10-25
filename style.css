@@ -2566,3 +2566,21 @@ and (pointer: coarse) {
         font-size: 22px;
     }
 }
+/* SHOP ONLY — phone landscape scale */
+@media screen
+and (orientation: landscape)
+and (max-height: 600px)
+and (hover: none)
+and (pointer: coarse) {
+
+    body.shop-page main {
+        width: auto;
+        max-width: none;
+        zoom: 0.5;
+    }
+
+    /* Preserve the hero's existing overall scale */
+    body.shop-page .tpj-banner {
+        zoom: 2;
+    }
+}
