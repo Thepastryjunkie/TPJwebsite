@@ -4150,7 +4150,8 @@ body.shop-page .jar-product:hover .jar-product-image {
         aspect-ratio: 1500 / 1900;
         margin: 0;
         padding: 0;
-        transform: none;
+       transform: scale(1.10);
+transform-origin: center bottom;
         z-index: 0;
     }
 

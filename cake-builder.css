@@ -15926,7 +15926,8 @@ and (pointer: coarse) {
         width: 100%;
         height: auto;
         max-width: 100%;
-        transform: none;
+        transform: scale(1.15);
+        transform-origin: center bottom;
         object-fit: contain;
     }
 
