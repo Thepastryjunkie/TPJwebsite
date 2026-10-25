@@ -3772,9 +3772,9 @@ body.shop-page .tpj-banner-title span {
     /* These jars have low-hanging crumbs:
        leave more clearance above their names. */
     body.shop-page .jar-product
-    .jar-product-image[src$="/Birthday Cake Cheesecake Jar.png"],
+    .jar-product-image[src$="/Birthday Cake Cheesecake Jar.webp"],
     body.shop-page .jar-product
-    .jar-product-image[src$="/Peach Cobbler Cheesecake Jar.png"] {
+    .jar-product-image[src$="/Peach Cobbler Cheesecake Jar.webp"] {
         translate: 0 8px;
     }
 }
