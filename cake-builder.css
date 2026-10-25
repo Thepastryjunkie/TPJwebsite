@@ -1178,7 +1178,7 @@ background: transparent;
 }
 
 .builder-step {
-    animation: stepEntrance 360ms ease backwards;
+    animation: stepEntrance 360ms ease both;
 }
 
 .step-heading {
@@ -15519,7 +15519,9 @@ and (pointer: coarse) {
         background: #D51B73 !important;
         border-color: #D51B73 !important;
     }
-@media (min-width: 481px), (orientation: landscape) {
+@media (min-width: 481px), (orientation: landscape) {    .builder-step {
+        animation-fill-mode: backwards;
+    }
 
     /* Existing option panels: stronger glass blur */
     :is(
