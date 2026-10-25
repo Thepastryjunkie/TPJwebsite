@@ -8906,8 +8906,24 @@ background-image:
 
 #builderStep1 #rushOrderNotice p {
     display: inline;
-font-weight: 700;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: inherit;
     margin: 0;
+}
+
+@media (max-width: 980px) {
+    html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    #builderStep1 #rushOrderNotice,
+    #builderStep1 #rushOrderNotice strong,
+    #builderStep1 #rushOrderNotice p {
+        font-size: 11px;
+        line-height: 1.4;
+    }
 }
 
 /* ==========================================================
@@ -8930,7 +8946,7 @@ font-weight: 700;
 
         margin: 0;
 
-        overflow: visible !important;
+        overflow: clip !important;
 
         background:
             transparent !important;
@@ -15769,4 +15785,80 @@ and (pointer: coarse) {
         min-width: 0;
         max-width: 100%;
     }
+      /* Keep both columns inside the available width */
+    .builder-main-inner {
+        grid-template-columns:
+            minmax(0, 2fr) minmax(0, 3fr);
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .cake-preview-column,
+    .cake-preview-sticky,
+    .builder-form-column {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    /* Let the preview contain the heading and whole cake */
+    #cakePreviewCard.preview-visual-card {
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        max-height: none;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #cakePreviewCard .preview-heading-row {
+        flex: 0 0 auto;
+    }
+
+    /* Explicit square size prevents the canvas widening it */
+    #cakePreviewCard .cake-renderer-stage {
+        --landscape-cake-size: min(
+            100%,
+            clamp(
+                100px,
+                calc(
+                    100svh -
+                    var(--builder-header-height) -
+                    var(--builder-progress-height) -
+                    100px
+                ),
+                320px
+            )
+        );
+
+        width: var(--landscape-cake-size);
+        height: auto;
+        min-width: 0;
+        min-height: 0;
+        max-width: 100%;
+        aspect-ratio: 1 / 1;
+        flex: 0 0 auto;
+        align-self: center;
+        margin: 8px auto 0;
+    }
+
+    #cakePreviewCard .realistic-cake-renderer {
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    #cakePreviewCard .realistic-cake-canvas {
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        object-fit: contain;
+    }
+
+    #cakePreviewCard .cake-renderer-stage
+    > #resetCakeBuilder {
+        right: 0 !important;
+    }  
 }
