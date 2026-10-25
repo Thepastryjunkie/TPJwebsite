@@ -13721,10 +13721,7 @@ b {
    Phones only — does not affect tablet or desktop
 ========================================================= */
 
-@media screen
-and (max-width: 480px)
-and (hover: none)
-and (pointer: coarse) {
+@media screen and (max-width: 720px) {
 
     /* =====================================================
        PAGE 1 — KEEP THE APPROVED HERO, FIX ITS CANVAS
@@ -14395,10 +14392,7 @@ backdrop-filter:
    Original cupcake sticky offset
 ========================================================= */
 
-@media screen
-and (max-width: 480px)
-and (hover: none)
-and (pointer: coarse) {
+@media screen and (max-width: 720px) {
 
     /* =====================================================
        PAGES 2–5 — RESTORE THE SCREENSHOT BACKGROUND
@@ -14509,10 +14503,7 @@ and (pointer: coarse) {
    Tablet and desktop remain untouched
 ========================================================= */
 
-@media screen
-and (max-width: 480px)
-and (hover: none)
-and (pointer: coarse) {
+@media screen and (max-width: 720px) {
 
     /* -----------------------------------------------------
        PAGES 2–5: RESTORE THE SPRINKLE BACKGROUND
@@ -14855,10 +14846,7 @@ height: 42px !important;
    Keep this as the final CSS block.
 ========================================================= */
 
-@media screen
-and (max-width: 480px)
-and (hover: none)
-and (pointer: coarse) {
+@media screen and (max-width: 720px) {
 
     /* Header, page numbers, and navigation scroll normally. */
 
@@ -15393,10 +15381,7 @@ and (pointer: coarse) {
 }
 }
 /* PAGE 4: five finishes — 3 on top, 2 centered below */
-@media screen
-and (max-width: 480px)
-and (hover: none)
-and (pointer: coarse) {
+@media screen and (max-width: 720px) {
 
     #builderStep4
     #cakeFinishCustomizer
