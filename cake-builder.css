@@ -15861,4 +15861,91 @@ and (pointer: coarse) {
     > #resetCakeBuilder {
         right: 0 !important;
     }  
+        /* Extend the existing backgrounds across the screen */
+    html,
+    body,
+    .cake-builder-app {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* Keep controls clear of the phone's notch */
+    .builder-header-inner,
+    .builder-progress-inner,
+    .builder-main-inner {
+        padding-left:
+            max(12px, env(safe-area-inset-left));
+        padding-right:
+            max(12px, env(safe-area-inset-right));
+    }
+
+    /* Page 1: separate image and form */
+    .builder-main:has(#builderStep1.is-active) {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .builder-main:has(#builderStep1.is-active)
+    .builder-main-inner {
+        height: auto;
+        grid-template-columns:
+            minmax(0, 45fr) minmax(0, 55fr);
+        align-items: start;
+        gap: 20px;
+    }
+
+    .cake-preview-column:has(
+        #builderBasicsHero:not(.is-hidden)
+    ),
+    .cake-preview-column:has(
+        #builderBasicsHero:not(.is-hidden)
+    ) .cake-preview-sticky {
+        position: relative;
+        top: auto;
+        height: auto;
+        max-height: none;
+        min-width: 0;
+    }
+
+    /* Full hero fits within its own column */
+    #builderBasicsHero {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        overflow: clip !important;
+    }
+
+    #builderBasicsHero img {
+        position: static;
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        transform: none;
+        object-fit: contain;
+    }
+
+    .builder-form-column:has(#builderStep1.is-active) {
+        height: auto;
+        min-width: 0;
+    }
+
+    #builderStep1 {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        gap: 16px;
+        padding: 16px 0 0 !important;
+    }
+
+    #builderStep1 .step-one-script-title {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: break-word;
+        font-size: clamp(30px, 4.5vw, 44px);
+        line-height: 1.08;
+    }
 }
