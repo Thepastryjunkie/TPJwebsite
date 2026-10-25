@@ -15641,10 +15641,3 @@ and (pointer: coarse) {
 ::-webkit-scrollbar-corner {
     background: #FDEBF3;
 }
-/* Desktop Step 1: contain artwork within its own column */
-@media (min-width: 981px) {
-    .cake-builder-app:has(#builderStep1.is-active)
-    .builder-basics-hero {
-        overflow: hidden !important;
-    }
-}
