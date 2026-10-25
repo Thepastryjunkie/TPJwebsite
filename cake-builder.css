@@ -8366,9 +8366,12 @@ background-image:
 
     .builder-main:has(#builderStep1.is-active)
     .builder-main-inner {
+        width: 100%;
+        max-width: none;
         height: 100%;
         min-height: 0;
-
+        margin: 0;
+        padding-left: 0;
         align-items: stretch;
     }
 
@@ -8387,8 +8390,12 @@ background-image:
         #builderBasicsHero:not(.is-hidden)
     )
     .cake-preview-sticky {
+        position: relative;
+        top: auto;
         height: 100%;
         min-height: 0;
+        max-height: none;
+        padding: 0;
     }
 
 
@@ -15912,23 +15919,34 @@ and (pointer: coarse) {
         min-width: 0;
     }
 
-    /* Full hero fits within its own column */
     #builderBasicsHero {
+        position: relative;
         width: 100%;
-        height: auto;
+        height: clamp(
+            280px,
+            calc(
+                100svh -
+                var(--builder-header-height) -
+                var(--builder-progress-height) -
+                12px
+            ),
+            460px
+        );
         max-height: none;
         overflow: clip !important;
     }
 
     #builderBasicsHero img {
-        position: static;
+        position: absolute;
+        inset: 0;
         display: block;
         width: 100%;
-        height: auto;
-        max-width: 100%;
-        transform: scale(1.15);
-        transform-origin: center bottom;
-        object-fit: contain;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        object-fit: cover;
+        object-position: left bottom;
+        transform: none;
     }
 
     .builder-form-column:has(#builderStep1.is-active) {
