@@ -3283,7 +3283,7 @@ margin-inline: auto;
     .compact-choice-row,
     .cupcake-control-grid,
     .cupcake-studio-layout {
-        grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     }
 }
 
@@ -8507,7 +8507,8 @@ background-image:
 
     letter-spacing: 0;
 
-    white-space: nowrap;
+      white-space: normal;
+    overflow-wrap: break-word;
 }
 
 #builderStep1 .step-one-intro {
@@ -15519,7 +15520,8 @@ and (pointer: coarse) {
         background: #D51B73 !important;
         border-color: #D51B73 !important;
     }
-@media (min-width: 481px), (orientation: landscape) {    .builder-step {
+@media (min-width: 481px), (orientation: landscape) {
+    .builder-step:not(#builderStep1) {
         animation-fill-mode: backwards;
     }
 
@@ -15638,4 +15640,93 @@ and (pointer: coarse) {
 
 ::-webkit-scrollbar-corner {
     background: #FDEBF3;
+}
+/* PORTRAIT PHONE */
+@media screen
+and (max-width: 480px)
+and (orientation: portrait) {
+
+    html,
+    body,
+    .cake-builder-app {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
+    }
+
+    /* Restore room for Home, wordmark, and price */
+    .cake-builder-app .builder-header-inner {
+        grid-template-columns:
+            64px minmax(0, 1fr) 90px !important;
+        gap: 6px !important;
+    }
+
+    .cake-builder-app .builder-logo-link {
+        display: flex !important;
+        width: 100% !important;
+        min-width: 0;
+        height: 42px !important;
+    }
+
+    .cake-builder-app .builder-header-logo {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 42px !important;
+        object-fit: contain;
+        transform: none !important;
+    }
+}
+
+/* LANDSCAPE PHONE / TOUCH SCREEN */
+@media screen
+and (orientation: landscape)
+and (hover: none)
+and (pointer: coarse) {
+
+    .cake-builder-app .builder-header-inner {
+        grid-template-columns:
+            90px minmax(0, 1fr) 110px !important;
+        gap: 10px !important;
+    }
+
+    .cake-builder-app .builder-logo-link {
+        display: flex !important;
+        width: 100% !important;
+        min-width: 0;
+        height: 38px !important;
+    }
+
+    .cake-builder-app .builder-header-logo {
+        width: 100% !important;
+        max-width: 260px !important;
+        height: 38px !important;
+        object-fit: contain;
+        transform: none !important;
+    }
+
+    /* Keep the form within its existing column */
+    #builderStep1 {
+        min-width: 0;
+        max-width: 100%;
+        padding: 16px 12px 0 !important;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #builderStep1 .step-one-script-title {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    #builderStep1 .step-one-date-grid {
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #builderStep1 .step-one-field,
+    #builderStep1 .step-one-date-shell,
+    #builderStep1 input {
+        min-width: 0;
+        max-width: 100%;
+    }
 }
