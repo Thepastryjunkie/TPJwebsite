@@ -6960,6 +6960,19 @@ function getCupcakeExtraStyleName() {
 }
 
 async function loadCupcakeExtraAssets() {
+    const product = getSelectedCakeProduct();
+
+    const hasCupcakesInOrder =
+        product.shape === "cupcakes" ||
+        builderState.cakeProductId === "heart-5-bento" ||
+        builderState.extras.some((extra) =>
+            /^\d+ Gourmet Cupcakes$/.test(extra.name)
+        );
+
+    if (!hasCupcakesInOrder) {
+        return [];
+    }
+
     const styleName =
         getCupcakeExtraStyleName();
 
@@ -10597,7 +10610,7 @@ function updatePreviewSummary() {
 
     if (previewCakeDescription) {
         previewCakeDescription.textContent =
-            `${shapeName} · ${heightLabel} · ${getCakeStructureLabel()}`;
+            `${shapeName} · ${heightLabel} · ${getCakeStructureLabel()} · Serves ${getCakeServings()}`;
     }
 
     if (previewServingCount) {

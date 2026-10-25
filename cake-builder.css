@@ -173,8 +173,8 @@ fieldset {
 ========================================= */
 
 .builder-header {
-    position: sticky;
-    top: 0;
+    position: relative;
+    top: auto;
     z-index: 1200;
 
     min-height: var(--builder-header-height);
@@ -1158,7 +1158,9 @@ background: transparent;
     margin: 0;
     padding: 0 12px;
 
-    color: var(--deep-berry);
+    color: #4D1F16 !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
 
     text-align: center;
 
@@ -1176,7 +1178,7 @@ background: transparent;
 }
 
 .builder-step {
-    animation: stepEntrance 360ms ease both;
+    animation: stepEntrance 360ms ease backwards;
 }
 
 .step-heading {
@@ -7875,13 +7877,39 @@ background-image:
     z-index: 0; 
     overflow: visible; 
 }
-/* One transparent sprinkle overlay for Page 2 */
+/* Shared background artwork layer */
 .tpj-sprinkle-scene {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
     background: none;
+}
+
+/* Enable the artwork on Steps 2–8 */
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+) .tpj-sprinkle-scene {
+    display: block !important;
+    overflow: hidden;
+    opacity: 1 !important;
+}
+
+/* Create the layer used by the existing background images */
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+) .tpj-sprinkle-scene::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(
+        var(--builder-header-height) +
+        var(--builder-progress-height)
+    );
+    bottom: 0;
+    pointer-events: none;
 }
 
 .tpj-ref-local { 
@@ -8828,9 +8856,10 @@ background-image:
 
     border: 0 !important;
     border-radius: 4px !important;
-    background: rgba(255, 241, 231, 0.58) !important;
+        background: rgba(255, 255, 255, 0.18) !important;
     box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
-    backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(18px) saturate(1.12);
+    backdrop-filter: blur(18px) saturate(1.12);
 
     color: #4D1F16;
     font-size: 11px;
@@ -8847,9 +8876,10 @@ background-image:
 
     border: 0 !important;
     border-radius: 4px !important;
-    background: rgba(255, 241, 231, 0.58) !important;
+      background: rgba(255, 255, 255, 0.18) !important;
     box-shadow: 0 3px 12px rgba(77, 31, 22, 0.08) !important;
-    backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(18px) saturate(1.12);
+    backdrop-filter: blur(18px) saturate(1.12);
 
     color: #4D1F16;
     font-size: 10px;
@@ -9553,10 +9583,25 @@ font-family: 'Parisienne', cursive;
 
 /* Hover */
 
-#builderStep2
-.height-choice:hover {
-    color:
-        var(--signature-pink);
+#builderStep2 .height-choice:hover {
+    color: var(--signature-pink);
+}
+
+#builderStep2 .height-choice::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 56px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--signature-pink);
+    transform: translateX(-50%);
+    opacity: 0;
+}
+
+#builderStep2 .height-choice[aria-pressed="true"]::after {
+    opacity: 1;
 }
 
 
@@ -12545,11 +12590,26 @@ background-position:
    PREVIOUS + CONTINUE
    No boxes. Pull both into the clear content zone.
 ---------------------------------------------------------- */
-
 .cake-builder-app:not(:has(#builderStep1.is-active))
 .builder-step-navigation {
     padding-left: clamp(20px, 3vw, 50px);
     padding-right: clamp(90px, 8vw, 150px);
+    padding-bottom: 18px !important;
+       border: 1px solid rgba(90, 42, 30, 0.13) !important;
+    border-radius: 15px;
+
+    background: linear-gradient(
+        145deg,
+        rgba(253, 235, 243, 0.52),
+        rgba(255, 244, 248, 0.36)
+    ) !important;
+
+    -webkit-backdrop-filter: blur(24px) saturate(1.08);
+    backdrop-filter: blur(24px) saturate(1.08);
+
+    box-shadow:
+        0 8px 24px rgba(90, 42, 30, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
 }
 
 
@@ -13721,7 +13781,10 @@ b {
    Phones only — does not affect tablet or desktop
 ========================================================= */
 
-@media screen and (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
 
     /* =====================================================
        PAGE 1 — KEEP THE APPROVED HERO, FIX ITS CANVAS
@@ -13782,7 +13845,7 @@ b {
             ) !important;
     }
 
-
+}
     /* =====================================================
        PAGES 2–8 — SAME PINK FAMILY AS PAGE 1
        Replaces the peach/buttercream mobile background.
@@ -13806,89 +13869,48 @@ b {
     }
 
 
-    /* =====================================================
-       REMOVE THE OLD BUTTERCREAM MOBILE ARTWORK
-       This only hides it on phones while Pages 2–8 are open.
-    ===================================================== */
+   /* Remove the previous background artwork on Steps 2–8 */
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+)::before,
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+)::after,
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+) .builder-main::before,
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+) .builder-main::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+}
 
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )::before,
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )::after,
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
+.cake-builder-app:has(
+    .builder-step.is-active:not(#builderStep1)
+) :is(
     .tpj-buttercream-feather,
+    .tpj-buttercream-return-right,
+    .tpj-right-frosting-canvas,
+    .tpj-step2-scatter
+) {
+    display: none !important;
+}
 
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .tpj-right-frosting-canvas {
-        display: none !important;
-    }
-
-
-    /* =====================================================
-       MOBILE DECORATIVE SCENE
-       One proven layer with two independent backgrounds.
-    ===================================================== */
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .tpj-sprinkle-scene {
-        display: block !important;
-
-        position: absolute !important;
-        inset: 0 !important;
-
-        z-index: 0 !important;
-
-        overflow: hidden;
-
-        background: none !important;
-        opacity: 1 !important;
-
-        pointer-events: none !important;
-        user-select: none;
-    }
-
-
-    /* Both decorative layers remain non-interactive. */
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .tpj-sprinkle-scene::before,
-
-    .cake-builder-app:has(
-        .builder-step.is-active:not(#builderStep1)
-    )
-    .tpj-sprinkle-scene::after {
-        content: "";
-
-        position: absolute;
-
-        left: 0;
-        right: 0;
-
-        top:
-            calc(
-                var(--builder-header-height) +
-                var(--builder-progress-height)
-            );
-
-        bottom: 0;
-
-        pointer-events: none !important;
-        user-select: none;
-    }
-
-
+/* Remove the old desktop-only sprinkle patches */
+.cake-builder-app:has(#builderStep2.is-active)
+:is(
+    #cakePreviewCard,
+    #cakeBoardCustomizer,
+    .builder-step-navigation
+)::before,
+.cake-builder-app:has(#builderStep2.is-active)
+#cakeBoardCustomizer::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+}
     /* -----------------------------------------------------
        PAGES 2–5 — CROPPED CORNER DESSERTS
 
@@ -14204,15 +14226,7 @@ b {
         position: relative;
         z-index: 4;
 
-        margin:
-            0
-            0
-            16px !important;
 
-        padding:
-            14px
-            12px
-            18px !important;
 
         border:
             1px solid
@@ -14285,6 +14299,21 @@ backdrop-filter:
         pointer-events:
             none;
     }
+    @media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {     :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    ) > .builder-fieldset,
+    #builderStep4 > #featuredDesignAddOns,
+    #builderStep4 > #cupcakeOnlyStudioSlot > #cupcakeStudio,
+    #builderStep5 > #cupcakeAddOnStudioSlot > #cupcakeStudio {
+        margin: 0 0 16px !important;
+        padding: 14px 12px 18px !important;
+    }
     /* =====================================================
        DECORATIONS CAN NEVER BLOCK MOBILE CONTROLS
     ===================================================== */
@@ -14308,8 +14337,6 @@ backdrop-filter:
 
     .cake-builder-app.tpj-cupcake-preview-mode
     .cake-preview-column {
-        position: relative !important;
-        top: auto !important;
         z-index: 1 !important;
     }
 
@@ -14392,7 +14419,10 @@ backdrop-filter:
    Original cupcake sticky offset
 ========================================================= */
 
-@media screen and (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
 
     /* =====================================================
        PAGES 2–5 — RESTORE THE SCREENSHOT BACKGROUND
@@ -14503,7 +14533,10 @@ backdrop-filter:
    Tablet and desktop remain untouched
 ========================================================= */
 
-@media screen and (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
 
     /* -----------------------------------------------------
        PAGES 2–5: RESTORE THE SPRINKLE BACKGROUND
@@ -14662,66 +14695,11 @@ height: 42px !important;
     font-size: 17px !important;
     white-space: nowrap !important;
 }
-
-    /* -----------------------------------------------------
-       CHOCOLATE PROGRESS BAR
-       It scrolls away and is not part of the cake sticky.
-    ----------------------------------------------------- */
-
-    .cake-builder-app:not(
-        :has(#builderStep1.is-active)
-    )
+    .cake-builder-app:not(:has(#builderStep1.is-active))
     .builder-progress {
         position: relative !important;
         top: auto !important;
-
-        background: #4D1F16 !important;
-        border-color: #35140F !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
     }
-
-    .cake-builder-app:not(
-        :has(#builderStep1.is-active)
-    )
-    .progress-step {
-        color: #FFF1E7 !important;
-    }
-
-    .cake-builder-app:not(
-        :has(#builderStep1.is-active)
-    )
-    .progress-step span {
-        color: #FFF1E7 !important;
-        border-color: rgba(255, 241, 231, 0.72) !important;
-    }
-/* Completed steps: light pink instead of burgundy */
-.cake-builder-app:not(
-    :has(#builderStep1.is-active)
-)
-.progress-step.is-complete span {
-    color: #4D1F16 !important;
-    background: #F4B7D1 !important;
-    border-color: #F4B7D1 !important;
-}
-    .cake-builder-app:not(
-        :has(#builderStep1.is-active)
-    )
-    .progress-step.is-active {
-        color: #FFF1E7 !important;
-        background: rgba(255, 241, 231, 0.14) !important;
-    }
-
-    .cake-builder-app:not(
-        :has(#builderStep1.is-active)
-    )
-    .progress-step.is-active span {
-        color: #FFFFFF !important;
-        background: #D51B73 !important;
-        border-color: #D51B73 !important;
-    }
-
-
     /* -----------------------------------------------------
        CHOCOLATE PREVIOUS / CONTINUE BAR
     ----------------------------------------------------- */
@@ -14846,7 +14824,10 @@ height: 42px !important;
    Keep this as the final CSS block.
 ========================================================= */
 
-@media screen and (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
 
     /* Header, page numbers, and navigation scroll normally. */
 
@@ -14861,7 +14842,7 @@ height: 42px !important;
         bottom: auto !important;
     }
 
-
+}
 /* =========================================================
    PAGES 2–5: FULL SPRINKLE SHEET
    Uses the same layer method as Pages 6–8
@@ -14968,7 +14949,10 @@ height: 42px !important;
     position: relative !important;
     z-index: 1 !important;
 }
-
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
     /* Only the cake preview sticks on Pages 2–4. */
 
     .cake-builder-app:has(
@@ -15185,7 +15169,7 @@ height: 42px !important;
     font-size: 10px !important;
     line-height: 1.3 !important;
 }
-
+}
     /* Pages 6–8: grouped frosted readability panels.
        Their existing backgrounds are not changed. */
 
@@ -15317,6 +15301,7 @@ height: 42px !important;
 
     overflow: visible !important;
 }
+
 /* =====================================================
    PAGES 2–5: PROTECT THE LARGE HEADINGS
 ===================================================== */
@@ -15379,9 +15364,12 @@ height: 42px !important;
     position: relative !important;
     z-index: 1 !important;
 }
-}
+
 /* PAGE 4: five finishes — 3 on top, 2 centered below */
-@media screen and (max-width: 720px) {
+@media screen
+and (max-width: 480px)
+and (hover: none)
+and (pointer: coarse) {
 
     #builderStep4
     #cakeFinishCustomizer
@@ -15473,4 +15461,179 @@ height: 42px !important;
     overflow-wrap: anywhere;
     text-align: center !important;
     line-height: 1.25;
+}
+    /* -----------------------------------------------------
+       CHOCOLATE PROGRESS BAR
+       It scrolls away and is not part of the cake sticky.
+    ----------------------------------------------------- */
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .builder-progress {
+        position: relative !important;
+        top: auto !important;
+
+        background: #4D1F16 !important;
+        border-color: #35140F !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step {
+        color: #FFF1E7 !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step span {
+        color: #FFF1E7 !important;
+        border-color: rgba(255, 241, 231, 0.72) !important;
+    }
+/* Completed steps: light pink instead of burgundy */
+.cake-builder-app:not(
+    :has(#builderStep1.is-active)
+)
+.progress-step.is-complete span {
+    color: #4D1F16 !important;
+    background: #F4B7D1 !important;
+    border-color: #F4B7D1 !important;
+}
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step.is-active {
+        color: #FFF1E7 !important;
+        background: rgba(255, 241, 231, 0.14) !important;
+    }
+
+    .cake-builder-app:not(
+        :has(#builderStep1.is-active)
+    )
+    .progress-step.is-active span {
+        color: #FFFFFF !important;
+        background: #D51B73 !important;
+        border-color: #D51B73 !important;
+    }
+@media (min-width: 481px), (orientation: landscape) {
+
+    /* Existing option panels: stronger glass blur */
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    ) > .builder-fieldset,
+    #builderStep4 > #featuredDesignAddOns,
+    #builderStep4 > #cupcakeOnlyStudioSlot > #cupcakeStudio,
+    #builderStep5 > #cupcakeAddOnStudioSlot > #cupcakeStudio {
+        -webkit-backdrop-filter:
+            blur(24px) saturate(1.08);
+        backdrop-filter:
+            blur(24px) saturate(1.08);
+    }
+
+    /* Existing heading frosting */
+    :is(
+        #builderStep2,
+        #builderStep3,
+        #builderStep4,
+        #builderStep5
+    ) .step-heading::before {
+        -webkit-backdrop-filter:
+            blur(24px) saturate(1.08);
+        backdrop-filter:
+            blur(24px) saturate(1.08);
+    }
+
+    /* Existing Steps 6–8 frosted panels */
+    :is(
+        #builderStep6,
+        #builderStep7,
+        #builderStep8
+    ).is-active > .step-heading,
+
+    #builderStep6.is-active > :is(
+        .inspiration-upload-zone,
+        .policy-check
+    ),
+
+    #builderStep6.is-active
+    > #inspirationPreviewGrid:not(:empty),
+
+    #builderStep7.is-active > :is(
+        .two-column-fields,
+        .form-field,
+        .builder-fieldset,
+        .delivery-address-panel,
+        .builder-warning
+    ),
+
+    #builderStep8.is-active
+    .review-grid > .review-section,
+
+    #builderStep8.is-active > :is(
+        .review-section-heading,
+        .review-price-card,
+        .review-disclaimer,
+        .review-acknowledgments
+    ) {
+        -webkit-backdrop-filter:
+            blur(24px) saturate(1.08);
+        backdrop-filter:
+            blur(24px) saturate(1.08);
+    }
+
+    /* Descriptions retain their existing sizes */
+    .builder-step.is-active :is(
+        .fieldset-description,
+        .field-note,
+        .visual-reference-note,
+        .quantity-product-description,
+        .shape-choice-card small,
+        .cake-size-card small,
+        .height-choice small,
+        .description-choice-card span,
+        .style-choice-card > small,
+        .decoration-choice-card small,
+        .extra-product-card small,
+        .step-heading > p:last-child
+    ) {
+        color: #4D1F16 !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+}
+/* Chocolate scrollbars */
+:root,
+* {
+    scrollbar-color: #4D1F16 #FDEBF3;
+}
+
+/* Browsers supporting WebKit scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FDEBF3;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4D1F16;
+    border: 2px solid #FDEBF3;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4D1F16;
+}
+
+::-webkit-scrollbar-corner {
+    background: #FDEBF3;
 }
