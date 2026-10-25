@@ -9030,11 +9030,34 @@ font-family: 'Parisienne', cursive;
 
 
     #builderStep1 .step-one-date-grid {
-        grid-template-columns: 1fr;
-
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        grid-template-columns: minmax(0, 1fr);
         gap: 11px;
-
         margin-bottom: 11px;
+    }
+
+    .builder-main:has(#builderStep1.is-active)
+    .builder-main-inner > *,
+    #builderStep1,
+    #builderStep1 .step-one-field,
+    #builderStep1 .step-one-date-shell,
+    #builderStep1 input,
+    #guestRecommendation,
+    #rushOrderNotice {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    #builderStep1 input {
+        width: 100%;
+    }
+
+    #guestRecommendation,
+    #rushOrderNotice {
+        overflow-wrap: anywhere;
     }
 
 
@@ -15641,28 +15664,25 @@ and (pointer: coarse) {
 ::-webkit-scrollbar-corner {
     background: #FDEBF3;
 }
-/* PORTRAIT PHONE */
+/* PORTRAIT MOBILE AND TABLET */
 @media screen
-and (max-width: 480px)
+and (max-width: 1100px)
 and (orientation: portrait) {
 
-    html,
-    body,
-    .cake-builder-app {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: clip;
-    }
-
-    /* Restore room for Home, wordmark, and price */
     .cake-builder-app .builder-header-inner {
+        display: grid;
         grid-template-columns:
             64px minmax(0, 1fr) 90px !important;
+        align-items: center;
         gap: 6px !important;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .cake-builder-app .builder-logo-link {
         display: flex !important;
+        align-items: center;
+        justify-content: center;
         width: 100% !important;
         min-width: 0;
         height: 42px !important;
@@ -15670,10 +15690,30 @@ and (orientation: portrait) {
 
     .cake-builder-app .builder-header-logo {
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 260px !important;
         height: 42px !important;
         object-fit: contain;
         transform: none !important;
+    }
+
+    .cake-builder-app .header-summary-button {
+        min-width: 0 !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* PORTRAIT PHONE: PAGE 1 HEADING */
+@media screen
+and (max-width: 720px)
+and (orientation: portrait) {
+
+    #builderStep1 .step-one-script-title {
+        font-size: clamp(34px, 8.5vw, 42px);
+        line-height: 1.08;
+        white-space: normal;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 }
 
