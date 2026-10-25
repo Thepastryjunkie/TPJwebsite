@@ -974,11 +974,15 @@
 }
 
 .jar-product-image {
+    --menu-image-scale: 1.15;
+
     width: auto;
     height: auto;
-
     max-width: 470px;
     max-height: 580px;
+
+    scale: var(--menu-image-scale);
+    transform-origin: center bottom;
 }
 
 
@@ -1508,11 +1512,15 @@
 }
 
 .apple-product-image {
+    --menu-image-scale: 1.15;
+
     width: auto;
     height: auto;
-
     max-width: 470px;
     max-height: 580px;
+
+    scale: var(--menu-image-scale);
+    transform-origin: center bottom;
 }
 
 
@@ -4059,7 +4067,7 @@ body.shop-page .jar-product:hover .jar-product-image {
         object-position: center bottom;
         margin: 0;
         translate: none;
-        scale: none;
+        scale: var(--menu-image-scale, 1);
         transform: none;
     }
 
