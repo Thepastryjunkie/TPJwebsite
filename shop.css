@@ -3809,10 +3809,12 @@ body.shop-page .tpj-banner-title span {
         margin-top: 44px;
     }
 }
-/* Chocolate outlines for the two pink phrases */
+/* Chocolate fill and outline for both phrases */
 body.shop-page .tpj-banner-handwriting,
 body.shop-page .signature-cake-tagline {
-    -webkit-text-stroke: 1px #421A12;
+    color: #421A12;
+    -webkit-text-fill-color: #fdade8;
+    -webkit-text-stroke: 3px #421A12;
     paint-order: stroke fill;
 }
 
@@ -4203,4 +4205,11 @@ transform-origin: center bottom;
         -webkit-text-stroke-width: 0.75px;
         paint-order: stroke fill;
     }
+}
+/* Cakes Made to Crave only */
+body.shop-page .signature-cake-tagline {
+    color: #421A12;
+    -webkit-text-fill-color: #fdade8;
+    -webkit-text-stroke: 4px #3c271a;
+    paint-order: stroke fill;
 }

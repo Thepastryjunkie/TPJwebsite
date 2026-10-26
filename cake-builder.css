@@ -15848,7 +15848,7 @@ and (pointer: coarse) {
         aspect-ratio: 1 / 1;
         flex: 0 0 auto;
         align-self: center;
-        margin: 8px auto 0;
+        margin: 40px auto 0;
     }
 
     #cakePreviewCard .realistic-cake-renderer {
@@ -15866,10 +15866,11 @@ and (pointer: coarse) {
         object-fit: contain;
     }
 
-    #cakePreviewCard .cake-renderer-stage
+     #cakePreviewCard .cake-renderer-stage
     > #resetCakeBuilder {
+        top: -32px !important;
         right: 0 !important;
-    }  
+    }
         /* Extend the existing backgrounds across the screen */
     html,
     body,
@@ -15947,7 +15948,7 @@ and (pointer: coarse) {
         height: 100%;
         max-width: none;
         max-height: none;
-        object-fit: cover;
+        object-fit: contain;
         object-position: left bottom;
         transform: none;
     }
