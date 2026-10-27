@@ -224,39 +224,46 @@ body.shop-page .shop-select:hover:enabled {
         grid-column: 4 / span 2;
     }
 }
-
-
 /* =====================================================
-   CONTENT-SIZED DIALOG
+   SHOP DIALOGS — ONE RESPONSIVE LAYOUT
 ===================================================== */
 
 .shop-dialog {
+    --shop-dialog-width: 680px;
+    --shop-dialog-top: clamp(12px, 4vh, 32px);
+
     box-sizing: border-box;
-
     position: fixed;
-    inset: 0;
+    inset: var(--shop-dialog-top) 0 auto;
 
-    width: min(620px, calc(100% - 32px));
-    height: fit-content;
+    width: min(
+        var(--shop-dialog-width),
+        calc(100vw - 24px)
+    );
 
+    height: auto;
     min-height: 0;
-    max-width: calc(100% - 24px);
-    max-height: calc(100dvh - 32px);
+    max-width: calc(100vw - 24px);
 
-    margin: auto;
+    max-height: calc(
+        100dvh - var(--shop-dialog-top) - 12px
+    );
+
+    margin: 0 auto;
     padding: 0;
 
     border: 1px solid #dc8fb5;
-    border-radius: 6px;
+    border-radius: 12px;
 
     background: #fff6f0;
     color: #421a12;
 
     box-shadow: 0 18px 65px #421a1240;
-
     font-family: inherit;
 
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+
     overscroll-behavior: contain;
 }
 
@@ -279,7 +286,7 @@ body:has(.shop-dialog[open]) {
 .shop-dialog-header {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 5;
 
     display: flex;
     align-items: center;
@@ -288,23 +295,23 @@ body:has(.shop-dialog[open]) {
     gap: 10px;
     padding: 10px 16px;
 
-    background: #fff6f0;
     border-bottom: 1px solid #e5c8cd;
+    background: #fff6f0;
 }
 
 .shop-dialog-header h2 {
     margin: 0;
     font-size: 22px;
-    line-height: 1.25;
+    line-height: 1.2;
 }
 
 .shop-close {
     flex: 0 0 44px;
 
-    min-width: 44px;
-    min-height: 44px;
-
+    width: 44px;
+    height: 44px;
     padding: 0;
+
     border: 0;
 
     background: transparent;
@@ -316,22 +323,35 @@ body:has(.shop-dialog[open]) {
     cursor: pointer;
 }
 
+.shop-close:focus-visible {
+    outline: 3px solid #bb1c59;
+    outline-offset: -3px;
+}
+
 .shop-dialog-content {
     padding: 16px;
 }
 
-
 /* Product popup */
 
 .shop-product-dialog {
-    width: min(500px, calc(100% - 24px));
-    border-radius: 18px;
-    background: linear-gradient(145deg, #fff9f4, #fff0ed);
+    background:
+        linear-gradient(145deg, #fff9f4, #fff0ed);
+}
+
+.shop-product-dialog:has(
+    #shopFlavorCounts:not([hidden])
+),
+.shop-product-dialog:has(
+    #shopChocolateMix:checked
+) {
+    --shop-dialog-width: 1040px;
 }
 
 .shop-product-dialog .shop-dialog-header {
-    justify-content: flex-end;
-    padding: 3px 7px;
+    height: 0;
+    min-height: 0;
+    padding: 0;
 
     border: 0;
     background: transparent;
@@ -339,7 +359,6 @@ body:has(.shop-dialog[open]) {
     pointer-events: none;
 }
 
-/* Accessible dialog title; visible title sits beside the image. */
 .shop-product-dialog .shop-dialog-header h2 {
     position: absolute;
 
@@ -352,31 +371,35 @@ body:has(.shop-dialog[open]) {
 }
 
 .shop-product-dialog .shop-close {
-    position: relative;
-    z-index: 2;
+    position: absolute;
+
+    top: 4px;
+    right: 4px;
 
     border-radius: 50%;
-    color: #704137;
     background: #fff8f3ed;
 
     pointer-events: auto;
 }
 
 .shop-product-dialog .shop-dialog-content {
-    padding: 66px 20px 78px;
+    padding: 62px 16px 76px;
 }
 
-/* Light pink cheesecake drizzle */
+/* White artwork, attached to the same edges */
 
 .shop-drizzle-top {
     position: absolute;
 
-    top: -1px;
-    left: -1px;
-    right: -1px;
+    top: 0;
+    left: 0;
+    right: 0;
 
-    height: auto;
+    display: flex;
+    align-items: flex-start;
+
     line-height: 0;
+    overflow: hidden;
 
     pointer-events: none;
 }
@@ -384,34 +407,32 @@ body:has(.shop-dialog[open]) {
 .shop-icing {
     display: block;
 
-    width: 100%;
+    min-width: 0;
     height: auto;
 
     overflow: hidden;
 }
 
-/* Image and flavor-specific description */
-
-.shop-product-layout {
-    display: block;
+.shop-drizzle-top .shop-icing {
+    flex: 0 0 280px;
+    width: 280px;
 }
 
-.shop-product-visual {
+/* Stable image column and adjacent content panel */
+
+.shop-product-layout {
     display: grid;
 
     grid-template-columns:
-        minmax(0, .85fr) minmax(0, 1.15fr);
+        180px minmax(0, 1fr);
 
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-
-    padding-bottom: 12px;
-    border-bottom: 1px solid #ecd4d0;
+    align-items: start;
+    gap: 18px;
 }
 
-.shop-product-visual.shop-no-image {
-    grid-template-columns: minmax(0, 1fr);
+.shop-product-visual {
+    min-width: 0;
+    align-self: start;
 }
 
 .shop-product-visual img {
@@ -419,13 +440,22 @@ body:has(.shop-dialog[open]) {
 
     width: 100%;
     height: auto;
-    max-height: 220px;
+    max-height: 210px;
 
     object-fit: contain;
+    object-position: center top;
 }
 
-.shop-product-intro {
+.shop-product-panel {
     min-width: 0;
+}
+
+.shop-product-layout:has(.shop-no-image) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.shop-no-image {
+    display: none;
 }
 
 .shop-dialog .shop-product-name {
@@ -433,324 +463,42 @@ body:has(.shop-dialog[open]) {
 
     color: #bb1c59;
 
-    font-size: clamp(20px, 4.7vw, 27px);
+    font-size: 23px;
     font-style: italic;
     font-weight: 850;
-    line-height: 1.05;
+    line-height: 1.12;
 
     overflow-wrap: break-word;
 }
 
-.shop-product-visual p {
-    margin: 0;
+.shop-product-intro p,
+.shop-split-explanation p {
+    margin: 0 0 10px;
+
     font-size: 13px;
     line-height: 1.45;
 }
 
-.shop-product-visual .shop-peanut-note {
-    margin-top: 6px;
-    font-size: 12px;
-    font-weight: 750;
-}
-
-.shop-split-explanation p {
-    margin: 10px 0;
-    font-size: 13px;
+.shop-product-dialog
+#shopProductOptions > .shop-field {
+    max-width: 360px;
 }
 
 .shop-product-dialog .shop-field {
     margin: 10px 0;
 }
 
-.shop-product-dialog select {
-    margin-top: 5px;
-
-    border-color: #ddb5ad;
-    border-radius: 6px;
-
-    background: #fffaf7;
-}
-
-/* Keep one flavor or mix the pack */
-
-.shop-product-dialog .shop-mix-picker {
-    margin: 12px 0 8px;
-    padding: 8px;
-
-    border: 1px solid #e0b7b0;
-    border-radius: 9px;
-}
-
-.shop-mix-picker legend {
-    padding: 0 4px;
-
-    font-family:
-        "Brush Script MT",
-        "Segoe Script",
-        cursive;
-
-    font-size: 23px;
-    line-height: 1.1;
-}
-
-.shop-mix-choices {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 8px;
-}
-
-.shop-mix-choice {
-    appearance: none;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 6px;
-
-    min-width: 0;
-    min-height: 62px;
-    padding: 7px;
-
-    border: 1px solid #e6c7c2;
-    border-radius: 7px;
-
-    background: #fffaf8;
-    color: #421a12;
-
-    font: inherit;
-    font-size: 12px;
-    text-align: left;
-
-    cursor: pointer;
-}
-
-.shop-mix-choice strong {
-    display: block;
-}
-
-.shop-mix-choice[aria-pressed="true"] {
-    border-color: #ba2c6f;
-    background: #ffe7ef;
-
-    box-shadow:
-        inset 0 0 0 1px #ba2c6f;
-}
-
-.shop-mix-choice:focus-visible {
-    outline: 3px solid #d72485;
-    outline-offset: 2px;
-}
-
-.shop-mix-choice img {
-    width: 38px;
-    height: 42px;
-
-    object-fit: contain;
-    flex: 0 0 auto;
-}
-
-.shop-mix-thumbnails {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-}
-
-.shop-mix-thumbnails img {
-    width: 26px;
-    height: 35px;
-}
-
-.shop-mix-thumbnails img + img {
-    margin-left: -9px;
-}
-
 .shop-product-dialog .shop-live {
     margin: 6px 0;
     padding: 0;
-    font-size: 12px;
-}
-
-/* Expandable information beneath the selections */
-
-.shop-product-information {
-    margin-top: 8px;
-}
-
-.shop-care-item h4 {
-    margin: 12px 0 5px;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.shop-care-item p {
-    margin: 8px 0;
-}
-
-.shop-product-dialog .shop-allergy-notice {
-    margin-top: 12px;
-    padding-top: 10px;
-
-    border-top: 1px solid #ead6d8;
-
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.shop-product-dialog .shop-about {
-    padding: 0;
-}
-
-.shop-product-dialog .shop-about summary {
-    display: list-item;
-
-    min-height: 44px;
-    padding: 12px 0;
 
     font-size: 12px;
 }
 
-/* One live total, inside Add to Cart */
-
-.shop-product-dialog .shop-product-footer {
-    display: block;
-
-    margin-top: 12px;
-    padding-top: 0;
-
-    border: 0;
-}
-
-.shop-product-footer .shop-error {
-    margin-bottom: 9px;
-    font-size: 13px;
-}
-
-.shop-product-dialog .shop-add-dessert {
-    position: relative;
-    display: block;
-
-    width: 100%;
-    min-height: 49px;
-    padding: 12px 14px;
-
-    border: 0;
-    border-radius: 12px 12px 0 0;
-
-    background: linear-gradient(
-        to bottom,
-        #fffaf0 0%,
-        #f8f0df 55%,
-        #efe4ce 100%
-    );
-
-    box-shadow: none;
-
-    color: #bb1c59;
-    font-size: 13px;
-
-    overflow: visible;
-}
-
-.shop-product-dialog .shop-add-dessert:hover:enabled {
-    background: linear-gradient(
-        to bottom,
-        #fffaf0 0%,
-        #f8f0df 55%,
-        #efe4ce 100%
-    );
-
-    color: #bb1c59;
-}
-.shop-button-drizzle {
-    position: absolute;
-
-    display: flex;
-    align-items: flex-start;
-
-    top: calc(100% - 1px);
-    left: -1px;
-    right: -1px;
-    bottom: auto;
-
-    height: auto;
-    line-height: 0;
-
-    pointer-events: none;
-}
-
-.shop-button-drizzle .shop-icing {
-    flex: 0 0 33.333333%;
-
-    width: 33.333333%;
-    height: auto;
-
-    min-width: 0;
-}
-
-.shop-add-content {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-    padding-inline: 20px;
-
-    text-align: center;
-}
-
-.shop-add-content > span:last-child {
-    position: absolute;
-
-    top: 50%;
-    right: 0;
-
-    margin: 0;
-    transform: translateY(-50%);
-}
-
-.shop-product-dialog .shop-add-content strong {
-    font-size: inherit;
-    font-weight: 850;
-}
-
-.shop-about {
-    padding: 8px 0;
-    border-bottom: 1px solid #ead6d8;
-}
-
-.shop-about summary {
-    min-height: 32px;
-
-    font-size: 14px;
-    font-weight: 750;
-
-    cursor: pointer;
-}
-
-.shop-about p,
-.shop-about ul {
-    margin: 8px 0;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.shop-about ul {
-    padding-left: 22px;
-}
-
-
-/* =====================================================
-   CONFIGURATION CONTROLS
-===================================================== */
+/* Shared controls */
 
 .shop-dialog h3 {
-    margin: 16px 0 8px;
+    margin: 14px 0 8px;
     font-size: 18px;
     line-height: 1.3;
 }
@@ -761,18 +509,18 @@ body:has(.shop-dialog[open]) {
 
 .shop-dialog fieldset {
     min-width: 0;
-    margin: 12px 0;
+    margin: 10px 0;
     padding: 0;
     border: 0;
 }
 
 .shop-dialog legend {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 800;
 }
 
 .shop-dialog label {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 650;
 }
 
@@ -787,12 +535,12 @@ input:not([type="radio"]):not([type="checkbox"]),
     min-width: 0;
     min-height: 44px;
 
-    padding: 10px;
+    padding: 9px;
 
     border: 1px solid #ad8072;
-    border-radius: 4px;
+    border-radius: 5px;
 
-    background: #fff;
+    background: #fffaf7;
     color: #421a12;
 
     font: inherit;
@@ -832,66 +580,164 @@ input:not([type="radio"]):not([type="checkbox"]),
     gap: 6px;
 
     min-height: 44px;
-    padding: 10px 12px;
+    padding: 9px 11px;
 
     border: 1px solid #ad8072;
-    border-radius: 4px;
+    border-radius: 5px;
 
     background: #fffaf7;
     cursor: pointer;
 }
 
 .shop-choice:has(input:checked) {
-    padding: 9px 11px;
-    border: 2px solid #9c285c;
-    background: #fdade8;
+    background: #ffe7ef;
+    border-color: #bb1c59;
+
+    box-shadow: inset 0 0 0 1px #bb1c59;
 }
 
 .shop-choice input,
 .shop-mix-toggle input {
-    accent-color: #a82467;
+    accent-color: #bb1c59;
 }
 
 .shop-two-col {
     display: grid;
+
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-/* Mixed flavors wrap into rows. */
-#shopFlavorCounts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
 
     gap: 10px;
-    margin-top: 12px;
 }
 
-#shopFlavorCounts[hidden] {
-    display: none !important;
+/* Keep one flavor or mix */
+
+.shop-product-dialog .shop-mix-picker {
+    padding: 8px;
+
+    border: 1px solid #e0b7b0;
+    border-radius: 7px;
+}
+
+.shop-mix-picker legend {
+    padding: 0 4px;
+
+    font-family:
+        "Brush Script MT",
+        "Segoe Script",
+        cursive;
+
+    font-size: 22px;
+    line-height: 1.1;
+}
+
+.shop-mix-choices {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+.shop-mix-choice {
+    appearance: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 0;
+    min-height: 52px;
+    padding: 6px;
+
+    border: 1px solid #e6c7c2;
+    border-radius: 6px;
+
+    background: #fffaf8;
+    color: #421a12;
+
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.shop-mix-choice strong {
+    display: block;
+}
+
+.shop-mix-choice[aria-pressed="true"] {
+    border-color: #bb1c59;
+    background: #ffe7ef;
+
+    box-shadow: inset 0 0 0 1px #bb1c59;
+}
+
+.shop-mix-choice:focus-visible {
+    outline: 3px solid #bb1c59;
+    outline-offset: 2px;
+}
+
+.shop-mix-choice img {
+    flex: 0 0 auto;
+
+    width: 28px;
+    height: 34px;
+
+    object-fit: contain;
+}
+
+.shop-mix-thumbnails {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.shop-mix-thumbnails img {
+    width: 22px;
+    height: 30px;
+}
+
+.shop-mix-thumbnails img + img {
+    margin-left: -8px;
+}
+
+#shopFlavorCounts {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+    margin-top: 10px;
 }
 
 #shopFlavorCounts > p {
     grid-column: 1 / -1;
-    margin: 0 0 4px;
 
-    font-size: 13px;
+    margin: 0;
+    font-size: 12px;
 }
 
 .shop-flavor-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 56px;
+
+    grid-template-columns:
+        minmax(0, 1fr) 52px;
 
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 
     min-width: 0;
-    min-height: 64px;
-    padding: 8px;
+    min-height: 56px;
+    padding: 6px;
 
     border: 1px solid #e6c7c2;
-    border-radius: 6px;
+    border-radius: 5px;
 
     background: #fffaf7;
 }
@@ -899,7 +745,7 @@ input:not([type="radio"]):not([type="checkbox"]),
 .shop-flavor-row span {
     min-width: 0;
 
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.3;
 
     overflow-wrap: break-word;
@@ -908,35 +754,56 @@ input:not([type="radio"]):not([type="checkbox"]),
 .shop-flavor-row input {
     text-align: center;
 }
+
 .shop-mix-toggle {
     display: flex;
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 
     min-height: 44px;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 
 .shop-mix-toggle input {
     flex: 0 0 20px;
+
     width: 20px;
     height: 20px;
 }
 
+/* Chocolate boxes wrap across the panel */
 
-/* =====================================================
-   CHOCOLATE PIECES
-===================================================== */
+#shopChocolatePieces:has(.shop-piece) {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(210px, 1fr));
+
+    gap: 10px;
+}
+
+#shopChocolatePieces > .shop-mix-toggle,
+#shopChocolatePieces > p {
+    grid-column: 1 / -1;
+}
 
 .shop-piece {
-    margin: 10px 0;
-    padding: 12px;
+    min-width: 0;
+    margin: 0;
+    padding: 10px;
 
     border: 1px solid #dcbac2;
-    border-radius: 4px;
+    border-radius: 5px;
 
     background: #fffaf8;
+}
+
+.shop-dialog fieldset.shop-piece {
+    margin: 0;
+    padding: 10px;
+
+    border: 1px solid #dcbac2;
 }
 
 .shop-piece label {
@@ -944,6 +811,9 @@ input:not([type="radio"]):not([type="checkbox"]),
 }
 
 .shop-piece .shop-two-col {
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 8px;
     margin: 8px 0;
 }
 
@@ -951,18 +821,150 @@ input:not([type="radio"]):not([type="checkbox"]),
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+
     gap: 8px;
 }
 
 .shop-piece-actions .shop-button {
-    padding: 8px 12px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 12px;
 }
 
+/* About this dessert */
 
-/* =====================================================
-   TOTALS / CART / NOTICES
-===================================================== */
+.shop-product-information {
+    margin-top: 8px;
+}
+
+.shop-about {
+    padding: 0;
+    border-bottom: 1px solid #ead6d8;
+}
+
+.shop-about summary {
+    display: list-item;
+
+    min-height: 44px;
+    padding: 12px 0;
+
+    font-size: 13px;
+    font-weight: 750;
+
+    cursor: pointer;
+}
+
+.shop-about p,
+.shop-about ul {
+    margin: 8px 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.shop-about ul {
+    padding-left: 20px;
+}
+
+.shop-care-item h4 {
+    margin: 10px 0 5px;
+    font-size: 13px;
+}
+
+.shop-allergy-notice {
+    padding-top: 10px;
+    border-top: 1px solid #ead6d8;
+}
+
+/* Add to Cart */
+
+.shop-product-dialog .shop-product-footer {
+    display: block;
+
+    margin-top: 12px;
+    padding: 0;
+
+    border: 0;
+}
+
+.shop-product-footer .shop-error {
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.shop-product-dialog .shop-add-dessert {
+    position: relative;
+    display: block;
+
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 14px;
+
+    border: 0;
+    border-radius: 8px 8px 0 0;
+
+color: #fdade8;
+
+    box-shadow: none;
+
+    color: #bb1c59;
+    font-size: 13px;
+
+    overflow: visible;
+}
+
+.shop-product-dialog .shop-add-dessert:hover:enabled {
+    background: #421502;
+    color: #fdade8;
+}
+
+.shop-button-drizzle {
+    position: absolute;
+
+    display: flex;
+    align-items: flex-start;
+
+    top: calc(100% - 1px);
+    left: 0;
+    right: 0;
+
+    line-height: 0;
+    pointer-events: none;
+}
+
+.shop-button-drizzle .shop-icing {
+    flex: 0 0 16.666666%;
+    width: 16.666666%;
+}
+
+.shop-add-content {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+    padding-inline: 18px;
+
+    text-align: center;
+}
+
+.shop-add-content > span:last-child {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
+    margin: 0;
+    transform: translateY(-50%);
+}
+
+.shop-product-dialog .shop-add-content strong {
+    font-size: inherit;
+    font-weight: 850;
+}
+
+/* Cart, checkout and review */
 
 .shop-live {
     padding: 6px 0;
@@ -982,7 +984,6 @@ input:not([type="radio"]):not([type="checkbox"]),
 .shop-dialog-footer {
     display: flex;
     flex-wrap: wrap;
-
     align-items: center;
     justify-content: space-between;
 
@@ -1011,12 +1012,14 @@ input:not([type="radio"]):not([type="checkbox"]),
 .shop-review ul {
     margin: 8px 0;
     padding-left: 22px;
+
     line-height: 1.5;
 }
 
 .shop-cart-actions {
     display: flex;
     flex-wrap: wrap;
+
     gap: 8px;
     margin-top: 10px;
 }
@@ -1039,6 +1042,7 @@ input:not([type="radio"]):not([type="checkbox"]),
 .shop-policies summary {
     min-height: 32px;
     font-weight: 800;
+
     cursor: pointer;
 }
 
@@ -1061,12 +1065,7 @@ input:not([type="radio"]):not([type="checkbox"]),
     clip-path: inset(50%);
 }
 
-
-/* =====================================================
-   COMPENSATE FOR EXISTING SHOP MAIN ZOOM ONLY
-
-   The dialog is outside the zoomed main.
-===================================================== */
+/* Preserve existing menu zoom compensation */
 
 @media (min-width: 1200px) {
     body.shop-page [data-shop-category] {
@@ -1082,221 +1081,103 @@ and (pointer: coarse) {
     body.shop-page [data-shop-category] {
         --shop-control-scale: 2;
     }
-
-    .shop-dialog {
-        max-height: calc(100dvh - 16px);
-    }
 }
-
-
-/* =====================================================
-   PHONE
-===================================================== */
 
 /* Phone */
 
 @media (max-width: 700px) {
     .shop-dialog {
-        inset: auto 0 0;
-        margin: 0 auto;
+        --shop-dialog-top: 8px;
 
-        width: 100%;
-        max-width: 100%;
-        max-height: 94dvh;
+        width: calc(100vw - 16px);
+        max-width: calc(100vw - 16px);
+        max-height: calc(100dvh - 16px);
+    }
 
-        border-radius: 8px 8px 0 0;
+    .shop-product-dialog .shop-dialog-content {
+        padding:
+            46px
+            12px
+            max(50px, env(safe-area-inset-bottom));
+    }
+
+    .shop-product-layout {
+        grid-template-columns:
+            90px minmax(0, 1fr);
+
+        gap: 10px;
+    }
+
+    .shop-product-visual img {
+        max-height: 150px;
+    }
+
+    .shop-dialog .shop-product-name {
+        font-size: 20px;
+    }
+
+    .shop-product-intro p {
+        font-size: 12px;
+    }
+
+    .shop-drizzle-top .shop-icing {
+        flex-basis: 50%;
+        width: 50%;
+    }
+
+    .shop-drizzle-top .shop-icing:nth-child(n+3) {
+        display: none;
+    }
+
+    .shop-button-drizzle .shop-icing {
+        flex-basis: 33.333333%;
+        width: 33.333333%;
+    }
+
+    .shop-button-drizzle .shop-icing:nth-child(n+4) {
+        display: none;
+    }
+
+    #shopFlavorCounts {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .shop-flavor-row {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+    }
+
+    .shop-flavor-row span {
+        font-size: 12px;
+    }
+
+    .shop-mix-choices {
+        gap: 5px;
+    }
+
+    .shop-mix-choice {
+        flex-wrap: wrap;
+
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .shop-two-col {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #shopChocolatePieces:has(.shop-piece) {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .shop-dialog-header h2 {
         font-size: 20px;
     }
-
-    .shop-dialog-content {
-        padding: 14px;
-
-        padding-bottom: max(
-            16px,
-            env(safe-area-inset-bottom)
-        );
-    }
-
-    .shop-two-col {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0;
-    }
-
-    .shop-dialog-footer .shop-button {
-        width: 100%;
-    }
-
-    .shop-product-dialog {
-        inset: 0;
-
-        width: calc(100% - 16px);
-        max-width: 500px;
-        max-height: calc(100dvh - 24px);
-
-        margin: auto;
-        border-radius: 16px;
-    }
-
-.shop-product-dialog .shop-dialog-content {
-    padding:
-        clamp(28px, calc(23.2vw - 50px), 66px)
-        13px
-        max(78px, env(safe-area-inset-bottom));
 }
 
-    .shop-product-visual {
-        gap: 9px;
-    }
+/* One chocolate scrollbar color */
 
-    .shop-product-visual img {
-        max-height: 200px;
-    }
-}
-
-@media (max-width: 360px) {
-    .shop-product-visual {
-        grid-template-columns:
-            minmax(0, .75fr) minmax(0, 1.25fr);
-    }
-
-    .shop-product-visual.shop-no-image {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .shop-product-visual p {
-        font-size: 12px;
-    }
-
-    .shop-mix-choice {
-        font-size: 11px;
-    }
-
-    .shop-mix-choice img {
-        width: 28px;
-    }
-
-    .shop-mix-thumbnails img {
-        width: 21px;
-    }
-}
-/* Wider product popup for tablet and desktop. */
-@media (min-width: 701px) {
-    .shop-product-dialog {
-        width: min(820px, calc(100% - 32px));
-        /* Give active flavor mixing the popup's full width. */
-.shop-product-dialog
-.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
-.shop-product-visual > img {
-    grid-row: 1;
-}
-
-.shop-product-dialog
-.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
-#shopProductOptions {
-    grid-column: 1 / -1;
-    grid-row: 2;
-}
-
-.shop-product-dialog
-.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
-.shop-product-information {
-    grid-column: 1 / -1;
-    grid-row: 3;
-}
-
-.shop-product-dialog
-.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
-#shopProductOptions > .shop-field {
-    max-width: 360px;
-}
-
-.shop-product-dialog #shopFlavorCounts {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-    }
-
-    .shop-product-dialog .shop-dialog-content {
-        /*
-         * Reserve room for the existing proportional artwork.
-         * Its attachment positions remain unchanged.
-         */
-        padding: 120px 24px 120px;
-    }
-
-    .shop-product-dialog .shop-product-layout {
-        display: grid;
-
-        grid-template-columns:
-            minmax(0, .85fr)
-            minmax(0, 1.15fr);
-
-        align-items: start;
-        gap: 14px 24px;
-    }
-
-    .shop-product-dialog .shop-product-visual {
-        display: contents;
-    }
-
-    .shop-product-dialog .shop-product-visual > img {
-        grid-column: 1;
-        grid-row: 1 / span 3;
-
-        align-self: center;
-
-        width: 100%;
-        height: auto;
-        max-height: 320px;
-
-        object-fit: contain;
-    }
-
-    .shop-product-dialog .shop-product-intro {
-        grid-column: 2;
-        grid-row: 1;
-    }
-
-    .shop-product-dialog #shopProductOptions {
-        grid-column: 2;
-        grid-row: 2;
-
-        min-width: 0;
-    }
-
-    .shop-product-dialog .shop-product-information {
-        grid-column: 2;
-        grid-row: 3;
-
-        min-width: 0;
-        margin-top: 0;
-    }
-
-    .shop-product-dialog .shop-split-explanation {
-        grid-column: 1 / -1;
-        grid-row: 4;
-    }
-
-    /* Accommodate a product without an image. */
-    .shop-product-dialog
-    .shop-product-layout:has(.shop-no-image) {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .shop-product-dialog
-    .shop-product-layout:has(.shop-no-image)
-    > :is(
-        .shop-product-information,
-        #shopProductOptions
-    ),
-    .shop-product-dialog
-    .shop-no-image .shop-product-intro {
-        grid-column: 1;
-    }
-}
-/* One chocolate thumb color throughout the Shop and its popups. */
 html:has(body.shop-page),
 body.shop-page,
 body.shop-page * {

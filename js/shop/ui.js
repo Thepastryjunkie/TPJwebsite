@@ -697,65 +697,32 @@ function cheesecakeDrizzle(position) {
     const path =
         "../images/Shop/Chocolate%20Drip/" + file;
 
-    /*
-     * Display the artwork without its large transparent margins.
-     * The original PNG files remain unchanged.
-     */
-  const viewBox = top
-    ? "28 175 1993 404"
-    : "27 175 1726 621";
+    const viewBox = top
+        ? "28 175 1993 404"
+        : "27 175 1726 621";
 
     const width = top ? 2048 : 1774;
     const height = top ? 682 : 887;
 
-    /*
-     * The smaller bottom artwork repeats three times,
-     * keeping its proportions instead of stretching it.
-     */
     return Array.from(
-        { length: top ? 1 : 3 },
+        { length: top ? 4 : 6 },
 
-        (_, index) => {
-            const id =
-                "shopDripTint" +
-                (top ? "Top" : "Button") +
-                index;
-
-            return `
-                <svg
-                    class="shop-icing"
-                    viewBox="${viewBox}"
-                    aria-hidden="true"
-                    focusable="false"
-                >
-                    <defs>
-                        <filter
-                            id="${id}"
-                            color-interpolation-filters="sRGB"
-                        >
-                            <feColorMatrix
-                                type="matrix"
-                                values="
-                                    0.2126 0.7152 0.0722 0 0
-                                    0.1743 0.5865 0.0592 0 0
-                                    0.1913 0.6437 0.0650 0 0
-                                    0 0 0 1 0
-                                "
-                            />
-                        </filter>
-                    </defs>
-
-                    <image
-                        href="${path}"
-                        x="0"
-                        y="0"
-                        width="${width}"
-                        height="${height}"
-                       
-                    />
-                </svg>
-            `;
-        }
+        () => `
+            <svg
+                class="shop-icing"
+                viewBox="${viewBox}"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <image
+                    href="${path}"
+                    x="0"
+                    y="0"
+                    width="${width}"
+                    height="${height}"
+                />
+            </svg>
+        `
     ).join("");
 }
 
@@ -803,6 +770,17 @@ function renderDessertAbout() {
     }
 
     const P = window.TPJShopProductInfo;
+
+if (!P?.care || typeof P.combine !== "function") {
+    root.innerHTML = `
+        <p>
+            Please contact The Pastry Junkie for storage
+            and allergen information before ordering.
+        </p>
+    `;
+
+    return;
+}
     const x = config;
 
     const category = x.category === "half"
@@ -1062,12 +1040,14 @@ function renderProduct() {
     const name = displayName(category, flavor);
 
     const splitDetails = category === "half" ? `
-        <p>
-            This is a true split cake. Every layer is
-            half Flavor One and half Flavor Two, so your
-            two flavors run through the entire cake
-            from top to bottom.
-        </p>
+        <div class="shop-split-explanation">
+            <p>
+                This is a true split cake. Every layer is
+                half Flavor One and half Flavor Two, so your
+                two flavors run through the entire cake
+                from top to bottom.
+            </p>
+        </div>
     ` : "";
 
     openDialog(name, `
@@ -1081,13 +1061,17 @@ function renderProduct() {
             }">
                 ${
                     source
-                        ? `<img
-                            src="${esc(source)}"
-                            alt="${esc(name)}"
-                        >`
+                        ? `
+                            <img
+                                src="${esc(source)}"
+                                alt="${esc(name)}"
+                            >
+                        `
                         : ""
                 }
+            </div>
 
+            <div class="shop-product-panel">
                 <div class="shop-product-intro">
                     <h3 class="shop-product-name">
                         ${esc(name)}
@@ -1103,26 +1087,18 @@ function renderProduct() {
                         )}
                     </p>
                 </div>
-            </div>
 
-            ${
-                splitDetails
-                    ? `
-                        <div class="shop-split-explanation">
-                            ${splitDetails}
-                        </div>
-                    `
-                    : ""
-            }
+                ${splitDetails}
 
-            <div id="shopProductOptions"></div>
+                <div id="shopProductOptions"></div>
 
-            <div class="shop-product-information">
-                <details class="shop-about">
-                    <summary>About this dessert</summary>
+                <div class="shop-product-information">
+                    <details class="shop-about">
+                        <summary>About this dessert</summary>
 
-                    <div id="shopAboutContent"></div>
-                </details>
+                        <div id="shopAboutContent"></div>
+                    </details>
+                </div>
             </div>
         </div>
 
@@ -1144,8 +1120,6 @@ function renderProduct() {
                 </span>
 
                 <span class="shop-add-content">
-                   
-
                     <span>
                         ${editing ? "Save Changes" : "Add to Cart"}
                         <span aria-hidden="true"> · </span>
@@ -1159,7 +1133,9 @@ function renderProduct() {
     `);
 
     dialog.classList.add("shop-product-dialog");
+
     const options = $("#shopProductOptions", dialog);
+
 
 
     if (["cupcakes", "jars", "apples"].includes(category)) {
