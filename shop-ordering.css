@@ -1,0 +1,1339 @@
+/* =====================================================
+   THE PASTRY JUNKIE — COMPACT SHOP ORDERING
+===================================================== */
+
+body.shop-page {
+    --shop-brown: #421a12;
+    --shop-pink: #fdade8;
+    --shop-cream: #fff6f0;
+}
+
+body.shop-page [data-shop-category] {
+    --shop-control-scale: 1;
+}
+
+/* Product names remain more prominent than descriptions. */
+body.shop-page [data-shop-category] h3 {
+    min-height: 0;
+    margin: 12px 0 5px;
+    padding-bottom: 0;
+
+    font-size:
+        calc(18px * var(--shop-control-scale)) !important;
+
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+body.shop-page [data-shop-category] h3::after {
+    display: none;
+}
+
+body.shop-page .shop-card-copy {
+    max-width: 32ch;
+    margin: 4px auto 8px;
+
+    color: #674339;
+
+    font-size:
+        calc(13px * var(--shop-control-scale));
+
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+body.shop-page .shop-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap:
+        calc(8px * var(--shop-control-scale));
+
+    margin-top:
+        calc(6px * var(--shop-control-scale));
+}
+
+body.shop-page .shop-card-price {
+    display: inline-block;
+    margin: 0;
+
+    font-size:
+        calc(16px * var(--shop-control-scale));
+
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.shop-button {
+    appearance: none;
+    border: 1px solid #421a12;
+    border-radius: 4px;
+    background: #421a12;
+    color: #fdade8;
+    font: inherit;
+    font-weight: 800;
+    line-height: 1.25;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+    text-align: center;
+}
+
+body.shop-page .shop-select {
+    appearance: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    width: calc(44px * var(--shop-control-scale));
+    height: calc(44px * var(--shop-control-scale));
+
+    min-width: calc(44px * var(--shop-control-scale));
+    min-height: calc(44px * var(--shop-control-scale));
+
+    padding: calc(7px * var(--shop-control-scale));
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    box-shadow: none;
+    color: #c62f79;
+
+    cursor: pointer;
+    line-height: 1;
+}
+
+.shop-bag-icon {
+    display: block;
+    width: 28px;
+    height: 32px;
+    flex: 0 0 auto;
+}
+
+body.shop-page .shop-select .shop-bag-icon {
+    width: calc(28px * var(--shop-control-scale));
+    height: calc(32px * var(--shop-control-scale));
+}
+
+body.shop-page .shop-select:hover:enabled {
+    background: transparent;
+    box-shadow: none;
+    color: #9f1d5c;
+}
+
+.shop-button.secondary {
+    background: transparent;
+    color: #421a12;
+}
+
+.shop-button:disabled,
+.shop-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.shop-button:hover:enabled {
+    background: #63362a;
+    color: #fff0fa;
+}
+
+.shop-button:focus-visible,
+.shop-select:focus-visible,
+.shop-dialog :is(input, select, textarea):focus-visible,
+[data-shop-entry]:focus-visible {
+    outline: 3px solid #d72485;
+    outline-offset: 3px;
+}
+
+[data-shop-entry] {
+    cursor: pointer;
+}
+
+.shop-is-unavailable .shop-card-copy,
+.shop-is-unavailable .shop-card-price {
+    opacity: 0.55;
+}
+
+
+/* =====================================================
+   SIGNATURE CARD SUPPORT
+===================================================== */
+
+.shop-badge {
+    display: inline-block;
+
+    padding: 4px 8px;
+    border: 1px solid #b65182;
+    border-radius: 3px;
+
+    font-size:
+        calc(12px * var(--shop-control-scale, 1));
+
+    font-weight: 800;
+}
+
+.shop-art-pending > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 180px;
+    width: 80%;
+    padding: 16px;
+
+    background: #f8e4e9;
+    border: 1px dashed #a87262;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* Three-card rows, with the final pair centered beneath them. */
+@media (min-width: 1101px) {
+    body.shop-page
+    #signatureCakes .signature-cake-grid {
+        grid-template-columns:
+            repeat(6, minmax(0, 1fr));
+    }
+
+    body.shop-page
+    #signatureCakes .signature-cake-grid
+    > .signature-cake-product {
+        grid-column: span 2;
+    }
+
+    body.shop-page
+    #signatureCakes .signature-cake-grid
+    > [data-shop-category="cakes"][data-shop-flavor="banana"] {
+        grid-column: 2 / span 2;
+    }
+
+    body.shop-page
+    #signatureCakes .signature-cake-grid
+    > [data-shop-category="half"] {
+        grid-column: 4 / span 2;
+    }
+}
+
+
+/* =====================================================
+   CONTENT-SIZED DIALOG
+===================================================== */
+
+.shop-dialog {
+    box-sizing: border-box;
+
+    position: fixed;
+    inset: 0;
+
+    width: min(620px, calc(100% - 32px));
+    height: fit-content;
+
+    min-height: 0;
+    max-width: calc(100% - 24px);
+    max-height: calc(100dvh - 32px);
+
+    margin: auto;
+    padding: 0;
+
+    border: 1px solid #dc8fb5;
+    border-radius: 6px;
+
+    background: #fff6f0;
+    color: #421a12;
+
+    box-shadow: 0 18px 65px #421a1240;
+
+    font-family: inherit;
+
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+.shop-dialog::backdrop {
+    background: #32180f99;
+}
+
+body:has(.shop-dialog[open]) {
+    overflow: hidden;
+}
+
+.shop-dialog * {
+    box-sizing: border-box;
+}
+
+.shop-dialog [hidden] {
+    display: none !important;
+}
+
+.shop-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    padding: 10px 16px;
+
+    background: #fff6f0;
+    border-bottom: 1px solid #e5c8cd;
+}
+
+.shop-dialog-header h2 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+.shop-close {
+    flex: 0 0 44px;
+
+    min-width: 44px;
+    min-height: 44px;
+
+    padding: 0;
+    border: 0;
+
+    background: transparent;
+    color: #421a12;
+
+    font: inherit;
+    font-size: 28px;
+
+    cursor: pointer;
+}
+
+.shop-dialog-content {
+    padding: 16px;
+}
+
+
+/* Product popup */
+
+.shop-product-dialog {
+    width: min(500px, calc(100% - 24px));
+    border-radius: 18px;
+    background: linear-gradient(145deg, #fff9f4, #fff0ed);
+}
+
+.shop-product-dialog .shop-dialog-header {
+    justify-content: flex-end;
+    padding: 3px 7px;
+
+    border: 0;
+    background: transparent;
+
+    pointer-events: none;
+}
+
+/* Accessible dialog title; visible title sits beside the image. */
+.shop-product-dialog .shop-dialog-header h2 {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+.shop-product-dialog .shop-close {
+    position: relative;
+    z-index: 2;
+
+    border-radius: 50%;
+    color: #704137;
+    background: #fff8f3ed;
+
+    pointer-events: auto;
+}
+
+.shop-product-dialog .shop-dialog-content {
+    padding: 66px 20px 78px;
+}
+
+/* Light pink cheesecake drizzle */
+
+.shop-drizzle-top {
+    position: absolute;
+
+    top: -1px;
+    left: -1px;
+    right: -1px;
+
+    height: auto;
+    line-height: 0;
+
+    pointer-events: none;
+}
+
+.shop-icing {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    overflow: hidden;
+}
+
+/* Image and flavor-specific description */
+
+.shop-product-layout {
+    display: block;
+}
+
+.shop-product-visual {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, .85fr) minmax(0, 1.15fr);
+
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ecd4d0;
+}
+
+.shop-product-visual.shop-no-image {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.shop-product-visual img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+
+    object-fit: contain;
+}
+
+.shop-product-intro {
+    min-width: 0;
+}
+
+.shop-dialog .shop-product-name {
+    margin: 0 0 8px;
+
+    color: #bb1c59;
+
+    font-size: clamp(20px, 4.7vw, 27px);
+    font-style: italic;
+    font-weight: 850;
+    line-height: 1.05;
+
+    overflow-wrap: break-word;
+}
+
+.shop-product-visual p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.shop-product-visual .shop-peanut-note {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.shop-split-explanation p {
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+.shop-product-dialog .shop-field {
+    margin: 10px 0;
+}
+
+.shop-product-dialog select {
+    margin-top: 5px;
+
+    border-color: #ddb5ad;
+    border-radius: 6px;
+
+    background: #fffaf7;
+}
+
+/* Keep one flavor or mix the pack */
+
+.shop-product-dialog .shop-mix-picker {
+    margin: 12px 0 8px;
+    padding: 8px;
+
+    border: 1px solid #e0b7b0;
+    border-radius: 9px;
+}
+
+.shop-mix-picker legend {
+    padding: 0 4px;
+
+    font-family:
+        "Brush Script MT",
+        "Segoe Script",
+        cursive;
+
+    font-size: 23px;
+    line-height: 1.1;
+}
+
+.shop-mix-choices {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+.shop-mix-choice {
+    appearance: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 0;
+    min-height: 62px;
+    padding: 7px;
+
+    border: 1px solid #e6c7c2;
+    border-radius: 7px;
+
+    background: #fffaf8;
+    color: #421a12;
+
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.shop-mix-choice strong {
+    display: block;
+}
+
+.shop-mix-choice[aria-pressed="true"] {
+    border-color: #ba2c6f;
+    background: #ffe7ef;
+
+    box-shadow:
+        inset 0 0 0 1px #ba2c6f;
+}
+
+.shop-mix-choice:focus-visible {
+    outline: 3px solid #d72485;
+    outline-offset: 2px;
+}
+
+.shop-mix-choice img {
+    width: 38px;
+    height: 42px;
+
+    object-fit: contain;
+    flex: 0 0 auto;
+}
+
+.shop-mix-thumbnails {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.shop-mix-thumbnails img {
+    width: 26px;
+    height: 35px;
+}
+
+.shop-mix-thumbnails img + img {
+    margin-left: -9px;
+}
+
+.shop-product-dialog .shop-live {
+    margin: 6px 0;
+    padding: 0;
+    font-size: 12px;
+}
+
+/* Expandable information beneath the selections */
+
+.shop-product-information {
+    margin-top: 8px;
+}
+
+.shop-care-item h4 {
+    margin: 12px 0 5px;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.shop-care-item p {
+    margin: 8px 0;
+}
+
+.shop-product-dialog .shop-allergy-notice {
+    margin-top: 12px;
+    padding-top: 10px;
+
+    border-top: 1px solid #ead6d8;
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.shop-product-dialog .shop-about {
+    padding: 0;
+}
+
+.shop-product-dialog .shop-about summary {
+    display: list-item;
+
+    min-height: 44px;
+    padding: 12px 0;
+
+    font-size: 12px;
+}
+
+/* One live total, inside Add to Cart */
+
+.shop-product-dialog .shop-product-footer {
+    display: block;
+
+    margin-top: 12px;
+    padding-top: 0;
+
+    border: 0;
+}
+
+.shop-product-footer .shop-error {
+    margin-bottom: 9px;
+    font-size: 13px;
+}
+
+.shop-product-dialog .shop-add-dessert {
+    position: relative;
+    display: block;
+
+    width: 100%;
+    min-height: 49px;
+    padding: 12px 14px;
+
+    border: 0;
+    border-radius: 12px 12px 0 0;
+
+    background: linear-gradient(
+        to bottom,
+        #fffaf0 0%,
+        #f8f0df 55%,
+        #efe4ce 100%
+    );
+
+    box-shadow: none;
+
+    color: #bb1c59;
+    font-size: 13px;
+
+    overflow: visible;
+}
+
+.shop-product-dialog .shop-add-dessert:hover:enabled {
+    background: linear-gradient(
+        to bottom,
+        #fffaf0 0%,
+        #f8f0df 55%,
+        #efe4ce 100%
+    );
+
+    color: #bb1c59;
+}
+.shop-button-drizzle {
+    position: absolute;
+
+    display: flex;
+    align-items: flex-start;
+
+    top: calc(100% - 1px);
+    left: -1px;
+    right: -1px;
+    bottom: auto;
+
+    height: auto;
+    line-height: 0;
+
+    pointer-events: none;
+}
+
+.shop-button-drizzle .shop-icing {
+    flex: 0 0 33.333333%;
+
+    width: 33.333333%;
+    height: auto;
+
+    min-width: 0;
+}
+
+.shop-add-content {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+    padding-inline: 20px;
+
+    text-align: center;
+}
+
+.shop-add-content > span:last-child {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
+    margin: 0;
+    transform: translateY(-50%);
+}
+
+.shop-product-dialog .shop-add-content strong {
+    font-size: inherit;
+    font-weight: 850;
+}
+
+.shop-about {
+    padding: 8px 0;
+    border-bottom: 1px solid #ead6d8;
+}
+
+.shop-about summary {
+    min-height: 32px;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    cursor: pointer;
+}
+
+.shop-about p,
+.shop-about ul {
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.shop-about ul {
+    padding-left: 22px;
+}
+
+
+/* =====================================================
+   CONFIGURATION CONTROLS
+===================================================== */
+
+.shop-dialog h3 {
+    margin: 16px 0 8px;
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.shop-dialog p {
+    line-height: 1.5;
+}
+
+.shop-dialog fieldset {
+    min-width: 0;
+    margin: 12px 0;
+    padding: 0;
+    border: 0;
+}
+
+.shop-dialog legend {
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.shop-dialog label {
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.shop-dialog
+input:not([type="radio"]):not([type="checkbox"]),
+.shop-dialog select,
+.shop-dialog textarea {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 44px;
+
+    padding: 10px;
+
+    border: 1px solid #ad8072;
+    border-radius: 4px;
+
+    background: #fff;
+    color: #421a12;
+
+    font: inherit;
+    font-size: 16px;
+}
+
+.shop-dialog textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.shop-field {
+    display: block;
+    margin: 12px 0;
+}
+
+.shop-field small {
+    display: block;
+    margin-top: 5px;
+
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.shop-choice-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shop-choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 44px;
+    padding: 10px 12px;
+
+    border: 1px solid #ad8072;
+    border-radius: 4px;
+
+    background: #fffaf7;
+    cursor: pointer;
+}
+
+.shop-choice:has(input:checked) {
+    padding: 9px 11px;
+    border: 2px solid #9c285c;
+    background: #fdade8;
+}
+
+.shop-choice input,
+.shop-mix-toggle input {
+    accent-color: #a82467;
+}
+
+.shop-two-col {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Mixed flavors wrap into rows. */
+#shopFlavorCounts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+    margin-top: 12px;
+}
+
+#shopFlavorCounts[hidden] {
+    display: none !important;
+}
+
+#shopFlavorCounts > p {
+    grid-column: 1 / -1;
+    margin: 0 0 4px;
+
+    font-size: 13px;
+}
+
+.shop-flavor-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 56px;
+
+    align-items: center;
+    gap: 8px;
+
+    min-width: 0;
+    min-height: 64px;
+    padding: 8px;
+
+    border: 1px solid #e6c7c2;
+    border-radius: 6px;
+
+    background: #fffaf7;
+}
+
+.shop-flavor-row span {
+    min-width: 0;
+
+    font-size: 13px;
+    line-height: 1.3;
+
+    overflow-wrap: break-word;
+}
+
+.shop-flavor-row input {
+    text-align: center;
+}
+.shop-mix-toggle {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 44px;
+    margin: 10px 0;
+}
+
+.shop-mix-toggle input {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+}
+
+
+/* =====================================================
+   CHOCOLATE PIECES
+===================================================== */
+
+.shop-piece {
+    margin: 10px 0;
+    padding: 12px;
+
+    border: 1px solid #dcbac2;
+    border-radius: 4px;
+
+    background: #fffaf8;
+}
+
+.shop-piece label {
+    display: block;
+}
+
+.shop-piece .shop-two-col {
+    margin: 8px 0;
+}
+
+.shop-piece-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shop-piece-actions .shop-button {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   TOTALS / CART / NOTICES
+===================================================== */
+
+.shop-live {
+    padding: 6px 0;
+    font-weight: 800;
+}
+
+.shop-error {
+    color: #8e1837;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.shop-error:empty {
+    display: none;
+}
+
+.shop-dialog-footer {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 14px;
+    padding-top: 12px;
+
+    border-top: 1px solid #e0bdc8;
+}
+
+.shop-dialog-footer strong {
+    font-size: 21px;
+}
+
+.shop-cart-row {
+    padding: 12px 0;
+    border-bottom: 1px solid #e1c6ce;
+}
+
+.shop-cart-row h3 {
+    margin: 0 0 8px;
+}
+
+.shop-cart-row ul,
+.shop-review ul {
+    margin: 8px 0;
+    padding-left: 22px;
+    line-height: 1.5;
+}
+
+.shop-cart-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.shop-notice {
+    margin: 12px 0;
+    padding: 12px;
+
+    background: #f8e5ec;
+    border-left: 3px solid #c04b85;
+
+    line-height: 1.5;
+}
+
+.shop-policies details {
+    padding: 10px 0;
+    border-top: 1px solid #e4cdd0;
+}
+
+.shop-policies summary {
+    min-height: 32px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.shop-review {
+    overflow-wrap: anywhere;
+}
+
+.shop-status {
+    padding: 10px;
+    line-height: 1.5;
+}
+
+.shop-honeypot {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+
+/* =====================================================
+   COMPENSATE FOR EXISTING SHOP MAIN ZOOM ONLY
+
+   The dialog is outside the zoomed main.
+===================================================== */
+
+@media (min-width: 1200px) {
+    body.shop-page [data-shop-category] {
+        --shop-control-scale: 2;
+    }
+}
+
+@media screen
+and (orientation: landscape)
+and (max-height: 600px)
+and (hover: none)
+and (pointer: coarse) {
+    body.shop-page [data-shop-category] {
+        --shop-control-scale: 2;
+    }
+
+    .shop-dialog {
+        max-height: calc(100dvh - 16px);
+    }
+}
+
+
+/* =====================================================
+   PHONE
+===================================================== */
+
+/* Phone */
+
+@media (max-width: 700px) {
+    .shop-dialog {
+        inset: auto 0 0;
+        margin: 0 auto;
+
+        width: 100%;
+        max-width: 100%;
+        max-height: 94dvh;
+
+        border-radius: 8px 8px 0 0;
+    }
+
+    .shop-dialog-header h2 {
+        font-size: 20px;
+    }
+
+    .shop-dialog-content {
+        padding: 14px;
+
+        padding-bottom: max(
+            16px,
+            env(safe-area-inset-bottom)
+        );
+    }
+
+    .shop-two-col {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+
+    .shop-dialog-footer .shop-button {
+        width: 100%;
+    }
+
+    .shop-product-dialog {
+        inset: 0;
+
+        width: calc(100% - 16px);
+        max-width: 500px;
+        max-height: calc(100dvh - 24px);
+
+        margin: auto;
+        border-radius: 16px;
+    }
+
+.shop-product-dialog .shop-dialog-content {
+    padding:
+        clamp(28px, calc(23.2vw - 50px), 66px)
+        13px
+        max(78px, env(safe-area-inset-bottom));
+}
+
+    .shop-product-visual {
+        gap: 9px;
+    }
+
+    .shop-product-visual img {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 360px) {
+    .shop-product-visual {
+        grid-template-columns:
+            minmax(0, .75fr) minmax(0, 1.25fr);
+    }
+
+    .shop-product-visual.shop-no-image {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .shop-product-visual p {
+        font-size: 12px;
+    }
+
+    .shop-mix-choice {
+        font-size: 11px;
+    }
+
+    .shop-mix-choice img {
+        width: 28px;
+    }
+
+    .shop-mix-thumbnails img {
+        width: 21px;
+    }
+}
+/* Wider product popup for tablet and desktop. */
+@media (min-width: 701px) {
+    .shop-product-dialog {
+        width: min(820px, calc(100% - 32px));
+        /* Give active flavor mixing the popup's full width. */
+.shop-product-dialog
+.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
+.shop-product-visual > img {
+    grid-row: 1;
+}
+
+.shop-product-dialog
+.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
+#shopProductOptions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+.shop-product-dialog
+.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
+.shop-product-information {
+    grid-column: 1 / -1;
+    grid-row: 3;
+}
+
+.shop-product-dialog
+.shop-product-layout:has(#shopFlavorCounts:not([hidden]))
+#shopProductOptions > .shop-field {
+    max-width: 360px;
+}
+
+.shop-product-dialog #shopFlavorCounts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+    }
+
+    .shop-product-dialog .shop-dialog-content {
+        /*
+         * Reserve room for the existing proportional artwork.
+         * Its attachment positions remain unchanged.
+         */
+        padding: 120px 24px 120px;
+    }
+
+    .shop-product-dialog .shop-product-layout {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, .85fr)
+            minmax(0, 1.15fr);
+
+        align-items: start;
+        gap: 14px 24px;
+    }
+
+    .shop-product-dialog .shop-product-visual {
+        display: contents;
+    }
+
+    .shop-product-dialog .shop-product-visual > img {
+        grid-column: 1;
+        grid-row: 1 / span 3;
+
+        align-self: center;
+
+        width: 100%;
+        height: auto;
+        max-height: 320px;
+
+        object-fit: contain;
+    }
+
+    .shop-product-dialog .shop-product-intro {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .shop-product-dialog #shopProductOptions {
+        grid-column: 2;
+        grid-row: 2;
+
+        min-width: 0;
+    }
+
+    .shop-product-dialog .shop-product-information {
+        grid-column: 2;
+        grid-row: 3;
+
+        min-width: 0;
+        margin-top: 0;
+    }
+
+    .shop-product-dialog .shop-split-explanation {
+        grid-column: 1 / -1;
+        grid-row: 4;
+    }
+
+    /* Accommodate a product without an image. */
+    .shop-product-dialog
+    .shop-product-layout:has(.shop-no-image) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .shop-product-dialog
+    .shop-product-layout:has(.shop-no-image)
+    > :is(
+        .shop-product-information,
+        #shopProductOptions
+    ),
+    .shop-product-dialog
+    .shop-no-image .shop-product-intro {
+        grid-column: 1;
+    }
+}
+/* One chocolate thumb color throughout the Shop and its popups. */
+html:has(body.shop-page),
+body.shop-page,
+body.shop-page * {
+    scrollbar-color: #421a12 #fff6f0;
+}
+
+html:has(body.shop-page)::-webkit-scrollbar,
+body.shop-page::-webkit-scrollbar,
+body.shop-page *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html:has(body.shop-page)::-webkit-scrollbar-track,
+body.shop-page::-webkit-scrollbar-track,
+body.shop-page *::-webkit-scrollbar-track {
+    background: #fff6f0;
+}
+
+html:has(body.shop-page)::-webkit-scrollbar-thumb,
+body.shop-page::-webkit-scrollbar-thumb,
+body.shop-page *::-webkit-scrollbar-thumb {
+    background: #421a12;
+    border-radius: 6px;
+}
+
+html:has(body.shop-page)::-webkit-scrollbar-thumb:hover,
+html:has(body.shop-page)::-webkit-scrollbar-thumb:active,
+body.shop-page::-webkit-scrollbar-thumb:hover,
+body.shop-page::-webkit-scrollbar-thumb:active,
+body.shop-page *::-webkit-scrollbar-thumb:hover,
+body.shop-page *::-webkit-scrollbar-thumb:active {
+    background: #421a12;
+}
+
+html:has(body.shop-page)::-webkit-scrollbar-corner,
+body.shop-page::-webkit-scrollbar-corner,
+body.shop-page *::-webkit-scrollbar-corner {
+    background: #fff6f0;
+}
