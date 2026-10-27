@@ -14,8 +14,13 @@ body.shop-page [data-shop-category] {
 
 /* Product names remain more prominent than descriptions. */
 body.shop-page [data-shop-category] h3 {
-    min-height: 0;
-    margin: 12px 0 5px;
+    min-height: var(--shop-title-height, 0);
+
+    margin:
+        var(--shop-title-top, 12px)
+        var(--shop-title-side, 0)
+        5px;
+
     padding-bottom: 0;
 
     font-size:
@@ -23,6 +28,7 @@ body.shop-page [data-shop-category] h3 {
 
     font-weight: 800;
     line-height: 1.25;
+    text-align: center;
 }
 
 body.shop-page [data-shop-category] h3::after {
@@ -40,6 +46,7 @@ body.shop-page .shop-card-copy {
 
     font-weight: 400;
     line-height: 1.45;
+    min-height: var(--shop-copy-height, 0);
 }
 
 body.shop-page .shop-card-actions {
@@ -198,30 +205,38 @@ body.shop-page .shop-select:hover:enabled {
     font-weight: 800;
 }
 
-/* Three-card rows, with the final pair centered beneath them. */
+/* Signature Cake grid placement */
 @media (min-width: 1101px) {
     body.shop-page
     #signatureCakes .signature-cake-grid {
         grid-template-columns:
-            repeat(6, minmax(0, 1fr));
+            repeat(
+                var(--shop-signature-columns, 6),
+                minmax(0, 1fr)
+            );
+
+        row-gap: var(--shop-signature-row-gap, 90px);
     }
 
     body.shop-page
     #signatureCakes .signature-cake-grid
     > .signature-cake-product {
-        grid-column: span 2;
+        grid-column:
+            var(--shop-signature-card-column, span 2);
     }
 
     body.shop-page
     #signatureCakes .signature-cake-grid
     > [data-shop-category="cakes"][data-shop-flavor="banana"] {
-        grid-column: 2 / span 2;
+        grid-column:
+            var(--shop-signature-banana-column, 2 / span 2);
     }
 
     body.shop-page
     #signatureCakes .signature-cake-grid
     > [data-shop-category="half"] {
-        grid-column: 4 / span 2;
+        grid-column:
+            var(--shop-signature-half-column, 4 / span 2);
     }
 }
 /* =====================================================

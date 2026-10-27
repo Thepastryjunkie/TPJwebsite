@@ -2,14 +2,7 @@
    THE PASTRY JUNKIE
    SHOP PAGE
 ========================================================= */
-
-/* =========================================================
-   DESKTOP SHOP SCALE
-
-   Keep the dessert/menu area pulled back,
-   but DO NOT shrink the website header.
-========================================================= */
-
+/* Desktop Shop scale */
 @media (min-width: 1200px) {
     body.shop-page {
         zoom: 1;
@@ -21,6 +14,112 @@
         zoom: 0.5;
     }
 }
+
+/* Desktop menu settings */
+@media (min-width: 1200px)
+and (hover: hover)
+and (pointer: fine) {
+
+    /* Shared desktop card alignment */
+    body.shop-page .cupcake-section,
+    body.shop-page .jar-section,
+    body.shop-page .apple-section,
+    body.shop-page .signature-cake-section {
+        --shop-menu-max: 2000px;
+
+        --shop-title-width: 100%;
+        --shop-title-height: 2.5em;
+        --shop-title-top: 12px;
+        --shop-title-side: auto;
+
+        --shop-first-title-top: 12px;
+        --shop-last-title-top: 12px;
+        --shop-last-card-top: 0px;
+
+        --shop-copy-height: 2.9em;
+        --shop-grid-align: start;
+    }
+
+    /* Four cards per row */
+    body.shop-page .cupcake-section,
+    body.shop-page .jar-section,
+    body.shop-page .apple-section {
+        --shop-menu-tracks: 8;
+        --shop-card-column: span 2;
+    }
+
+/* Cupcakes: five across, two rows */
+body.shop-page .cupcake-section {
+    --shop-menu-max: 2500px;
+    --shop-menu-tracks: 10;
+
+    --shop-cupcake-tenth: span 2;
+    --shop-cupcake-last: span 2;
+
+    --shop-cupcake-heading-size:
+        clamp(5.6rem, 10vw, 11rem);
+}
+
+
+
+    /* Jars: four, four, three centered */
+    body.shop-page .jar-section {
+        --shop-jar-tenth: 4 / span 2;
+        --shop-jar-eleventh: 6 / span 2;
+
+        --shop-jar-showcase-height: calc(100% - 15px);
+
+        /* Strawberry decoration */
+        --shop-strawberry-top: auto;
+        --shop-strawberry-bottom: -205px;
+
+        /* Oreo decoration */
+        --shop-oreo-top: -60px;
+        --shop-oreo-right: -60px;
+        --shop-oreo-rotation: -150deg;
+        --shop-oreo-origin: center;
+    }
+
+    body.shop-page .jar-product:nth-child(9) {
+        --shop-card-column: 2 / span 2;
+    }
+
+    /* Apples: four, three centered */
+    body.shop-page .apple-section {
+        --shop-apple-seventh: 6 / span 2;
+    }
+
+    body.shop-page .apple-product:nth-child(5) {
+        --shop-card-column: 2 / span 2;
+    }
+
+    body.shop-page .apple-product:nth-child(6) {
+        --shop-card-column: 4 / span 2;
+    }
+
+    /* Signature Cakes: four, four */
+    body.shop-page .signature-cake-section {
+        --shop-signature-columns: 4;
+        --shop-signature-card-column: auto;
+        --shop-signature-banana-column: auto;
+        --shop-signature-half-column: auto;
+        --shop-signature-row-gap: 60px;
+    }
+        /* Chocolate treats: four across */
+    body.shop-page .chocolate-collection {
+        --shop-chocolate-columns: 4;
+        --shop-chocolate-max: 2500px;
+        --shop-chocolate-gap: 40px;
+        --shop-chocolate-image-height: 460px;
+        --shop-chocolate-padding: 80px 0 90px;
+        --shop-chocolate-heading-gap: 40px;
+
+        --shop-title-height: 2.5em;
+        --shop-title-side: auto;
+        --shop-copy-height: 2.9em;
+    }
+}
+
 /* =========================================================
    SHOP CONTENT
 ========================================================= */
@@ -48,7 +147,10 @@
     position: relative;
     z-index: 2;
 
-    width: min(1440px, calc(100% - 80px));
+    width: min(
+    var(--shop-menu-max, 1440px),
+    calc(100% - 80px)
+);
 
     margin: 0 auto;
 
@@ -252,23 +354,28 @@
     display: grid;
 
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(
+            var(--shop-menu-tracks, 3),
+            minmax(0, 1fr)
+        );
 
     gap: 85px 55px;
-
     margin-top: 45px;
 }
 
-/* Center the final cupcake on its own row */
+/* Final cupcake placement */
 .cupcake-section .dessert-product:nth-child(10) {
-    grid-column: 2;
+    grid-column:
+        var(--shop-cupcake-tenth, 2);
 }
-/* Product is intentionally NOT a card */
 
 .dessert-product {
     position: relative;
 
     min-width: 0;
+
+    grid-column:
+        var(--shop-card-column, auto);
 
     text-align: center;
 }
@@ -792,7 +899,7 @@
     left: 0;
 
     width: 100%;
-    height: 570px;
+  height: var(--shop-jar-showcase-height, 570px);
 
     overflow: hidden;
 
@@ -860,19 +967,27 @@
         z-index: 2;
     }
 
-    /* Strawberry: larger jar body, leaning inward RIGHT */
-    .jar-showcase .jar-feature-left {
-        width: 740px;
-        left: -90px;
-        transform: rotate(12deg);
-    }
+/* Strawberry: keep its size and angle */
+.jar-showcase .jar-feature-left {
+    width: 740px;
+    left: -90px;
 
-    /* Oreo: larger jar body, leaning inward LEFT */
-    .jar-showcase .jar-feature-right {
-        width: 760px;
-        right: -90px;
-        transform: rotate(-12deg);
-    }
+    top: var(--shop-strawberry-top, 20px);
+    bottom: var(--shop-strawberry-bottom, auto);
+
+    transform: rotate(12deg);
+}
+
+/* Oreo decoration */
+.jar-showcase .jar-feature-right {
+    width: 760px;
+
+    top: var(--shop-oreo-top, 20px);
+    right: var(--shop-oreo-right, -90px);
+
+    transform: rotate(var(--shop-oreo-rotation, -12deg));
+    transform-origin: var(--shop-oreo-origin, center top);
+}
 
     .jar-showcase::before,
     .jar-showcase::after {
@@ -940,30 +1055,29 @@
 
 .jar-product-grid {
     grid-template-columns:
-        repeat(6, minmax(0, 1fr));
+        repeat(
+            var(--shop-menu-tracks, 6),
+            minmax(0, 1fr)
+        );
 
-    gap:
-        85px 55px;
-
+    gap: 85px 55px;
     margin-top: 10px;
 }
 
-/* Three jars across */
-
 .jar-product:nth-child(n) {
-    grid-column: span 2;
+    grid-column:
+        var(--shop-card-column, span 2);
 }
 
-/* Center the final two jars */
-
 .jar-product:nth-child(10) {
-    grid-column: 2 / span 2;
+    grid-column:
+        var(--shop-jar-tenth, 2 / span 2);
 }
 
 .jar-product:nth-child(11) {
-    grid-column: 4 / span 2;
+    grid-column:
+        var(--shop-jar-eleventh, 4 / span 2);
 }
-
 
 /* =========================================================
    JAR PRODUCT IMAGES
@@ -1482,24 +1596,23 @@
     z-index: 6;
 
     grid-template-columns:
-        repeat(6, minmax(0, 1fr));
+        repeat(
+            var(--shop-menu-tracks, 6),
+            minmax(0, 1fr)
+        );
 
-    gap:
-        85px 55px;
-
+    gap: 85px 55px;
     margin-top: 10px;
 }
 
-/* Three apples across */
-
 .apple-product:nth-child(n) {
-    grid-column: span 2;
+    grid-column:
+        var(--shop-card-column, span 2);
 }
 
-/* Center the final apple */
-
 .apple-product:nth-child(7) {
-    grid-column: 3 / span 2;
+    grid-column:
+        var(--shop-apple-seventh, 3 / span 2);
 }
 
 
@@ -1996,7 +2109,7 @@
     gap:
         90px 55px;
 
-    align-items: end;
+align-items: var(--shop-grid-align, end);
 }
 
 
@@ -2825,9 +2938,12 @@
 .chocolate-collection-inner {
     position: relative;
     z-index: 2;
-    width: min(1800px, calc(100% - 80px));
+    width: min(
+    var(--shop-chocolate-max, 1800px),
+    calc(100% - 80px)
+);
     margin: 0 auto;
-    padding: 125px 0 155px;
+    padding: var(--shop-chocolate-padding, 125px 0 155px);
 }
 
 /* Decorative splashes — mobile stays hidden for now. */
@@ -2888,9 +3004,9 @@
 
     max-width: 1000px;
 
-    margin:
-        0 auto
-        85px;
+margin:
+    0 auto
+    var(--shop-chocolate-heading-gap, 85px);
 
     text-align: center;
 }
@@ -3026,7 +3142,7 @@
     position: relative;
 
     width: 100%;
-    height: 580px;
+   height: var(--shop-chocolate-image-height, 580px);
 
     display: flex;
     align-items: flex-end;
@@ -3181,7 +3297,7 @@
 @media (min-width: 1500px) {
 
 .chocolate-collection-image-wrap {
-    height: 620px;
+    height: var(--shop-chocolate-image-height, 620px);
 }
 
 .chocolate-collection-image {
@@ -3468,12 +3584,13 @@ body.shop-page .cupcake-section .dessert-section-description {
   text-align: center;
 }
 
-/* Center Peach Cobbler on desktop */
+/* Final cupcake placement by screen layout */
 @media (min-width: 701px) {
-  body.shop-page .cupcake-section
-  .dessert-product-grid > .dessert-product:last-child {
-    grid-column: 2 / 3;
-  }
+    body.shop-page .cupcake-section
+    .dessert-product-grid > .dessert-product:last-child {
+        grid-column:
+            var(--shop-cupcake-last, 2 / 3);
+    }
 }
 
 /* Keep the two-column arrangement on phones */
@@ -3485,8 +3602,13 @@ body.shop-page .cupcake-section .dessert-section-description {
 }
 /* Give chocolate collections room without overflowing */
 body.shop-page .chocolate-collection-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 80px 70px;
+    grid-template-columns:
+        repeat(
+            var(--shop-chocolate-columns, 2),
+            minmax(0, 1fr)
+        );
+
+    gap: var(--shop-chocolate-gap, 80px 70px);
 }
 
 body.shop-page .chocolate-collection-image {
@@ -3798,15 +3920,15 @@ body.shop-page .tpj-banner-title span {
     }
 }
 @media (min-width: 1101px) {
-    /* Move the Birthday Cake item upward */
-    body.shop-page .apple-product-grid > .apple-product:last-child {
+    body.shop-page .apple-product-grid
+    > .apple-product:last-child {
         position: relative;
-        top: -80px;
+        top: var(--shop-last-card-top, -80px);
     }
 
-    /* Give the name extra clearance below the decorations */
-    body.shop-page .apple-product-grid > .apple-product:last-child h3 {
-        margin-top: 44px;
+    body.shop-page .apple-product-grid
+    > .apple-product:last-child h3 {
+        margin-top: var(--shop-last-title-top, 44px);
     }
 }
 /* Chocolate fill and outline for both phrases */
@@ -3826,7 +3948,10 @@ body.shop-page .signature-cake-tagline {
 }
 @media (min-width: 1101px) {
     body.shop-page .cupcake-section .dessert-section-title {
-        font-size: clamp(4.8rem, 8.4vw, 9.24rem);
+        font-size: var(
+            --shop-cupcake-heading-size,
+            clamp(4.8rem, 8.4vw, 9.24rem)
+        );
     }
 }
 @media (min-width: 1101px) {
@@ -3835,7 +3960,7 @@ body.shop-page .signature-cake-tagline {
 
     body.shop-page .apple-product-grid
     > .apple-product:first-child h3 {
-        margin-top: 32px;
+        margin-top: var(--shop-first-title-top, 32px);
     }
 }
 /* Remove the separate oval beneath each menu jar */
