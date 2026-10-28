@@ -15127,6 +15127,161 @@ button.textContent = alreadySent
     : "Submit Cake Vision";
 }
 let cakeVisionSubmissionInProgress = false;
+/* TPJ VERIFIED CAKE RECEIPTS */
+
+const tpjCakeAPI =
+  "https://tpj-orders-api.business-c3f.workers.dev";
+
+const tpjCakePending = new Map();
+
+async function tpjCakeReference(inquiryKey) {
+  const digest =
+    await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(inquiryKey)
+    );
+
+  const hash =
+    Array.from(new Uint8Array(digest))
+      .map(
+        value =>
+          value.toString(16).padStart(2, "0")
+      )
+      .join("");
+
+  const storageKey =
+    "tpj.cake.pending." + hash;
+
+  let saved =
+    tpjCakePending.get(hash);
+
+  if (!saved) {
+    try {
+      saved = JSON.parse(
+        sessionStorage.getItem(storageKey) ||
+        "null"
+      );
+    } catch (_) {}
+  }
+
+  if (
+    !/^[A-Za-z0-9_-]{16,128}$/
+      .test(saved?.key || "") ||
+
+    !/^[a-f0-9]{64}$/
+      .test(saved?.token || "")
+  ) {
+    const bytes =
+      crypto.getRandomValues(
+        new Uint8Array(32)
+      );
+
+    saved = {
+      key:
+        crypto.randomUUID(),
+
+      token:
+        Array.from(bytes)
+          .map(
+            value =>
+              value.toString(16).padStart(2, "0")
+          )
+          .join("")
+    };
+  }
+
+  tpjCakePending.set(hash, saved);
+
+  try {
+    sessionStorage.setItem(
+      storageKey,
+      JSON.stringify(saved)
+    );
+  } catch (_) {}
+
+  return saved;
+}
+
+async function tpjWaitForCakeReceipt(reference) {
+  const deadline =
+    Date.now() + 180000;
+
+  while (Date.now() < deadline) {
+    const controller =
+      new AbortController();
+
+    const timer =
+      setTimeout(
+        () => controller.abort(),
+        8000
+      );
+
+    let response = null;
+    let result = null;
+
+    try {
+      response = await fetch(
+        tpjCakeAPI +
+        "/api/cake/receipt?key=" +
+        encodeURIComponent(reference.key),
+
+        {
+          headers: {
+            Authorization:
+              "Bearer " + reference.token
+          },
+
+          cache:
+            "no-store",
+
+          signal:
+            controller.signal
+        }
+      );
+
+      result =
+        await response.json();
+
+    } catch (_) {
+      // A network interruption does not prove
+      // that the inquiry was lost.
+
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (
+      response?.ok &&
+      result?.ok &&
+      result.id
+    ) {
+      return result;
+    }
+
+    if (
+      response &&
+      [400, 401, 403, 404]
+        .includes(response.status)
+    ) {
+      throw new Error(
+        "Your inquiry could not be verified. " +
+        "Please try again."
+      );
+    }
+
+    await new Promise(
+      resolve =>
+        setTimeout(resolve, 2500)
+    );
+  }
+
+  throw new Error(
+    "We could not confirm your inquiry yet. " +
+    "Your selections are still here. " +
+    "Please retry; an inquiry that already " +
+    "saved will not be duplicated."
+  );
+}
 async function submitCakeVision() {
     if (cakeVisionSubmissionInProgress) {
         return;
@@ -15250,6 +15405,13 @@ if (submissionRoot) {
                 submissionFiles
         };
 
+               const tpjReference =
+            await tpjCakeReference(inquiryKey);
+
+        payload.deliveryVersion = 2;
+        payload.submissionKey = tpjReference.key;
+        payload.receiptToken = tpjReference.token;
+
         await fetch(
             cakeVisionSubmissionEndpoint,
             {
@@ -15265,13 +15427,26 @@ if (submissionRoot) {
                     JSON.stringify(payload)
             }
         );
-rememberSentCakeVision(inquiryKey);
+        if (message) {
+            message.textContent =
+                "Confirming that your inquiry " +
+                "and uploads were saved...";
+        }
+
+        const tpjReceipt =
+            await tpjWaitForCakeReceipt(
+                tpjReference
+            );
+
+        rememberSentCakeVision(inquiryKey);
         if (message) {
             message.className =
                 "submission-message is-success";
 
            message.textContent =
-    "Your Cake Vision inquiry was submitted successfully. The Pastry Junkie will review your design and contact you within 24–48 hours using your preferred contact method.";
+    "Your Cake Vision inquiry was received. Request ID: " +
+tpjReceipt.id +
+". A receipt email will follow. The Pastry Junkie will review your design and contact you within 24–48 hours using your preferred contact method.";
         }
 
         if (submitButton) {
@@ -15289,7 +15464,7 @@ rememberSentCakeVision(inquiryKey);
                 "submission-message is-error";
 
             message.textContent =
-                "Your inquiry could not be sent. Your selections are still saved on this page, so please try again.";
+             "We could not confirm your inquiry yet. Your selections are still saved on this page. Please retry; an inquiry that already saved will not be duplicated.";   
         }
 
         if (submitButton) {

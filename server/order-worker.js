@@ -2597,6 +2597,20 @@ async function tpjRoute(request, env) {
   }
 
   if (
+    request.method === "POST" &&
+    path === "/api/bridge"
+  ) {
+    return tpjBridge(request, env);
+  }
+
+  if (
+    request.method === "GET" &&
+    path === "/api/cake/receipt"
+  ) {
+    return tpjCakeReceipt(request, env, url);
+  }
+
+  if (
     request.method === "GET" &&
     ["/", "/health"].includes(path)
   ) {
@@ -2899,3 +2913,636 @@ export default {
     );
   }
 };
+
+/* TPJ GOOGLE BRIDGE — V1 */
+
+async function tpjBridge(request, env) {
+  const envelope = await tpjReadJSON(request);
+
+  if (
+    String(env.GOOGLE_BRIDGE_SECRET || "").length < 40 ||
+    !Number.isSafeInteger(envelope.timestamp) ||
+    Math.abs(Date.now() - envelope.timestamp) > 300000 ||
+    typeof envelope.payload !== "string" ||
+    !/^[a-f0-9]{64}$/.test(envelope.signature || "")
+  ) {
+    throw tpjError("Invalid bridge request.", 401);
+  }
+
+  const expected = await tpjHash(
+    envelope.timestamp + "\n" + envelope.payload,
+    env.GOOGLE_BRIDGE_SECRET
+  );
+
+  if (
+    await tpjHash(expected) !==
+    await tpjHash(envelope.signature)
+  ) {
+    throw tpjError("Invalid bridge signature.", 401);
+  }
+
+  let command;
+
+  try {
+    command = JSON.parse(envelope.payload);
+  } catch {
+    throw tpjError("Invalid bridge data.");
+  }
+
+  const data = command.data || {};
+  const now = new Date().toISOString();
+
+  if (command.action === "connect") {
+    await env.DB.prepare(
+      "INSERT INTO tpj_settings " +
+      "VALUES ('google_bridge_verified', 'true', ?) " +
+      "ON CONFLICT(key) DO UPDATE SET " +
+      "value_json='true', updated_at=excluded.updated_at"
+    ).bind(now).run();
+
+    return tpjJSON({
+      ok: true,
+      verified: true
+    });
+  }
+
+  if (command.action === "mail_claim") {
+    await env.DB.prepare(
+      "UPDATE tpj_notifications SET state='failed', " +
+      "last_error='Retry limit reached; review this notification.' " +
+      "WHERE state='processing' " +
+      "AND lease_until < ? AND attempts >= 8"
+    ).bind(now).run();
+
+    const lease =
+      new Date(Date.now() + 600000).toISOString();
+
+    const rows = await env.DB.prepare(
+      "UPDATE tpj_notifications SET " +
+      "state='processing', attempts=attempts+1, lease_until=? " +
+
+      "WHERE id IN (" +
+      "SELECT id FROM tpj_notifications " +
+      "WHERE attempts < 8 AND (" +
+      "(state='pending' AND next_attempt_at <= ?) OR " +
+      "(state='processing' AND lease_until < ?)) " +
+      "ORDER BY created_at LIMIT 5) " +
+
+      "RETURNING *"
+    ).bind(lease, now, now).all();
+
+    return tpjJSON({
+      ok: true,
+
+      jobs: rows.results.map(row => ({
+        id: row.id,
+        leaseUntil: row.lease_until,
+        recipientType: row.recipient_type,
+        data: JSON.parse(row.payload_json)
+      }))
+    });
+  }
+
+  if (command.action === "mail_ack") {
+    const row = await env.DB.prepare(
+      "SELECT * FROM tpj_notifications " +
+      "WHERE id=? AND state='processing' AND lease_until=?"
+    ).bind(
+      String(data.id || ""),
+      String(data.leaseUntil || "")
+    ).first();
+
+    if (!row) {
+      throw tpjError(
+        "This email lease has expired.",
+        409
+      );
+    }
+
+    const sent = data.success === true;
+
+    const state = sent
+      ? "sent"
+      : (
+          data.uncertain === true ||
+          row.attempts >= 8
+            ? "failed"
+            : "pending"
+        );
+
+    await env.DB.prepare(
+      "UPDATE tpj_notifications SET " +
+      "state=?, sent_at=?, last_error=?, " +
+      "lease_until=NULL, next_attempt_at=? " +
+      "WHERE id=? AND lease_until=?"
+    ).bind(
+      state,
+      sent ? now : null,
+
+      sent
+        ? null
+        : String(
+            data.error || "Email delivery failed."
+          ).slice(0, 400),
+
+      new Date(Date.now() + 300000).toISOString(),
+      row.id,
+      row.lease_until
+    ).run();
+
+    return tpjJSON({
+      ok: true,
+      state
+    });
+  }
+
+  if (command.action === "cake_import") {
+    return tpjImportCake(data, env);
+  }
+
+  throw tpjError("Unknown bridge action.");
+}
+
+async function tpjImportCake(data, env) {
+  const key =
+    String(data.submissionKey || "");
+
+  const receiptHash =
+    String(data.receiptHash || "");
+
+  if (
+    !/^[A-Za-z0-9_-]{16,128}$/.test(key) ||
+    !/^[a-f0-9]{64}$/.test(receiptHash)
+  ) {
+    throw tpjError("Invalid inquiry reference.");
+  }
+
+  const customer = {
+    name:
+      String(data.customer?.name || "")
+        .trim()
+        .slice(0, 100),
+
+    email:
+      String(data.customer?.email || "")
+        .trim()
+        .toLowerCase()
+        .slice(0, 254),
+
+    phone:
+      String(data.customer?.phone || "")
+        .trim()
+        .slice(0, 40)
+  };
+
+  if (
+    !customer.name ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) ||
+    customer.phone.replace(/\D/g, "").length < 10
+  ) {
+    throw tpjError(
+      "Valid customer contact details are required."
+    );
+  }
+
+  const fulfillment =
+    data.fulfillment || {};
+
+  if (
+    !["pickup", "delivery"].includes(
+      fulfillment.method
+    )
+  ) {
+    throw tpjError("Choose Pickup or Delivery.");
+  }
+
+  TPJ_M.localInstant(
+    fulfillment.date,
+    "12:00"
+  );
+
+  for (
+    const name of [
+      "inquiryOnly",
+      "estimatedPrice",
+      "depositRequired",
+      "termsAccepted"
+    ]
+  ) {
+    if (
+      data.acknowledgments?.[name] !== true
+    ) {
+      throw tpjError(
+        "All inquiry acknowledgments are required."
+      );
+    }
+  }
+
+  const summary = Object.fromEntries(
+    Object.entries(
+      data.inquirySummary || {}
+    )
+      .filter(
+        ([label, value]) =>
+          label &&
+          typeof value === "string"
+      )
+      .slice(0, 100)
+      .map(
+        ([label, value]) => [
+          label.slice(0, 150),
+          value.slice(0, 10000)
+        ]
+      )
+  );
+
+  if (!Object.keys(summary).length) {
+    throw tpjError(
+      "The inquiry summary is missing."
+    );
+  }
+
+  const files = data.files;
+
+  if (
+    !Array.isArray(files) ||
+    files.length > 12
+  ) {
+    throw tpjError("Invalid inquiry files.");
+  }
+
+  const driveFolder =
+    String(data.driveFolder || "");
+
+  if (
+    !/^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+$/
+      .test(driveFolder)
+  ) {
+    throw tpjError(
+      "The saved Drive folder is missing."
+    );
+  }
+
+  let totalBytes = 0;
+
+  for (const file of files) {
+    if (
+      !/^[A-Za-z0-9_-]{10,150}$/
+        .test(file.driveFileId || "") ||
+
+      !/^[a-f0-9]{64}$/
+        .test(file.sha256 || "") ||
+
+      !Number.isSafeInteger(file.size) ||
+      file.size < 0 ||
+      file.size > 15728640 ||
+
+      !/^https:\/\/drive\.google\.com\//
+        .test(file.url || "")
+    ) {
+      throw tpjError(
+        "An inquiry file is invalid."
+      );
+    }
+
+    totalBytes += file.size;
+  }
+
+  if (totalBytes > 31457280) {
+    throw tpjError(
+      "The combined files are too large."
+    );
+  }
+
+  const dollars =
+    Number(data.pricing?.estimatedTotal);
+
+  if (
+    !Number.isFinite(dollars) ||
+    dollars < 0 ||
+    dollars > 1000000
+  ) {
+    throw tpjError(
+      "The cake estimate is invalid."
+    );
+  }
+
+  const estimated =
+    Math.round(dollars * 100);
+
+  const meaningful = {
+    customer,
+    fulfillment,
+    summary,
+
+    edibleLayout:
+      data.edibleLayout || null,
+
+    files:
+      files
+        .filter(
+          file =>
+            file.role !==
+              "Cake Builder Preview"
+        )
+        .map(
+          file => ({
+            role: file.role,
+            name: file.name,
+            sha256: file.sha256
+          })
+        )
+  };
+
+  const fingerprint =
+    await tpjHash(
+      tpjStable(meaningful),
+      env.GOOGLE_BRIDGE_SECRET
+    );
+
+  const combinedHash =
+    receiptHash + "." + fingerprint;
+
+  const existingKey =
+    await env.DB.prepare(
+      "SELECT request_id, payload_hash " +
+      "FROM tpj_submission_keys " +
+      "WHERE source='cake_builder' " +
+      "AND submission_key=?"
+    ).bind(key).first();
+
+  if (
+    existingKey &&
+    existingKey.payload_hash !== combinedHash
+  ) {
+    throw tpjError(
+      "This inquiry reference was already " +
+      "used for different details.",
+      409
+    );
+  }
+
+  if (existingKey) {
+    return tpjJSON({
+      ok: true,
+      id: existingKey.request_id,
+      duplicate: true
+    });
+  }
+
+  if (
+    fulfillment.date < TPJ_M.dateKey()
+  ) {
+    throw tpjError(
+      "The requested fulfillment date has passed."
+    );
+  }
+
+  const availability =
+    await tpjAvailability(env);
+
+  if (
+    availability.blockedDates.includes(
+      fulfillment.date
+    )
+  ) {
+    throw tpjError(
+      "The requested fulfillment date is unavailable."
+    );
+  }
+
+  const id =
+    "TPJ-" + crypto.randomUUID();
+
+  const now =
+    new Date().toISOString();
+
+  const savedData = {
+    ...data,
+    customer,
+    inquirySummary: summary
+  };
+
+  delete savedData.receiptHash;
+  delete savedData.submissionKey;
+
+  const message =
+    JSON.stringify({
+      source: "cake_builder",
+      event: "received",
+      customer,
+      fulfillment,
+      inquirySummary: summary,
+      estimatedTotalCents: estimated,
+      driveFolder,
+      businessName: env.BUSINESS_NAME,
+      ownerEmail: env.OWNER_EMAIL
+    });
+
+  const db = env.DB;
+
+  await db.batch([
+    db.prepare(
+      "INSERT OR IGNORE INTO tpj_requests " +
+
+      "(id,source,fingerprint,customer_name," +
+      "customer_email,customer_phone," +
+      "fulfillment_date,fulfillment_method," +
+      "payload_json,estimated_total_cents," +
+      "created_at,updated_at) " +
+
+      "SELECT ?,'cake_builder',?,?,?,?,?,?,?,?,?,? " +
+
+      "WHERE NOT EXISTS (" +
+      "SELECT 1 FROM tpj_submission_keys " +
+      "WHERE source='cake_builder' " +
+      "AND submission_key=?)"
+    ).bind(
+      id,
+      fingerprint,
+      customer.name,
+      customer.email,
+      customer.phone,
+      fulfillment.date,
+      fulfillment.method,
+      JSON.stringify(savedData),
+      estimated,
+      now,
+      now,
+      key
+    ),
+
+    db.prepare(
+      "INSERT OR IGNORE INTO tpj_submission_keys " +
+      "SELECT 'cake_builder',?,?,id,? " +
+      "FROM tpj_requests " +
+      "WHERE source='cake_builder' " +
+      "AND fingerprint=?"
+    ).bind(
+      key,
+      combinedHash,
+      now,
+      fingerprint
+    ),
+
+    db.prepare(
+      "INSERT INTO tpj_request_events " +
+      "(request_id,event_type,details_json,created_at) " +
+
+      "SELECT r.id,'received','{}',? " +
+      "FROM tpj_requests r " +
+
+      "JOIN tpj_submission_keys k " +
+      "ON k.request_id=r.id " +
+
+      "WHERE k.source='cake_builder' " +
+      "AND k.submission_key=? " +
+      "AND k.payload_hash=? " +
+
+      "AND NOT EXISTS (" +
+      "SELECT 1 FROM tpj_request_events e " +
+      "WHERE e.request_id=r.id " +
+      "AND e.event_type='received')"
+    ).bind(
+      now,
+      key,
+      combinedHash
+    ),
+
+    ...files.map(
+      file =>
+        db.prepare(
+          "INSERT OR IGNORE INTO tpj_files " +
+
+          "(id,request_id,role,name,mime_type," +
+          "size_bytes,drive_file_id,private_url,created_at) " +
+
+          "SELECT ?,r.id,?,?,?,?,?,?,? " +
+          "FROM tpj_requests r " +
+
+          "JOIN tpj_submission_keys k " +
+          "ON k.request_id=r.id " +
+
+          "WHERE r.id=? " +
+          "AND k.source='cake_builder' " +
+          "AND k.submission_key=? " +
+          "AND k.payload_hash=?"
+        ).bind(
+          crypto.randomUUID(),
+          file.role,
+          file.name,
+          file.mimeType,
+          file.size,
+          file.driveFileId,
+          file.url,
+          now,
+          id,
+          key,
+          combinedHash
+        )
+    ),
+
+    ...["customer", "owner"].map(
+      recipient =>
+        db.prepare(
+          "INSERT OR IGNORE INTO tpj_notifications " +
+
+          "(id,request_id,event_key,recipient_type," +
+          "payload_json,next_attempt_at,created_at) " +
+
+          "SELECT ?,r.id,'received',?," +
+          "json_set(?,'$.requestId',r.id),?,? " +
+          "FROM tpj_requests r " +
+
+          "JOIN tpj_submission_keys k " +
+          "ON k.request_id=r.id " +
+
+          "WHERE k.source='cake_builder' " +
+          "AND k.submission_key=? " +
+          "AND k.payload_hash=?"
+        ).bind(
+          crypto.randomUUID(),
+          recipient,
+          message,
+          now,
+          now,
+          key,
+          combinedHash
+        )
+    )
+  ]);
+
+  const saved =
+    await db.prepare(
+      "SELECT request_id,payload_hash " +
+      "FROM tpj_submission_keys " +
+      "WHERE source='cake_builder' " +
+      "AND submission_key=?"
+    ).bind(key).first();
+
+  if (
+    !saved ||
+    saved.payload_hash !== combinedHash
+  ) {
+    throw tpjError(
+      "This inquiry reference changed.",
+      409
+    );
+  }
+
+  return tpjJSON({
+    ok: true,
+    id: saved.request_id,
+    duplicate: saved.request_id !== id
+  });
+}
+
+async function tpjCakeReceipt(
+  request,
+  env,
+  url
+) {
+  const key =
+    url.searchParams.get("key") || "";
+
+  const token =
+    (
+      request.headers.get("Authorization") || ""
+    ).replace(/^Bearer /, "");
+
+  if (
+    !/^[A-Za-z0-9_-]{16,128}$/.test(key) ||
+    !/^[a-f0-9]{64}$/.test(token)
+  ) {
+    throw tpjError(
+      "Invalid inquiry receipt."
+    );
+  }
+
+  const row =
+    await env.DB.prepare(
+      "SELECT request_id,payload_hash " +
+      "FROM tpj_submission_keys " +
+      "WHERE source='cake_builder' " +
+      "AND submission_key=?"
+    ).bind(key).first();
+
+  if (
+    row &&
+    row.payload_hash.split(".")[0] ===
+      await tpjHash(token)
+  ) {
+    return tpjJSON({
+      ok: true,
+      id: row.request_id
+    });
+  }
+
+  return tpjJSON(
+    {
+      ok: false,
+      pending: true
+    },
+    202
+  );
+}
