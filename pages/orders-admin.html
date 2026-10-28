@@ -324,6 +324,19 @@ summary { cursor: pointer; font-weight: 750; }
       </label>
 
       <button id="refresh">Refresh</button>
+
+      <button id="squareCheck" type="button">
+        Check Square Sandbox
+      </button>
+
+      <p
+        id="squareStatus"
+        class="notice"
+        role="status"
+        aria-live="polite"
+        style="flex-basis:100%;margin:0"
+        hidden
+      ></p>
     </div>
 
     <p class="muted">
@@ -493,7 +506,9 @@ summary { cursor: pointer; font-weight: 750; }
     $("orders").replaceChildren();
     $("detail").replaceChildren();
     $("search").value = "";
-    $("notice").textContent = "";
+      $("notice").textContent = "";
+    $("squareStatus").textContent = "";
+    $("squareStatus").hidden = true;
     $("loginError").textContent = message;
   }
 
@@ -1061,6 +1076,65 @@ summary { cursor: pointer; font-weight: 750; }
 
   $("logout").onclick = () => lock();
   $("refresh").onclick = () => load();
+    $("squareCheck").onclick = async () => {
+    if (!key) return;
+
+    const session = generation;
+    const button = $("squareCheck");
+    const status = $("squareStatus");
+
+    button.disabled = true;
+
+    status.hidden = false;
+    status.className = "notice";
+    status.textContent = "Checking Square Sandbox…";
+
+    try {
+      const result = await request(
+        "/api/admin/square/status"
+      );
+
+      if (
+        session !== generation ||
+        !key
+      ) return;
+
+      const failed = Object.entries(
+        result.checks || {}
+      )
+        .filter(
+          ([, value]) => value !== true
+        )
+        .map(
+          ([name]) => name
+        );
+
+      status.textContent =
+        result.message +
+        (
+          failed.length
+            ? " Checks marked false: " +
+              failed.join(", ")
+            : ""
+        );
+
+      status.className = result.ok
+        ? "notice"
+        : "notice error";
+
+    } catch (error) {
+      if (
+        session === generation &&
+        key
+      ) {
+        status.textContent = error.message;
+        status.className = "notice error";
+      }
+
+    } finally {
+      button.disabled = false;
+    }
+  };
 
   $("source").onchange = () => {
     offset = 0;
