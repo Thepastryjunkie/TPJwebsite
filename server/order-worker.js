@@ -2552,6 +2552,13 @@ function tpjRecord(row) {
 }
 
 async function tpjRoute(request, env) {
+  if (
+    request.method === "GET" &&
+    new URL(request.url).pathname === "/api/admin/square/status"
+  ) {
+    await tpjAdmin(request, env);
+    return tpjSquareSandboxStatus(env);
+  }
   const url =
     new URL(request.url);
 
@@ -3641,4 +3648,141 @@ async function tpjUpdateInternalRequest(request, env, id) {
     ok: true,
     order: tpjRecord(updated)
   });
+}
+/* TPJ SQUARE SANDBOX CONNECTION CHECK */
+async function tpjSquareSandboxStatus(env) {
+  const checks = {
+    sandboxSelected:
+      String(env.SQUARE_ENVIRONMENT || "")
+        .trim()
+        .toLowerCase() === "sandbox",
+
+    applicationIdConfigured:
+      Boolean(
+        String(env.SQUARE_APPLICATION_ID || "").trim()
+      ),
+
+    accessTokenConfigured:
+      Boolean(
+        String(env.SQUARE_ACCESS_TOKEN || "").trim()
+      ),
+
+    locationIdConfigured:
+      Boolean(
+        String(env.SQUARE_LOCATION_ID || "").trim()
+      ),
+
+    squareReachable: false,
+    tokenAccepted: false,
+    locationFound: false,
+    locationActive: false,
+    locationInUS: false,
+    locationUsesUSD: false,
+    cardProcessingSupported: false
+  };
+
+  const reply = message => tpjJSON({
+    ok: Object.values(checks).every(Boolean),
+    stage: "square-sandbox-connection",
+    paymentsEnabled: false,
+    checks,
+    message
+  });
+
+  if (
+    !checks.sandboxSelected ||
+    !checks.applicationIdConfigured ||
+    !checks.accessTokenConfigured ||
+    !checks.locationIdConfigured
+  ) {
+    return reply(
+      "Check the four Square Sandbox settings in Cloudflare."
+    );
+  }
+
+  const controller = new AbortController();
+
+  const timer = setTimeout(
+    () => controller.abort(),
+    15000
+  );
+
+  try {
+    const response = await fetch(
+      "https://connect.squareupsandbox.com/v2/locations",
+      {
+        method: "GET",
+        redirect: "error",
+
+        headers: {
+          Authorization:
+            "Bearer " +
+            String(env.SQUARE_ACCESS_TOKEN).trim(),
+
+          "Square-Version": "2026-09-16",
+          Accept: "application/json"
+        },
+
+        signal: controller.signal
+      }
+    );
+
+    checks.squareReachable = true;
+
+    if (!response.ok) {
+      return reply(
+        response.status === 401 ||
+        response.status === 403
+          ? "Square did not accept this Sandbox access token. Check its environment and permissions."
+          : "Square returned HTTP " +
+            response.status +
+            ". Try again shortly."
+      );
+    }
+
+    const data = await response.json();
+
+    checks.tokenAccepted = true;
+
+    const location = Array.isArray(data.locations)
+      ? data.locations.find(
+          item =>
+            item.id ===
+            String(env.SQUARE_LOCATION_ID).trim()
+        )
+      : null;
+
+    checks.locationFound = Boolean(location);
+
+    checks.locationActive =
+      location?.status === "ACTIVE";
+
+    checks.locationInUS =
+      location?.country === "US";
+
+    checks.locationUsesUSD =
+      location?.currency === "USD";
+
+    checks.cardProcessingSupported =
+      Array.isArray(location?.capabilities) &&
+      location.capabilities.includes(
+        "CREDIT_CARD_PROCESSING"
+      );
+
+    return reply(
+      Object.values(checks).every(Boolean)
+        ? "Sandbox token and location verified. Application ID is configured; card-entry testing comes next."
+        : "The token connected. Check the location settings marked false."
+    );
+
+  } catch (error) {
+    return reply(
+      error.name === "AbortError"
+        ? "Square's connection check timed out. Try again."
+        : "The Square Sandbox check could not be completed. Try again."
+    );
+
+  } finally {
+    clearTimeout(timer);
+  }
 }
