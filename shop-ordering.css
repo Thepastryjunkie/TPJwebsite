@@ -447,10 +447,21 @@ body:has(.shop-dialog[open]) {
 and (hover: hover)
 and (pointer: fine) {
 
-    .shop-dialog.tpj-tray-dialog {
-        --shop-dialog-width: 1040px;
-        background: #fff8f3;
-    }
+/* Cupcakes, jars and apples */
+.shop-dialog.tpj-tray-dialog {
+    --shop-dialog-width: 840px;
+    background: #fff8f3;
+}
+
+/* Chocolate treat tray and editor */
+.shop-dialog.tpj-tray-dialog[data-tray-kind="treats"] {
+    --shop-dialog-width: 760px;
+}
+
+/* Signature and Half & Half cakes */
+.shop-dialog.tpj-tray-dialog[data-tray-kind="cake"] {
+    --shop-dialog-width: 640px;
+}
 
     .shop-dialog.tpj-tray-dialog .shop-dialog-content {
         padding: 76px 22px 18px;
@@ -465,12 +476,12 @@ and (pointer: fine) {
         margin-left: -12px;
     }
 
-    .tpj-tray-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-    }
+.tpj-tray-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
 
     .tpj-tray-heading p {
         margin: 0 0 5px;
@@ -651,27 +662,83 @@ and (pointer: fine) {
         line-height: 1.45;
     }
 
-    .tpj-tray-picks {
-        display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 8px;
-    }
+.tpj-tray-picks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 calc(
+    (100% - (var(--pick-columns, 5) - 1) * 8px)
+    / var(--pick-columns, 5)
+);
 
-    .tpj-tray-pick {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+min-width: 0;
+}
 
-        padding: 6px 3px;
+/* Explicit columns prevent uneven wrapping. */
+.tpj-tray-picks {
+    display: grid;
 
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-    }
+    grid-template-columns:
+        repeat(var(--pick-columns, 5), minmax(0, 1fr));
 
-    .tpj-tray-pick[draggable="true"] {
-        cursor: grab;
-    }
+    column-gap: 8px;
+    row-gap: 14px;
+}
+
+.tpj-tray-pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+    padding: 6px 3px;
+
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+}
+
+/* Jars: five in each row, plus one beside both rows. */
+.tpj-tray-picks.tpj-jar-picks {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.tpj-jar-picks > .tpj-tray-pick:nth-child(-n+5) {
+    grid-row: 1;
+}
+
+.tpj-jar-picks > .tpj-tray-pick:nth-child(n+6):nth-child(-n+10) {
+    grid-row: 2;
+}
+
+.tpj-jar-picks > .tpj-tray-pick:nth-child(11) {
+    grid-column: 6;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+/* Apples: four above, three centered below. */
+.tpj-tray-picks.tpj-apple-picks {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.tpj-apple-picks > .tpj-tray-pick {
+    grid-column: span 2;
+}
+
+.tpj-apple-picks > .tpj-tray-pick:nth-child(5) {
+    grid-column: 2 / span 2;
+}
+
+.tpj-apple-picks > .tpj-tray-pick:nth-child(6) {
+    grid-column: 4 / span 2;
+}
+
+.tpj-apple-picks > .tpj-tray-pick:nth-child(7) {
+    grid-column: 6 / span 2;
+}
 
     .tpj-tray-pick:hover:not(:disabled) {
         background: #fce4ed;
@@ -696,15 +763,20 @@ and (pointer: fine) {
         min-height: 70px;
     }
 
-    .tpj-treat-layout {
-        display: grid;
+.tpj-treat-layout {
+    display: grid;
 
-        grid-template-columns:
-            minmax(0, 1.6fr) minmax(230px, 1fr);
+    grid-template-columns:
+        minmax(0, 1.5fr) minmax(220px, 1fr);
 
-        align-items: start;
-        gap: 18px;
-    }
+    align-items: start;
+    gap: 14px;
+}
+
+/* Use the full width until a spot is opened for editing. */
+.tpj-treat-layout:not(:has(.tpj-piece-editor)) {
+    display: block;
+}
 
     .tpj-treat-slots .tpj-slot-open {
         min-height: 102px;
@@ -716,9 +788,9 @@ and (pointer: fine) {
         min-height: 60px;
     }
 
-    .tpj-treat-layout .tpj-tray-picks {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+.tpj-treat-layout .tpj-tray-picks {
+    --pick-columns: 4;
+}
 
     .tpj-piece-editor {
         padding: 14px;
@@ -752,23 +824,24 @@ and (pointer: fine) {
         border-color: #bb1c59;
     }
 
-    .tpj-cake-choices {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 24px;
-        margin-top: 20px;
-    }
+.tpj-cake-choices {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+    margin-top: 16px;
+}
 
     .tpj-cake-choices figure {
         margin: 0;
         text-align: center;
     }
 
-    .tpj-cake-choices img {
-        width: 100%;
-        height: 240px;
-        object-fit: contain;
-    }
+.tpj-cake-choices img {
+    width: 100%;
+    height: 190px;
+    object-fit: contain;
+}
 
     .tpj-cake-choices figcaption {
         margin-top: 8px;
@@ -814,6 +887,15 @@ and (pointer: fine) {
         background: #421a12;
         color: #fdade8;
     }
+    .tpj-cake-choices .tpj-tray-sizes {
+    margin-bottom: 14px;
+}
+
+.tpj-tray-dialog .tpj-tray-field select {
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
 }
 
 .shop-product-visual {

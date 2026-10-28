@@ -700,8 +700,14 @@ function cheesecakeDrizzle(position) {
     const path =
         "../images/Shop/Chocolate%20Drip/" + file;
 
+const attachedTop = top && matchMedia(
+    "(min-width: 1200px) and (hover: hover) and (pointer: fine)"
+).matches;
+
 const viewBox = top
-    ? "0 80 2048 530"
+    ? attachedTop
+        ? "28 155 1996 445"
+        : "0 80 2048 530"
     : "27 175 1726 621";
 
     const width = top ? 2048 : 1774;
@@ -1061,6 +1067,11 @@ function renderDesktopTray() {
     host.className = 'tpj-tray-builder';
 
     dialog.classList.add('tpj-tray-dialog');
+    dialog.dataset.trayKind = cake
+    ? 'cake'
+    : treats
+        ? 'treats'
+        : 'pack';
     body.replaceChildren(host);
 
     const copy = value => JSON.parse(JSON.stringify(value));
@@ -1109,9 +1120,9 @@ function renderDesktopTray() {
         }[category]) + ' box'
         : treats
             ? 'Build your treat box'
-            : category === 'half'
-                ? 'Choose your two flavors'
-                : 'Choose your Signature Cake';
+           : category === 'half'
+    ? 'Half & Half Cake'
+    : 'Signature Cake';
 
     $('#shopDialogTitle', dialog).textContent = name;
 
@@ -1169,31 +1180,100 @@ function renderDesktopTray() {
         x.traySlots = slots.slice();
     }
 
-    function art(cat, id) {
-        const src = popupImageFor(cat, id) || imageFor(cat, id);
+function art(cat, id, piece = null) {
+    if (cat === 'chocolate') {
+        const kinds = {
+            pretzel: 'Pretzel',
+            oreo: 'Oreo',
+            strawberry: 'Strawberries',
+            rice: 'Rice-Krispy'
+        };
 
-        if (src) {
+        const featured = {
+            birthday: 'Birthday',
+            biscoff: 'Biscoff',
+            cookies: 'Oreo',
+            strawberry: 'Strawberry'
+        };
+
+        const bases = {
+            white: 'White',
+            milk: 'Milk',
+            dark: 'Dark'
+        };
+
+        const kind = kinds[id];
+
+        if (!kind) {
             return `
-                <img
-                    src="${esc(src)}"
-                    alt=""
-                    loading="lazy"
-                >
+                <span class="tpj-art-fallback">
+                    Choose a treat
+                </span>
             `;
         }
 
-        const fallback = cat === 'half'
-            ? 'Half & Half'
-            : cat === 'cakes'
-                ? M.cakeName(id)
-                : label(id);
+        const base = bases[piece?.base]
+            ? piece.base
+            : 'white';
+
+        const finishedFlavor = base === 'white'
+            ? featured[piece?.topping]
+            : null;
+
+        const variant = finishedFlavor || bases[base];
+
+        const src = encodeURI(
+            '../images/Shop/Chocolate Treats/' +
+            `Chocolate-${variant}-${kind}.png`
+        );
+
+        let note = '';
+
+        if (piece && !piece.base) {
+            note = 'White chocolate preview';
+        } else if (piece?.topping && !finishedFlavor) {
+            note = 'Base preview';
+        }
 
         return `
-            <span class="tpj-art-fallback">
-                ${esc(fallback)}
-            </span>
+            <img
+                src="${esc(src)}"
+                alt=""
+                loading="lazy"
+            >
+
+            ${note ? `
+                <small class="tpj-preview-note">
+                    ${esc(note)}
+                </small>
+            ` : ''}
         `;
     }
+
+    const src = popupImageFor(cat, id) || imageFor(cat, id);
+
+    if (src) {
+        return `
+            <img
+                src="${esc(src)}"
+                alt=""
+                loading="lazy"
+            >
+        `;
+    }
+
+    const fallback = cat === 'half'
+        ? 'Half & Half'
+        : cat === 'cakes'
+            ? M.cakeName(id)
+            : label(id);
+
+    return `
+        <span class="tpj-art-fallback">
+            ${esc(fallback)}
+        </span>
+    `;
+}
 
     function choice(action, value, text, active, disabled = false) {
         return `
@@ -1231,18 +1311,19 @@ function renderDesktopTray() {
     }
 
     function editor() {
-        if (selected === null) {
-            return `
-                <p class="tpj-tray-hint">
-                    Select a spot, or drag a treat type
-                    into an empty spot.
-                </p>
-            `;
-        }
+if (selected === null) {
+    return '';
+}
 
         return `
             <section class="tpj-piece-editor">
                 <h3>Treat #${selected + 1}</h3>
+                <div class="tpj-piece-preview">
+    ${draft.type
+        ? art('chocolate', draft.type, draft)
+        : ''
+    }
+</div>
 
                 <p>
                     Choose all three options,
@@ -1290,7 +1371,25 @@ function renderDesktopTray() {
             </section>
         `;
     }
-
+function sizeButtons() {
+    return `
+        <div
+            class="tpj-tray-sizes"
+            role="group"
+            aria-label="${cake ? 'Cake layers' : 'Pack size'}"
+        >
+            ${Object.keys(prices).map(number =>
+                choice(
+                    'size',
+                    number,
+                    number + (cake ? ' layers' : ''),
+                    Number(cake ? x.layers : x.size) ===
+                        Number(number)
+                )
+            ).join('')}
+        </div>
+    `;
+}
     function draw(focus = '') {
         sync();
 
@@ -1314,14 +1413,13 @@ function renderDesktopTray() {
                     <figure>
                         ${art(category, x.flavor)}
 
-                        <figcaption>
-                            Example appearance; selected options
-                            are listed alongside.
-                        </figcaption>
+<figcaption>Example appearance.</figcaption>
                     </figure>
 
-                    <div>
-                        ${category === 'half'
+<div>
+    ${sizeButtons()}
+
+    ${category === 'half'
                             ? select(
                                 'one',
                                 'Flavor one',
@@ -1424,10 +1522,11 @@ function renderDesktopTray() {
                                         </span>
 
                                         ${filled
-                                            ? art(
-                                                category,
-                                                treats ? item.type : item
-                                            )
+? art(
+    category,
+    treats ? item.type : item,
+    treats ? item : null
+)
                                             : `
                                                 <span class="tpj-slot-plus">
                                                     +
@@ -1480,7 +1579,16 @@ function renderDesktopTray() {
                         }
                     </p>
 
-                    <div class="tpj-tray-picks">
+<div
+    class="tpj-tray-picks ${
+        category === 'jars'
+            ? 'tpj-jar-picks'
+            : category === 'apples'
+                ? 'tpj-apple-picks'
+                : ''
+    }"
+    style="--pick-columns:${treats ? 4 : 5}"
+>
                         ${ids.map(id => `
                             <button
                                 type="button"
@@ -1535,28 +1643,14 @@ function renderDesktopTray() {
         }
 
         host.innerHTML = `
-            <header class="tpj-tray-heading">
-                <div>
-                    <p>THE PASTRY JUNKIE</p>
-                    <h2>${esc(name)}</h2>
-                </div>
+<header class="tpj-tray-heading">
+    <div>
+        <p>THE PASTRY JUNKIE</p>
+        <h2>${esc(name)}</h2>
+    </div>
 
-                <div
-                    class="tpj-tray-sizes"
-                    role="group"
-                    aria-label="${cake ? 'Cake layers' : 'Pack size'}"
-                >
-                    ${Object.keys(prices).map(number =>
-                        choice(
-                            'size',
-                            number,
-                            number + (cake ? ' layers' : ''),
-                            Number(cake ? x.layers : x.size) ===
-                                Number(number)
-                        )
-                    ).join('')}
-                </div>
-            </header>
+    ${cake ? '' : sizeButtons()}
+</header>
 
             <p
                 class="tpj-tray-message"
@@ -1806,10 +1900,19 @@ function renderDesktopTray() {
 
         if (!field) return;
 
-        if (treats) {
-            draft[field] = event.target.value;
-            return;
-        }
+if (treats) {
+    draft[field] = event.target.value;
+
+    const preview = $('.tpj-piece-preview', host);
+
+    if (preview) {
+        preview.innerHTML = draft.type
+            ? art('chocolate', draft.type, draft)
+            : '';
+    }
+
+    return;
+}
 
         x[field] = event.target.value;
 
@@ -2994,9 +3097,9 @@ function updateProductTotal() {
 
                 0
             ) +
-            " of " +
-            x.size +
-            " selected";
+" of " +
+(x.size || "—") +
+" selected";
     }
 
     const halfSummary = $(
