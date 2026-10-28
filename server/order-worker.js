@@ -3712,7 +3712,7 @@ async function tpjSquareSandboxStatus(env) {
       "https://connect.squareupsandbox.com/v2/locations",
       {
         method: "GET",
-        redirect: "error",
+        redirect: "manual",
 
         headers: {
           Authorization:
