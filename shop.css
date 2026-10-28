@@ -50,14 +50,14 @@ and (pointer: fine) {
 
 /* Cupcakes: five across, two rows */
 body.shop-page .cupcake-section {
+    --shop-cupcake-image-max: min(510px, 94%);
     --shop-menu-max: 2500px;
     --shop-menu-tracks: 10;
 
     --shop-cupcake-tenth: span 2;
     --shop-cupcake-last: span 2;
 
-    --shop-cupcake-heading-size:
-        clamp(5.6rem, 10vw, 11rem);
+
 }
 
 
@@ -103,7 +103,7 @@ body.shop-page .cupcake-section {
         --shop-signature-card-column: auto;
         --shop-signature-banana-column: auto;
         --shop-signature-half-column: auto;
-        --shop-signature-row-gap: 60px;
+        --shop-signature-row-gap: 40px;
     }
         /* Chocolate treats: four across */
     body.shop-page .chocolate-collection {
@@ -111,12 +111,22 @@ body.shop-page .cupcake-section {
         --shop-chocolate-max: 2500px;
         --shop-chocolate-gap: 40px;
         --shop-chocolate-image-height: 460px;
-        --shop-chocolate-padding: 80px 0 90px;
-        --shop-chocolate-heading-gap: 40px;
+--shop-chocolate-padding: 60px 0 60px;
+--shop-chocolate-heading-gap: 25px;
 
         --shop-title-height: 2.5em;
         --shop-title-side: auto;
         --shop-copy-height: 2.9em;
+    }
+        /* Compact desktop section spacing */
+    body.shop-page .cupcake-section,
+    body.shop-page .jar-section,
+    body.shop-page .apple-section,
+    body.shop-page .signature-cake-section {
+        --shop-section-padding: 60px 0 60px;
+        --shop-section-top-padding: 60px;
+        --shop-product-row-gap: 40px;
+        --shop-heading-bottom-gap: 35px;
     }
 }
 
@@ -154,7 +164,7 @@ body.shop-page .cupcake-section {
 
     margin: 0 auto;
 
-    padding: 120px 0 130px;
+    padding: var(--shop-section-padding, 120px 0 130px);
 }
 
 
@@ -359,7 +369,8 @@ body.shop-page .cupcake-section {
             minmax(0, 1fr)
         );
 
-    gap: 85px 55px;
+    row-gap: var(--shop-product-row-gap, 85px);
+column-gap: 55px;
     margin-top: 45px;
 }
 
@@ -429,7 +440,7 @@ body.shop-page .cupcake-section {
     width: auto;
     height: auto;
 
-    max-width: 470px;
+    max-width: var(--shop-cupcake-image-max, 470px);
     max-height: 580px;
 
     object-fit: contain;
@@ -520,7 +531,7 @@ body.shop-page .cupcake-section {
     }
 
     .dessert-product-image {
-        max-width: 510px;
+        max-width: var(--shop-cupcake-image-max, 510px);
         max-height: 620px;
     }
 
@@ -832,9 +843,8 @@ body.shop-page .cupcake-section {
 ========================================================= */
 
 .jar-section-inner {
-    padding-top: 105px;
+    padding-top: var(--shop-section-top-padding, 105px);
 }
-
 
 /* =========================================================
    CENTERED JAR HEADING
@@ -1060,7 +1070,8 @@ body.shop-page .cupcake-section {
             minmax(0, 1fr)
         );
 
-    gap: 85px 55px;
+    row-gap: var(--shop-product-row-gap, 85px);
+column-gap: 55px;
     margin-top: 10px;
 }
 
@@ -1418,9 +1429,8 @@ body.shop-page .cupcake-section {
 ========================================================= */
 
 .apple-section-inner {
-    padding-top: 105px;
+    padding-top: var(--shop-section-top-padding, 105px);
 }
-
 
 /* =========================================================
    APPLE SECTION HEADING
@@ -1601,7 +1611,8 @@ body.shop-page .cupcake-section {
             minmax(0, 1fr)
         );
 
-    gap: 85px 55px;
+    row-gap: var(--shop-product-row-gap, 85px);
+column-gap: 55px;
     margin-top: 10px;
 }
 
@@ -1964,9 +1975,8 @@ body.shop-page .cupcake-section {
         );
 }
 
-
 .signature-cake-section-inner {
-    padding-top: 110px;
+    padding-top: var(--shop-section-top-padding, 110px);
 }
 
 /* Corner artwork stays hidden on mobile for now. */
@@ -2010,9 +2020,9 @@ body.shop-page .cupcake-section {
     max-width: 950px;
     min-height: auto;
 
-    margin:
-        0 auto
-        80px;
+margin:
+    0 auto
+    var(--shop-heading-bottom-gap, 80px);
 
     text-align: center;
 }
@@ -2033,7 +2043,15 @@ body.shop-page .cupcake-section {
 
     line-height: 0.88;
 }
-
+/* Transparent lettering artwork */
+.shop-phrase-art {
+    display: inline-block;
+    width: auto;
+    height: 1.4em;
+    max-width: 100%;
+    object-fit: contain;
+    vertical-align: middle;
+}
 
 .signature-cake-tagline {
     margin:
@@ -2048,9 +2066,9 @@ body.shop-page .cupcake-section {
             2.8rem
         );
 
-    font-weight: 800;
-
-    font-style: italic;
+font-family: "Chewy", cursive;
+font-weight: 400;
+font-style: normal;
 }
 
 
@@ -3709,21 +3727,33 @@ body.shop-page .tpj-banner-title span {
 }
 
 body.shop-page .tpj-banner-description {
-  width: 90%;
-  max-width: 460px;
-  margin: 1.25cqw auto 0;
-  font-size: clamp(11px, 1.05cqw, 19px);
-  line-height: 1.6;
-  color: #542e26;
+    width: 90%;
+    max-width: 460px;
+    margin: 1.25cqw auto 0;
+    font-size: clamp(11px, 1.05cqw, 19px);
+    line-height: 1.6;
+    color: #542e26;
+}
+
+@media (min-width: 1200px)
+and (hover: hover)
+and (pointer: fine) {
+    body.shop-page .tpj-banner-description {
+        width: 80%;
+        max-width: 420px;
+        font-size: 9px;
+        line-height: 1.45;
+    }
 }
 
 body.shop-page .tpj-banner-handwriting {
-  margin: 0.8cqw 0 0;
-  font-family: "Caveat", cursive;
-  font-size: clamp(22px, 2.3cqw, 44px);
-  font-weight: 700;
-  line-height: 1.15;
-  color: #d71969;
+    margin: 0.8cqw 0 0;
+    font-family: "Chewy", cursive;
+    font-size: clamp(22px, 2.3cqw, 44px);
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.15;
+    color: #d71969;
 }
 
 /* Matches the existing desktop main zoom */
@@ -3832,11 +3862,7 @@ body.shop-page .tpj-banner-handwriting {
     }
 }
 
-@media (min-width: 1200px) {
-    body.shop-page .cupcake-section .dessert-section-intro {
-        margin-top: 420px;
-    }
-}
+
 /* Chocolate outline around the light-pink display lettering */
 body.shop-page .dessert-section-title span,
 body.shop-page .apple-section-title span,
@@ -3946,14 +3972,7 @@ body.shop-page .signature-cake-tagline {
         -webkit-text-stroke-width: 2px;
     }
 }
-@media (min-width: 1101px) {
-    body.shop-page .cupcake-section .dessert-section-title {
-        font-size: var(
-            --shop-cupcake-heading-size,
-            clamp(4.8rem, 8.4vw, 9.24rem)
-        );
-    }
-}
+
 @media (min-width: 1101px) {
     body.shop-page .cupcake-section
     .dessert-product-grid > .dessert-product:first-child h3,
@@ -3981,7 +4000,10 @@ body.shop-page .jar-product:hover .jar-product-image {
         0 12px 10px rgba(77, 41, 32, 0.16)
     );
 }
-/* Match all dessert section heading sizes on desktop */
+/* The added menu introduction does not occupy mobile space. */
+
+
+/* Shared heading size for larger screens */
 @media (min-width: 1101px) {
     body.shop-page .dessert-section-title,
     body.shop-page .jar-section-title,
@@ -3989,6 +4011,77 @@ body.shop-page .jar-product:hover .jar-product-image {
     body.shop-page .signature-cake-title,
     body.shop-page .chocolate-collection-title {
         font-size: clamp(4.8rem, 8.4vw, 9.24rem);
+    }
+}
+
+/* Desktop menu introduction and category headings */
+@media (min-width: 1200px)
+and (hover: hover)
+and (pointer: fine) {
+
+    /* Introduction on the left, beneath the top drip */
+
+
+    /* Pick Your Poison already appears in the introduction. */
+    body.shop-page .cupcake-section
+    .dessert-section-intro > .dessert-section-kicker {
+        display: none;
+    }
+
+    /* Remove reserved empty height from category introductions. */
+    body.shop-page .cupcake-section .dessert-section-intro,
+    body.shop-page .jar-section .jar-section-intro,
+    body.shop-page .apple-section .apple-section-intro,
+    body.shop-page .signature-cake-section .signature-cake-intro,
+    body.shop-page .chocolate-collection .chocolate-collection-intro {
+        width: 100%;
+        max-width: 100%;
+        min-height: 0;
+        margin: 0 auto 35px;
+        padding: 0;
+
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+    }
+
+    /* Shift the cupcake heading left to balance the corner artwork. */
+body.shop-page .cupcake-section .dessert-section-intro {
+    width: 84%;
+    margin: 440px auto 35px 0;
+}
+
+    /* Category names run across one line on desktop. */
+    body.shop-page .cupcake-section .dessert-section-title,
+    body.shop-page .jar-section .jar-section-title,
+    body.shop-page .apple-section .apple-section-title,
+    body.shop-page .signature-cake-section .signature-cake-title,
+    body.shop-page .chocolate-collection .chocolate-collection-title {
+        max-width: 100%;
+        margin: 0;
+
+        font-size: clamp(4.8rem, 8.4vw, 9.24rem);
+        line-height: 1.05;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    body.shop-page .dessert-section-title span,
+    body.shop-page .chocolate-collection-title span {
+        display: inline;
+        margin: 0;
+    }
+
+    /* Descriptions sit directly below their category names. */
+    body.shop-page .cupcake-section .dessert-section-description,
+    body.shop-page .jar-section .jar-section-description,
+    body.shop-page .apple-section .apple-section-description,
+    body.shop-page .signature-cake-section .signature-cake-description,
+    body.shop-page .chocolate-collection .chocolate-collection-description {
+        width: auto;
+        max-width: 100%;
+        margin: 22px auto 0;
+        text-align: center;
     }
 }
 /* =====================================================

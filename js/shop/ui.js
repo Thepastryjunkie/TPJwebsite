@@ -261,7 +261,10 @@ dialog.setAttribute(
 document.body.append(dialog);
 
 function openDialog(title, content) {
-        dialog.classList.remove("shop-product-dialog");
+        dialog.classList.remove(
+    "shop-product-dialog",
+    "tpj-tray-dialog"
+);
     if (!dialog.open) {
         returnFocus =
             document.activeElement;
@@ -697,9 +700,9 @@ function cheesecakeDrizzle(position) {
     const path =
         "../images/Shop/Chocolate%20Drip/" + file;
 
-    const viewBox = top
-        ? "28 175 1993 404"
-        : "27 175 1726 621";
+const viewBox = top
+    ? "0 80 2048 530"
+    : "27 175 1726 621";
 
     const width = top ? 2048 : 1774;
     const height = top ? 682 : 887;
@@ -1031,6 +1034,873 @@ function customerDetails(item) {
             !detail.includes("% box discount:")
     );
 }
+function renderDesktopTray() {
+    if (!matchMedia(
+        '(min-width: 1200px) and (hover: hover) and (pointer: fine)'
+    ).matches) return false;
+
+    const x = config;
+    const category = x.category;
+
+    const pack = [
+        'cupcakes', 'jars', 'apples'
+    ].includes(category);
+
+    const treats = category === 'chocolate';
+    const cake = category === 'cakes' || category === 'half';
+
+    if (!pack && !treats && !cake) return false;
+
+    const body = $('.shop-dialog-content', dialog);
+    const about = $('.shop-about', body);
+    const add = $('#shopAdd', body);
+    const error = $('#shopConfigError', body);
+    const drip = $('.shop-drizzle-top', body);
+
+    const host = document.createElement('div');
+    host.className = 'tpj-tray-builder';
+
+    dialog.classList.add('tpj-tray-dialog');
+    body.replaceChildren(host);
+
+    const copy = value => JSON.parse(JSON.stringify(value));
+
+    const blank = () => ({
+        type: '',
+        base: '',
+        topping: ''
+    });
+
+    const complete = piece => Boolean(
+        piece &&
+        C.chocolate.treats[piece.type] &&
+        C.chocolate.bases[piece.base] &&
+        C.chocolate.toppings[piece.topping]
+    );
+
+    const enabled = key => M.enabled(availability, key);
+
+    const allowed = id => treats
+        ? enabled('category:chocolate') &&
+          enabled('treat:' + id)
+        : M.available(category, id, availability);
+
+    const label = id => treats
+        ? C.chocolate.treats[id]?.name || ''
+        : C.flavors[id] || '';
+
+    const ids = treats
+        ? Object.keys(C.chocolate.treats)
+        : C.categories[
+            category === 'half' ? 'cakes' : category
+        ].flavors;
+
+    const prices = treats
+        ? C.chocolate.discounts
+        : category === 'half'
+            ? C.half.prices
+            : C.categories[category].prices;
+
+    const name = pack
+        ? 'Build your ' + ({
+            cupcakes: 'cupcake',
+            jars: 'jar',
+            apples: 'apple'
+        }[category]) + ' box'
+        : treats
+            ? 'Build your treat box'
+            : category === 'half'
+                ? 'Choose your two flavors'
+                : 'Choose your Signature Cake';
+
+    $('#shopDialogTitle', dialog).textContent = name;
+
+    let selected = null;
+    let draft = null;
+    let message = '';
+    let slots = [];
+
+    if (pack) {
+        const counts = {};
+        const saved = x.traySlots;
+
+        if (Array.isArray(saved)) {
+            saved.filter(Boolean).forEach(id => {
+                counts[id] = (counts[id] || 0) + 1;
+            });
+        }
+
+        const same = (
+            Array.isArray(saved) &&
+            saved.length === Number(x.size) &&
+            saved.every(id => id === null || ids.includes(id)) &&
+            ids.every(id =>
+                (counts[id] || 0) === Number(x.mix?.[id] || 0)
+            )
+        );
+
+        slots = same
+            ? saved.slice()
+            : ids.flatMap(id =>
+                Array(Number(x.mix?.[id] || 0)).fill(id)
+            );
+
+        while (slots.length < Number(x.size || 0)) {
+            slots.push(null);
+        }
+
+        x.mixing = true;
+    }
+
+    if (treats) {
+        x.pieces = x.pieces || [];
+        x.mixing = true;
+    }
+
+    function sync() {
+        if (!pack) return;
+
+        x.mix = {};
+
+        slots.filter(Boolean).forEach(id => {
+            x.mix[id] = (x.mix[id] || 0) + 1;
+        });
+
+        x.traySlots = slots.slice();
+    }
+
+    function art(cat, id) {
+        const src = popupImageFor(cat, id) || imageFor(cat, id);
+
+        if (src) {
+            return `
+                <img
+                    src="${esc(src)}"
+                    alt=""
+                    loading="lazy"
+                >
+            `;
+        }
+
+        const fallback = cat === 'half'
+            ? 'Half & Half'
+            : cat === 'cakes'
+                ? M.cakeName(id)
+                : label(id);
+
+        return `
+            <span class="tpj-art-fallback">
+                ${esc(fallback)}
+            </span>
+        `;
+    }
+
+    function choice(action, value, text, active, disabled = false) {
+        return `
+            <button
+                type="button"
+                data-action="${action}"
+                data-value="${esc(value)}"
+                aria-pressed="${Boolean(active)}"
+                ${disabled ? 'disabled' : ''}
+            >${esc(text)}</button>
+        `;
+    }
+
+    function select(field, title, entries, value, unavailable) {
+        return `
+            <label class="tpj-tray-field">
+                ${esc(title)}
+
+                <select data-field="${field}">
+                    <option value="">Choose…</option>
+
+                    ${entries.map(([id, text]) => `
+                        <option
+                            value="${esc(id)}"
+                            ${id === value ? 'selected' : ''}
+                            ${unavailable(id) ? 'disabled' : ''}
+                        >
+                            ${esc(text)}
+                            ${unavailable(id) ? ' — Unavailable' : ''}
+                        </option>
+                    `).join('')}
+                </select>
+            </label>
+        `;
+    }
+
+    function editor() {
+        if (selected === null) {
+            return `
+                <p class="tpj-tray-hint">
+                    Select a spot, or drag a treat type
+                    into an empty spot.
+                </p>
+            `;
+        }
+
+        return `
+            <section class="tpj-piece-editor">
+                <h3>Treat #${selected + 1}</h3>
+
+                <p>
+                    Choose all three options,
+                    then save this spot.
+                </p>
+
+                ${select(
+                    'type',
+                    'Treat type',
+                    Object.entries(C.chocolate.treats).map(
+                        ([id, item]) => [id, item.name]
+                    ),
+                    draft.type,
+                    id => !allowed(id)
+                )}
+
+                ${select(
+                    'base',
+                    'Chocolate',
+                    Object.entries(C.chocolate.bases),
+                    draft.base,
+                    id => !enabled('base:' + id)
+                )}
+
+                ${select(
+                    'topping',
+                    'Topping',
+                    Object.entries(C.chocolate.toppings),
+                    draft.topping,
+                    id =>
+                        !enabled('topping:' + id) ||
+                        !enabled('flavor:' + id)
+                )}
+
+                <button
+                    class="tpj-tray-save"
+                    type="button"
+                    data-action="save"
+                >Save this spot</button>
+
+                <button
+                    type="button"
+                    data-action="cancel"
+                >Cancel editing</button>
+            </section>
+        `;
+    }
+
+    function draw(focus = '') {
+        sync();
+
+        const items = treats ? x.pieces : slots;
+
+        const count = pack
+            ? slots.filter(Boolean).length
+            : treats
+                ? x.pieces.filter(complete).length
+                : 0;
+
+        let main = '';
+
+        if (cake) {
+            const options = C.categories.cakes.flavors.map(
+                id => [id, M.cakeName(id)]
+            );
+
+            main = `
+                <div class="tpj-cake-choices">
+                    <figure>
+                        ${art(category, x.flavor)}
+
+                        <figcaption>
+                            Example appearance; selected options
+                            are listed alongside.
+                        </figcaption>
+                    </figure>
+
+                    <div>
+                        ${category === 'half'
+                            ? select(
+                                'one',
+                                'Flavor one',
+                                options,
+                                x.one,
+                                id => !M.available(
+                                    'cakes', id, availability
+                                )
+                            ) + select(
+                                'two',
+                                'Flavor two',
+                                options,
+                                x.two,
+                                id =>
+                                    id === x.one ||
+                                    !M.available(
+                                        'cakes', id, availability
+                                    )
+                            )
+                            : select(
+                                'flavor',
+                                'Cake flavor',
+                                options,
+                                x.flavor,
+                                id => !M.available(
+                                    'cakes', id, availability
+                                )
+                            )
+                        }
+
+                        <p class="tpj-tray-hint">
+                            6-inch round.
+                            ${category === 'half'
+                                ? 'Every layer is split evenly between two different flavors.'
+                                : 'Flavor-matched Signature design.'
+                            }
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+            const columns = treats
+                ? x.size === 6 ? 3 : 4
+                : x.size;
+
+            const tray = !x.size
+                ? `
+                    <p class="tpj-tray-hint">
+                        Choose a pack size to open your tray.
+                    </p>
+                `
+                : `
+                    <div
+                        class="tpj-tray-slots ${
+                            treats ? 'tpj-treat-slots' : ''
+                        }"
+                        style="--tray-columns:${columns}"
+                    >
+                        ${items.map((item, index) => {
+                            const filled = treats
+                                ? complete(item)
+                                : Boolean(item);
+
+                            const title = filled
+                                ? treats
+                                    ? [
+                                        label(item.type),
+                                        C.chocolate.bases[item.base],
+                                        C.chocolate.toppings[item.topping]
+                                    ].join(' · ')
+                                    : label(item)
+                                : 'Choose a flavor';
+
+                            return `
+                                <div
+                                    class="tpj-tray-slot ${
+                                        selected === index
+                                            ? 'is-active'
+                                            : ''
+                                    }"
+                                    data-slot="${index}"
+                                >
+                                    <button
+                                        class="tpj-slot-open"
+                                        type="button"
+                                        data-action="slot"
+                                        data-value="${index}"
+                                        aria-label="Spot ${index + 1}: ${
+                                            esc(
+                                                filled
+                                                    ? title
+                                                    : treats
+                                                        ? 'Choose a treat'
+                                                        : title
+                                            )
+                                        }"
+                                    >
+                                        <span class="tpj-slot-number">
+                                            ${index + 1}
+                                        </span>
+
+                                        ${filled
+                                            ? art(
+                                                category,
+                                                treats ? item.type : item
+                                            )
+                                            : `
+                                                <span class="tpj-slot-plus">
+                                                    +
+                                                </span>
+                                            `
+                                        }
+
+                                        <span>
+                                            ${esc(
+                                                filled
+                                                    ? title
+                                                    : treats
+                                                        ? 'Choose a treat'
+                                                        : title
+                                            )}
+                                        </span>
+                                    </button>
+
+                                    ${filled ? `
+                                        <button
+                                            class="tpj-slot-remove"
+                                            type="button"
+                                            data-action="remove"
+                                            data-value="${index}"
+                                            aria-label="Remove ${
+                                                esc(title)
+                                            } from spot ${index + 1}"
+                                        >×</button>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+            const palette = `
+                <section class="tpj-tray-palette">
+                    <h3>
+                        ${treats
+                            ? 'Choose a treat type'
+                            : 'Click or drag a flavor'
+                        }
+                    </h3>
+
+                    <p>
+                        Repeats are welcome.
+                        ${treats
+                            ? 'Images represent treat types; labels show your exact choices.'
+                            : 'Click a filled spot to choose its replacement.'
+                        }
+                    </p>
+
+                    <div class="tpj-tray-picks">
+                        ${ids.map(id => `
+                            <button
+                                type="button"
+                                class="tpj-tray-pick"
+                                draggable="${
+                                    Boolean(x.size && allowed(id))
+                                }"
+                                data-action="pick"
+                                data-value="${id}"
+                                ${!x.size || !allowed(id)
+                                    ? 'disabled'
+                                    : ''
+                                }
+                            >
+                                ${art(category, id)}
+
+                                <span>
+                                    ${esc(label(id))}
+                                    ${allowed(id)
+                                        ? ''
+                                        : ' — Unavailable'
+                                    }
+                                </span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+
+            main = `
+                <p
+                    class="tpj-tray-count"
+                    id="${
+                        treats
+                            ? 'shopChocolateCount'
+                            : 'shopPackCount'
+                    }"
+                    aria-live="polite"
+                >
+                    ${count} of ${x.size || '—'} selected
+                </p>
+
+                <div class="${
+                    treats
+                        ? 'tpj-treat-layout'
+                        : 'tpj-pack-layout'
+                }">
+                    <div>${tray}${palette}</div>
+                    ${treats ? editor() : ''}
+                </div>
+            `;
+        }
+
+        host.innerHTML = `
+            <header class="tpj-tray-heading">
+                <div>
+                    <p>THE PASTRY JUNKIE</p>
+                    <h2>${esc(name)}</h2>
+                </div>
+
+                <div
+                    class="tpj-tray-sizes"
+                    role="group"
+                    aria-label="${cake ? 'Cake layers' : 'Pack size'}"
+                >
+                    ${Object.keys(prices).map(number =>
+                        choice(
+                            'size',
+                            number,
+                            number + (cake ? ' layers' : ''),
+                            Number(cake ? x.layers : x.size) ===
+                                Number(number)
+                        )
+                    ).join('')}
+                </div>
+            </header>
+
+            <p
+                class="tpj-tray-message"
+                role="status"
+                aria-live="polite"
+            >${esc(message)}</p>
+
+            ${main}
+
+            <div class="tpj-tray-about"></div>
+
+            <footer class="tpj-tray-footer">
+                <div class="tpj-tray-errors"></div>
+                <div class="tpj-tray-add"></div>
+            </footer>
+        `;
+
+        if (drip) host.prepend(drip);
+        if (about) $('.tpj-tray-about', host).append(about);
+
+        $('.tpj-tray-errors', host).append(error);
+        $('.tpj-tray-add', host).append(add);
+
+        add.className = 'shop-button tpj-tray-add-button';
+
+        add.innerHTML = `
+            ${editing ? 'Save Changes' : 'Add to Cart'} ·
+            <span id="shopLivePrice"></span>
+        `;
+
+        updateProductTotal();
+
+        if (treats && selected !== null) {
+            add.disabled = true;
+            error.textContent =
+                'Save or cancel the open treat before adding your box.';
+        }
+
+        if (focus) {
+            const target = [
+                ...host.querySelectorAll(
+                    '[data-action], [data-field]'
+                )
+            ].find(element =>
+                `${
+                    element.dataset.action || 'field'
+                }:${
+                    element.dataset.value ||
+                    element.dataset.field ||
+                    ''
+                }` === focus
+            );
+
+            (
+                target ||
+                host.querySelector(
+                    '[data-action="slot"], [data-action="size"]'
+                )
+            )?.focus({ preventScroll: true });
+        }
+    }
+
+    function editSpot(index, type) {
+        if (
+            selected !== null &&
+            selected !== index &&
+            JSON.stringify(draft) !==
+                JSON.stringify(x.pieces[selected])
+        ) {
+            message =
+                'Save or cancel your current treat before opening another spot.';
+
+            draw('save:');
+            return;
+        }
+
+        selected = index;
+        draft = copy(x.pieces[index] || blank());
+
+        if (type) draft.type = type;
+
+        draw(treats ? 'field:type' : '');
+    }
+
+    function pick(id, target = null) {
+        if (
+            !x.size ||
+            !ids.includes(id) ||
+            !allowed(id)
+        ) return;
+
+        const items = treats ? x.pieces : slots;
+
+        const index = target ??
+            selected ??
+            items.findIndex(item =>
+                treats ? !complete(item) : !item
+            );
+
+        if (index < 0 || index >= Number(x.size)) {
+            message =
+                'Your box is full. Remove an item or select a spot to edit.';
+
+            draw('pick:' + id);
+            return;
+        }
+
+        if (treats) return editSpot(index, id);
+
+        slots[index] = id;
+        selected = null;
+
+        message =
+            label(id) + ' added to spot ' + (index + 1) + '.';
+
+        draw('pick:' + id);
+    }
+
+    host.onclick = event => {
+        const button = event.target.closest('[data-action]');
+
+        if (!button || button.disabled) return;
+
+        const action = button.dataset.action;
+        const value = button.dataset.value;
+
+        message = '';
+
+        if (action === 'size') {
+            const number = Number(value);
+
+            if (cake) {
+                x.layers = number;
+            } else if (number !== Number(x.size)) {
+                if (
+                    treats &&
+                    selected !== null &&
+                    JSON.stringify(draft) !==
+                        JSON.stringify(x.pieces[selected])
+                ) {
+                    message =
+                        'Save or cancel the open treat before changing pack size.';
+
+                    draw('save:');
+                    return;
+                }
+
+                const kept = (
+                    treats ? x.pieces : slots
+                ).filter(item =>
+                    treats
+                        ? Boolean(
+                            item.type ||
+                            item.base ||
+                            item.topping
+                        )
+                        : Boolean(item)
+                );
+
+                if (kept.length > number) {
+                    message =
+                        'Remove ' +
+                        (kept.length - number) +
+                        ' item(s) before choosing this smaller pack.';
+
+                    draw('size:' + value);
+                    return;
+                }
+
+                x.size = number;
+
+                if (treats) {
+                    x.pieces = Array.from(
+                        { length: number },
+                        (_, index) => kept[index] || blank()
+                    );
+                } else {
+                    slots = Array.from(
+                        { length: number },
+                        (_, index) => kept[index] || null
+                    );
+                }
+
+                selected = null;
+                draft = null;
+            }
+        } else if (action === 'pick') {
+            return pick(value);
+        } else if (action === 'slot') {
+            if (treats) return editSpot(Number(value));
+
+            selected = Number(value);
+
+            message =
+                'Choose a flavor for spot ' +
+                (selected + 1) +
+                '.';
+        } else if (action === 'remove') {
+            if (treats) {
+                x.pieces[Number(value)] = blank();
+            } else {
+                slots[Number(value)] = null;
+            }
+
+            selected = null;
+            draft = null;
+
+            message =
+                'Spot ' + (Number(value) + 1) + ' cleared.';
+        } else if (action === 'cancel') {
+            selected = null;
+            draft = null;
+        } else if (action === 'save') {
+            if (
+                !complete(draft) ||
+                !allowed(draft.type) ||
+                !enabled('base:' + draft.base) ||
+                !enabled('topping:' + draft.topping) ||
+                !enabled('flavor:' + draft.topping)
+            ) {
+                message =
+                    'Choose an available treat type, chocolate, and topping.';
+
+                draw('field:type');
+                return;
+            }
+
+            x.pieces[selected] = copy(draft);
+
+            message =
+                'Treat #' + (selected + 1) + ' saved.';
+
+            selected = null;
+            draft = null;
+        }
+
+        draw(action + ':' + (value || ''));
+
+        if (action === 'slot' && pack) {
+            $('.tpj-tray-pick:not(:disabled)', host)
+                ?.focus({ preventScroll: true });
+        }
+    };
+
+    host.onchange = event => {
+        const field = event.target.dataset.field;
+
+        if (!field) return;
+
+        if (treats) {
+            draft[field] = event.target.value;
+            return;
+        }
+
+        x[field] = event.target.value;
+
+        if (field === 'one' && x.one === x.two) {
+            x.two = '';
+        }
+
+        draw('field:' + field);
+    };
+
+    host.ondragstart = event => {
+        const item = event.target.closest('.tpj-tray-pick');
+
+        if (!item || item.disabled) {
+            event.preventDefault();
+            return;
+        }
+
+        event.dataTransfer.setData(
+            'application/x-tpj-dessert',
+            category + ':' + item.dataset.value
+        );
+
+        event.dataTransfer.effectAllowed = 'copy';
+    };
+
+    host.ondragover = event => {
+        const slot = event.target.closest('[data-slot]');
+
+        if (
+            slot &&
+            [...event.dataTransfer.types].includes(
+                'application/x-tpj-dessert'
+            )
+        ) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+        }
+    };
+
+    host.ondrop = event => {
+        const slot = event.target.closest('[data-slot]');
+
+        if (!slot) return;
+
+        event.preventDefault();
+
+        const [cat, id] = event.dataTransfer.getData(
+            'application/x-tpj-dessert'
+        ).split(':');
+
+        if (cat !== category || !ids.includes(id)) return;
+
+        const index = Number(slot.dataset.slot);
+
+        const filled = treats
+            ? complete(x.pieces[index])
+            : Boolean(slots[index]);
+
+        if (filled) {
+            message =
+                'That spot is filled. Click it to edit, or remove its item first.';
+
+            draw('slot:' + index);
+            return;
+        }
+
+        pick(id, index);
+    };
+
+    host.addEventListener('error', event => {
+        if (event.target.tagName === 'IMG') {
+            event.target.hidden = true;
+        }
+    }, true);
+
+    draw();
+    return true;
+}
+
+matchMedia(
+    '(min-width: 1200px) and (hover: hover) and (pointer: fine)'
+).addEventListener('change', () => {
+    if (
+        config &&
+        dialog.open &&
+        dialog.classList.contains('shop-product-dialog')
+    ) {
+        renderProduct();
+    }
+});
 function renderProduct() {
     const x = config;
     const category = x.category;
@@ -1431,7 +2301,9 @@ function renderProduct() {
         }
     };
 
-    updateProductTotal();
+    if (renderDesktopTray()) return;
+
+updateProductTotal();
 }
 
 
