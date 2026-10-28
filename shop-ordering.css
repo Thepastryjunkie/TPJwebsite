@@ -442,25 +442,26 @@ body:has(.shop-dialog[open]) {
     gap: 18px;
 }
 
-/* Desktop visual dessert trays */
+/* Desktop-only popup widths. */
 @media (min-width: 1200px)
 and (hover: hover)
 and (pointer: fine) {
+    .shop-dialog.tpj-tray-dialog {
+        --shop-dialog-width: 840px;
+    }
 
-/* Cupcakes, jars and apples */
+    .shop-dialog.tpj-tray-dialog[data-tray-kind="treats"] {
+        --shop-dialog-width: 760px;
+    }
+
+    .shop-dialog.tpj-tray-dialog[data-tray-kind="cake"] {
+        --shop-dialog-width: 640px;
+    }
+}
+
+/* Shared visual dessert trays. */
 .shop-dialog.tpj-tray-dialog {
-    --shop-dialog-width: 840px;
     background: #fff8f3;
-}
-
-/* Chocolate treat tray and editor */
-.shop-dialog.tpj-tray-dialog[data-tray-kind="treats"] {
-    --shop-dialog-width: 760px;
-}
-
-/* Signature and Half & Half cakes */
-.shop-dialog.tpj-tray-dialog[data-tray-kind="cake"] {
-    --shop-dialog-width: 640px;
 }
 
     .shop-dialog.tpj-tray-dialog .shop-dialog-content {
@@ -895,7 +896,6 @@ min-width: 0;
     min-height: 40px;
     padding: 8px 10px;
     font-size: 14px;
-}
 }
 
 .shop-product-visual {
@@ -1680,4 +1680,190 @@ html:has(body.shop-page)::-webkit-scrollbar-corner,
 body.shop-page::-webkit-scrollbar-corner,
 body.shop-page *::-webkit-scrollbar-corner {
     background: #fff6f0;
+}
+/* Compact screens: retain the existing dialog dimensions. */
+@media (max-width: 1199px),
+       (hover: none),
+       (pointer: coarse),
+       (pointer: none) {
+
+    .shop-dialog.tpj-tray-dialog .shop-dialog-content {
+        padding: 62px 16px max(50px, env(safe-area-inset-bottom));
+    }
+
+    .tpj-tray-heading h2 {
+        font-size: 24px;
+        overflow-wrap: anywhere;
+    }
+
+    .tpj-tray-sizes button,
+    .tpj-piece-editor > button {
+        min-height: 44px;
+    }
+
+    .tpj-tray-dialog .tpj-tray-field select {
+        min-height: 44px;
+        font-size: 16px;
+        max-width: 100%;
+    }
+
+    .tpj-treat-layout {
+        display: block;
+    }
+
+    .tpj-piece-editor {
+        margin-top: 14px;
+        padding: 14px 0 0;
+
+        border-left: 0;
+        border-top: 1px solid #e5c9c3;
+
+        scroll-margin-block: 12px;
+    }
+
+    .tpj-piece-preview img {
+        display: block;
+        width: 100%;
+        height: 90px;
+        object-fit: contain;
+    }
+
+    .tpj-preview-note {
+        display: block;
+        font-size: 10px;
+        text-align: center;
+    }
+
+    .tpj-tray-dialog .tpj-slot-open > span,
+    .tpj-tray-pick span {
+        overflow-wrap: anywhere;
+    }
+
+    .tpj-tray-builder .tpj-slot-remove {
+        width: 32px;
+        height: 32px;
+        min-height: 32px;
+    }
+
+    .tpj-slot-remove::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+    }
+}
+
+/* Phones: preserve existing popup bounds and scrolling. */
+@media (max-width: 700px) {
+
+    .shop-dialog.tpj-tray-dialog .shop-dialog-content {
+        padding: 46px 12px max(50px, env(safe-area-inset-bottom));
+    }
+
+    /* Overlapping pieces form one continuous attached drip. */
+    .tpj-tray-dialog .shop-drizzle-top .shop-icing {
+        flex: 0 0 calc(50% + 6px);
+        width: calc(50% + 6px);
+    }
+
+    .tpj-tray-heading {
+        gap: 9px;
+    }
+
+    .tpj-tray-heading h2 {
+        font-size: 22px;
+    }
+
+    /* Two choices per row. */
+    .tpj-tray-dialog .tpj-tray-picks {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+    /* Reset the desktop jar/apple row placements. */
+    .shop-dialog.tpj-tray-dialog
+    .tpj-tray-picks > .tpj-tray-pick {
+        grid-column: auto;
+        grid-row: auto;
+        align-self: auto;
+    }
+
+    /* Center an odd final choice. */
+    .shop-dialog.tpj-tray-dialog
+    .tpj-tray-picks > .tpj-tray-pick:nth-child(odd):last-child {
+        grid-column: 1 / -1;
+        justify-self: center;
+
+        width: calc((100% - 10px) / 2);
+    }
+
+    .tpj-tray-slots {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        max-width: 100%;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    /* Six- and twelve-piece trays use three columns. */
+    .tpj-tray-slots:has(> .tpj-tray-slot:nth-child(6)) {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .tpj-tray-slots:has(> .tpj-tray-slot:only-child) {
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        max-width: 180px;
+    }
+
+    .tpj-slot-open {
+        min-height: 116px;
+        padding: 8px 5px;
+    }
+
+    .tpj-slot-open img,
+    .tpj-slot-plus {
+        height: 78px;
+        min-height: 78px;
+    }
+
+    .tpj-cake-choices {
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        gap: 12px;
+    }
+
+    .tpj-cake-choices img {
+        height: 160px;
+    }
+
+    .tpj-cake-choices figcaption {
+        margin-top: 4px;
+    }
+
+    .tpj-tray-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .tpj-tray-add {
+        width: 100%;
+    }
+
+    .tpj-tray-builder .tpj-tray-add-button {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+
+        padding: 10px;
+        font-size: 14px;
+        line-height: 1.35;
+        white-space: normal;
+    }
 }

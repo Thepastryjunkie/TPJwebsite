@@ -700,14 +700,8 @@ function cheesecakeDrizzle(position) {
     const path =
         "../images/Shop/Chocolate%20Drip/" + file;
 
-const attachedTop = top && matchMedia(
-    "(min-width: 1200px) and (hover: hover) and (pointer: fine)"
-).matches;
-
 const viewBox = top
-    ? attachedTop
-        ? "28 155 1996 445"
-        : "0 80 2048 530"
+    ? "28 155 1996 445"
     : "27 175 1726 621";
 
     const width = top ? 2048 : 1774;
@@ -1041,9 +1035,9 @@ function customerDetails(item) {
     );
 }
 function renderDesktopTray() {
-    if (!matchMedia(
+    const compactTray = !matchMedia(
         '(min-width: 1200px) and (hover: hover) and (pointer: fine)'
-    ).matches) return false;
+    ).matches;
 
     const x = config;
     const category = x.category;
@@ -1567,7 +1561,7 @@ function sizeButtons() {
                     <h3>
                         ${treats
                             ? 'Choose a treat type'
-                            : 'Click or drag a flavor'
+                           : compactTray ? 'Tap a flavor' : 'Click or drag a flavor'
                         }
                     </h3>
 
@@ -1575,7 +1569,9 @@ function sizeButtons() {
                         Repeats are welcome.
                         ${treats
                             ? 'Images represent treat types; labels show your exact choices.'
-                            : 'Click a filled spot to choose its replacement.'
+                            : compactTray
+    ? 'Tap a filled spot to choose its replacement.'
+    : 'Click a filled spot to choose its replacement.'
                         }
                     </p>
 
@@ -1594,7 +1590,7 @@ function sizeButtons() {
                                 type="button"
                                 class="tpj-tray-pick"
                                 draggable="${
-                                    Boolean(x.size && allowed(id))
+                                Boolean(!compactTray && x.size && allowed(id))    
                                 }"
                                 data-action="pick"
                                 data-value="${id}"
@@ -1733,6 +1729,12 @@ function sizeButtons() {
         if (type) draft.type = type;
 
         draw(treats ? 'field:type' : '');
+                if (compactTray && treats) {
+            $('.tpj-piece-editor', host)?.scrollIntoView({
+                block: 'nearest',
+                behavior: 'smooth'
+            });
+        }
     }
 
     function pick(id, target = null) {
