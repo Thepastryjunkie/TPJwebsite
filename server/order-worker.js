@@ -5,14 +5,7 @@
 (function (root, factory) {
     const api = factory();
 
-    if (
-        typeof module === "object" &&
-        module.exports
-    ) {
-        module.exports = api;
-    } else {
-        root.TPJDelivery = api;
-    }
+    root.TPJDelivery = api;
 })(
     typeof globalThis !== "undefined"
         ? globalThis
@@ -79,14 +72,7 @@
 (function (root, factory) {
     const data = factory();
 
-    if (
-        typeof module === "object" &&
-        module.exports
-    ) {
-        module.exports = data;
-    } else {
-        root.TPJShopCatalog = data;
-    }
+    root.TPJShopCatalog = data;
 })(
     typeof globalThis !== "undefined"
         ? globalThis
@@ -471,20 +457,10 @@ const newCakeAssets = {
  * Prices are calculated in integer cents.
  */
 (function (root, factory) {
-    if (
-        typeof module === "object" &&
-        module.exports
-    ) {
-        module.exports = factory(
-            require("./catalog.js"),
-            require("../delivery.js")
-        );
-    } else {
-        root.TPJShopModel = factory(
-            root.TPJShopCatalog,
-            root.TPJDelivery
-        );
-    }
+    root.TPJShopModel = factory(
+        root.TPJShopCatalog,
+        root.TPJDelivery
+    );
 })(
     typeof globalThis !== "undefined"
         ? globalThis
