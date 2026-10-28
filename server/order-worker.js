@@ -2552,6 +2552,38 @@ function tpjRecord(row) {
 }
 
 async function tpjRoute(request, env) {
+  const squareTestPath =
+    new URL(request.url).pathname;
+
+  if (
+    squareTestPath === "/api/admin/square/test-config" ||
+    squareTestPath === "/api/admin/square/test-payment"
+  ) {
+    await tpjAdmin(request, env);
+
+    if (!env.DB) {
+      throw tpjError(
+        "The database is not connected.",
+        503
+      );
+    }
+
+    if (
+      request.method === "GET" &&
+      squareTestPath.endsWith("/test-config")
+    ) {
+      return tpjSquareTestConfig(env);
+    }
+
+    if (
+      request.method === "POST" &&
+      squareTestPath.endsWith("/test-payment")
+    ) {
+      return tpjSquareTestPayment(request, env);
+    }
+
+    throw tpjError("Method not allowed.", 405);
+  }
   if (
     request.method === "GET" &&
     new URL(request.url).pathname === "/api/admin/square/status"
@@ -3785,4 +3817,342 @@ async function tpjSquareSandboxStatus(env) {
   } finally {
     clearTimeout(timer);
   }
+}
+/* TPJ SANDBOX CARD TEST — NO CUSTOMER ORDERS */
+
+function tpjRequireSquareSandbox(env) {
+  if (
+    String(env.SQUARE_ENVIRONMENT || "")
+      .trim()
+      .toLowerCase() !== "sandbox"
+  ) {
+    throw tpjError(
+      "This test is available only in Sandbox.",
+      409
+    );
+  }
+
+  for (const name of [
+    "SQUARE_ACCESS_TOKEN",
+    "SQUARE_APPLICATION_ID",
+    "SQUARE_LOCATION_ID"
+  ]) {
+    if (!String(env[name] || "").trim()) {
+      throw tpjError(
+        "A Square Sandbox setting is missing.",
+        503
+      );
+    }
+  }
+}
+
+async function tpjSquareTestConfig(env) {
+  tpjRequireSquareSandbox(env);
+
+  await env.DB.prepare(
+    "SELECT test_key " +
+    "FROM tpj_square_sandbox_tests LIMIT 1"
+  ).all();
+
+  const response =
+    await tpjSquareSandboxStatus(env);
+
+  const status = await response.json();
+
+  if (!status.ok) {
+    throw tpjError(status.message, 503);
+  }
+
+  return tpjJSON({
+    ok: true,
+    environment: "sandbox",
+    amountCents: 100,
+    currency: "USD",
+
+    applicationId:
+      String(env.SQUARE_APPLICATION_ID).trim(),
+
+    locationId:
+      String(env.SQUARE_LOCATION_ID).trim()
+  });
+}
+
+async function tpjSquareSandboxCall(
+  env,
+  path,
+  body
+) {
+  tpjRequireSquareSandbox(env);
+
+  const controller = new AbortController();
+
+  const timer = setTimeout(
+    () => controller.abort(),
+    15000
+  );
+
+  try {
+    const response = await fetch(
+      "https://connect.squareupsandbox.com/v2" + path,
+      {
+        method: body ? "POST" : "GET",
+        redirect: "manual",
+
+        headers: {
+          Authorization:
+            "Bearer " +
+            String(env.SQUARE_ACCESS_TOKEN).trim(),
+
+          "Square-Version": "2026-09-16",
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+
+        ...(body
+          ? { body: JSON.stringify(body) }
+          : {}),
+
+        signal: controller.signal
+      }
+    );
+
+    let data = null;
+
+    try {
+      data = await response.json();
+    } catch {}
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data
+    };
+
+  } catch {
+    throw tpjError(
+      "Square did not return a confirmed result. Retry the same test.",
+      503
+    );
+
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function tpjSquareTestPayment(
+  request,
+  env
+) {
+  tpjRequireSquareSandbox(env);
+
+  const body = await tpjReadJSON(request);
+
+  if (
+    !/^[A-Za-z0-9_-]{16,45}$/.test(
+      body.testKey || ""
+    ) ||
+    typeof body.sourceId !== "string" ||
+    !/^cnon:[A-Za-z0-9:_-]{1,4000}$/.test(
+      body.sourceId
+    )
+  ) {
+    throw tpjError(
+      "A valid test reference and Square card token are required.",
+      422
+    );
+  }
+
+  const key = body.testKey;
+
+  const location =
+    String(env.SQUARE_LOCATION_ID).trim();
+
+  const hash = await tpjHash(body.sourceId);
+  const now = new Date().toISOString();
+
+  await env.DB.prepare(
+    "INSERT OR IGNORE INTO tpj_square_sandbox_tests " +
+    "(test_key,source_hash,location_id,created_at,updated_at) " +
+    "VALUES (?,?,?,?,?)"
+  ).bind(
+    key,
+    hash,
+    location,
+    now,
+    now
+  ).run();
+
+  const previous = await env.DB.prepare(
+    "SELECT * FROM tpj_square_sandbox_tests " +
+    "WHERE test_key = ?"
+  ).bind(key).first();
+
+  if (
+    previous.source_hash !== hash ||
+    previous.location_id !== location
+  ) {
+    throw tpjError(
+      "This test reference belongs to a different attempt.",
+      409
+    );
+  }
+
+  const success = id => tpjJSON({
+    ok: true,
+    environment: "sandbox",
+    paymentId: id,
+    amountCents: 100,
+    currency: "USD",
+    saved: true
+  });
+
+  if (previous.status === "COMPLETED") {
+    return success(previous.square_payment_id);
+  }
+
+  if (previous.status === "FAILED") {
+    return tpjJSON({
+      ok: false,
+      retryable: false,
+      error:
+        "This test failed. Start a new card attempt."
+    }, 422);
+  }
+
+  const result = previous.square_payment_id
+    ? await tpjSquareSandboxCall(
+        env,
+        "/payments/" +
+        encodeURIComponent(
+          previous.square_payment_id
+        )
+      )
+    : await tpjSquareSandboxCall(
+        env,
+        "/payments",
+        {
+          source_id: body.sourceId,
+          idempotency_key: key,
+          location_id: location,
+
+          amount_money: {
+            amount: 100,
+            currency: "USD"
+          },
+
+          autocomplete: true,
+          accept_partial_authorization: false,
+          reference_id: "TPJ-SANDBOX-TEST",
+
+          note:
+            "TPJ Sandbox integration test — no customer order"
+        }
+      );
+
+  if (!result.ok) {
+    const codes =
+      Array.isArray(result.data?.errors)
+        ? result.data.errors
+            .map(error => error.code)
+            .filter(code =>
+              typeof code === "string" &&
+              /^[A-Z0-9_]{1,80}$/.test(code)
+            )
+        : [];
+
+    if (
+      result.status >= 400 &&
+      result.status < 500 &&
+      ![401, 403, 408, 429].includes(
+        result.status
+      )
+    ) {
+      await env.DB.prepare(
+        "UPDATE tpj_square_sandbox_tests " +
+        "SET status='FAILED'," +
+        "error_codes_json=?,updated_at=? " +
+        "WHERE test_key=? " +
+        "AND status='PENDING' " +
+        "AND square_payment_id IS NULL"
+      ).bind(
+        JSON.stringify(codes),
+        new Date().toISOString(),
+        key
+      ).run();
+
+      return tpjJSON({
+        ok: false,
+        retryable: false,
+
+        error:
+          "Square rejected the test: " +
+          (
+            codes.join(", ") ||
+            "payment declined"
+          )
+      }, 422);
+    }
+
+    throw tpjError(
+      "Square returned HTTP " +
+      result.status +
+      ". Retry the same test after checking the connection.",
+      503
+    );
+  }
+
+  const payment = result.data?.payment;
+
+  if (
+    !payment?.id ||
+    payment.location_id !== location ||
+    payment.amount_money?.amount !== 100 ||
+    payment.amount_money?.currency !== "USD" ||
+    payment.source_type !== "CARD"
+  ) {
+    throw tpjError(
+      "Square returned an unexpected test result. Retry the same test.",
+      503
+    );
+  }
+
+  const state =
+    payment.status === "COMPLETED"
+      ? "COMPLETED"
+      : ["FAILED", "CANCELED"].includes(
+          payment.status
+        )
+        ? "FAILED"
+        : "PENDING";
+
+  await env.DB.prepare(
+    "UPDATE tpj_square_sandbox_tests " +
+    "SET square_payment_id=?,status=?,updated_at=? " +
+    "WHERE test_key=? AND status='PENDING'"
+  ).bind(
+    payment.id,
+    state,
+    new Date().toISOString(),
+    key
+  ).run();
+
+  const saved = await env.DB.prepare(
+    "SELECT * FROM tpj_square_sandbox_tests " +
+    "WHERE test_key=?"
+  ).bind(key).first();
+
+  if (saved.status === "COMPLETED") {
+    return success(saved.square_payment_id);
+  }
+
+  return tpjJSON({
+    ok: false,
+    retryable: saved.status === "PENDING",
+
+    error:
+      saved.status === "PENDING"
+        ? "Square is still processing the test. Retry the same test."
+        : "The test payment failed. Start a new card attempt."
+
+  }, saved.status === "PENDING" ? 202 : 422);
 }

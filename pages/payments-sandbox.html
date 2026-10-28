@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="robots"
+  content="noindex,nofollow,noarchive"
+>
+
+<meta name="referrer" content="no-referrer">
+
+<meta
+  http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self';
+    base-uri 'none';
+    form-action 'none';
+    script-src 'self' 'unsafe-inline'
+      https://sandbox.web.squarecdn.com;
+    frame-src https://sandbox.web.squarecdn.com;
+    connect-src 'self'
+      https://tpj-orders-api.business-c3f.workers.dev
+      https://sandbox.web.squarecdn.com
+      https://pci-connect.squareupsandbox.com
+      https://o160250.ingest.sentry.io;
+    style-src 'self' 'unsafe-inline'
+      https://sandbox.web.squarecdn.com;
+    font-src 'self'
+      https://square-fonts-production-f.squarecdn.com
+      https://d1g145x70srn7h.cloudfront.net;
+  "
+>
+
+<title>Sandbox payment test | The Pastry Junkie</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5e8e5;
+  color: #421c15;
+  font: 16px/1.5 system-ui, sans-serif;
+}
+
+main {
+  max-width: 650px;
+  margin: 30px auto;
+  padding: 22px;
+}
+
+section {
+  background: #fff9f5;
+  border: 1px solid #e9c9ce;
+  border-radius: 15px;
+  padding: 24px;
+  margin: 18px 0;
+}
+
+h1 {
+  font-size: 27px;
+}
+
+small {
+  font-weight: 800;
+  color: #b51558;
+  letter-spacing: .1em;
+}
+
+button,
+input {
+  font: inherit;
+  min-height: 46px;
+  border: 1px solid #cda7ad;
+  border-radius: 8px;
+  padding: 10px;
+  max-width: 100%;
+}
+
+input {
+  width: 100%;
+  margin: 8px 0 16px;
+}
+
+button {
+  cursor: pointer;
+  background: #421c15;
+  color: #ffd0e6;
+  font-weight: 750;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+button.secondary {
+  background: white;
+  color: #421c15;
+}
+
+p {
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: #a51b33;
+  font-weight: 700;
+}
+
+#result {
+  white-space: pre-wrap;
+}
+
+a {
+  color: #b51558;
+}
+
+:focus-visible {
+  outline: 3px solid #b51558;
+  outline-offset: 3px;
+}
+
+[hidden] {
+  display: none !important;
+}
+</style>
+</head>
+
+<body>
+<main>
+  <small>
+    THE PASTRY JUNKIE · SANDBOX ONLY
+  </small>
+
+  <h1>Test a simulated $1 payment</h1>
+
+  <p>
+    This page uses Square test cards. It does not charge
+    real money, confirm customer orders or send receipt emails.
+  </p>
+
+  <section id="login">
+    <form id="loginForm">
+      <label for="adminKey">Admin key</label>
+
+      <input
+        id="adminKey"
+        type="password"
+        autocomplete="current-password"
+        required
+        spellcheck="false"
+        autocapitalize="none"
+      >
+
+      <button id="open" type="submit">
+        Open test card form
+      </button>
+    </form>
+
+    <p
+      id="loginMessage"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </section>
+
+  <section id="test" hidden>
+    <p>
+      <strong>Use only Square’s test card:</strong><br>
+      4111 1111 1111 1111<br>
+      CVV: 111 · Any future expiration · ZIP: 11111
+    </p>
+
+    <div id="card-container"></div>
+
+    <button id="pay" type="button" disabled>
+      Run $1 Sandbox test
+    </button>
+
+    <button
+      id="lock"
+      class="secondary"
+      type="button"
+    >
+      Lock page
+    </button>
+
+    <p
+      id="result"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </section>
+
+  <p>
+    <a href="orders-admin.html">
+      Back to order dashboard
+    </a>
+  </p>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const API =
+    "https://tpj-orders-api.business-c3f.workers.dev";
+
+  const $ = id => document.getElementById(id);
+
+  let key = "";
+  let card = null;
+  let attempt = null;
+  let session = 0;
+  let idle;
+
+  function touch() {
+    clearTimeout(idle);
+
+    if (key) {
+      idle = setTimeout(
+        () => lock("Page locked after inactivity."),
+        15 * 60 * 1000
+      );
+    }
+  }
+
+  function lock(message = "") {
+    session++;
+    key = "";
+    attempt = null;
+
+    clearTimeout(idle);
+
+    if (card) {
+      Promise.resolve(card.destroy()).catch(() => {});
+      card = null;
+    }
+
+    $("card-container").replaceChildren();
+    $("adminKey").value = "";
+    $("login").hidden = false;
+    $("test").hidden = true;
+    $("result").textContent = "";
+    $("loginMessage").textContent = message;
+    $("open").disabled = false;
+  }
+
+  async function api(path, body) {
+    const token = key;
+    const controller = new AbortController();
+
+    const timer = setTimeout(
+      () => controller.abort(),
+      25000
+    );
+
+    try {
+      const response = await fetch(API + path, {
+        method: body ? "POST" : "GET",
+
+        headers: {
+          Authorization: "Bearer " + token,
+
+          ...(body
+            ? { "Content-Type": "application/json" }
+            : {})
+        },
+
+        ...(body
+          ? { body: JSON.stringify(body) }
+          : {}),
+
+        cache: "no-store",
+        signal: controller.signal
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        if (key === token) {
+          lock("Admin key was not accepted.");
+        }
+
+        throw new Error(
+          "Admin key was not accepted."
+        );
+      }
+
+      if (!response.ok || !data.ok) {
+        const error = new Error(
+          data.error ||
+          data.message ||
+          "The test was not confirmed."
+        );
+
+        error.retryable =
+          data.retryable !== false;
+
+        throw error;
+      }
+
+      return data;
+
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function loadSDK() {
+    if (window.Square) return;
+
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+
+      const timer = setTimeout(() => {
+        script.remove();
+
+        reject(new Error(
+          "Square card form loading timed out. Try again."
+        ));
+      }, 20000);
+
+      script.src =
+        "https://sandbox.web.squarecdn.com/v1/square.js";
+
+      script.onload = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+
+      script.onerror = () => {
+        clearTimeout(timer);
+        script.remove();
+
+        reject(new Error(
+          "Square card form could not load. Check the connection or browser extensions."
+        ));
+      };
+
+      document.head.append(script);
+    });
+
+    if (!window.Square) {
+      throw new Error(
+        "Square card form did not initialize."
+      );
+    }
+  }
+
+  $("loginForm").onsubmit = async event => {
+    event.preventDefault();
+
+    if ($("open").disabled) return;
+
+    key = $("adminKey").value.trim();
+    $("adminKey").value = "";
+    $("open").disabled = true;
+
+    $("loginMessage").textContent =
+      "Verifying Sandbox and loading card form…";
+
+    const current = ++session;
+
+    try {
+      const config = await api(
+        "/api/admin/square/test-config"
+      );
+
+      if (
+        config.environment !== "sandbox" ||
+        config.amountCents !== 100 ||
+        config.currency !== "USD"
+      ) {
+        throw new Error(
+          "Unexpected test configuration."
+        );
+      }
+
+      await loadSDK();
+
+      if (
+        current !== session ||
+        !key
+      ) return;
+
+      const payments = window.Square.payments(
+        config.applicationId,
+        config.locationId
+      );
+
+      const newCard = await payments.card();
+
+      if (
+        current !== session ||
+        !key
+      ) {
+        await newCard.destroy();
+        return;
+      }
+
+      card = newCard;
+
+      $("test").hidden = false;
+
+      await card.attach("#card-container");
+
+      if (
+        current !== session ||
+        !key
+      ) return;
+
+      $("login").hidden = true;
+      $("loginMessage").textContent = "";
+      $("pay").disabled = false;
+
+      $("pay").textContent =
+        "Run $1 Sandbox test";
+
+      touch();
+
+    } catch (error) {
+      if (current === session) {
+        lock(error.message);
+      }
+
+    } finally {
+      $("open").disabled = false;
+    }
+  };
+
+  $("pay").onclick = async () => {
+    if (
+      !key ||
+      !card ||
+      $("pay").disabled
+    ) return;
+
+    const current = session;
+    const button = $("pay");
+
+    button.disabled = true;
+
+    $("result").className = "";
+    $("result").textContent =
+      "Running Sandbox test…";
+
+    let completed = false;
+
+    try {
+      if (!attempt) {
+        const token = await card.tokenize({
+          amount: "1.00",
+          currencyCode: "USD",
+          intent: "CHARGE",
+          customerInitiated: true,
+          sellerKeyedIn: false,
+
+          billingContact: {
+            givenName: "Sandbox",
+            familyName: "Test",
+            countryCode: "US"
+          }
+        });
+
+        if (
+          current !== session ||
+          !key
+        ) return;
+
+        if (
+          token.status !== "OK" ||
+          !token.token
+        ) {
+          throw new Error(
+            "Check the test-card fields and try again."
+          );
+        }
+
+        attempt = {
+          testKey: crypto.randomUUID(),
+          sourceId: token.token
+        };
+      }
+
+      const result = await api(
+        "/api/admin/square/test-payment",
+        attempt
+      );
+
+      if (
+        current !== session ||
+        !key
+      ) return;
+
+      if (
+        result.environment !== "sandbox" ||
+        result.amountCents !== 100 ||
+        result.currency !== "USD" ||
+        result.saved !== true ||
+        !result.paymentId
+      ) {
+        throw new Error(
+          "The completed test could not be verified. Retry the same test."
+        );
+      }
+
+      completed = true;
+      attempt = null;
+
+      button.textContent =
+        "Sandbox test completed";
+
+      $("result").textContent =
+        "SUCCESS — simulated $1.00 payment completed and saved.\n" +
+        "Square payment ID: " + result.paymentId +
+        "\nNo customer order or email was changed.";
+
+    } catch (error) {
+      if (
+        current === session &&
+        key
+      ) {
+        if (error.retryable === false) {
+          attempt = null;
+        }
+
+        $("result").className = "error";
+        $("result").textContent = error.message;
+
+        button.textContent = attempt
+          ? "Retry same Sandbox test"
+          : "Run $1 Sandbox test";
+      }
+
+    } finally {
+      if (
+        current === session &&
+        key
+      ) {
+        button.disabled = completed;
+      }
+    }
+  };
+
+  $("lock").onclick = () => lock();
+
+  document.addEventListener(
+    "pointerdown",
+    touch,
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "keydown",
+    touch,
+    { passive: true }
+  );
+})();
+</script>
+</body>
+</html>
