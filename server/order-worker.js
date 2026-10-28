@@ -2623,6 +2623,21 @@ async function tpjRoute(request, env) {
       env
     );
 
+      const internalMatch = path.match(
+      /^\/api\/admin\/orders\/(TPJ-[A-Za-z0-9-]+)$/
+    );
+
+    if (
+      request.method === "PATCH" &&
+      internalMatch
+    ) {
+      return tpjUpdateInternalRequest(
+        request,
+        env,
+        internalMatch[1]
+      );
+    }
+
     if (
       request.method !== "GET"
     ) {
@@ -3521,4 +3536,109 @@ async function tpjCakeReceipt(
     },
     202
   );
+}
+/* TPJ INTERNAL REQUEST MANAGEMENT */
+async function tpjUpdateInternalRequest(request, env, id) {
+  const body = await tpjReadJSON(request);
+
+  const statuses = [
+    "submitted",
+    "reviewing",
+    "awaiting_customer",
+    "awaiting_payment",
+    "confirmed",
+    "preparing",
+    "ready",
+    "completed",
+    "declined",
+    "cancelled"
+  ];
+
+  if (
+    !Number.isSafeInteger(body.version) ||
+    body.version < 1 ||
+    !statuses.includes(body.status) ||
+    typeof body.internalNotes !== "string" ||
+    body.internalNotes.length > 10000
+  ) {
+    throw tpjError(
+      "Choose a valid status and keep notes under 10,000 characters.",
+      422
+    );
+  }
+
+  const current = await env.DB.prepare(
+    "SELECT * FROM tpj_requests WHERE id = ?"
+  ).bind(id).first();
+
+  if (!current) {
+    throw tpjError("Request not found.", 404);
+  }
+
+  if (current.version !== body.version) {
+    throw tpjError(
+      "This request changed in another window. Reload it before saving.",
+      409
+    );
+  }
+
+  const notes = body.internalNotes.trim();
+
+  if (
+    current.status === body.status &&
+    current.internal_notes === notes
+  ) {
+    return tpjJSON({
+      ok: true,
+      order: tpjRecord(current)
+    });
+  }
+
+  const now = new Date().toISOString();
+
+  const result = await env.DB.batch([
+    env.DB.prepare(
+      "UPDATE tpj_requests SET status = ?, internal_notes = ?, " +
+      "version = version + 1, updated_at = ? " +
+      "WHERE id = ? AND version = ? RETURNING id"
+    ).bind(
+      body.status,
+      notes,
+      now,
+      id,
+      body.version
+    ),
+
+    env.DB.prepare(
+      "INSERT INTO tpj_request_events " +
+      "(request_id,event_type,details_json,created_at) " +
+      "SELECT ?,'internal_updated',?,? WHERE changes() = 1"
+    ).bind(
+      id,
+      JSON.stringify({
+        previousStatus: current.status,
+        status: body.status,
+        notesChanged: current.internal_notes !== notes,
+        previousVersion: body.version,
+        version: body.version + 1
+      }),
+      now
+    )
+  ]);
+
+  if (!result[0].results?.length) {
+    throw tpjError(
+      "This request changed in another window. Reload it before saving.",
+      409
+    );
+  }
+
+  const updated = await env.DB.prepare(
+    "SELECT * FROM tpj_requests WHERE id = ?"
+  ).bind(id).first();
+
+  return tpjJSON({
+    ok: true,
+    order: tpjRecord(updated)
+  });
 }
