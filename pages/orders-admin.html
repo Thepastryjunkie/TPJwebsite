@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta
   http-equiv="Content-Security-Policy"
-  content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://tpj-orders-api.business-c3f.workers.dev; base-uri 'none'; form-action 'none'"
+  content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://tpj-orders-api.business-c3f.workers.dev; base-uri 'none'; form-action 'none'"
 >
 <title>Orders | The Pastry Junkie</title>
 
@@ -380,6 +380,8 @@ summary { cursor: pointer; font-weight: 750; }
   </section>
 </main>
 
+<script src="../js/order-terms.js?v=workflow-1"></script>
+<script src="../js/order-workflow-admin.js?v=workflow-1"></script>
 <script>
 (() => {
   "use strict";
@@ -462,6 +464,7 @@ summary { cursor: pointer; font-weight: 750; }
     "declined",
     "cancelled"
   ];
+  statuses.push("awaiting_contract", "payment_review", "cancellation_requested", "sandbox_test");
 
   let currentOrder = null;
   let key = "";
@@ -486,6 +489,7 @@ summary { cursor: pointer; font-weight: 750; }
   }
 
   function lock(message = "") {
+    window.TPJWorkflowAdmin?.clear();
     generation++;
     detailGeneration++;
     currentOrder = null;
@@ -906,6 +910,12 @@ summary { cursor: pointer; font-weight: 750; }
       "</pre></details>";
 
     $("detail").innerHTML = html;
+    window.TPJWorkflowAdmin?.mount({
+      container: $("detail"),
+      order: r,
+      api: request,
+      reload: () => select(r.id)
+    });
 
     $("internalForm").onsubmit = saveInternal;
     $("reloadDetail").onclick = () => select(r.id);
