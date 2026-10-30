@@ -13,19 +13,19 @@ window.TPJWorkflowAdmin = (() => {
    const [settings,data,business]=await Promise.all([api('/api/admin/workflow/status'),api('/api/admin/workflow/requests/'+encodeURIComponent(order.id)),api('/api/admin/business/config')]);
    if(current!==generation)return;
    if(settings.missingTables?.length){root.innerHTML='<p class="error">Run the workflow SQL setup first. Missing: '+e(settings.missingTables.join(', '))+'</p>';return;}
-   const cake=order.source==='cake_builder',offers=data.offers||[],active=offers.find(o=>o.status!=='CLOSED'),o=active||offers[0];
+   const cake=order.source==='cake_builder',offers=(data.offers||[]).filter(x=>!x.change),active=offers.find(o=>o.status!=='CLOSED'),o=active||offers[0];
    const sourceTerms=structuredClone(window.TPJOrderTerms?.[order.source]);
    if(!cake&&sourceTerms)sourceTerms.sections[0].text=sourceTerms.sections[0].text.replace('72 hours',business.config.settings.shopLeadHours+' hours');
    const sandboxButton=document.getElementById('squareCheck');if(sandboxButton)sandboxButton.hidden=settings.environment!=='sandbox';
    const initialPaid=active?.intents.find(i=>i.phase==='initial')?.status==='PAID';
    const progress=order.status==='completed'?'Fulfilled':['cancelled','declined'].includes(order.status)?'Canceled':initialPaid&&!active.paymentReview?'Confirmed':active?'Pending':'New';
-   let html='<h3>Manage order</h3>'+(settings.environment==='sandbox'?'<p class="banner">Square Sandbox test — no real charge or booking.</p>':'')+'<p><strong>Stage:</strong> '+progress+'</p>'+(active&&!initialPaid?'<p>'+(active.signature?'Waiting for the customer’s required payment.':'Waiting for the customer’s agreement and required payment.')+'</p>':'')+'<p data-message role="status" aria-live="polite"></p>';
+   let html='<h3>Manage order</h3>'+(settings.environment==='sandbox'?'<p class="banner">Square Sandbox test — no real charge or booking.</p>':'')+'<p><strong>Signing/payment progress:</strong> '+progress+'</p>'+(active&&!initialPaid?'<p>'+(active.signature?'Waiting for the customer’s required payment.':'Waiting for the customer’s agreement and required payment.')+'</p>':'')+'<p data-message role="status" aria-live="polite"></p>';
    if(!active&&offers.some(x=>x.intents.some(i=>i.paid_cents>0)))html+='<p>This request already has a recorded payment. Review its saved agreement and Square record before resolving changes. A second payment schedule cannot be issued for the same request.</p>';
    if(!active&&!offers.some(x=>x.intents.some(i=>i.paid_cents>0))&&!['cancelled','declined','completed'].includes(order.status)){
     if(!sourceTerms)throw Error('The order-terms.js file did not load.');
     html+='<form data-issue><h4>Accept this inquiry</h4><label>Approved amount BEFORE any rush fee<br><input name="base" type="number" step="0.01" min="0.01" required value="'+(typeof order.estimatedTotalCents==='number'?(order.estimatedTotalCents/100).toFixed(2):'')+'"></label>'+
      '<label>Approved fulfillment date<br><input name="date" type="date" required value="'+e(order.fulfillmentDate)+'"></label> <label>Central time<br><input name="time" type="text" data-tpj-time placeholder="12:05 PM" autocomplete="off" required value="'+e(order.details?.order?.fulfillment?.time||order.details?.fulfillment?.time||'12:00')+'"></label>'+
-     (cake?'<p><label><input name="rush" type="checkbox"> Rush order</label></p><label>Rush fee in dollars<br><input name="rushFee" type="number" step="0.01" min="0" value="0" required></label><p class="muted">Cake rush fees start at $75. Orders accepted seven days or fewer before fulfillment require full payment, including the rush fee.</p>':'<input name="rushFee" type="hidden" value="0">')+
+     (cake?'<p><label><input name="rush" type="checkbox"> Rush order</label></p><label>Rush fee in dollars<br><input name="rushFee" type="number" step="0.01" min="0" value="0" required></label><p class="muted">The proposed rush fee is listed separately and counted once. Set any approved amount, including $0 to waive it. Orders accepted seven days or fewer before fulfillment require full payment of the final approved total.</p>':'<input name="rushFee" type="hidden" value="0">')+
      '<label>Your name as business signer<br><input name="businessSigner" value="Erykah Williams" required minlength="2" maxlength="150"></label><label><input name="businessConsent" type="checkbox" required> I adopt this name as my electronic signature and authorize this agreement.</label><p data-plan></p><label>Final approved design/order notes<br><textarea name="description" maxlength="10000" placeholder="Document any approved details that differ from the original inquiry."></textarea></label>'+
           '<p><label><input name="reviewed" type="checkbox" required> I confirm the final charges, fulfillment details and product disclosures are correct and ready to send.</label></p><button class="primary" type="submit">Accept inquiry and send agreement</button></form>';
    }
@@ -80,7 +80,7 @@ window.TPJWorkflowAdmin = (() => {
      const base=cents(issue.elements.base.value),fee=cents(issue.elements.rushFee.value),total=base+fee;
      const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const f=k=>parts.find(x=>x.type===k).value;const today=f('year')+'-'+f('month')+'-'+f('day');
      const days=Math.round((Date.parse(issue.elements.date.value+'T00:00:00Z')-Date.parse(today+'T00:00:00Z'))/86400000);
-     if(cake&&days<=7){issue.elements.rush.checked=true;if(fee<7500){issue.elements.rushFee.value='75.00';return preview();}}
+     if(cake&&(days<=7||fee>0))issue.elements.rush.checked=true;
      const initial=!cake||days<=7?total:Math.ceil(total/2);
      plan.textContent='Final total including rush fee: '+money(total)+' · Initial payment: '+money(initial)+(initial<total?' · Remaining balance: '+money(total-initial)+' due seven calendar days before fulfillment.':' · Full payment required.');
     }catch{plan.textContent='Enter the final amounts and fulfillment date.';}};

@@ -1,6 +1,6 @@
 /* TPJ VERSIONED ORDER TERMS — final legal review recommended before production. */
 window.TPJOrderTerms = {
-  "version": "2026-10-29-ops-1",
+  "version": "2026-10-30-rush-1",
   "shop": {
     "title": "Shop Order Terms",
     "sections": [
@@ -18,11 +18,11 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Order Changes",
-        "text": "Request changes in writing. Changes depend on availability and preparation already completed, and are not effective until approved in writing by The Pastry Junkie. Any additional charge must be approved before payment. Changes cannot be guaranteed once preparation has begun."
+        "text": "Request changes in writing. Changes depend on availability and preparation already completed, and are not effective until approved in writing by The Pastry Junkie. Any additional charges will be disclosed for written approval. For Shop orders already paid in full, the additional payment is due when the changes are approved and must be received before pickup or delivery. Previous payments remain credited toward the revised total. Changes cannot be guaranteed once preparation has begun."
       },
       {
         "title": "Pickup & Delivery",
-        "text": "Pickup and delivery are by appointment. Confirm the address, recipient and access instructions in the approved order. Delivery estimates may be adjusted before approval. Customers must disclose gates, stairs and access restrictions and make a designated recipient available. Delays or unsuccessful handoff may require rescheduling and additional charges communicated in writing. Inspect the order at handoff and report concerns promptly."
+        "text": "Available for pickup and personal delivery within Texas only. We do not ship or deliver outside Texas. Pickup and delivery are by appointment. At handoff, the customer or their authorized representative and a business representative must sign two receipt copies; one is provided to the customer and one is retained by The Pastry Junkie. The business may retain a private image of its signed copy as a fulfillment record. The receipt acknowledges handoff and does not waive rights provided by applicable law. Confirm the address, recipient and access instructions in the approved order. Delivery estimates may be adjusted before approval. Customers must disclose gates, stairs and access restrictions and make a designated recipient available. Delays or unsuccessful handoff may require rescheduling and additional charges communicated in writing. Inspect the order at handoff and report concerns promptly."
       },
       {
         "title": "Care, Storage & Transport",
@@ -59,7 +59,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Design Changes & Alterations",
-        "text": "Request changes to size, flavor, design or fulfillment details in writing by email. A change is effective only when The Pastry Junkie confirms it in writing, including any revised price or schedule. Request changes at least seven calendar days before fulfillment. Changes within seven days, after production begins or after final payment may be unavailable. Material changes to an accepted agreement require a written amendment or replacement agreement and any required new customer acceptance; changing an internal note does not amend the customer's agreement."
+        "text": "Request changes to size, flavor, design or fulfillment details in writing by email. A change is effective only when The Pastry Junkie confirms it in writing, including any revised price or schedule. Request changes at least seven calendar days before fulfillment. Changes requested within the permitted change window may still result in additional charges for ingredients, materials, labor, design complexity or revised fulfillment requirements. Any additional charges will be disclosed in writing and require customer approval. For custom cakes, approved additional charges are due on the original final balance date, seven days before fulfillment. If approved on or after that date, the additional payment is due upon approval and before pickup or delivery. Previous payments remain credited toward the revised total. Changes within seven days, after production begins or after final payment may be unavailable. Material changes to an accepted agreement require a written amendment or replacement agreement and any required new customer acceptance; changing an internal note does not amend the customer's agreement."
       },
       {
         "title": "Design Disclaimer",
@@ -87,11 +87,11 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Rush Orders",
-        "text": "Rush orders depend on capacity and design requirements and are not guaranteed. An accepted cake rush order has a fee starting at $75, which may increase for complexity. The actual fee is disclosed in the approved quote and included in the agreed total. Orders accepted seven days or fewer before fulfillment require full payment, including the rush fee, after signing."
+        "text": "Rush orders depend on capacity and design requirements and are not guaranteed. Proposed cake rush fees normally start at $75 and may increase for complexity. The Pastry Junkie may adjust or waive the rush fee before issuing the final approval. Only the rush fee shown in the final approved quote forms part of the agreed total. Orders accepted seven days or fewer before fulfillment require full payment, including the rush fee, after signing."
       },
       {
         "title": "Delivery Policy",
-        "text": "Confirm delivery details at least two days before fulfillment. Supply the correct address, recipient contact details, access instructions, stairs and other conditions affecting delivery. A designated recipient must be available. Customer-caused failed handoff or an approved address change may require rescheduling and a separately disclosed additional delivery fee. Responsibility for proper care transfers at actual handoff or agreed setup completion, subject to applicable law. Temperature-sensitive products will be transported under the applicable safe-handling requirements; a decorative-care guideline does not replace refrigeration requirements."
+        "text": "Available for pickup and personal delivery within Texas only. We do not ship or deliver outside Texas. For both pickup and delivery, the customer or an authorized representative and a business representative sign two handoff receipts. The customer receives one signed copy; The Pastry Junkie retains the other and may retain a private image as a fulfillment record. A handoff receipt records receipt of the products and does not waive rights provided by applicable law. Confirm delivery details at least two days before fulfillment. Supply the correct address, recipient contact details, access instructions, stairs and other conditions affecting delivery. A designated recipient must be available. Customer-caused failed handoff or an approved address change may require rescheduling and a separately disclosed additional delivery fee. Responsibility for proper care transfers at actual handoff or agreed setup completion, subject to applicable law. Temperature-sensitive products will be transported under the applicable safe-handling requirements; a decorative-care guideline does not replace refrigeration requirements."
       },
       {
         "title": "Allergy Disclaimer",
@@ -145,7 +145,7 @@ window.TPJOrderTerms = {
     "sections": [
       {
         "title": "Information we collect",
-        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
+        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. We also retain the signed business handoff receipt or its private image, the recipient and business representative names, and confirmation that the customer received their signed copy. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
       },
       {
         "title": "How we use information",
@@ -173,7 +173,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Contact and updates",
-        "text": "The Pastry Junkie LLC, Dallas–Fort Worth, Texas. Customer and privacy questions: baked@thepastryjunkie.com (preferred). Phone: (682) 373-8842. Automated order notices are sent from orders@thepastryjunkie.com; replies to those notices are directed to customer support. This notice may be updated, and its published version identifies the current general notice. Updates do not silently replace the order-specific terms already accepted for an existing agreement."
+        "text": "The Pastry Junkie LLC, Dallas–Fort Worth, Texas. Customer and privacy questions: baked@thepastryjunkie.com. Phone: (682) 373-8842. Automated order notices are sent from orders@thepastryjunkie.com; replies to those notices are directed to customer support. This notice may be updated, and its published version identifies the current general notice. Updates do not silently replace the order-specific terms already accepted for an existing agreement."
       }
     ]
   }

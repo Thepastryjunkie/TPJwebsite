@@ -443,6 +443,8 @@ function tpjReceiveCake_(payload) {
           state.fulfillmentDate ||
           state.eventDate,
 
+        time: state.fulfillmentTime || "",
+
         eventDate:
           state.eventDate || "",
 

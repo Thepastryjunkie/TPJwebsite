@@ -124,6 +124,11 @@
             );
 
             const category = item.category;
+            if(category==='custom'){
+                const p=C.customProducts?.[item.product];
+                if(!p||!enabled(availability,'custom:'+item.product)||!enabled(availability,'category:'+p.category))fail('This product is no longer available.');
+                return {id:typeof item.id==='string'?item.id:undefined,category:'custom',product:item.product,quantity:count,title:p.name,details:p.description?[p.description]:[],unitCents:p.price,totalCents:p.price*count};
+            }
 
             let unit = 0;
             let title = "";
@@ -951,7 +956,8 @@
                 (
                     availability.blockedDates ||
                     []
-                ).includes(f.date)
+                ).includes(f.date) ||
+                (availability.dateRules||[]).some(r=>r.date===f.date && (r.windows||[]).some(w=>f.time>=w.start&&f.time<w.end))
             ) {
                 fail(
                     "That requested date is unavailable. Choose another date."
@@ -1011,6 +1017,10 @@
                             : 80
                     );
                 }
+
+                if(!['TX','TEXAS'].includes(address.state.trim().toUpperCase()))fail('Texas delivery only. We do not ship or deliver outside Texas.');
+                address.state='TX';
+                if(!/^(733\d{2}|73960|7[5-9]\d{3}|885\d{2})(-\d{4})?$/.test(address.zip))fail('Enter a delivery ZIP code consistent with Texas. We do not ship or deliver outside Texas.');
 
                 address.unit = clean(
                     f.address?.unit || "",
@@ -1190,6 +1200,7 @@
                 }
             }
 
+            for(const [id,p]of Object.entries(C.customProducts||{}))targets.push(['custom:'+id,p.name]);
             targets.push(
                 [
                     "product:cakes:half",

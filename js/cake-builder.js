@@ -11154,6 +11154,7 @@ applyDateInputBounds(input, stateKey);
 }
 
 function validateStepOne() {
+    try {builderState.fulfillmentTime=window.TPJOrderTime.parse(getElement('#requestedCakeTime')?.value||'');}catch(_){showValidationMessage('Enter the requested pickup or delivery time, such as 12:05 PM.');getElement('#requestedCakeTime')?.focus();return false;}
     builderState.eventDate =
         getElement("#eventDate")?.value || "";
 
@@ -15361,6 +15362,10 @@ if (submissionRoot) {
         const availabilityResponse=await fetch('https://tpj-orders-api.business-c3f.workers.dev/api/business/public',{cache:'no-store'});
         const requestSettings=await availabilityResponse.json();
         if(!availabilityResponse.ok || !requestSettings.acceptCake)throw Error('Custom cake inquiries are temporarily paused. Your selections are saved. Please contact baked@thepastryjunkie.com.');
+        if(builderState.fulfillmentMethod==='Delivery'&&(!['TX','TEXAS'].includes(String(builderState.deliveryState||'').trim().toUpperCase())||!/^(733\d{2}|73960|7[5-9]\d{3}|885\d{2})(-\d{4})?$/.test(String(builderState.deliveryZip||'').trim())))throw Error('Texas delivery only. We do not ship or deliver outside Texas.');
+        const selectedDate=String(builderState.fulfillmentDate||''),selectedTime=window.TPJOrderTime.parse(getElement('#requestedCakeTime')?.value||'');
+        builderState.fulfillmentTime=selectedTime;
+        if((requestSettings.blockedDates||[]).includes(selectedDate)||(requestSettings.dateRules||[]).some(r=>r.date===selectedDate&&(r.windows||[]).some(w=>selectedTime>=w.start&&selectedTime<w.end)))throw Error('That requested date/time is unavailable. Choose another date or time.');
         const submissionFiles =
             await collectSubmissionFiles();
 
@@ -21089,5 +21094,3 @@ const main = new Set([
         start();
     }
 })();
-
- 

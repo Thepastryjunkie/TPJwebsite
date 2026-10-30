@@ -182,10 +182,12 @@ function isCardAvailable(category, flavor) {
 }
 
 function refreshCards() {
+    renderOwnerMenu();
     for(const [id,category]of Object.entries(C.categories)){const original=window.TPJShopCatalog.categories[id];if(category.name!==original.name){const heading=document.getElementById(category.section)?.querySelector('h2');if(heading)heading.textContent=category.name;}}
     if(C.chocolate.name!==window.TPJShopCatalog.chocolate.name){const heading=document.getElementById('chocolateTreats')?.querySelector('h2');if(heading)heading.textContent=C.chocolate.name;}
     $$("[data-shop-category]").forEach(card => {
         const category=card.dataset.shopCategory,flavor=card.dataset.shopFlavor;
+        card.style.display=(C.removed||[]).some(k=>k==='product:'+category+':'+flavor||k==='flavor:'+flavor||k==='treat:'+flavor)?'none':'';
         const price=category==='half'?C.half.prices[2]:category==='chocolate'?C.chocolate.treats[flavor]?.price:C.categories[category]?.prices[category==='cakes'?2:1];
         const priceNode=card.querySelector('.shop-card-price');if(priceNode&&typeof price==='number')priceNode.textContent=M.money(price);
         const copyNode=card.querySelector('.shop-card-copy');if(copyNode)copyNode.textContent=productDescription(category,flavor);
@@ -433,6 +435,7 @@ function openProduct(
     flavor,
     item = null
 ) {
+    if(category==='custom'){openCustomProduct(item?.product||flavor,item);return;}
     config = item
         ? clone(item)
         : {
@@ -3465,6 +3468,7 @@ function openCheckout() {
         if (
             !availability.blockedDates
                 .includes(key) &&
+            !(availability.dateRules || []).some(r => r.date === key && r.windows.some(w => w.start === '00:00' && w.end === '24:00')) &&
             !dates.some(
                 ([value]) =>
                     value === key
@@ -4672,5 +4676,20 @@ window.addEventListener(
 
 updateCount();
 refreshAvailability();
+
+function renderOwnerMenu(){
+ $$('[data-owner-menu]').forEach(n=>n.remove());
+ for(const [id,definition]of Object.entries(C.categories)){const section=document.getElementById(definition.section),removed=(C.removed||[]).includes('category:'+id);if(section)section.style.display=removed?'none':'';document.querySelectorAll('a[href="#'+definition.section+'"]').forEach(a=>a.style.display=removed?'none':'');}
+ const chocolate=document.getElementById('chocolateTreats');if(chocolate)chocolate.style.display=(C.removed||[]).includes('category:chocolate')?'none':'';
+ function cardFor(category,title,image,description,price,onChoose){const section=document.getElementById(category==='chocolate'?'chocolateTreats':C.categories[category]?.section);if(!section)return;const grid=section.querySelector('.dessert-product-grid,.signature-cake-grid,.chocolate-collection-grid');if(!grid)return;const card=document.createElement('article');card.dataset.ownerMenu='';card.className='dessert-product-card';card.innerHTML=(image?'<img style="width:100%;max-height:260px;object-fit:contain" src="'+esc(image)+'" alt="'+esc(title)+'">':'')+'<h3>'+esc(title)+'</h3><p>'+esc(description)+'</p><p>'+esc(M.money(price))+'</p><button class="shop-button" type="button">Choose '+esc(title)+'</button>';card.querySelector('button').onclick=onChoose;grid.append(card);}
+ for(const [id,p]of Object.entries(C.customProducts||{})){if(!M.enabled(availability,'custom:'+id)||!M.enabled(availability,'category:'+p.category))continue;cardFor(p.category,p.name,p.image,p.description,p.price,()=>openCustomProduct(id));}
+ for(const [id,p]of Object.entries(C.ownerExtraFlavors||{}))for(const category of p.categories){if(!M.available(category,id,availability))continue;cardFor(category,p.name,p.image,C.categories[category].description,Number(Object.values(C.categories[category].prices)[0]),()=>openProduct(category,id));}
+}
+function openCustomProduct(id,item=null){
+ config=null;editing=item?.id||null;const p=C.customProducts?.[id];if(!p){openDialog('Product unavailable','<p>This product has been removed from the current menu. Please choose another item.</p>');return;}
+ openDialog(p.name,'<p>'+esc(p.description||'')+'</p><p>Price per product/package: '+esc(M.money(p.price))+'</p><label>Quantity<input id="customQuantity" type="number" min="1" max="99" step="1" required value="'+(item?.quantity||1)+'"></label><p id="customTotal"></p><p id="customError" role="alert"></p><button type="button" id="customAdd" class="shop-button">'+(item?'Update cart':'Add to cart')+'</button>');
+ const field=$('#customQuantity',dialog),total=$('#customTotal',dialog),button=$('#customAdd',dialog);const value=()=>({category:'custom',product:id,quantity:Number(field.value),id:editing||uid()});const update=()=>{try{const q=M.quote(value(),availability);total.textContent=M.money(q.totalCents);button.disabled=false;$('#customError',dialog).textContent='';}catch(e){button.disabled=true;$('#customError',dialog).textContent=e.message;}};field.oninput=update;
+ button.onclick=()=>{try{const x=value();M.quote(x,availability);if(editing)cart=cart.map(v=>v.id===editing?x:v);else cart.push(x);persist();openCart();}catch(e){$('#customError',dialog).textContent=e.message;}};update();
+}
 
 })();

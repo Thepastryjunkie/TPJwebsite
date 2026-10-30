@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; connect-src https://tpj-orders-api.business-c3f.workers.dev; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Owner dashboard | The Pastry Junkie</title>
+<link rel="stylesheet" href="../owner-dashboard.css?v=ops-1">
+<script src="../js/shop/catalog.js?v=ops-1" defer></script><script src="../js/order-terms.js?v=rush-1" defer></script>
+<script src="../js/order-time.js?v=ops-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script><script src="../js/handoff-receipts.js?v=rush-1" defer></script><script src="../js/product-labels.js?v=rush-1" defer></script><script src="../js/owner-quote.js?v=rush-1" defer></script>
+<script src="../js/order-workflow-admin.js?v=rush-1" defer></script><script src="../js/menu-editor.js?v=finish-1" defer></script><script src="../js/order-tools.js?v=finish-1" defer></script><script src="../js/owner-dashboard.js?v=finish-1" defer></script>
+</head><body>
+<header><div><small>THE PASTRY JUNKIE</small><h1>Your business dashboard</h1></div><button id="lock" hidden>Lock dashboard</button></header>
+<main>
+<section id="login" class="card"><h2>Welcome back, Erykah</h2><p>Manage orders, your menu and business records.</p><form id="loginForm"><label>Private admin key<input id="adminKey" type="password" autocomplete="current-password" required></label><button>Open dashboard</button></form><p id="loginError" role="alert"></p><p class="muted">The key stays in this page's memory. The dashboard locks after 15 minutes of inactivity.</p></section>
+<section id="app" hidden>
+<nav aria-label="Dashboard"><button data-tab="orders" aria-current="page">Orders</button><button data-tab="menu">Menu & dates</button><button data-tab="records">Records</button><button data-tab="settings">Settings</button></nav>
+<p id="notice" role="status" aria-live="polite"></p><div id="view"></div>
+</section>
+</main></body></html>

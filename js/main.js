@@ -109,9 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const contact = document.createElement("p");
     contact.dataset.tpjContact = "";
     contact.innerHTML =
-        '<a href="mailto:baked@thepastryjunkie.com">' +
-        'baked@thepastryjunkie.com</a> (preferred) · ' +
-        '<a href="tel:+16823738842">(682) 373-8842</a>';
+        'For questions or assistance, email <a href="mailto:baked@thepastryjunkie.com">' +
+        'baked@thepastryjunkie.com</a> or call ' +
+        '<a href="tel:+16823738842">(682) 373-8842</a>.';
 
     footer.append(contact);
 });

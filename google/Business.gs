@@ -24,6 +24,7 @@ function tpjBusinessDelivery_(event){
   const expected=tpjHex_(Utilities.computeHmacSha256Signature(envelope.timestamp+'\n'+envelope.payload,secret,Utilities.Charset.UTF_8));
   const a=tpjSHA_(expected),b=tpjSHA_(String(envelope.signature||''));let mismatch=0;for(let i=0;i<a.length;i++)mismatch|=a.charCodeAt(i)^b.charCodeAt(i);if(mismatch)throw Error('Invalid file signature.');
   const d=JSON.parse(envelope.payload);
+  if(d.action==='purge_test_records'){lock=LockService.getUserLock();if(!lock.tryLock(1000))throw Error('Cleanup busy. Retry the same record.');return reply(tpjPurgeTestRecords_(d));}
   if(d.action!=='fulfillment_photo'||!/^TPJ-[a-f0-9-]{36}$/i.test(d.requestId)||!/^[A-Za-z0-9_-]{16,80}$/.test(d.operationKey)||!['image/jpeg','image/png'].includes(d.mime)||typeof d.base64!=='string'||d.base64.length>450000||!/^[A-Za-z0-9+/]+=*$/.test(d.base64))throw Error('Invalid fulfillment photo.');
   const bytes=Utilities.base64Decode(d.base64),unsigned=i=>(bytes[i]+256)%256;
   if(d.mime==='image/jpeg'?(unsigned(0)!==255||unsigned(1)!==216||unsigned(2)!==255):[137,80,78,71,13,10,26,10].some((n,i)=>unsigned(i)!==n))throw Error('Invalid image content.');
@@ -34,7 +35,7 @@ function tpjBusinessDelivery_(event){
   if(file){if(file.getDescription()!==hash)throw Error('This fulfillment reference already has a different photo.');}
   else {file=folder.createFile(Utilities.newBlob(bytes,d.mime,name));file.setDescription(hash);}
   return reply({ok:true,fileId:file.getId(),url:'https://drive.google.com/file/d/'+file.getId()+'/view'});
- }catch(_){return reply({ok:false,message:'The private fulfillment photo could not be saved. Retry the same fulfillment or save without a photo.'});}
+ }catch(_){return reply({ok:false,message:'The private file operation could not be completed. Retry the same operation or check the private storage configuration.'});}
  finally{if(lock)try{lock.releaseLock();}catch(_){} }
 }
 function tpjDeclinedMail_(job){
