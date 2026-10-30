@@ -2359,7 +2359,8 @@ async function tpjSaveShop(request, env) {
           key,
           hash
         )
-    )
+    ),
+    ...TPJDisplay.newRequest(env, id, now)
   ]);
 
   const saved =
@@ -2900,7 +2901,7 @@ export default {
         error.status || 503
       );
     }
-
+    response = await TPJDisplay.decorate(response, env);
     const headers =
       new Headers(
         response.headers
@@ -3005,7 +3006,7 @@ async function tpjBridge(request, env) {
   }
 
   if (command.action === "mail_claim") {
-    await env.DB.prepare("UPDATE tpj_notifications SET state='failed',last_error='Owner email disabled; manage this event in the dashboard.',lease_until=NULL WHERE recipient_type='owner' AND state IN ('pending','processing')").run();
+    await env.DB.prepare("UPDATE tpj_notifications SET state='failed',last_error='Owner email disabled; manage this event in the dashboard.',lease_until=NULL WHERE recipient_type='owner' AND event_key!='owner_new_request' AND state IN ('pending','processing')").run();
     await env.DB.prepare(
       "UPDATE tpj_notifications SET state='failed', " +
       "last_error='Retry limit reached; review this notification.' " +
@@ -3508,7 +3509,8 @@ async function tpjImportCake(data, env) {
           key,
           combinedHash
         )
-    )
+    ),
+    ...TPJDisplay.newRequest(env, id, now)
   ]);
 
   const saved =
@@ -4298,7 +4300,7 @@ const TPJWorkflow = (() => {
   if(!terms||typeof terms.version!=='string'||typeof terms.title!=='string'||!Array.isArray(terms.sections)||terms.sections.length!==(row.source==='cake_builder'?20:11)||JSON.stringify(terms).length>100000)throw error('The complete order terms are required.');
   if(!terms.sections.every(x=>x&&typeof x.title==='string'&&typeof x.text==='string'&&x.text.trim()))throw error('A terms section is empty.');
   if(b.businessConsent!==true||String(b.businessSigner||'').trim().length<2)throw error('Confirm your business signature before sending the agreement.');
-  if(b.termsReviewed!==true)throw error('Review and confirm the customer terms before issuing the approval.');
+  if(b.priceConfirmed!==true && b.termsReviewed!==true)throw error('Confirm the final price and fulfillment details before issuing the approval.');
   const fulfillment=localMS(b.fulfillmentDate,b.fulfillmentTime);
   if(fulfillment<=Date.now())throw error('The approved fulfillment time must be in the future.');
   const days=(dateMS(b.fulfillmentDate)-dateMS(day()))/86400000,cake=row.source==='cake_builder';
@@ -4698,4 +4700,108 @@ const TPJSigning = (() => {
  }
  async function evidence(e,o){const row=await get(e,'SELECT * FROM tpj_signed_records WHERE offer_id=?',o.id);if(!row)throw err('No enhanced signing record is available for this agreement.',404);return tpjJSON({ok:true,evidence:JSON.parse(row.evidence_json),evidenceHash:row.evidence_hash,pdfSHA256:row.pdf_sha256,archivedAt:row.archived_at});}
  return {start,verify,prepare,documentAck,evidence};
+})();
+/* TPJ DISPLAY REFERENCES — internal IDs and signed evidence stay unchanged. */
+const TPJDisplay = (() => {
+  function newRequest(env, id, createdAt) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date(createdAt));
+
+    const part = key => parts.find(p => p.type === key).value;
+    const prefix = 'TPJ' + part('year') + part('day') + part('month');
+    const sql = (text, ...values) => env.DB.prepare(text).bind(...values);
+
+    return [
+      sql(
+        "UPDATE tpj_display_counters SET sequence=sequence+1 " +
+        "WHERE scope IN ('footprint',(SELECT source FROM tpj_requests WHERE id=?)) " +
+        "AND EXISTS(SELECT 1 FROM tpj_requests WHERE id=? AND source IN ('shop','cake_builder')) " +
+        "AND NOT EXISTS(SELECT 1 FROM tpj_display_references WHERE request_id=?)",
+        id, id, id
+      ),
+      sql(
+        "INSERT INTO tpj_display_references(request_id,reference,footprint,created_at) " +
+        "SELECT r.id,CASE r.source WHEN 'cake_builder' THEN 'TPJCAKE' ELSE 'TPJSHOP' END " +
+        "||printf('%03d',c.sequence),?||printf('%02d',f.sequence),r.created_at " +
+        "FROM tpj_requests r JOIN tpj_display_counters c ON c.scope=r.source " +
+        "JOIN tpj_display_counters f ON f.scope='footprint' " +
+        "WHERE r.id=? AND NOT EXISTS(SELECT 1 FROM tpj_display_references WHERE request_id=r.id)",
+        prefix, id
+      ),
+      sql(
+        "INSERT OR IGNORE INTO tpj_notifications " +
+        "(id,request_id,event_key,recipient_type,payload_json,next_attempt_at,created_at) " +
+        "SELECT ?,r.id,'owner_new_request','owner'," +
+        "json_object('event','owner_new_request','source',r.source,'requestId',r.id," +
+        "'reference',p.reference,'footprint',p.footprint,'sandbox',json(?)),?,? " +
+        "FROM tpj_requests r JOIN tpj_display_references p ON p.request_id=r.id WHERE r.id=?",
+        crypto.randomUUID(),
+        JSON.stringify(
+          String(env.SQUARE_ENVIRONMENT).trim().toLowerCase() !== 'production'
+        ),
+        createdAt, createdAt, id
+      )
+    ];
+  }
+
+  async function decorate(response, env) {
+    if (
+      !response.ok ||
+      !response.headers.get('Content-Type')?.includes('application/json')
+    ) return response;
+
+    const excluded = new Set([
+      'record', 'evidence', 'signature', 'terms',
+      'snapshot', 'details', 'signingRecord'
+    ]);
+    const cache = new Map();
+
+    async function visit(value) {
+      if (!value || typeof value !== 'object') return;
+
+      if (Array.isArray(value)) {
+        for (const item of value) await visit(item);
+        return;
+      }
+
+      const id = value.requestId || value.id;
+
+      if (typeof id === 'string' && /^TPJ-[a-f0-9-]{36}$/i.test(id)) {
+        if (!cache.has(id)) {
+          cache.set(id, await env.DB.prepare(
+            'SELECT reference,footprint FROM tpj_display_references WHERE request_id=?'
+          ).bind(id).first());
+        }
+
+        const labels = cache.get(id);
+        if (labels) Object.assign(value, labels);
+      }
+
+      for (const [key, child] of Object.entries(value)) {
+        if (!excluded.has(key)) await visit(child);
+      }
+    }
+
+    try {
+      const data = await response.clone().json();
+      await visit(data);
+
+      const headers = new Headers(response.headers);
+      headers.delete('Content-Length');
+
+      return new Response(JSON.stringify(data), {
+        status: response.status,
+        headers
+      });
+    } catch (_) {
+      console.error('TPJ display labels unavailable; original response retained.');
+      return response;
+    }
+  }
+
+  return {newRequest, decorate};
 })();

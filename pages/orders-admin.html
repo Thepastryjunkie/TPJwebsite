@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta
   http-equiv="Content-Security-Policy"
-  content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://tpj-orders-api.business-c3f.workers.dev; base-uri 'none'; form-action 'none'"
+  content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://tpj-orders-api.business-c3f.workers.dev; img-src data:; base-uri 'none'; form-action 'none'"
 >
 <title>Orders | The Pastry Junkie</title>
 
@@ -380,8 +380,8 @@ summary { cursor: pointer; font-weight: 750; }
   </section>
 </main>
 
-<script src="../js/order-terms.js?v=signing-2"></script>
-<script src="../js/order-workflow-admin.js?v=signing-2"></script>
+<script src="../js/order-terms.js?v=display-3"></script>
+<script src="../js/order-workflow-admin.js?v=display-3"></script>
 <script>
 (() => {
   "use strict";
@@ -617,7 +617,7 @@ summary { cursor: pointer; font-weight: 750; }
           esc(money(r.estimatedTotalCents)) +
           "</span></span>" +
 
-          "<small>" + esc(r.id) + "</small></button>"
+          "<small>" + esc(r.reference || r.id) + "</small></button>"
         ).join("")
       : "<p>No matching requests.</p>";
 
@@ -700,7 +700,8 @@ summary { cursor: pointer; font-weight: 750; }
         ? "Shop request"
         : "Cake Vision inquiry") +
       "</span><h2>" + esc(r.customerName) +
-      '</h2><p class="detail-id">' + esc(r.id) + "</p>";
+      '</h2><p class="detail-id">' + esc(r.reference || r.id) + "</p>" +
+      (r.footprint ? '<p>Footprint reference: ' + esc(r.footprint) + '</p>' : '');
 
     html += facts([
       ["Status", r.status],
@@ -892,7 +893,7 @@ summary { cursor: pointer; font-weight: 750; }
       "</form>";
 
     html +=
-      "<details><summary>Request history</summary>" +
+      "<details><summary>Technical records</summary><details><summary>Activity log</summary>" +
 
       ((result.events || []).map(e =>
         "<p><strong>" + esc(e.event_type) +
@@ -904,10 +905,10 @@ summary { cursor: pointer; font-weight: 750; }
       "</details>";
 
     html +=
-      "<details><summary>Complete saved configuration</summary>" +
+      "<details><summary>Raw saved data</summary>" +
       '<pre class="pre">' +
       esc(JSON.stringify(d, null, 2)) +
-      "</pre></details>";
+     "</pre></details></details>";
 
     $("detail").innerHTML = html;
     window.TPJWorkflowAdmin?.mount({

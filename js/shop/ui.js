@@ -4307,7 +4307,7 @@ function showReview(
                         Your request ID:
 
                         <strong>
-                            ${esc(result.id)}
+                            ${esc(result.reference || result.id)}
                         </strong>
                     </p>
 

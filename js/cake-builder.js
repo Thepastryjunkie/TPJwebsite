@@ -15445,7 +15445,7 @@ if (submissionRoot) {
 
            message.textContent =
     "Your Cake Vision inquiry was received. Request ID: " +
-tpjReceipt.id +
+(tpjReceipt.reference || tpjReceipt.id) +
 ". A receipt email will follow. The Pastry Junkie will review your design and contact you within 24–48 hours using your preferred contact method.";
         }
 

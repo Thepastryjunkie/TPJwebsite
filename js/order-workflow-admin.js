@@ -25,10 +25,36 @@ window.TPJWorkflowAdmin = (() => {
      '<label>Approved fulfillment date<br><input name="date" type="date" required value="'+e(order.fulfillmentDate)+'"></label> <label>Central time<br><input name="time" type="time" required step="60" value="'+e(order.details?.order?.fulfillment?.time||'12:00')+'"></label>'+
      (cake?'<p><label><input name="rush" type="checkbox"> Rush order</label></p><label>Rush fee in dollars<br><input name="rushFee" type="number" step="0.01" min="0" value="0" required></label><p class="muted">Cake rush fees start at $75. Orders accepted seven days or fewer before fulfillment require full payment, including the rush fee.</p>':'<input name="rushFee" type="hidden" value="0">')+
      '<label>Your name as business signer<br><input name="businessSigner" value="Erykah Williams" required minlength="2" maxlength="150"></label><label><input name="businessConsent" type="checkbox" required> I adopt this name as my electronic signature and authorize this agreement.</label><p data-plan></p><label>Final approved design/order notes<br><textarea name="description" maxlength="10000" placeholder="Document any approved details that differ from the original inquiry."></textarea></label>'+
-     '<details><summary>Review customer terms before sending</summary>'+termsHTML({...sourceTerms,version:window.TPJOrderTerms.version})+'</details><p><label><input name="reviewed" type="checkbox" required> I verified the final price, terms and fulfillment details and authorize sending them to the customer.</label></p><button class="primary" type="submit">Issue approval and queue customer email</button></form>';
+          '<p><label><input name="reviewed" type="checkbox" required> I confirm the final price and fulfillment details are correct and ready to send.</label></p><button class="primary" type="submit">Issue approval and queue customer email</button></form>';
    }
    if(o){
     html+='<h4>Latest approval · '+e(o.environment)+' · '+e(o.status)+'</h4><p>Approved total: <strong>'+money(o.totalCents)+'</strong><br>Initial payment: '+money(o.initialCents)+(o.balanceDueDate?'<br>Balance due: '+e(o.balanceDueDate):'')+'<br>Fulfillment: '+e(o.fulfillmentDate+' '+o.fulfillmentTime)+' Central<br>Agreement: '+(o.signature?'Accepted by '+e(o.signature.name)+' at '+e(o.signature.signedAt):'Awaiting acceptance')+'<br>Approval expires: '+e(o.expiresAt)+'</p>';
+      const business=o.snapshot?.businessAcceptance,customer=o.signature;
+
+    const signedDate=value=>value?new Date(value).toLocaleString('en-US',{
+      timeZone:'America/Chicago',
+      dateStyle:'long',
+      timeStyle:'short'
+    }):'';
+
+    const mark=customer?.signature;
+
+    const customerMark=customer?(
+      mark?.method==='drawn' &&
+      /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(mark.png||'')
+        ? '<img src="'+mark.png+'" width="300" style="max-width:100%;height:auto" alt="Customer signature">'
+        : '<p style="font:italic 26px Georgia,serif">'+e(customer.name)+'</p>'
+    ):'<p>Awaiting customer signature.</p>';
+
+    html+='<details><summary>Agreement signatures</summary><h4>Business signature</h4>'+
+      (business
+        ? '<p style="font:italic 26px Georgia,serif">'+e(business.name)+'</p><p>'+e(signedDate(business.signedAt))+' Central</p>'
+        : '<p>No business signature was recorded for this earlier approval.</p>')+
+      '<h4>Customer signature</h4>'+customerMark+
+      (customer
+        ? '<p>'+e(customer.name)+' · '+e(signedDate(customer.signedAt))+' Central</p>'
+        : '')+
+      '</details>';
     html+='<p><a href="'+e(o.orderURL)+'" target="_blank" rel="noopener noreferrer">Open private customer order page</a></p>';
     html+=o.paymentReview?'<p class="error">PAYMENT REVIEW REQUIRED — check Square before preparing or releasing this order.</p>':'';
     if(o.signingRecord){const record=o.signingRecord;html+='<details><summary>Signing evidence and archived agreement</summary><p>Verified email: '+e(o.signature?.verification?.email||'Legacy agreement')+'<br>Signed record fingerprint: '+e(record.evidence_hash)+'<br>PDF archived: '+e(record.archived_at||'Waiting for the customer email queue')+'</p>'+(record.drive_file_id?'<p><a href="https://drive.google.com/file/d/'+e(record.drive_file_id)+'/view" target="_blank" rel="noopener noreferrer">Open private signed PDF</a></p>':'')+'<button type="button" data-evidence>Download signing record</button></details>'; }
@@ -56,7 +82,7 @@ window.TPJWorkflowAdmin = (() => {
     }catch{plan.textContent='Enter the final amounts and fulfillment date.';}};
     issue.oninput=preview;issue.onchange=preview;preview();
     issue.onsubmit=event=>{event.preventDefault();if(!issue.reportValidity())return;busy(issue.querySelector('button[type="submit"]'),async()=>{
-     if(!pending){const fee=cents(issue.elements.rushFee.value);pending={operationKey:crypto.randomUUID(),businessSigner:issue.elements.businessSigner.value,businessConsent:issue.elements.businessConsent.checked,version:order.version,totalCents:cents(issue.elements.base.value)+fee,rushFeeCents:fee,rushOrder:cake&&issue.elements.rush.checked,fulfillmentDate:issue.elements.date.value,fulfillmentTime:issue.elements.time.value,approvedDescription:issue.elements.description.value,termsReviewed:issue.elements.reviewed.checked,terms:{version:window.TPJOrderTerms.version,...sourceTerms}};}
+     if(!pending){const fee=cents(issue.elements.rushFee.value);pending={operationKey:crypto.randomUUID(),businessSigner:issue.elements.businessSigner.value,businessConsent:issue.elements.businessConsent.checked,version:order.version,totalCents:cents(issue.elements.base.value)+fee,rushFeeCents:fee,rushOrder:cake&&issue.elements.rush.checked,fulfillmentDate:issue.elements.date.value,fulfillmentTime:issue.elements.time.value,approvedDescription:issue.elements.description.value,priceConfirmed:issue.elements.reviewed.checked,terms:{version:window.TPJOrderTerms.version,...sourceTerms}};}
      await api('/api/admin/workflow/requests/'+encodeURIComponent(order.id)+'/issue',{method:'POST',body:pending});
     });};
    }
