@@ -27,7 +27,7 @@
         ? globalThis
         : this,
 
-    function (C, D) {
+    function buildModel(C, D) {
         function money(cents) {
             return new Intl.NumberFormat(
                 "en-US",
@@ -93,9 +93,7 @@
         }
 
         function cakeName(id) {
-            return id === "chocolate"
-                ? "Triple Chocolate Brownie"
-                : C.flavors[id];
+            return C.flavors[id];
         }
 
         /*
@@ -945,7 +943,7 @@
                     3600000
             ) {
                 fail(
-                    "Choose a requested date and time at least 72 hours from now."
+                    "Choose a requested date and time at least " + C.preorderHours + " hours from now."
                 );
             }
 
@@ -1263,7 +1261,8 @@
             localInstant,
             validateOrder,
             cakeName,
-            availabilityTargets
+            availabilityTargets,
+            withCatalog: catalog => buildModel(catalog, D)
         };
     }
 );

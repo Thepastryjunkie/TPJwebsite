@@ -2,8 +2,8 @@
 (function () {
 "use strict";
 
-const C = window.TPJShopCatalog;
-const M = window.TPJShopModel;
+let C = window.TPJShopCatalog;
+let M = window.TPJShopModel;
 const D = window.TPJDelivery;
 
 const API = (
@@ -116,6 +116,7 @@ async function refreshAvailability() {
         }
 
         availability = await response.json();
+        if(availability.catalog){C=availability.catalog;M=window.TPJShopModel.withCatalog(C);}
 
         if (
             !Number.isInteger(
@@ -181,7 +182,14 @@ function isCardAvailable(category, flavor) {
 }
 
 function refreshCards() {
+    for(const [id,category]of Object.entries(C.categories)){const original=window.TPJShopCatalog.categories[id];if(category.name!==original.name){const heading=document.getElementById(category.section)?.querySelector('h2');if(heading)heading.textContent=category.name;}}
+    if(C.chocolate.name!==window.TPJShopCatalog.chocolate.name){const heading=document.getElementById('chocolateTreats')?.querySelector('h2');if(heading)heading.textContent=C.chocolate.name;}
     $$("[data-shop-category]").forEach(card => {
+        const category=card.dataset.shopCategory,flavor=card.dataset.shopFlavor;
+        const price=category==='half'?C.half.prices[2]:category==='chocolate'?C.chocolate.treats[flavor]?.price:C.categories[category]?.prices[category==='cakes'?2:1];
+        const priceNode=card.querySelector('.shop-card-price');if(priceNode&&typeof price==='number')priceNode.textContent=M.money(price);
+        const copyNode=card.querySelector('.shop-card-copy');if(copyNode)copyNode.textContent=productDescription(category,flavor);
+        const titleNode=card.querySelector('h3');if(titleNode)titleNode.textContent=displayName(category,flavor);
         const available = isCardAvailable(
             card.dataset.shopCategory,
             card.dataset.shopFlavor
@@ -654,6 +662,7 @@ const SHOP_COPY = {
 };
 
 function productDescription(category, flavor, popup = false) {
+    if(Object.hasOwn(C.ownerDescriptions||{},category))return C.ownerDescriptions[category];
     const key = category === "half" ? "half" : flavor;
 
     return SHOP_COPY[category]?.[key]?.[popup ? 1 : 0] || "";
@@ -3437,7 +3446,7 @@ function openCheckout() {
 
     const start = new Date(
         now().getTime() +
-        72 * 3600000
+        C.preorderHours * 3600000
     );
 
     for (
@@ -3487,7 +3496,7 @@ function openCheckout() {
             <form id="shopCheckoutForm">
                 <p>
                     Everyday sweets, made to order.
-                    At least 72 hours’ notice is required.
+                    At least ${C.preorderHours} hours’ notice is required.
                     All times are Central time
                     (Dallas–Fort Worth).
                 </p>
@@ -3558,9 +3567,11 @@ function openCheckout() {
 
                         <input
                             name="time"
-                            type="time"
+                            type="text"
+                            data-tpj-time
+                            placeholder="12:05 PM"
+                            autocomplete="off"
                             required
-                            step="900"
                         >
 
                         <small>
@@ -3893,6 +3904,9 @@ function openCheckout() {
             Object.fromEntries(
                 new FormData(form)
             );
+
+        try { values.time=window.TPJOrderTime.parse(values.time); }
+        catch(error){form.elements.time.setCustomValidity(error.message);form.elements.time.reportValidity();return;}
 
         const payload = {
             items: clone(cart),
@@ -4273,6 +4287,7 @@ function showReview(
                 ) {
                     availability =
                         result.availability;
+                    if(availability.catalog){C=availability.catalog;M=window.TPJShopModel.withCatalog(C);}
 
                     refreshCards();
                 }

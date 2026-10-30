@@ -101,3 +101,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const footer = document.querySelector("footer");
+
+    if (!footer || footer.querySelector("[data-tpj-contact]")) return;
+
+    const contact = document.createElement("p");
+    contact.dataset.tpjContact = "";
+    contact.innerHTML =
+        '<a href="mailto:baked@thepastryjunkie.com">' +
+        'baked@thepastryjunkie.com</a> (preferred) · ' +
+        '<a href="tel:+16823738842">(682) 373-8842</a>';
+
+    footer.append(contact);
+});

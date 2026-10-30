@@ -11,7 +11,7 @@ window.TPJSigningUI=(()=>{
  }
  function invoice(o){
   const paid=o.intents.reduce((n,i)=>n+Number(i.paid_cents||0),0),pending=o.intents.find(i=>i.status!=='PAID'),items=o.snapshot.items||[];
-  return '<section class="card" id="invoice"><h2>'+(o.contractRequired?'Custom Cake Order Invoice':'Shop Order Invoice')+'</h2><p>Order reference: <strong>'+e(o.reference || o.requestId)+'</strong></p><p>Thank you for choosing The Pastry Junkie. This invoice reflects your approved order and payment schedule.</p>'+items.map(i=>'<p><strong>'+e(i.title)+'</strong> · Quantity '+e(i.quantity)+'</p><ul>'+(i.details||[]).map(t=>'<li>'+e(t)+'</li>').join('')+'</ul>').join('')+(o.snapshot.approvedDescription?'<p style="white-space:pre-wrap">'+e(o.snapshot.approvedDescription)+'</p>':'')+'<dl class="facts"><dt>Order total</dt><dd>'+money(o.totalCents)+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Remaining balance</dt><dd>'+money(Math.max(0,o.totalCents-paid))+'</dd></dl>'+o.intents.map(i=>'<p><strong>'+e(i.phase==='initial'?(o.initialCents<o.totalCents?'Deposit':'Full payment'):'Remaining balance')+'</strong> · '+money(i.amount_cents)+' · '+e(i.status)+(i.phase==='balance'?' · Due '+e(format(o.balanceDueDate)):'')+(i.paid_at?' · Received '+e(format(i.paid_at)):'')+'</p>').join('')+(o.paymentReview?'<p class="error">A refund or dispute requires review. Contact the business for the current financial resolution.</p>':pending?'<p>Use the secure payment section on this page to pay the amount currently required.</p>':'<p><strong>Paid in full. Thank you!</strong></p>')+'<p class="no-print"><a href="?view=agreement#'+e(o.id)+'.'+e(location.hash.split('.').at(-1))+'">View agreement</a> · <button type="button" id="invoicePrint">Print / save invoice</button></p></section>';
+  return '<section class="card" id="invoice"><h2>'+(o.contractRequired?'Custom Cake Order Invoice':'Shop Order Invoice')+'</h2><p>Order reference: <strong>'+e(o.reference || o.requestId)+'</strong></p><p>Thank you for choosing The Pastry Junkie. This invoice reflects your approved order and payment schedule.</p>'+(o.snapshot.quote?window.TPJRecords.quote(o.snapshot.quote,o.totalCents):'')+(o.snapshot.quote?[]:items).map(i=>'<p><strong>'+e(i.title)+'</strong> · Quantity '+e(i.quantity)+'</p><ul>'+(i.details||[]).map(t=>'<li>'+e(t)+'</li>').join('')+'</ul>').join('')+(o.snapshot.approvedDescription?'<p style="white-space:pre-wrap">'+e(o.snapshot.approvedDescription)+'</p>':'')+'<dl class="facts"><dt>Order total</dt><dd>'+money(o.totalCents)+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Remaining balance</dt><dd>'+money(Math.max(0,o.totalCents-paid))+'</dd></dl>'+o.intents.map(i=>'<p><strong>'+e(i.phase==='initial'?(o.initialCents<o.totalCents?'Deposit':'Full payment'):'Remaining balance')+'</strong> · '+money(i.amount_cents)+' · '+e(i.status)+(i.phase==='balance'?' · Due '+e(format(o.balanceDueDate)):'')+(i.paid_at?' · Received '+e(format(i.paid_at)):'')+'</p>').join('')+(o.paymentReview?'<p class="error">A refund or dispute requires review. Contact the business for the current financial resolution.</p>':pending?'<p>Use the secure payment section on this page to pay the amount currently required.</p>':'<p><strong>Paid in full. Thank you!</strong></p>')+'<p class="no-print"><a href="?view=agreement#'+e(o.id)+'.'+e(location.hash.split('.').at(-1))+'">View agreement</a> · <button type="button" id="invoicePrint">Print / save invoice</button></p></section>';
  }
  function savedSignature(o){
   const s=o.signature,a=s.signature,b=o.snapshot.businessAcceptance;
@@ -19,7 +19,7 @@ window.TPJSigningUI=(()=>{
   return '<div class="signature"><h3>Customer signature</h3>'+picture+'<p>'+e(s.name)+' · '+e(format(s.signedAt))+'</p><p>Email verification: '+e(s.verification?.email||'Not recorded for this earlier agreement')+'</p>'+(b?'<h3>Business signature</h3><p style="font:italic 26px Georgia,serif">'+e(b.name)+'</p><p>'+e(format(b.signedAt))+'</p>':'')+'</div>';
  }
  function mount(form,api,getVerification,setVerification){
-  const block=document.createElement('section');block.innerHTML='<h3>Verify your email and sign</h3><p>We’ll send a six-digit code to the email saved on this order. It expires in 10 minutes. Verification confirms access to that inbox.</p><button type="button" id="sendCode">Send verification code</button><label>Verification code<input id="emailCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label><button type="button" id="verifyCode">Verify code</button><p id="codeStatus" role="status" aria-live="polite"></p><label>Signature style<select id="signatureMethod"><option value="typed">Type my signature</option><option value="drawn">Draw my signature</option></select></label><p id="typedSignature" style="font:italic 28px Georgia,serif"></p><div id="drawing" hidden><p>Draw inside the box using your finger or mouse.</p><canvas id="signatureCanvas" width="900" height="300" aria-label="Draw your signature" style="display:block;width:100%;height:150px;border:1px solid #cda7ad;border-radius:8px;background:white;touch-action:none"></canvas><button type="button" id="clearSignature">Clear signature</button></div>';
+  const block=document.createElement('section');block.innerHTML='<h3>Verify your email and sign</h3><p>We’ll send a six-digit code to the email saved on this order. It expires in 10 minutes. Check Spam/Junk if the code has not arrived. Verification confirms access to that inbox.</p><button type="button" id="sendCode">Send verification code</button><label>Verification code<input id="emailCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label><button type="button" id="verifyCode">Verify code</button><p id="codeStatus" role="status" aria-live="polite"></p><label>Signature style<select id="signatureMethod"><option value="typed">Type my signature</option><option value="drawn">Draw my signature</option></select></label><p id="typedSignature" style="font:italic 28px Georgia,serif"></p><div id="drawing" hidden><p>Draw inside the box using your finger or mouse.</p><canvas id="signatureCanvas" width="900" height="300" aria-label="Draw your signature" style="display:block;width:100%;height:150px;border:1px solid #cda7ad;border-radius:8px;background:white;touch-action:none"></canvas><button type="button" id="clearSignature">Clear signature</button></div>';
   const submit=form.querySelector('button[type=submit]');form.insertBefore(block,submit);
   const q=s=>block.querySelector(s),status=q('#codeStatus'),canvas=q('#signatureCanvas'),ctx=canvas.getContext('2d');let challenge=null,busy=false,down=false,drawn=false;
   ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1c1614';
@@ -30,9 +30,71 @@ window.TPJSigningUI=(()=>{
   q('#clearSignature').onclick=()=>{ctx.clearRect(0,0,900,300);drawn=false;};
   const signer=form.elements.signer;signer.addEventListener('input',()=>q('#typedSignature').textContent=signer.value);
   q('#signatureMethod').onchange=()=>{const draw=q('#signatureMethod').value==='drawn';q('#drawing').hidden=!draw;q('#typedSignature').hidden=draw;};
-  q('#sendCode').onclick=async()=>{if(busy)return;busy=true;q('#sendCode').disabled=true;status.textContent='Sending your code…';try{setVerification(null);const d=await api('verification-start',{});challenge=d.challengeId;status.textContent='Code sent to '+d.emailHint+'. Use the latest code within 10 minutes.';}catch(error){status.textContent=error.message;}finally{busy=false;setTimeout(()=>{q('#sendCode').disabled=false;},60000);}};
-  q('#verifyCode').onclick=async()=>{if(busy)return;if(!challenge){status.textContent='Request a code first. If you refreshed the page, request a new one.';return;}busy=true;q('#verifyCode').disabled=true;try{const d=await api('verification-check',{challengeId:challenge,code:q('#emailCode').value.trim()});setVerification(d);status.textContent='Email verified. Review the agreement and finish signing before the code expires.';q('#emailCode').value='';}catch(error){status.textContent=error.message;}finally{busy=false;q('#verifyCode').disabled=false;}};
-  return {payload(){const v=getVerification();if(!v)throw Error('Verify your email before signing.');const method=q('#signatureMethod').value;if(method==='drawn'&&!drawn)throw Error('Draw your signature or choose the typed option.');return {verificationId:v.verificationId,verificationProof:v.verificationProof,signatureMethod:method,...(method==='drawn'?{signaturePNG:canvas.toDataURL('image/png')}:{})};}};
+  const validProof=()=>{
+    const v=getVerification();
+    return Boolean(v && Date.parse(v.expiresAt)>Date.now());
+  };
+  let codeExpiresAt=null;
+  const showVerified=proof=>{
+    q('#emailCode').value='';
+    q('#emailCode').disabled=true;
+    q('#verifyCode').disabled=true;
+    q('#sendCode').disabled=true;
+    status.textContent='Email verified. You can now finish signing. Verification stays active until the code expires.';
+    setTimeout(()=>{
+      if(getVerification()?.verificationId!==proof.verificationId)return;
+      setVerification(null);
+      challenge=null;
+      q('#emailCode').disabled=false;
+      q('#verifyCode').disabled=false;
+      q('#sendCode').disabled=false;
+      q('#sendCode').textContent='Send a new code';
+      status.textContent='Verification expired. Request a new code to finish signing.';
+    },Math.max(0,Date.parse(proof.expiresAt)-Date.now()));
+  };
+  q('#sendCode').onclick=async()=>{
+    if(busy || validProof() || q('#sendCode').disabled)return;
+    busy=true;
+    q('#sendCode').disabled=true;
+    q('#verifyCode').disabled=true;
+    status.textContent='Sending your code…';
+    try{
+      setVerification(null);
+      const d=await api('verification-start',{});
+      challenge=d.challengeId;
+      codeExpiresAt=d.expiresAt;
+      q('#sendCode').textContent='Resend code';
+      status.textContent='Code sent to '+d.emailHint+'. Check your inbox and Spam/Junk folder. Use the latest code within 10 minutes. You can resend after one minute.';
+    }catch(error){status.textContent=error.message;}
+    finally{
+      busy=false;
+      if(!validProof())q('#verifyCode').disabled=false;
+      setTimeout(()=>{
+        if(!validProof())q('#sendCode').disabled=false;
+      },60000);
+    }
+  };
+  q('#verifyCode').onclick=async()=>{
+    if(busy || validProof())return;
+    if(!challenge){status.textContent='Request a code first. Check your Spam/Junk folder if it has not arrived.';return;}
+    busy=true;
+    q('#verifyCode').disabled=true;
+    try{
+      const d=await api('verification-check',{
+        challengeId:challenge,
+        code:q('#emailCode').value.trim()
+      });
+      const proof={...d,expiresAt:d.expiresAt || codeExpiresAt};
+      setVerification(proof);
+      showVerified(proof);
+    }catch(error){status.textContent=error.message;}
+    finally{
+      busy=false;
+      if(!validProof())q('#verifyCode').disabled=false;
+    }
+  };
+  if(validProof())showVerified(getVerification());
+  return {payload(){const v=getVerification();if(!validProof())throw Error('Verify your email before signing.');const method=q('#signatureMethod').value;if(method==='drawn'&&!drawn)throw Error('Draw your signature or choose the typed option.');return {verificationId:v.verificationId,verificationProof:v.verificationProof,signatureMethod:method,...(method==='drawn'?{signaturePNG:canvas.toDataURL('image/png')}:{})};}};
  }
  function navigate(){
   const target=new URLSearchParams(location.search).get('view');if(['invoice','agreement'].includes(target))document.getElementById(target)?.scrollIntoView();

@@ -15358,6 +15358,9 @@ if (submissionRoot) {
     }
 
     try {
+        const availabilityResponse=await fetch('https://tpj-orders-api.business-c3f.workers.dev/api/business/public',{cache:'no-store'});
+        const requestSettings=await availabilityResponse.json();
+        if(!availabilityResponse.ok || !requestSettings.acceptCake)throw Error('Custom cake inquiries are temporarily paused. Your selections are saved. Please contact baked@thepastryjunkie.com.');
         const submissionFiles =
             await collectSubmissionFiles();
 

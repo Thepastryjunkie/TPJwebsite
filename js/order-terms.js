@@ -1,12 +1,12 @@
-/* TPJ ORDER TERMS — REVIEW BEFORE PUBLISHING */
+/* TPJ VERSIONED ORDER TERMS — final legal review recommended before production. */
 window.TPJOrderTerms = {
-  "version": "2026-10-28-1",
+  "version": "2026-10-29-ops-1",
   "shop": {
     "title": "Shop Order Terms",
     "sections": [
       {
         "title": "Requests, Approval & Confirmation",
-        "text": "Submit Shop requests at least 72 hours before the requested pickup or delivery time. An inquiry does not reserve a date. The Pastry Junkie reviews availability and fulfillment details before issuing an approval. Full payment of the approved total is required to confirm a Shop order. No product is released before full payment is verified."
+        "text": "Submit Shop requests at least 72 hours before requested fulfillment, or the longer advance-notice period displayed in the Shop. An inquiry does not reserve a date. The Pastry Junkie reviews availability and sends a final, itemized approval. Full payment of the approved total, after acceptance of the agreement, is required to confirm a Shop order. No product is released before full payment is verified."
       },
       {
         "title": "Products, Quantities & Substitutions",
@@ -26,7 +26,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Care, Storage & Transport",
-        "text": "Keep products level and protected from heat and sunlight. Use a cooled vehicle and a flat, stable surface. Refrigerated desserts, including cheesecake jars and cheesecake apples, must remain refrigerated or frozen until prepared for consumption, following the product's safe-handling instructions. The customer is responsible for proper transport, storage and handling after handoff. Decorative-temperature guidance is not a substitute for food-safety refrigeration requirements."
+        "text": "Keep products level and protected from heat and sunlight. Use a cooled vehicle and a flat, stable surface. Products requiring refrigeration, including cheesecake jars and cheesecake apples, must remain refrigerated or frozen until prepared for consumption, following their product-specific safe-handling instructions. The customer is responsible for proper care after actual handoff. This does not exclude obligations or liability that cannot lawfully be excluded."
       },
       {
         "title": "Allergens",
@@ -46,7 +46,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Cottage Food Disclosure",
-        "text": "The Pastry Junkie operates as a Texas Cottage Food Production Operation. THIS PRODUCT WAS PRODUCED IN A PRIVATE RESIDENCE THAT IS NOT SUBJECT TO GOVERNMENTAL LICENSING OR INSPECTION. Required product labels and safe-handling instructions are provided separately at fulfillment."
+        "text": "The Pastry Junkie operates as a Texas Cottage Food Production Operation. THIS PRODUCT WAS PRODUCED IN A PRIVATE RESIDENCE THAT IS NOT SUBJECT TO GOVERNMENTAL LICENSING OR INSPECTION. Review the product information displayed before payment and the required physical label supplied at fulfillment. Products requiring refrigeration carry the applicable production date and safe-handling information. The operation's address or DSHS registration number will be provided on the physical label as required."
       }
     ]
   },
@@ -55,93 +55,97 @@ window.TPJOrderTerms = {
     "sections": [
       {
         "title": "Care & Handling",
-        "text": "Cakes and desserts must be kept at temperatures of 70°F (21°C) or below. Exposure to heat, direct sunlight, or warm environments may cause melting, shifting, cracking, or other damage.\nCustomers are responsible for ensuring their vehicle is cooled before pickup. Cakes should be transported on a flat, sturdy surface, preferably on the floor of the vehicle. Do not place cakes on seats, laps, or uneven surfaces.\nThe Pastry Junkie is not responsible for damage occurring after pickup, delivery, or setup due to improper handling, transportation, storage, environmental conditions, or customer negligence.\nOutdoor events, direct sunlight, heaters, and temperatures above 70°F are accepted at the customer’s own risk."
+        "text": "Keep cakes level, protected from sunlight and heat, and transported on a flat, stable surface in a cooled vehicle. The 70°F decorative-care guideline concerns the stability of decorations; it is not a safe-storage temperature for refrigerated foods. Products requiring refrigeration must be kept refrigerated or frozen until prepared for consumption, following their product-specific safe-handling instructions. After handoff, customers are responsible for proper transport, storage and handling. The Pastry Junkie is not responsible for damage caused by customer mishandling or unsuitable conditions after handoff, subject to applicable law. Discuss outdoor or unusually warm event conditions before approval."
       },
       {
         "title": "Design Changes & Alterations",
-        "text": "Changes to the size, flavor, or design of an order must be requested and approved in writing via email or text message.\nAll design changes must be submitted no later than seven (7) days prior to the pickup or delivery date.\nChanges requested after final payment or within seven (7) days of the event date may not be accommodated."
+        "text": "Request changes to size, flavor, design or fulfillment details in writing by email. A change is effective only when The Pastry Junkie confirms it in writing, including any revised price or schedule. Request changes at least seven calendar days before fulfillment. Changes within seven days, after production begins or after final payment may be unavailable. Material changes to an accepted agreement require a written amendment or replacement agreement and any required new customer acceptance; changing an internal note does not amend the customer's agreement."
       },
       {
         "title": "Design Disclaimer",
-        "text": "The Pastry Junkie will make every reasonable effort to create a cake that closely matches the requested design and color palette.\nBecause all products are handmade and artistic in nature:\n• Exact color matches cannot be guaranteed.\n• Decorative finishes are subject to artistic interpretation.\n• Minor variations in color, texture, and design may occur.\n• Lighting conditions and photography may affect the appearance of colors.\nRefunds, discounts, or credits will not be provided for minor artistic variations.\nIf the customer provides photographs, inspiration images, logos, or likenesses, The Pastry Junkie will make every reasonable effort to recreate them but does not guarantee exact duplication."
+        "text": "Each cake is handmade. Exact duplication of inspiration photos, colors or artistic finishes is not guaranteed. Minor artistic variations and differences caused by lighting or photography alone do not qualify for a refund or credit. The approved order identifies the material design specifications. If you supply images, logos or other reference material, ensure you have permission to use it. This section does not excuse a material failure to provide the agreed product or limit remedies required by law."
       },
       {
         "title": "Deposits",
-        "text": "A non-refundable deposit equal to 50% of the total order amount and acceptance of these terms are required to secure an order date.\nOrders are not considered confirmed until the deposit has been received.\nDeposits are non-refundable under all circumstances."
+        "text": "For orders accepted more than seven calendar days before fulfillment, a signed agreement and a deposit equal to 50% of the final approved total are required to secure the date. An odd cent is rounded up in the initial payment. The deposit is applied to the total and supports reserved production capacity and order preparation. For customer-requested cancellation, the deposit is non-refundable subject to applicable law and the cancellation terms below. Orders accepted seven days or fewer before fulfillment require full payment, including any approved rush fee, after signing. An inquiry, quote or signature alone does not reserve the date; the required initial payment must be verified."
       },
       {
         "title": "Final Payment",
-        "text": "The remaining balance must be paid in full no later than seven (7) days prior to the scheduled pickup or delivery date.\nNo product will be released until full payment has been received.\nFailure to pay the remaining balance by the due date may result in cancellation of the order without refund of the deposit.\nLate payments may be subject to a 10% late fee."
+        "text": "When a balance remains, it is due seven calendar days before the scheduled pickup or delivery date. The invoice shows the actual due date and payment amounts. No product is released before full payment is verified. If payment is late, The Pastry Junkie may contact the customer and, after notice, cancel the order subject to the agreed cancellation terms and applicable law. Late fees are not charged automatically. Any proposed late fee must be lawful, disclosed and accepted before it is charged. Card details are not stored for automatic future charges by this ordering system."
       },
       {
         "title": "Cancellation Policy",
-        "text": "Deposits are non-refundable.\nOrders canceled more than seven (7) days before the scheduled pickup or delivery date may receive store credit for payments made beyond the deposit amount. Store credit must be used within three (3) months of the original event date.\nOrders canceled within seven (7) days of the scheduled pickup or delivery date are not eligible for refunds or store credit."
+        "text": "Submit cancellation requests in writing through the private order page or by emailing baked@thepastryjunkie.com. For customer cancellations more than seven calendar days before fulfillment, payments beyond the deposit may be considered for discretionary store credit. Any credit granted must be confirmed in writing and used within three months of the original event date unless its written conditions provide otherwise. Customer cancellations within seven calendar days generally do not qualify for refunds or store credit, subject to applicable law. A request is not a promise of credit, and a cancellation record does not itself process a refund. Business-initiated cancellations are addressed separately below."
       },
       {
         "title": "Refunds, Disputes & Store Credit",
-        "text": "Due to the custom, perishable, and handcrafted nature of our products, all sales are final.\nCustomers are encouraged to inspect their order at pickup or delivery.\nIf an issue is identified at the time of pickup or delivery, The Pastry Junkie will make reasonable efforts to correct the issue when possible.\nOnce an order has been accepted through pickup, delivery, or setup completion, it is considered accepted in full.\nNo refunds, credits, replacements, or adjustments will be issued after acceptance.\nFlavor or texture preferences are subjective and do not constitute grounds for a refund.\nAt the sole discretion of The Pastry Junkie, store credit may be offered in limited circumstances.\nNo refunds or credits will be provided for products that have been consumed."
+        "text": "Because products are custom and perishable, payments are generally non-refundable for customer-requested cancellations and subjective preferences, subject to applicable law. Inspect the order at handoff and promptly report concerns so reasonable correction can be considered. Acceptance, consumption or disposal can affect our ability to investigate or correct a concern, but does not waive rights that cannot lawfully be waived. Store credit is discretionary unless otherwise required by law or expressly agreed in writing. Nothing in this agreement removes remedies required for non-delivery, material failure to meet approved specifications or other non-waivable rights."
       },
       {
         "title": "Late Pickup Policy",
-        "text": "Customers are granted a ten (10) minute grace period for scheduled pickups.\nAfter ten (10) minutes, a $15 late fee may be assessed.\nOrders not picked up within thirty (30) minutes of the scheduled pickup time may be refrigerated and rescheduled for pickup at The Pastry Junkie’s discretion.\nAdditional fees may apply."
+        "text": "A ten-minute pickup grace period is provided. After ten minutes, a $15 late-pickup fee may apply if disclosed in the approved order and permitted by law. After thirty minutes, pickup may need to be rescheduled, subject to availability and safe storage. Contact the business promptly if delayed. Any further fee or revised arrangement will be communicated rather than silently added to a card charge."
       },
       {
         "title": "Rush Orders",
-        "text": "Rush orders may be accepted depending on availability, design complexity, and production schedule.\nApproved rush orders are subject to an additional fee beginning at $75.\nRush fees may increase based on the complexity of the order."
+        "text": "Rush orders depend on capacity and design requirements and are not guaranteed. An accepted cake rush order has a fee starting at $75, which may increase for complexity. The actual fee is disclosed in the approved quote and included in the agreed total. Orders accepted seven days or fewer before fulfillment require full payment, including the rush fee, after signing."
       },
       {
         "title": "Delivery Policy",
-        "text": "Customers must confirm delivery details at least two (2) days prior to the scheduled delivery date.\nCustomers must disclose any road hazards, access restrictions, gated entry requirements, staircases, or other obstacles that may affect delivery.\nIf a customer or designated representative is unavailable to accept delivery, additional delivery fees may apply.\nOnce delivery is completed and accepted by the customer or designated representative, responsibility for the product transfers to the customer.\nThe Pastry Junkie’s liability for delivery-related issues shall not exceed the total amount paid for the order."
+        "text": "Confirm delivery details at least two days before fulfillment. Supply the correct address, recipient contact details, access instructions, stairs and other conditions affecting delivery. A designated recipient must be available. Customer-caused failed handoff or an approved address change may require rescheduling and a separately disclosed additional delivery fee. Responsibility for proper care transfers at actual handoff or agreed setup completion, subject to applicable law. Temperature-sensitive products will be transported under the applicable safe-handling requirements; a decorative-care guideline does not replace refrigeration requirements."
       },
       {
         "title": "Allergy Disclaimer",
-        "text": "While The Pastry Junkie follows procedures intended to reduce cross-contamination, products are prepared in an environment where common allergens may be present.\nProducts may contain or come into contact with:\n• Milk\n• Eggs\n• Wheat\n• Soy\n• Peanuts\n• Tree nuts\n• Other allergens\nThe Pastry Junkie cannot guarantee an allergen-free environment and assumes no liability for allergic reactions."
+        "text": "Products are prepared in a shared home kitchen where common allergens may be present. Review the approved order's product disclosures and physical labels for allergens present in the actual recipe. Cross-contact with other allergens is possible; an allergen-free product or environment is not promised. Tell us about allergies before approval so we can discuss whether the order can be accommodated. An allergy notice does not exclude liability or obligations that cannot lawfully be excluded."
       },
       {
         "title": "Serving Size Disclaimer",
-        "text": "Serving recommendations are estimates only.\nThe Pastry Junkie is not responsible for cake shortages resulting from portions being cut larger than recommended serving sizes.\nBy placing an order, the customer acknowledges that serving counts are approximate and not guaranteed."
+        "text": "Serving counts are estimates based on the stated cake dimensions and recommended portion sizes. Actual yield depends on cutting and serving choices. Request a suitable size before approval. This does not excuse supplying a materially different size from the approved order."
       },
       {
         "title": "Photography & Intellectual Property",
-        "text": "The Pastry Junkie respects customer privacy and will not share personal contact information, event details, or identifying information without permission.\nHowever, The Pastry Junkie reserves the right to photograph products and use those photographs for:\n• Social media\n• Advertising\n• Marketing materials\n• Website content\n• Promotional purposes\nBy placing an order, the customer grants permission for photographs of purchased products to be used without compensation."
+        "text": "The Pastry Junkie may photograph its finished products for portfolio and marketing use. Private customer contact information, identifying event details and uploaded reference files will not be published without permission. Product images containing identifying customer details require permission before publication. Discuss privacy restrictions before approval. No compensation is paid for authorized product photography unless separately agreed."
       },
       {
         "title": "Pricing & Availability",
-        "text": "Prices are subject to change without notice.\nThe Pastry Junkie reserves the right to modify, discontinue, or refuse products and services at any time.\nPrice changes will not affect orders that have already been confirmed and secured with a deposit."
+        "text": "Menu prices and availability may change for new inquiries. An accepted agreement keeps its saved prices and specifications. An approved change affecting price or fulfillment must be disclosed and accepted in writing. The business may decline an inquiry before confirmation; it may not silently substitute material products or add charges to an accepted order."
       },
       {
         "title": "Ordering Policy",
-        "text": "Custom cakes must generally be ordered:\n• Three (3) weeks in advance for two-tier and three-tier cakes.\n• Two (2) weeks in advance for single-tier custom cakes.\nOrders requested outside these timelines may be considered rush orders and subject to rush fees.\nAcceptance of rush orders is not guaranteed."
+        "text": "Generally request single-tier custom cakes at least two weeks in advance and two-tier or three-tier cakes at least three weeks in advance. Requests outside these periods are subject to availability and any approved rush fee. The approved fulfillment date, written payment deadline and quote expiration govern the specific order. An inquiry does not reserve availability."
       },
       {
         "title": "Decorative Elements Disclaimer",
-        "text": "Customers are responsible for ensuring children and guests are supervised around decorative elements.\nThe Pastry Junkie is not responsible for injuries, choking hazards, or damages resulting from:\n• Cake toppers\n• Decorative supports\n• Plastic decorations\n• Non-edible accessories\n• Fresh flowers supplied by customers or third parties\nThe Pastry Junkie is not responsible for flowers that may contain pesticides, dirt, toxins, or other contaminants supplied by third parties."
+        "text": "Cakes may include non-edible supports, toppers, decorative pieces or other accessories. Follow removal instructions and supervise children and guests around small parts. Disclose customer-supplied flowers or decorations before approval. Customer-supplied items must be suitable for the agreed use; fresh flowers may carry contaminants and are not automatically food-safe. This section does not exclude obligations or liability that cannot lawfully be excluded."
       },
       {
         "title": "Chargebacks",
-        "text": "By submitting payment, the customer acknowledges receipt and acceptance of these terms and conditions.\nThe customer agrees not to initiate a chargeback for products that have been delivered, picked up, accepted, or otherwise fulfilled according to the agreed-upon order specifications."
+        "text": "Contact baked@thepastryjunkie.com promptly about payment or fulfillment concerns so we can investigate. We retain the approved order, accepted terms, verified signature, payment records and relevant fulfillment evidence. This agreement does not waive lawful cardholder dispute rights or determine a payment processor's dispute decision. A refund or credit, if agreed or required, must be recorded separately; changing an order status alone does not move funds."
       },
       {
         "title": "Limitation of Liability",
-        "text": "The Pastry Junkie’s maximum liability for any claim arising from an order shall not exceed the amount paid for that specific order.\nThe Pastry Junkie shall not be responsible for indirect, incidental, consequential, or special damages."
+        "text": "To the extent permitted by applicable law, liability for ordinary contractual claims is limited to the amount paid for the affected order, and indirect or consequential losses are excluded. This limitation does not apply where the law prohibits an exclusion or limitation, and does not remove non-waivable consumer rights. The effect of this provision depends on applicable law and the circumstances of a claim."
       },
       {
         "title": "Force Majeure",
-        "text": "The Pastry Junkie shall not be liable for delays, cancellations, or inability to perform due to circumstances beyond reasonable control, including but not limited to:\n• Severe weather\n• Natural disasters\n• Power outages\n• Vehicle accidents\n• Government actions\n• Illness\n• Acts of God\n• Other unforeseen emergencies\nIn such circumstances, every reasonable effort will be made to reschedule, provide store credit, or otherwise accommodate the customer."
+        "text": "Events outside reasonable control, including severe weather, outages, accidents, illness or government action, may affect fulfillment. The business will communicate promptly and discuss a lawful resolution, which may include an agreed reschedule, agreed store credit or a refund where required. A customer-cancellation policy does not authorize retaining payment contrary to law when the business cannot provide the agreed products. The parties' written resolution will be retained with the order."
       },
       {
         "title": "Cottage Food Disclosure",
-        "text": "The Pastry Junkie operates as a Texas Cottage Food Production Operation. Products are prepared in a home kitchen that is not inspected by the Texas Department of State."
+        "text": "The Pastry Junkie operates as a Texas Cottage Food Production Operation. THIS PRODUCT WAS PRODUCED IN A PRIVATE RESIDENCE THAT IS NOT SUBJECT TO GOVERNMENTAL LICENSING OR INSPECTION. Review the product information displayed before payment and the required physical label supplied at fulfillment. Products requiring refrigeration carry the applicable production date and safe-handling information. The operation's address or DSHS registration number will be provided on the physical label as required."
       }
     ],
-    "addendum": "Clarifications and approved payment schedule: The order-specific written total and fulfillment details form part of this contract. A signed contract and verified initial payment are required for confirmation. Orders accepted seven days or fewer before fulfillment require full payment after signing, including the approved rush fee. For other orders the initial payment is 50% (rounded up by one cent if needed) and the balance is due seven days before fulfillment. Late fees and cancellation decisions are discretionary and are not automatically charged. Refrigerated products must remain refrigerated or frozen until prepared for consumption, following their safe-handling instructions; the 70°F decorative-handling guideline is not a food-safety storage standard. The current cottage-food disclosure is: THIS PRODUCT WAS PRODUCED IN A PRIVATE RESIDENCE THAT IS NOT SUBJECT TO GOVERNMENTAL LICENSING OR INSPECTION. Product labels and fulfillment safe-handling instructions are provided separately. All refund exclusions, chargeback provisions and liability limitations are subject to applicable law and do not waive cardholder dispute rights or other non-waivable rights. If the business cannot fulfill an order, an appropriate resolution must comply with applicable law. These clarifications control if they conflict with an earlier paragraph."
+    "initialSectionIndexes": [
+      3,
+      4,
+      5
+    ]
   },
   "privacy": {
     "title": "Privacy Notice",
     "sections": [
       {
         "title": "Information we collect",
-        "text": "When you inquire, order or sign an agreement, we collect the contact details, fulfillment information, design preferences, notes, uploaded files, signatures/initials and order records you provide. Signing records may include timestamps, browser information and the IP address provided by our hosting service. Payment processors may collect device and fraud-prevention information."
+        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
       },
       {
         "title": "How we use information",
@@ -149,11 +153,11 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Services that process information",
-        "text": "Our website uses GitHub Pages, Cloudflare, Google Workspace/Apps Script/Drive and Square. These providers process information needed to deliver their services under their own terms and privacy practices. Secure card fields are provided by Square. We do not collect or store your full card number or card security code in our order database."
+        "text": "Our website and ordering services use GitHub Pages, Cloudflare, Google Workspace/Apps Script/Drive and Square. These providers process information needed for their services under their own terms and privacy practices. Square provides secure card fields. Full card numbers and card security codes are not collected or stored in our order database. Transaction identifiers and limited payment-status information are retained for order records."
       },
       {
         "title": "Storage, access and retention",
-        "text": "Order records and signature evidence are stored using access-controlled business services. Uploaded design files are stored in the business’s private Google Drive. We retain information as reasonably necessary for fulfillment, business records, dispute handling and legal obligations. No internet service can guarantee absolute security. Your private order link grants access to your order; keep it confidential."
+        "text": "Order records and signing evidence are stored in access-controlled business services. Uploaded references, signed PDFs and fulfillment photographs are stored in the business's private Google Drive. We retain information as reasonably necessary for fulfillment, accounting, disputes and legal obligations. Accepted agreements and their evidence are preserved rather than silently rewritten; corrections may be recorded as additional history. We do not promise immediate deletion of records that must be retained. No internet service guarantees absolute security. Private order links grant access to their order and should be kept confidential."
       },
       {
         "title": "Browser storage and third-party technology",
@@ -161,7 +165,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Your requests",
-        "text": "Contact baked@thepastryjunkie.com to request access to or correction of your information or to discuss deletion. We may need to verify your identity. Some records may need to be retained for business, dispute or legal reasons. Do not email full payment-card details."
+        "text": "Contact baked@thepastryjunkie.com to request access to, correction of or deletion of information. We may need to verify the requester and may retain records where needed for accounting, disputes or legal obligations. We will explain the response appropriate to the request and applicable law. Do not email full payment-card details or identity-document images."
       },
       {
         "title": "Product photographs",
@@ -169,7 +173,7 @@ window.TPJOrderTerms = {
       },
       {
         "title": "Contact and updates",
-        "text": "The Pastry Junkie, Dallas–Fort Worth, Texas. Privacy questions: baked@thepastryjunkie.com. This notice may be updated; the version published here identifies the current general notice."
+        "text": "The Pastry Junkie LLC, Dallas–Fort Worth, Texas. Customer and privacy questions: baked@thepastryjunkie.com (preferred). Phone: (682) 373-8842. Automated order notices are sent from orders@thepastryjunkie.com; replies to those notices are directed to customer support. This notice may be updated, and its published version identifies the current general notice. Updates do not silently replace the order-specific terms already accepted for an existing agreement."
       }
     ]
   }
