@@ -1,0 +1,717 @@
+diff --git a/google/Business.gs b/google/Business.gs
+--- a/google/Business.gs
++++ b/google/Business.gs
+@@ -24,7 +24,7 @@
+   const expected=tpjHex_(Utilities.computeHmacSha256Signature(envelope.timestamp+'\n'+envelope.payload,secret,Utilities.Charset.UTF_8));
+   const a=tpjSHA_(expected),b=tpjSHA_(String(envelope.signature||''));let mismatch=0;for(let i=0;i<a.length;i++)mismatch|=a.charCodeAt(i)^b.charCodeAt(i);if(mismatch)throw Error('Invalid file signature.');
+   const d=JSON.parse(envelope.payload);
+-  if(d.action==='purge_test_records'){lock=LockService.getUserLock();if(!lock.tryLock(1000))throw Error('Cleanup busy. Retry the same record.');return reply(tpjPurgeTestRecords_(d));}
++  if(d.action==='purge_order_records'){lock=LockService.getUserLock();if(!lock.tryLock(1000))throw Error('Cleanup busy. Retry the same record.');return reply(tpjPurgeOrderRecords_(d));}
+   if(d.action!=='fulfillment_photo'||!/^TPJ-[a-f0-9-]{36}$/i.test(d.requestId)||!/^[A-Za-z0-9_-]{16,80}$/.test(d.operationKey)||!['image/jpeg','image/png'].includes(d.mime)||typeof d.base64!=='string'||d.base64.length>450000||!/^[A-Za-z0-9+/]+=*$/.test(d.base64))throw Error('Invalid fulfillment photo.');
+   const bytes=Utilities.base64Decode(d.base64),unsigned=i=>(bytes[i]+256)%256;
+   if(d.mime==='image/jpeg'?(unsigned(0)!==255||unsigned(1)!==216||unsigned(2)!==255):[137,80,78,71,13,10,26,10].some((n,i)=>unsigned(i)!==n))throw Error('Invalid image content.');
+diff --git a/google/TestCleanup.gs b/google/TestCleanup.gs
+--- a/google/TestCleanup.gs
++++ b/google/TestCleanup.gs
+@@ -1,8 +1,8 @@
+-/* Called only by the signed Business bridge for explicitly marked Sandbox tests. */
+-function tpjPurgeTestRecords_(data){
+- if(data.sandbox!==true||!/^TPJ-[a-f0-9-]{36}$/i.test(data.requestId))throw Error('Invalid test cleanup.');
+- const ids=['offerIds','jobIds','challengeIds','fileIds'];for(const key of ids)if(!Array.isArray(data[key])||data[key].length>500||!data[key].every(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{5,150}$/.test(x)))throw Error('Invalid test file identifiers.');
+- const root=tpjRoot_();if(root.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Test storage must remain private.');
++/* Called only by the signed Business bridge for an explicitly authorized owner deletion. */
++function tpjPurgeOrderRecords_(data){
++ if(data.authorizedDeletion!==true||!/^TPJ-[a-f0-9-]{36}$/i.test(data.requestId))throw Error('Invalid order cleanup.');
++ const ids=['offerIds','jobIds','challengeIds','fileIds'];for(const key of ids)if(!Array.isArray(data[key])||data[key].length>500||!data[key].every(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{5,150}$/.test(x)))throw Error('Invalid order file identifiers.');
++ const root=tpjRoot_();if(root.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Order storage must remain private.');
+  const find=(parent,name)=>{const values=parent.getFoldersByName(name);return values.hasNext()?values.next():null;};
+  const signed=find(root,'TPJ Signed Agreements');if(signed){if(signed.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Unexpected shared agreement storage.');for(const id of data.offerIds){const folder=find(signed,id);if(folder)folder.setTrashed(true);}}
+  const ledgers=[['TPJ Mail Receipts',data.jobIds],['TPJ Verification Receipts',data.challengeIds]];
+diff --git a/js/handoff-receipts.js b/js/handoff-receipts.js
+--- a/js/handoff-receipts.js
++++ b/js/handoff-receipts.js
+@@ -9,14 +9,14 @@
+   if(!['pickup','delivery'].includes(details.method)||typeof details.recipient!=='string'||details.recipient.trim().length<2||details.recipient.length>150||typeof details.notes!=='string'||details.notes.length>2000)throw Error('Enter the actual recipient, pickup/delivery method and any receipt notes.');
+   const b=offer.snapshot.business||packet.business,ref=packet.order.reference||packet.order.id,q=packet.effectiveQuote||offer.snapshot.quote;
+   const rows=(q?.lines||offer.snapshot.items||[]).filter(l=>l.labelProduct!==false).map(l=>'<tr><td>'+h(l.title)+'</td><td>'+h(l.quantity)+'</td></tr>').join('');
+-  const copy=kind=>'<section class="receipt"><header><h1>'+h(b.businessName||'The Pastry Junkie LLC')+'</h1><p>Pickup / Delivery Receipt · '+h(kind)+'</p></header><h2>'+h(ref)+'</h2><p><b>Customer:</b> '+h(packet.order.customerName)+'<br><b>Recipient:</b> '+h(details.recipient)+'<br><b>Handoff:</b> '+h(details.method)+'<br><b>Scheduled:</b> '+h(offer.fulfillment_date)+' at '+h(window.TPJOrderTime.format(offer.fulfillment_time))+' Central</p><table><thead><tr><th>Approved products / packages</th><th>Quantity</th></tr></thead><tbody>'+rows+'</tbody></table><p><b>Approved total:</b> '+money(packet.orderTotals?.revisedTotalCents??offer.total_cents)+' · <b>Verified payments:</b> '+money(packet.orderTotals?.paidTotalCents??offer.intents.reduce((n,i)=>n+i.paid_cents,0))+'</p>'+(details.notes?'<p><b>Handoff notes / condition / exceptions:</b> '+h(details.notes)+'</p>':'<p><b>Handoff notes / condition / exceptions:</b><br>________________________________________________________</p>')+'<p>I acknowledge receipt of the products listed above for this order. Any visible concerns or exceptions noted at handoff are recorded above. I received the product care/storage information and a signed copy of this receipt. This acknowledgment records handoff and does not waive rights provided by applicable law.</p><p><b>Recipient:</b> Customer / Authorized representative (circle one)</p><div class="line">Recipient signature: ____________________________________</div><div class="line">Business representative name: ___________________________</div><div class="line">Business representative signature: ________________________</div><div class="line">Actual date: _________________ Time: __________ Central</div><div class="stamp">BUSINESS DATE / TIME STAMP</div><footer>'+h(b.supportEmail||'baked@thepastryjunkie.com')+' · '+h(b.phone||'(682) 373-8842')+'<br>Order '+h(ref)+' · '+h(kind)+'</footer></section>';
+-  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><title>'+h(ref)+' handoff receipt</title><style>*{box-sizing:border-box}body{max-width:8.5in;margin:auto;padding:20px;background:#f5eee8;color:#421c15;font:11pt/1.4 Arial,sans-serif}header{border-bottom:5px solid #efcfeb}h1{font-size:22pt;margin-bottom:4px}h2{font-size:17pt}.receipt{background:white;padding:24px;margin-bottom:24px;break-after:page}.receipt:last-child{break-after:auto}p{white-space:pre-wrap;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse}td,th{padding:7px;border-bottom:1px solid #ddd;text-align:left}.line{margin-top:23px}.stamp{margin-top:20px;padding:18px;border:1px dashed #999;font-size:9pt;color:#888}footer{margin-top:22px;font-size:9pt}@media print{@page{size:letter;margin:.4in}body{background:white;padding:0;max-width:none}.instructions{display:none}.receipt{padding:0;margin:0}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><p class="instructions">Print both copies. Have the recipient and business representative sign each copy at the actual handoff, then apply your date/time stamp. Give the customer their copy. Keep your business copy and upload a legible photo in the dashboard before marking Fulfilled. This is a handoff receipt, not a notarized document. Long orders may span extra pages; keep each complete copy together.</p>'+copy('Business copy')+copy('Customer copy')+'</body></html>';
++  const copy=kind=>'<section class="receipt"><header><h1>'+h(b.businessName||'The Pastry Junkie LLC')+'</h1><p>Pickup / Delivery Receipt · '+h(kind)+'</p></header><h2>'+h(ref)+'</h2><p><b>Customer:</b> '+h(packet.order.customerName)+'<br><b>Recipient:</b> '+h(details.recipient)+'<br><b>Handoff:</b> '+h(details.method)+'<br><b>Scheduled:</b> '+h(offer.fulfillment_date)+' at '+h(window.TPJOrderTime.format(offer.fulfillment_time))+' Central</p><table><thead><tr><th>Approved products / packages</th><th>Quantity</th></tr></thead><tbody>'+rows+'</tbody></table><p><b>Approved total:</b> '+money(packet.orderTotals?.revisedTotalCents??offer.total_cents)+' · <b>Verified payments:</b> '+money(packet.orderTotals?.paidTotalCents??offer.intents.reduce((n,i)=>n+i.paid_cents,0))+'</p>'+'<p>I acknowledge receipt of the products listed above for this order. I received the product care/storage information and a signed copy of this receipt. This acknowledgment records handoff and does not waive rights provided by applicable law.</p><p><b>Recipient:</b> Customer / Authorized representative (circle one)</p><div class="line">Recipient signature: ____________________________________</div><div class="line">Business representative name: ___________________________</div><div class="line">Business representative signature: ________________________</div><div class="line">Actual date: _________________ Time: __________ Central</div><footer>'+h(b.supportEmail||'baked@thepastryjunkie.com')+' · '+h(b.phone||'(682) 373-8842')+'<br>Order '+h(ref)+' · '+h(kind)+'</footer></section>';
++  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><title>'+h(ref)+' handoff receipt</title><style>*{box-sizing:border-box}body{max-width:8.5in;margin:auto;padding:20px;background:#f5eee8;color:#421c15;font:11pt/1.4 Arial,sans-serif}header{border-bottom:5px solid #efcfeb}h1{font-size:22pt;margin-bottom:4px}h2{font-size:17pt}.receipt{background:white;padding:24px;margin-bottom:24px;break-after:page}.receipt:last-child{break-after:auto}p{white-space:pre-wrap;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse}td,th{padding:7px;border-bottom:1px solid #ddd;text-align:left}.line{margin-top:23px}.stamp{margin-top:20px;padding:18px;border:1px dashed #999;font-size:9pt;color:#888}footer{margin-top:22px;font-size:9pt}@media print{@page{size:letter;margin:.4in}body{background:white;padding:0;max-width:none}.instructions{display:none}.receipt{padding:0;margin:0}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><p class="instructions">Print both copies. Have the recipient and business representative sign each copy at the actual handoff. Give the customer their copy. Keep your business copy and upload a legible photo in the dashboard before marking Fulfilled. This is a handoff receipt, not a notarized document. Long orders may span extra pages; keep each complete copy together.</p>'+copy('Business copy')+copy('Customer copy')+'</body></html>';
+  }
+  function open(packet){
+   document.querySelector('[data-tpj-handoff]')?.remove();const dialog=document.createElement('dialog');dialog.dataset.tpjHandoff='';dialog.style.cssText='width:min(850px,96vw);max-height:92dvh;padding:24px;border:1px solid #e2b5bc;border-radius:16px;background:#fff7f2';
+-  dialog.innerHTML='<h2>Prepare handoff receipt</h2><p>Print two copies before pickup/delivery. Sign both with the recipient at handoff. Receipt notes do not amend the approved quote or agreement.</p><form><label>Recipient name<input name="recipient" maxlength="150" minlength="2" required></label><label>Handoff method<select name="method"><option value="pickup">Pickup</option><option value="delivery">Delivery</option></select></label><label>Handoff notes / condition / exceptions<textarea name="notes" maxlength="2000"></textarea></label><p data-error role="alert"></p><div class="actions"><button type="submit">Preview both copies</button><button type="button" data-download>Download both copies</button><button type="button" data-close>Close</button></div><iframe title="Handoff receipt preview" sandbox="" data-preview style="display:none;width:100%;height:650px;border:1px solid #ddd"></iframe></form>';
++  dialog.innerHTML='<h2>Prepare handoff receipt</h2><p>Print two copies before pickup/delivery. Sign both with the recipient at handoff. </p><form><label>Recipient name<input name="recipient" maxlength="150" minlength="2" required></label><label>Handoff method<select name="method"><option value="pickup">Pickup</option><option value="delivery">Delivery</option></select></label><p data-error role="alert"></p><div class="actions"><button type="submit">Preview both copies</button><button type="button" data-download>Download both copies</button><button type="button" data-close>Close</button></div><iframe title="Handoff receipt preview" sandbox="" data-preview style="display:none;width:100%;height:650px;border:1px solid #ddd"></iframe></form>';
+   document.body.append(dialog);const form=dialog.querySelector('form'),error=dialog.querySelector('[data-error]'),preview=dialog.querySelector('iframe');form.elements.recipient.value=packet.order.customerName||'';form.elements.method.value=packet.order.fulfillmentMethod||'pickup';
+-  const render=()=>html(packet,{recipient:form.elements.recipient.value.trim(),method:form.elements.method.value,notes:form.elements.notes.value.trim()});
++  const render=()=>html(packet,{recipient:form.elements.recipient.value.trim(),method:form.elements.method.value,notes:''});
+   form.onsubmit=e=>{e.preventDefault();error.textContent='';try{preview.srcdoc=render();preview.style.display='block';}catch(err){error.textContent=err.message;}};
+   dialog.querySelector('[data-download]').onclick=()=>{if(!form.reportValidity())return;try{window.TPJRecords.download(render(),(packet.order.reference||packet.order.id)+'-handoff-receipts.html');}catch(e){error.textContent=e.message;}};
+   form.oninput=()=>{preview.style.display='none';preview.removeAttribute('srcdoc');};
+diff --git a/js/order-terms.js b/js/order-terms.js
+--- a/js/order-terms.js
++++ b/js/order-terms.js
+@@ -1,6 +1,6 @@
+ /* TPJ VERSIONED ORDER TERMS — final legal review recommended before production. */
+ window.TPJOrderTerms = {
+-  "version": "2026-10-30-rush-1",
++  "version": "1",
+   "shop": {
+     "title": "Shop Order Terms",
+     "sections": [
+@@ -145,7 +145,7 @@
+     "sections": [
+       {
+         "title": "Information we collect",
+-        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. We also retain the signed business handoff receipt or its private image, the recipient and business representative names, and confirmation that the customer received their signed copy. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
++        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
+       },
+       {
+         "title": "How we use information",
+diff --git a/js/order-time.js b/js/order-time.js
+--- a/js/order-time.js
++++ b/js/order-time.js
+@@ -43,25 +43,13 @@
+           event.preventDefault(); nudge(event.key === 'ArrowUp' ? 1 : -1);
+         }
+       });
+-      const controls = document.createElement('span');
+-      controls.style.cssText = 'display:inline-flex;gap:6px;margin-top:6px';
+-      for (const delta of [-1, 1]) {
+-        const button = document.createElement('button');
+-        button.type = 'button';
+-        button.textContent = delta === 1 ? '▲ 1 min' : '▼ 1 min';
+-        button.setAttribute('aria-label', delta === 1 ? 'Time forward one minute' : 'Time back one minute');
+-        button.style.cssText = 'font:inherit;padding:8px 12px;min-height:44px';
+-        button.onmousedown = event => event.preventDefault();
+-        button.onclick = () => { nudge(delta); input.focus(); };
+-        controls.append(button);
+-      }
+-      input.insertAdjacentElement('afterend', controls);
+       check(true);
+     });
+   }
+   if (typeof document !== 'undefined') {
+     new MutationObserver(mount).observe(document.documentElement, {childList: true, subtree: true});
+     mount();
++    document.addEventListener('keydown',event=>{const input=event.target;if(input?.tagName==='INPUT'&&['date','datetime-local'].includes(input.type)&&['Backspace','Delete'].includes(event.key)){event.preventDefault();input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}},true);
+   }
+   return {parse, format, shift};
+ })();
+diff --git a/js/order-tools.js b/js/order-tools.js
+--- a/js/order-tools.js
++++ b/js/order-tools.js
+@@ -1,17 +1,25 @@
+-/* Read state, stage overrides, archiving and explicit Sandbox-test removal. */
++/* Compact owner actions. Deletion requires explicit confirmation and admin authorization. */
+ window.TPJOrderTools=(()=>{
+  const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let bulkBusy=false;
+  const labels={new:'New',pending:'Pending',confirmed:'Confirmed',fulfilled:'Fulfilled',canceled:'Canceled'};
++ const actions='<option value="">Actions</option><option value="read">Mark read</option><option value="unread">Mark unread</option><option value="archive">Archive</option><option value="restore">Restore</option><option value="purge">Delete</option>';
+  const path=id=>'/api/admin/business/orders/'+encodeURIComponent(id);
+  function mount(host,packet,api,reload){
+-  const r=packet.order,m=packet.management||{},section=document.createElement('section');section.className='card';section.innerHTML='<h3>Organize this order</h3><p>Choose your business stage at any time. Payment, signature and actual handoff records remain separate. Changing the stage alone does not charge, refund, sign an agreement or cancel a payment link.</p><form data-stage><label>Your stage<select name="stage"><option value="">Automatic</option>'+Object.entries(labels).map(([k,v])=>'<option value="'+k+'" '+(m.manualStage===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label><button>Save stage</button></form><div class="actions"><button data-read>'+((m.read===false)?'Mark as read':'Mark as unread')+'</button><button data-archive>'+((m.archivedAt)?'Restore from archive':'Archive record')+'</button><button data-test>'+((m.isTest)?'Remove test marker':'Mark as Sandbox test')+'</button></div><details><summary>Delete a Sandbox test permanently</summary><p>This removes the test from the dashboard database and moves identified private test files to Google Trash. Real production orders cannot use this action. Previously delivered emails, Square history, provider backups and Google Trash are separate copies. Number counters continue forward.</p><label>Type '+h(r.reference||r.id)+' to confirm<input data-confirm autocomplete="off"></label><button data-delete '+(!m.isTest?'disabled':'')+'>'+(m.purging?'Retry test removal':'Permanently delete this test')+'</button></details><p data-status role="status"></p>';host.append(section);const status=section.querySelector('[data-status]');
+-  async function run(button,action,extra={}){button.disabled=true;try{const response=await api(path(r.id)+(action==='purge'?'/purge':'/manage'),{method:'POST',body:{version:r.version,action,...extra}});await reload({id:r.id,action,stage:extra.stage,deleted:response.deleted});}catch(e){status.textContent=e.message;if(button.isConnected)button.disabled=false;}}
+-  section.querySelector('[data-stage]').onsubmit=e=>{e.preventDefault();run(e.submitter,'stage',{stage:e.target.elements.stage.value||null});};section.querySelector('[data-read]').onclick=e=>run(e.target,m.read===false?'read':'unread');section.querySelector('[data-archive]').onclick=e=>run(e.target,m.archivedAt?'restore':'archive');section.querySelector('[data-test]').onclick=e=>run(e.target,'test',{isTest:!m.isTest});section.querySelector('[data-delete]').onclick=e=>run(e.target,'purge',{confirmation:section.querySelector('[data-confirm]').value.trim()});
++  const r=packet.order,m=packet.management||{},bar=document.createElement('div');bar.className='order-actionbar';bar.innerHTML='<label class="sr-only" for="orderStage">Order stage</label><select id="orderStage" aria-label="Order stage"><option value="">Automatic</option>'+Object.entries(labels).map(([k,v])=>'<option value="'+k+'" '+(m.manualStage===k?'selected':'')+'>'+v+'</option>').join('')+'</select><select data-action aria-label="Order actions">'+actions+'</select><span data-status role="status"></span>';
++  host.querySelector('h2')?.insertAdjacentElement('afterend',bar)||host.prepend(bar);
++  async function run(control,action,extra={}){if(action==='purge'&&!window.confirm('Permanently delete '+(r.reference||r.id)+'?')){control.value='';return;}control.disabled=true;try{const response=await api(path(r.id)+(action==='purge'?'/purge':'/manage'),{method:'POST',body:{version:r.version,action,...extra,...(action==='purge'?{confirmed:true}:{})}});await reload({id:r.id,action,stage:extra.stage,deleted:response.deleted});}catch(e){bar.querySelector('[data-status]').textContent=e.message;control.disabled=false;}}
++  bar.querySelector('#orderStage').onchange=e=>run(e.target,'stage',{stage:e.target.value||null});bar.querySelector('[data-action]').onchange=e=>{if(e.target.value)run(e.target,e.target.value);};
+  }
+  function bulk(host,rows,api,reload){
+-  const bar=document.createElement('section');bar.className='card';bar.dataset.bulkTools='';bar.innerHTML='<label><input type="checkbox" data-all> Select all visible records</label><div class="actions"><button data-action="read">Mark selected read</button><button data-action="unread">Mark selected unread</button><button data-action="archive">Archive selected</button><button data-action="restore">Restore selected</button><button data-action="test">Mark selected as tests</button></div><details><summary>Delete selected Sandbox tests</summary><p>Only records already marked as tests qualify. Type DELETE SELECTED TESTS below. This permanently removes selected tests from the app; it does not reset order counters or remove Square history, delivered emails or Google Trash.</p><input data-confirm aria-label="Test deletion confirmation"><button data-action="purge">Delete selected tests permanently</button></details><p data-status role="status"></p>';host.prepend(bar);const status=bar.querySelector('[data-status]'),checkboxes=()=>[...host.querySelectorAll('input[data-select-order]')];bar.querySelector('[data-all]').onchange=e=>checkboxes().forEach(x=>x.checked=e.target.checked);
+-  for(const button of bar.querySelectorAll('[data-action]'))button.onclick=async()=>{const selected=checkboxes().filter(x=>x.checked).map(x=>rows.find(r=>r.id===x.dataset.selectOrder)).filter(Boolean);if(!selected.length){status.textContent='Select records first.';return;}const action=button.dataset.action;if(action==='purge'&&(bar.querySelector('[data-confirm]').value!=='DELETE SELECTED TESTS'||selected.some(r=>!r.isTest))){status.textContent='Mark the selected records as tests first, then type DELETE SELECTED TESTS.';return;}bulkBusy=true;bar.querySelectorAll('button,input').forEach(x=>x.disabled=true);let done=0;const errors=[];for(const row of selected){try{status.textContent='Processing '+(done+errors.length+1)+' of '+selected.length+'…';await api(path(row.id)+(action==='purge'?'/purge':'/manage'),{method:'POST',body:{version:row.version,action,...(action==='test'?{isTest:true}:{}),...(action==='purge'?{confirmation:row.reference||row.id}:{})}});done++;}catch(e){errors.push((row.reference||row.id)+': '+e.message);}}bulkBusy=false;await reload();const summary=document.createElement('p');summary.setAttribute('role','status');summary.textContent=done+' record(s) updated.'+(errors.length?' '+errors.join(' / '):'');host.prepend(summary);};
++  const bar=document.createElement('div');bar.className='bulk-actionbar';bar.dataset.bulkTools='';bar.innerHTML='<label><input type="checkbox" data-all aria-label="Select all visible orders"> All</label><select data-action aria-label="Selected order actions">'+actions+'</select><span data-count></span><span data-status role="status"></span>';host.prepend(bar);
++  const boxes=()=>[...host.querySelectorAll('input[data-select-order]')],status=bar.querySelector('[data-status]'),select=bar.querySelector('[data-action]');
++  const update=()=>{const n=boxes().filter(x=>x.checked).length;bar.querySelector('[data-count]').textContent=n?n+' selected':'';select.disabled=!n;bar.querySelector('[data-all]').indeterminate=n>0&&n<boxes().length;};
++  bar.querySelector('[data-all]').onchange=e=>{boxes().forEach(x=>x.checked=e.target.checked);update();};boxes().forEach(x=>x.addEventListener('change',update));update();
++  select.onchange=async()=>{const action=select.value;if(!action)return;const selected=boxes().filter(x=>x.checked).map(x=>rows.find(r=>r.id===x.dataset.selectOrder)).filter(Boolean);if(!selected.length)return;if(action==='purge'&&!window.confirm('Permanently delete '+selected.length+' selected order'+(selected.length===1?'?':'s?'))){select.value='';return;}
++   bulkBusy=true;bar.querySelectorAll('input,select').forEach(x=>x.disabled=true);let done=0;const errors=[];
++   try{for(const row of selected){try{status.textContent=(done+errors.length+1)+' / '+selected.length;await api(path(row.id)+(action==='purge'?'/purge':'/manage'),{method:'POST',body:{version:row.version,action,...(action==='purge'?{confirmed:true}:{})}});done++;}catch(e){errors.push((row.reference||row.id)+': '+e.message);}}await reload({deletedIds:action==='purge'?selected.filter(r=>!errors.some(e=>e.startsWith((r.reference||r.id)+':'))).map(r=>r.id):[]});const summary=document.createElement('p');summary.setAttribute('role','status');summary.textContent=done+' updated.'+(errors.length?' '+errors.join(' / '):'');host.prepend(summary);}finally{bulkBusy=false;}
++  };
+  }
+  return {mount,bulk,busy:()=>bulkBusy};
+ })();
+diff --git a/js/owner-dashboard.js b/js/owner-dashboard.js
+--- a/js/owner-dashboard.js
++++ b/js/owner-dashboard.js
+@@ -25,17 +25,17 @@
+   params.set('view',tab);if($('readFilter')?.value==='unread')params.set('unread','1');if($('archiveFilter')?.value)params.set('archive',$('archiveFilter').value);if(attentionOnly)params.set('attention','1');
+   const data=await api('/api/admin/business/orders?'+params);if(id!==listGeneration||active!==session||!['orders','records'].includes(tab)||!key)return;next=data.nextOffset;
+   $('counts').innerHTML=Object.entries(labels).map(([k,v])=>'<button class="secondary" data-stage="'+k+'">'+v+' · '+(data.counts[k]||0)+'</button>').join('');$('counts').querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>{$('stage').value=b.dataset.stage;offset=0;loadOrders();});
+-  $('orders').innerHTML=data.orders.length?data.orders.map(r=>'<div><label><input type="checkbox" data-select-order="'+h(r.id)+'"> Select '+h(r.reference||r.id)+'</label><button class="order-card" data-id="'+h(r.id)+'" aria-current="'+(current?.id===r.id)+'"><span class="tag">'+(!r.read?'Unread · ':'')+labels[r.stage]+' · '+(r.source==='shop'?'Shop':'Custom cake')+'</span><strong>'+h(r.reference||r.id)+'</strong><span>'+h(r.customerName)+'</span><span>'+(tab==='records'?'Received '+h(stamp(r.createdAt))+'<br>':'')+h(r.fulfillmentDate)+' · '+h(r.fulfillmentMethod)+'</span><small>'+money(r.approvedTotalCents??r.estimatedTotalCents)+(r.balanceDue?' · Balance due '+h(r.balanceDue):'')+(r.status==='payment_review'?' · Payment review needed':'')+(r.status==='cancellation_requested'?' · Cancellation requested':'')+'</small>'+(r.attentionReasons?.length?'<small>Needs attention: '+h(r.attentionReasons.join('; '))+'</small>':'')+'</button></div>').join(''):'<p>'+(attentionOnly?'No active orders currently need attention with these filters.':'No matching orders.')+'</p>';
+-  $('list').querySelector('[data-bulk-tools]')?.remove();window.TPJOrderTools.bulk($('list'),data.orders,api,loadOrders);
++  $('orders').innerHTML=data.orders.length?data.orders.map(r=>'<div class="order-list-row"><input type="checkbox" aria-label="Select '+h(r.reference||r.id)+'" data-select-order="'+h(r.id)+'"><button class="order-card" data-id="'+h(r.id)+'" aria-current="'+(current?.id===r.id)+'"><span class="tag">'+(!r.read?'Unread · ':'')+labels[r.stage]+' · '+(r.source==='shop'?'Shop':'Custom cake')+'</span><strong>'+h(r.reference||r.id)+'</strong><span>'+h(r.customerName)+'</span><span>'+(tab==='records'?'Received '+h(stamp(r.createdAt))+'<br>':'')+h(r.fulfillmentDate)+' · '+h(r.fulfillmentMethod)+'</span><small>'+money(r.approvedTotalCents??r.estimatedTotalCents)+(r.balanceDue?' · Balance due '+h(r.balanceDue):'')+(r.status==='payment_review'?' · Payment review needed':'')+(r.status==='cancellation_requested'?' · Cancellation requested':'')+'</small>'+(r.attentionReasons?.length?'<small>Needs attention: '+h(r.attentionReasons.join('; '))+'</small>':'')+'</button></div>').join(''):'<p>'+(attentionOnly?'No active orders currently need attention with these filters.':'No matching orders.')+'</p>';
++  $('list').querySelector('[data-bulk-tools]')?.remove();window.TPJOrderTools.bulk($('list'),data.orders,api,async change=>{if(change?.deletedIds?.includes(current?.id)){current=null;currentPacket=null;$('detail').innerHTML='<h2>Select an order</h2>';}await loadOrders();});
+   $('orders').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>select(b.dataset.id));$('pageInfo').textContent=data.orders.length?'Showing '+(offset+1)+'–'+(offset+data.orders.length):'';$('previous').disabled=offset===0;$('next').disabled=next===null;
+  }
+  async function select(id){
+   const generation=++selection,active=session;window.TPJWorkflowAdmin.clear();$('detail').innerHTML='<p role="status">Loading order…</p>';try{
+    const [result,packet]=await Promise.all([api('/api/admin/orders/'+encodeURIComponent(id)),api('/api/admin/business/orders/'+encodeURIComponent(id)+'/packet')]);
+    if(generation!==selection||active!==session||!key)return;current=result.order;currentPacket=packet;
+-   const r=current,d=r.details||{},order=d.order||{},f=order.fulfillment||d.fulfillment||{},clock=f.time?window.TPJOrderTime.format(f.time)+' Central':'See inquiry details';
++   const r={...current,stage:packet.order.stage},d=r.details||{},order=d.order||{},f=order.fulfillment||d.fulfillment||{},clock=f.time?window.TPJOrderTime.format(f.time)+' Central':'See inquiry details';
+    let html='<span class="tag">'+(r.source==='shop'?'Shop':'Custom cake')+' · '+h(labels[r.stage]||'New')+'</span><h2>'+h(packet.order.reference||r.id)+'</h2><h3>'+h(r.customerName)+'</h3><dl class="facts">'+[['Customer email',r.customerEmail],['Phone',r.customerPhone],['Requested date',r.fulfillmentDate],['Requested time',clock],['Method',r.fulfillmentMethod],['Received',stamp(r.createdAt)]].map(([k,v])=>'<dt>'+h(k)+'</dt><dd>'+h(v)+'</dd>').join('')+'</dl>';
+-   if(order.items)html+='<h3>Requested selections</h3>'+order.items.map(x=>'<article class="item"><strong>'+h(x.title)+' · Qty '+x.quantity+'</strong><p>'+(x.details||[]).map(h).join('<br>')+'</p></article>').join('');else html+='<h3>Requested cake design</h3>'+Object.entries(d.inquirySummary||{}).map(([k,v])=>'<p><strong>'+h(k)+':</strong> '+h(v)+'</p>').join('');
++   if(order.items)html+='<h3>Requested selections</h3><div class="order-spec-grid">'+order.items.map(x=>'<article class="item"><strong>'+h(x.title)+' · Qty '+x.quantity+'</strong><p>'+(x.details||[]).map(h).join('<br>')+'</p></article>').join('')+'</div>';else{const omit=/^(customer|email|phone|personal details\s*[—–-]\s*(customer|fulfillment))$/i,entries=Object.entries(d.inquirySummary||{}).filter(([k,v])=>!omit.test(k)&&!['',null,undefined].includes(v)&&![r.customerName,r.customerEmail,r.customerPhone,r.fulfillmentMethod].includes(v));html+='<h3>Requested cake design</h3><dl class="order-spec-grid">'+entries.map(([k,v])=>'<div><dt>'+h(k.replace(/^(Cake|Flavor|Design|Personal Details|Celebration)\s*[—–-]\s*/i,''))+'</dt><dd>'+h(v)+'</dd></div>').join('')+'</dl>';}
+    if(f.method==='delivery')html+='<h3>Delivery details</h3><p>'+h(Object.values(f.address||{}).filter(Boolean).join(', '))+'<br>Recipient: '+h(f.recipient?.name||r.customerName)+'<br>'+h(f.instructions||'')+'</p>';
+    if(result.files?.length)html+='<details><summary>Customer images & uploads</summary>'+result.files.map(x=>/^https:\/\/drive\.google\.com\//.test(x.private_url||'')?'<p><a target="_blank" rel="noopener noreferrer" href="'+h(x.private_url)+'">'+h(x.name)+'</a></p>':'').join('')+'</details>';
+    html+='<div class="actions"><button id="exportRecord">Download order record</button><button id="handoffReceipt" class="secondary">Prepare handoff receipt</button><button id="labels" class="secondary">Prepare product labels</button></div>';
+@@ -47,7 +47,7 @@
+     html=html.slice(0,before)+'<h3>Documents & saved evidence</h3><p>Read-only invoices, accepted agreements, verified payments and signed handoff records. Use Orders to manage an active request.</p><div class="actions"><button id="exportRecord">Download complete record</button><button id="exportInvoice">Download invoice</button><button id="exportAgreement">Download agreement</button><button id="labels">Prepare product labels</button><button id="handoffReceipt">Prepare handoff receipt</button></div>'+html.slice(technical);
+    }
+    $('detail').innerHTML=html;
+-   window.TPJOrderTools.mount($('detail'),packet,api,async change=>{if(change.deleted){current=null;currentPacket=null;await navigate(tab);return;}if(change.action==='archive'||['fulfilled','canceled'].includes(change.stage)){await navigate('records');await select(r.id);}else if(change.action==='restore'||change.stage&&['new','pending','confirmed'].includes(change.stage)){await navigate('orders');await select(r.id);}else{await loadOrders();await select(r.id);}});
++   window.TPJOrderTools.mount($('detail'),packet,api,async change=>{if(change.deleted){current=null;currentPacket=null;await navigate(tab);return;}if(change.action==='archive'||change.stage==='canceled'){await navigate('records');await select(r.id);}else if(change.action==='restore'||change.stage&&['new','pending','confirmed','fulfilled'].includes(change.stage)){await navigate('orders');if(change.stage){$('stage').value=change.stage;await loadOrders();}await select(r.id);}else{await loadOrders();await select(r.id);}});
+    if(!packet.offers.length){for(const id of ['exportInvoice','exportAgreement','labels','handoffReceipt'])if($(id))$(id).disabled=true;}
+    if($('exportInvoice'))$('exportInvoice').onclick=()=>window.TPJRecordDocuments.download(packet,'invoice');if($('exportAgreement'))$('exportAgreement').onclick=()=>window.TPJRecordDocuments.download(packet,'agreement');
+    $('exportRecord').onclick=()=>window.TPJRecords.download(window.TPJRecords.html(packet),(packet.order.reference||r.id)+'-record.html');$('exportJSON').onclick=()=>window.TPJRecords.download(JSON.stringify(packet,(k,v)=>['orderURL','rootURL'].includes(k)?undefined:v,2),(packet.order.reference||r.id)+'-record.json','application/json');
+@@ -56,7 +56,7 @@
+    $('correctionForm').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{await api('/api/admin/business/orders/'+r.id+'/correction',{method:'POST',body:{version:r.version,note:e.target.elements.note.value}});await select(r.id);notice('Correction added. The original agreement and fulfillment record are preserved.');});};
+    if(tab==='orders'){
+     $('notesForm').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{await api('/api/admin/orders/'+r.id,{method:'PATCH',body:{version:r.version,status:r.status,internalNotes:$('notes').value}});await select(r.id);notice('Private notes saved.');});};
+-    await window.TPJWorkflowAdmin.mount({container:$('detail').querySelector('[data-workflow-host]'),order:r,api,reload:async()=>{const latest=await api('/api/admin/business/orders/'+r.id+'/packet');if(latest.order.status==='cancelled'||latest.order.status==='completed'){await navigate('records');}else await loadOrders();await select(r.id);}});
++    await window.TPJWorkflowAdmin.mount({container:$('detail').querySelector('[data-workflow-host]'),order:r,api,reload:async()=>{const latest=await api('/api/admin/business/orders/'+r.id+'/packet');if(latest.order.status==='cancelled'){await navigate('records');}else await loadOrders();await select(r.id);}});
+     if(generation!==selection||!key)return;await window.TPJOrderChanges.mount($('detail'),packet,business||await api('/api/admin/business/config'),api,async()=>{await loadOrders();await select(r.id);});
+     const latest=packet.offers.find(o=>o.status!=='CLOSED');const full=latest&&latest.status==='SIGNED'&&!latest.payment_review&&latest.intents.length&&latest.intents.every(i=>i.status==='PAID'&&i.paid_cents>=i.amount_cents);
+     if(full&&!packet.orderTotals?.pendingChanges&&!packet.orderTotals?.outstandingCents&&!packet.orderTotals?.paymentReview&&!packet.fulfillment&&!['cancelled','completed'].includes(r.status))drawFulfillment(r);
+@@ -71,8 +71,8 @@
+  }
+  async function photo(file){if(!file)return null;if(!['image/png','image/jpeg'].includes(file.type)||file.size>15000000)throw Error('Choose a JPG or PNG under 15 MB.');const bitmap=await createImageBitmap(file);try{const scale=Math.min(1,1200/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);let data;for(const quality of [.8,.65,.5,.35]){data=canvas.toDataURL('image/jpeg',quality).split(',')[1];if(data.length<=450000)return {mime:'image/jpeg',base64:data};}throw Error('Choose a smaller photo.');}finally{bitmap.close();}}
+  function drawFulfillment(r){
+-  const el=document.createElement('section');el.innerHTML='<details><summary>Mark order Fulfilled</summary><form data-fulfilled><label>Handoff method<select name="method"><option value="pickup">Pickup</option><option value="delivery">Delivery</option></select></label><label>Received by<input name="recipient" required minlength="2" maxlength="150" value="'+h(r.customerName)+'"></label><label>Actual handoff date and time<input name="at" type="datetime-local" step="60" required></label><p class="muted">Enter Dallas/Central time.</p><label>Production date<input name="made" type="date" required value="'+today()+'"></label><label>Legible photo of the signed business receipt<input name="photo" type="file" accept="image/jpeg,image/png" capture="environment" required></label><label>Business representative name<input name="businessRepresentative" required minlength="2" maxlength="150"></label><label><input name="signedCopies" type="checkbox" required> The recipient and business representative signed both receipt copies, and the uploaded photo clearly shows the complete signed business copy.</label><label><input name="customerCopy" type="checkbox" required> The customer received their signed receipt copy and product care/storage information.</label><label>Handoff notes<textarea name="notes" maxlength="3000"></textarea></label><label><input name="handed" type="checkbox" required> I confirm the order was handed to the customer or their designated recipient.</label><button>Save fulfillment record</button></form></details>';$('detail').append(el);
+-  const form=el.querySelector('form');form.elements.method.value=r.fulfillmentMethod;let pending=null;form.oninput=()=>{pending=null;};form.onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{if(!pending){const local=form.elements.at.value,[date,time]=local.split('T');pending={version:r.version,operationKey:crypto.randomUUID(),method:form.elements.method.value,recipient:form.elements.recipient.value,productionDate:form.elements.made.value,handedOverLocal:{date,time},notes:form.elements.notes.value,handedOver:true,signedCopiesConfirmed:form.elements.signedCopies.checked,customerCopyProvided:form.elements.customerCopy.checked,businessRepresentative:form.elements.businessRepresentative.value,photo:await photo(form.elements.photo.files[0])};}await api('/api/admin/business/orders/'+r.id+'/fulfill',{method:'POST',body:pending});await navigate('records');await select(r.id);notice('Fulfillment recorded. No additional customer email was sent.');});};
++  const el=document.createElement('section');el.innerHTML='<details><summary>Mark order Fulfilled</summary><form data-fulfilled><label>Handoff method<select name="method"><option value="pickup">Pickup</option><option value="delivery">Delivery</option></select></label><label>Received by<input name="recipient" required minlength="2" maxlength="150" value="'+h(r.customerName)+'"></label><label>Actual handoff date and time<input name="at" type="datetime-local" step="60" required></label><p class="muted">Enter Dallas/Central time.</p><label>Production date<input name="made" type="date" required value="'+today()+'"></label><label>Legible photo of the signed business receipt<input name="photo" type="file" accept="image/jpeg,image/png" capture="environment" required></label><label>Business representative name<input name="businessRepresentative" required minlength="2" maxlength="150"></label><label><input name="signedCopies" type="checkbox" required> The recipient and business representative signed both receipt copies, and the uploaded photo clearly shows the complete signed business copy.</label><label><input name="customerCopy" type="checkbox" required> The customer received their signed receipt copy and product care/storage information.</label><label><input name="handed" type="checkbox" required> I confirm the order was handed to the customer or their designated recipient.</label><button>Save fulfillment record</button></form></details>';$('detail').append(el);
++  const form=el.querySelector('form');form.elements.method.value=r.fulfillmentMethod;let pending=null;form.oninput=()=>{pending=null;};form.onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{if(!pending){const local=form.elements.at.value,[date,time]=local.split('T');pending={version:r.version,operationKey:crypto.randomUUID(),method:form.elements.method.value,recipient:form.elements.recipient.value,productionDate:form.elements.made.value,handedOverLocal:{date,time},notes:'',handedOver:true,signedCopiesConfirmed:form.elements.signedCopies.checked,customerCopyProvided:form.elements.customerCopy.checked,businessRepresentative:form.elements.businessRepresentative.value,photo:await photo(form.elements.photo.files[0])};}await api('/api/admin/business/orders/'+r.id+'/fulfill',{method:'POST',body:pending});await navigate('orders');$('stage').value='fulfilled';await loadOrders();await select(r.id);notice('Fulfillment recorded. No additional customer email was sent.');});};
+  }
+  function drawConfig(mode){
+   const c=business.config,s=c.settings,targets=business.targets;
+@@ -84,6 +84,6 @@
+   const catalog=window.TPJShopCatalog;
+   $('view').innerHTML='<section class="card"><h2>Menu & availability</h2><p>Changes apply to new requests. Existing saved quotes and agreements keep their prices and terms.</p><form id="menuForm"><details open><summary>Prices</summary><div class="menu-grid">'+Object.entries(c.prices).map(([k,n])=>'<label>'+h(k.replaceAll(':',' · '))+' ($)<input data-price="'+h(k)+'" type="number" min="0.01" step="0.01" required value="'+(n/100).toFixed(2)+'"></label>').join('')+'</div></details><details><summary>Product names & category descriptions</summary><div class="menu-grid">'+Object.entries(c.names||{}).map(([k,v])=>'<label>'+h(k.replaceAll(':',' · '))+'<input data-name="'+h(k)+'" maxlength="150" required value="'+h(v)+'"></label>').join('')+'</div><h3>Flavor names</h3><div class="menu-grid">'+Object.entries(c.flavors).map(([k,v])=>'<label>'+h(k)+'<input data-flavor="'+h(k)+'" maxlength="100" required value="'+h(v)+'"></label>').join('')+'</div>'+Object.entries(c.descriptions).map(([k,v])=>'<label>'+h(catalog.categories[k].name)+'<textarea data-description="'+h(k)+'" maxlength="1500">'+h(v)+'</textarea></label>').join('')+'</details><details><summary>Available products & flavors</summary>'+targets.map(([k,v])=>'<label><input type="checkbox" data-available="'+h(k)+'" '+(!c.disabled.includes(k)?'checked':'')+'> '+h(v)+'</label>').join('')+'</details><details><summary>Blocked dates</summary><p>One date per line, in YYYY-MM-DD format. These dates are unavailable for new requests.</p><textarea id="blocked" rows="8">'+h(c.blockedDates.join('\n'))+'</textarea></details><details><summary>Recipe allergen & storage profiles</summary><p>Review against your actual recipes and ingredient packaging. These profiles help prepare accurate disclosures for each quote.</p>'+targets.filter(([k])=>/^(product|treat|base|topping|custom):/.test(k)).map(([k,v])=>{const p=c.profiles[k]||{};return '<fieldset data-profile="'+h(k)+'"><legend>'+h(v)+'</legend>'+business.allergens.map(a=>'<label style="display:inline-block;margin-right:12px"><input type="checkbox" data-allergen="'+h(a)+'" '+(p.contains?.includes(a)?'checked':'')+'> '+h(a)+'</label>').join('')+'<label><input type="checkbox" data-cold '+(p.refrigerated?'checked':'')+'> Requires refrigeration</label><label><input type="checkbox" data-reviewed '+(p.reviewed?'checked':'')+'> Recipe/ingredient information reviewed</label></fieldset>';}).join('')+'</details><button>Publish menu changes</button></form></section>';
+   $('blocked').closest('details').remove();window.TPJMenuEditor.mount($('view'),business,api,()=>navigate('menu'));
+-  $('menuForm').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{const next=structuredClone(c),form=e.target;form.querySelectorAll('[data-price]').forEach(x=>next.prices[x.dataset.price]=Math.round(Number(x.value)*100));next.names={};form.querySelectorAll('[data-name]').forEach(x=>next.names[x.dataset.name]=x.value);form.querySelectorAll('[data-flavor]').forEach(x=>next.flavors[x.dataset.flavor]=x.value);form.querySelectorAll('[data-description]').forEach(x=>next.descriptions[x.dataset.description]=x.value);next.disabled=[...form.querySelectorAll('[data-available]:not(:checked)')].map(x=>x.dataset.available);next.blockedDates=c.blockedDates;next.profiles={};form.querySelectorAll('[data-profile]').forEach(x=>next.profiles[x.dataset.profile]={contains:[...x.querySelectorAll('[data-allergen]:checked')].map(a=>a.dataset.allergen),refrigerated:x.querySelector('[data-cold]').checked,reviewed:x.querySelector('[data-reviewed]').checked});await api('/api/admin/business/config',{method:'PUT',body:{version:business.version,config:next}});business=await api('/api/admin/business/config');drawConfig('menu');notice('Menu published. New Shop requests use the updated menu.');});};
++  $('menuForm').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{const next=structuredClone(c),form=e.target;form.querySelectorAll('[data-price]').forEach(x=>next.prices[x.dataset.price]=Math.round(Number(x.value)*100));next.names={};form.querySelectorAll('[data-name]').forEach(x=>next.names[x.dataset.name]=x.value);form.querySelectorAll('[data-flavor]').forEach(x=>next.flavors[x.dataset.flavor]=x.value);form.querySelectorAll('[data-description]').forEach(x=>next.descriptions[x.dataset.description]=x.value);next.disabled=[...form.querySelectorAll('[data-available]:not(:checked)')].map(x=>x.dataset.available);next.blockedDates=c.blockedDates;next.profiles={};form.querySelectorAll('[data-profile]').forEach(x=>next.profiles[x.dataset.profile]={contains:[...x.querySelectorAll('[data-allergen]:checked')].map(a=>a.dataset.allergen),additionalInfo:x.querySelector('[data-profile-info]').value,refrigerated:x.querySelector('[data-cold]').checked,reviewed:x.querySelector('[data-reviewed]').checked});await api('/api/admin/business/config',{method:'PUT',body:{version:business.version,config:next}});business=await api('/api/admin/business/config');drawConfig('menu');notice('Menu published. New Shop requests use the updated menu.');});};
+  }
+ })();
+diff --git a/js/policy-pages.js b/js/policy-pages.js
+--- a/js/policy-pages.js
++++ b/js/policy-pages.js
+@@ -8,7 +8,7 @@
+  function draw(){
+   const key=privacy?'privacy':location.hash==='#cake'?'cake_builder':'shop';const item=data[key];
+   document.title=item.title+' | The Pastry Junkie';
+-  root.innerHTML='<h1>'+e(item.title)+'</h1><p>Policy version '+e(data.version)+'</p>'+(!privacy?'<p>These are general terms. Your private, order-specific agreement records the final approved details and the exact terms you accept before payment.</p>':'')+item.sections.map((s,i)=>'<section><h2>'+(i+1)+'. '+e(s.title)+'</h2><p>'+e(s.text)+'</p></section>').join('')+(item.addendum?'<section><h2>Contract clarifications</h2><p>'+e(item.addendum)+'</p></section>':'');
++  root.innerHTML='<h1>'+e(item.title)+'</h1><p>Version '+e(data.version)+'</p>'+(!privacy?'<p>These are general terms. Your private, order-specific agreement records the final approved details and the exact terms you accept before payment.</p>':'')+item.sections.map((s,i)=>'<section><h2>'+(i+1)+'. '+e(s.title)+'</h2><p>'+e(s.text)+'</p></section>').join('')+(item.addendum?'<section><h2>Contract clarifications</h2><p>'+e(item.addendum)+'</p></section>':'');
+  }
+  window.addEventListener('hashchange',draw);draw();
+ })();
+diff --git a/js/product-labels.js b/js/product-labels.js
+--- a/js/product-labels.js
++++ b/js/product-labels.js
+@@ -17,6 +17,7 @@
+  function html(d){validate(d);const cards=d.items.flatMap(x=>Array.from({length:x.copies},()=>'<article class="label"><header><strong>'+h(d.business.name)+'</strong><span>THERE’S A PIECE OF LOVE IN EVERY CRUMB.</span></header><h1>'+h(x.title)+'</h1><p class="reference">Order '+h(d.reference)+'</p>'+(x.ingredients?'<p><b>Ingredients:</b> '+h(x.ingredients)+'</p>':'')+'<p><b>Contains:</b> '+h(x.contains.trim()||'No major allergens declared in the reviewed recipe.')+'</p>'+(x.additionalInfo?'<p><b>Additional allergen information:</b> '+h(x.additionalInfo)+'</p>':'')+'<p class="small">Prepared in a shared kitchen. Cross-contact with other allergens is possible.</p><p><b>Made on:</b> '+h(d.productionDate)+'</p>'+(x.storage?'<p><b>Care & storage:</b> '+h(x.storage)+'</p>':'')+(x.cold?'<p class="safe">'+safe+'</p>':'')+'<footer><p>DSHS registration: '+h(d.business.registrationId)+'</p><p class="disclosure">'+notice+'</p><p>'+h(d.business.email)+' · '+h(d.business.phone)+'</p></footer></article>')).join('');
+   return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><title>'+h(d.reference)+' product labels</title><style>*{box-sizing:border-box}body{margin:0;padding:16px;background:#f6eee9;color:#421c15;font:12pt/1.4 Arial,sans-serif}.instructions{max-width:8.3in;margin:0 auto 16px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,4in),4in));justify-content:center;gap:16px}.label{width:100%;padding:18px;background:white;border:1px solid #c9b4aa;border-radius:10px;overflow-wrap:anywhere;break-inside:avoid}header{border-bottom:5px solid #efcfeb;padding-bottom:12px}header strong{display:block;font-size:19pt}header span{font-size:8pt;letter-spacing:1px}h1{font-size:19pt;margin:16px 0 4px}.reference{font-size:10pt;color:#68564f}.small{font-size:10pt}.safe{font-size:12pt;font-weight:bold;border-top:1px solid #ddd;padding-top:12px}footer{border-top:1px solid #ddd;margin-top:14px;padding-top:6px;font-size:9pt}.disclosure{font-size:10pt}@media print{@page{margin:.35in}body{background:white;padding:0}.instructions{display:none}main{gap:.18in;grid-template-columns:repeat(auto-fit,4in);justify-content:start}.label{border-radius:0}}</style></head><body><p class="instructions">'+h(d.reference)+' — Product labels. Use your browser’s Print command or Save as PDF. Print at 100% scale and check the preview; this layout is not calibrated to a specific sticker sheet. Required safe-handling text is 12pt before any printer scaling.</p><main>'+cards+'</main></body></html>';
+  }
++ function duplicate(items,index){if(items.length>=100)throw Error('Up to 100 label groups are supported.');if(!Number.isInteger(index)||!items[index])throw Error('Choose a label to duplicate.');items.splice(index+1,0,{...structuredClone(items[index]),reviewed:false});return items;}
+  function open(packet){
+   const offer=packet.offers.find(o=>o.status!=='CLOSED');
+   if(!offer?.snapshot?.quote||['cancelled','declined'].includes(packet.order.status))throw Error('Issue a final approval before preparing labels. Canceled approvals cannot generate new labels.');
+@@ -26,8 +27,9 @@
+   const dialog=document.createElement('dialog');dialog.dataset.tpjLabelEditor='';dialog.style.cssText='width:min(960px,96vw);max-height:92dvh;border:1px solid #e2b5bc;border-radius:16px;padding:22px;background:#fff7f2;color:#421c15';
+   dialog.innerHTML='<div style="display:flex;justify-content:space-between;gap:15px"><h2>Prepare product labels</h2><button type="button" data-close>Close</button></div><p>Order '+h(d.reference)+'. One editable label group per approved item. Changes here affect labels only; they do not change the quote, contract, payment or fulfillment status.</p><p>Allergens and refrigeration are initially copied from the whole order. Review them separately for each product, including specific tree nut, fish or shellfish names where applicable. Print quantity means packages/labels, not automatically individual pieces in a box.</p><form><label>Business name<input name="businessName" maxlength="150" required></label><label>DSHS registration number<input name="registration" maxlength="100" required></label><label>Actual production date<input name="made" type="date" max="'+today()+'" required></label><div data-items></div><p data-error role="alert"></p><div class="actions"><button type="submit">Preview labels</button><button type="button" data-download>Download printable labels</button><button type="button" data-data>Save editable label data</button><label>Restore saved label data<input type="file" data-import accept=".json,application/json"></label></div><p>These drafts stay in this open editor. Save the editable data file if you want to reopen them later. Label drafts are not saved to the dashboard database.</p><iframe title="Product label print preview" sandbox="" style="display:none;width:100%;height:650px;border:1px solid #ddd" data-preview></iframe></form>';
+   document.body.append(dialog);const form=dialog.querySelector('form'),list=dialog.querySelector('[data-items]'),error=dialog.querySelector('[data-error]'),preview=dialog.querySelector('[data-preview]');
+-  function draw(){form.elements.businessName.value=d.business.name;form.elements.registration.value=d.business.registrationId;form.elements.made.value=d.productionDate;list.innerHTML=d.items.map((x,i)=>'<fieldset data-item="'+i+'"><legend>Product '+(i+1)+'</legend><label>Product name<input data-title maxlength="300" required value="'+h(x.title)+'"></label><label>Labels to print (0 skips this item)<input data-copies type="number" min="0" max="100" step="1" required value="'+x.copies+'"></label><label>Contains — list actual major allergens<input data-contains maxlength="1000" value="'+h(x.contains)+'"></label><label>Additional allergen information<textarea data-info maxlength="2000">'+h(x.additionalInfo)+'</textarea></label><label>Ingredients (optional)<textarea data-ingredients maxlength="4000">'+h(x.ingredients)+'</textarea></label><label>Care/storage instructions<textarea data-storage maxlength="1000">'+h(x.storage)+'</textarea></label><label><input data-cold type="checkbox" '+(x.cold?'checked':'')+'> Requires refrigeration/freezing for food safety</label><label><input data-reviewed type="checkbox" required> I verified this product’s name, allergens, storage and label quantity against the actual recipe and packaging.</label></fieldset>').join('');}
+-  function read(){d.business.name=form.elements.businessName.value.trim();d.business.registrationId=form.elements.registration.value.trim();d.productionDate=form.elements.made.value;d.items=[...list.querySelectorAll('[data-item]')].map(n=>({title:n.querySelector('[data-title]').value.trim(),copies:Number(n.querySelector('[data-copies]').value),contains:n.querySelector('[data-contains]').value.trim(),ingredients:n.querySelector('[data-ingredients]').value.trim(),additionalInfo:n.querySelector('[data-info]').value.trim(),storage:n.querySelector('[data-storage]').value.trim(),cold:n.querySelector('[data-cold]').checked,reviewed:n.querySelector('[data-reviewed]').checked}));return validate(d);}
++  function draw(){form.elements.businessName.value=d.business.name;form.elements.registration.value=d.business.registrationId;form.elements.made.value=d.productionDate;list.innerHTML=d.items.map((x,i)=>'<fieldset data-item="'+i+'"><legend>Product '+(i+1)+'</legend><button type="button" data-duplicate="'+i+'">Duplicate</button><label>Product name<input data-title maxlength="300" required value="'+h(x.title)+'"></label><label>Labels to print (0 skips this item)<input data-copies type="number" min="0" max="100" step="1" required value="'+x.copies+'"></label><label>Contains — list actual major allergens<input data-contains maxlength="1000" value="'+h(x.contains)+'"></label><label>Additional allergen information<textarea data-info maxlength="2000">'+h(x.additionalInfo)+'</textarea></label><label>Ingredients (optional)<textarea data-ingredients maxlength="4000">'+h(x.ingredients)+'</textarea></label><label>Care/storage instructions<textarea data-storage maxlength="1000">'+h(x.storage)+'</textarea></label><label><input data-cold type="checkbox" '+(x.cold?'checked':'')+'> Requires refrigeration/freezing for food safety</label><label><input data-reviewed type="checkbox" required> I verified this product’s name, allergens, storage and label quantity against the actual recipe and packaging.</label></fieldset>').join('');}
++  function read(check=true){d.business.name=form.elements.businessName.value.trim();d.business.registrationId=form.elements.registration.value.trim();d.productionDate=form.elements.made.value;d.items=[...list.querySelectorAll('[data-item]')].map(n=>({title:n.querySelector('[data-title]').value.trim(),copies:Number(n.querySelector('[data-copies]').value),contains:n.querySelector('[data-contains]').value.trim(),ingredients:n.querySelector('[data-ingredients]').value.trim(),additionalInfo:n.querySelector('[data-info]').value.trim(),storage:n.querySelector('[data-storage]').value.trim(),cold:n.querySelector('[data-cold]').checked,reviewed:n.querySelector('[data-reviewed]').checked}));return check?validate(d):d;}
++  list.onclick=e=>{const button=e.target.closest('[data-duplicate]');if(!button)return;read(false);if(d.items.length>=100){error.textContent='Up to 100 label groups are supported.';return;}const i=Number(button.dataset.duplicate);duplicate(d.items,i);draw();preview.style.display='none';list.querySelectorAll('[data-title]')[i+1]?.focus();};
+   function action(fn){error.textContent='';if(!form.reportValidity())return;try{fn(read());}catch(e){error.textContent=e.message;}}
+   form.onsubmit=e=>{e.preventDefault();action(v=>{preview.srcdoc=html(v);preview.style.display='block';});};
+   dialog.querySelector('[data-download]').onclick=()=>action(v=>window.TPJRecords.download(html(v),v.reference+'-product-labels.html'));
+@@ -38,5 +40,5 @@
+   const app=document.getElementById('app'),observer=app?new MutationObserver(()=>{if(app.hidden)close();}):null;if(observer)observer.observe(app,{attributes:true,attributeFilter:['hidden']});dialog.addEventListener('close',()=>observer?.disconnect(),{once:true});
+   draw();dialog.showModal();
+  }
+- return {open,html};
++ return {open,html,duplicate};
+ })();
+diff --git a/js/shop/model.js b/js/shop/model.js
+--- a/js/shop/model.js
++++ b/js/shop/model.js
+@@ -1105,15 +1105,7 @@
+                     );
+             }
+ 
+-            if (
+-                body.acknowledged !== true
+-            ) {
+-                fail(
+-                    "Acknowledge the order request, handling and allergen notices."
+-                );
+-            }
+-
+-            const subtotalCents =
++const subtotalCents =
+                 items.reduce(
+                     (sum, item) =>
+                         sum +
+@@ -1145,7 +1137,7 @@
+                     false
+                 ),
+ 
+-                acknowledged: true,
++                acknowledged: false,
+ 
+                 subtotalCents,
+ 
+diff --git a/js/shop/product-info.js b/js/shop/product-info.js
+--- a/js/shop/product-info.js
++++ b/js/shop/product-info.js
+@@ -273,10 +273,36 @@
+             };
+         }
+ 
++        function resolve(item, profiles = {}) {
++            const records = [], missing = [];
++            const add = (key, fallback, label) => {
++                const saved = profiles[key];
++                if (saved?.reviewed) records.push({contains:saved.contains || [],mayContain:[],notes:saved.additionalInfo?[saved.additionalInfo]:[]});
++                else if (fallback) records.push({contains:fallback.contains || [],mayContain:fallback.mayContain || [],notes:fallback.notes?[fallback.notes]:[]});
++                else missing.push(label || key);
++            };
++            const category = item.category === 'half' ? 'cakes' : item.category;
++            if (category === 'custom') add('custom:'+item.product,null,item.title || 'This product');
++            else if (category === 'chocolate') {
++                const pieces = item.mixing!==false && item.pieces?.length ? item.pieces : [{type:item.flavor,base:item.base,topping:item.topping}];
++                for (const piece of pieces) {
++                    if(piece.type)add('treat:'+piece.type,care.chocolate[piece.type],piece.type);
++                    if(piece.base && profiles['base:'+piece.base]?.reviewed)add('base:'+piece.base,null,piece.base);
++                    if(piece.topping && !['none','plain'].includes(piece.topping))add('topping:'+piece.topping,null,piece.topping+' topping');
++                }
++            } else {
++                const flavors = item.category === 'half' ? [item.one,item.two] : item.mixing!==false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k=>Number(item.mix[k])>0) : [item.flavor];
++                for (const flavor of new Set(flavors.filter(Boolean)))add('product:'+category+':'+flavor,care[category]?.[flavor],flavor);
++            }
++            const unique = values => [...new Set(values)], allergen = values => unique(values.map(x=>({egg:'eggs',peanut:'peanuts',treeNut:'tree nuts'}[x]||x)));
++            return {contains:allergen(records.flatMap(r=>r.contains)),mayContain:allergen(records.flatMap(r=>r.mayContain)),notes:unique(records.flatMap(r=>r.notes)),missing:unique(missing)};
++        }
++
+         return {
+             care,
+             labels,
+             combine,
++            resolve,
+ 
+             toppingNotice:
+                 "May add milk, egg, wheat and soy depending on components.",
+@@ -285,4 +311,4 @@
+                 "Ingredient brands and formulas may change. Please contact The Pastry Junkie before ordering if you have a food allergy. Products are prepared in a shared kitchen, and cross-contact with other allergens is possible."
+         };
+     }
+-);
+\ No newline at end of file
++);
+diff --git a/js/shop/ui.js b/js/shop/ui.js
+--- a/js/shop/ui.js
++++ b/js/shop/ui.js
+@@ -846,7 +846,7 @@
+     const allergenLabels = ids =>
+         ids.map(id => P.labels[id] || id).join(", ");
+ 
+-    const combined = P.combine(category, selected);
++    const combined = P.resolve(x, availability.profiles || {});
+ 
+     const storage = selected.map(id => `
+         <div class="shop-care-item">
+@@ -965,20 +965,17 @@
+         }
+ 
+         ${
+-            x.category === "chocolate" && selected.length
++            combined.missing.length
+                 ? `
+                     <p>
+-                        <strong>Topping Additions:</strong>
+-                        ${esc(P.toppingNotice)}
++                        <strong>Ingredient information:</strong>
++                        ${esc(combined.missing.length ? 'Ingredient information needs review for: '+combined.missing.join(', ')+'. Please contact us before ordering.' : '')}
+                     </p>
+                 `
+                 : ""
+         }
+ 
+-        <p class="shop-allergy-notice">
+-            <strong>Allergy Notice:</strong>
+-            ${esc(P.notice)}
+-        </p>
++
+     `;
+ }
+ 
+@@ -3444,6 +3441,17 @@
+     `;
+ }
+ 
++function selectedAllergensHTML(item) {
++    const P = window.TPJShopProductInfo;
++    const a = P.resolve(item, availability.profiles || {});
++    const names = values => values.map(x=>P.labels[x] || x).join(', ');
++    return '<div class="shop-selected-allergens"><strong>'+esc(item.title || 'Selected product')+'</strong>'+
++        (a.contains.length?'<p>Contains: '+esc(names(a.contains))+'.</p>':'')+
++        (a.mayContain.length?'<p>May contain: '+esc(names(a.mayContain))+'.</p>':'')+
++        a.notes.map(n=>'<p>'+esc(n)+'</p>').join('')+
++        (a.missing.length?'<p>Ingredient information needs review for '+esc(a.missing.join(', '))+'. Please contact us before ordering.</p>':'')+'</div>';
++}
++
+ function openCheckout() {
+     const dates = [];
+ 
+@@ -3708,11 +3716,7 @@
+                             Allergens and Cross-Contact
+                         </summary>
+ 
+-                        <p>
+-                            ${esc(
+-                                C.messages.allergens
+-                            )}
+-                        </p>
++                        ${cart.map(item => selectedAllergensHTML(item)).join('')}
+                     </details>
+ 
+                     <details>
+@@ -3754,17 +3758,7 @@
+                     </details>
+                 </div>
+ 
+-                <label class="shop-mix-toggle">
+-                    <input
+-                        name="acknowledged"
+-                        type="checkbox"
+-                        required
+-                    >
+-
+-                    I have read the allergen, handling
+-                    and fulfillment notices and understand
+-                    this is an order request.
+-                </label>
++
+ 
+                 <label
+                     class="shop-honeypot"
+@@ -3949,8 +3943,6 @@
+ 
+             notes: values.notes,
+ 
+-            acknowledged:
+-                values.acknowledged === "on",
+ 
+             website:
+                 values.website || "",
+@@ -4687,7 +4679,7 @@
+ }
+ function openCustomProduct(id,item=null){
+  config=null;editing=item?.id||null;const p=C.customProducts?.[id];if(!p){openDialog('Product unavailable','<p>This product has been removed from the current menu. Please choose another item.</p>');return;}
+- openDialog(p.name,'<p>'+esc(p.description||'')+'</p><p>Price per product/package: '+esc(M.money(p.price))+'</p><label>Quantity<input id="customQuantity" type="number" min="1" max="99" step="1" required value="'+(item?.quantity||1)+'"></label><p id="customTotal"></p><p id="customError" role="alert"></p><button type="button" id="customAdd" class="shop-button">'+(item?'Update cart':'Add to cart')+'</button>');
++ openDialog(p.name,'<p>'+esc(p.description||'')+'</p>'+selectedAllergensHTML({category:'custom',product:id,title:p.name})+'<p>Price per product/package: '+esc(M.money(p.price))+'</p><label>Quantity<input id="customQuantity" type="number" min="1" max="99" step="1" required value="'+(item?.quantity||1)+'"></label><p id="customTotal"></p><p id="customError" role="alert"></p><button type="button" id="customAdd" class="shop-button">'+(item?'Update cart':'Add to cart')+'</button>');
+  const field=$('#customQuantity',dialog),total=$('#customTotal',dialog),button=$('#customAdd',dialog);const value=()=>({category:'custom',product:id,quantity:Number(field.value),id:editing||uid()});const update=()=>{try{const q=M.quote(value(),availability);total.textContent=M.money(q.totalCents);button.disabled=false;$('#customError',dialog).textContent='';}catch(e){button.disabled=true;$('#customError',dialog).textContent=e.message;}};field.oninput=update;
+  button.onclick=()=>{try{const x=value();M.quote(x,availability);if(editing)cart=cart.map(v=>v.id===editing?x:v);else cart.push(x);persist();openCart();}catch(e){$('#customError',dialog).textContent=e.message;}};update();
+ }
+diff --git a/owner-dashboard.css b/owner-dashboard.css
+--- a/owner-dashboard.css
++++ b/owner-dashboard.css
+@@ -1 +1,10 @@
+ :root{color-scheme:light;--ink:#421c15;--pink:#b51558;--line:#e9c9ce;--paper:#fff9f5}*{box-sizing:border-box}body{margin:0;background:#f5e8e5;color:var(--ink);font:16px/1.55 system-ui,sans-serif}header{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--ink);color:#ffd0e6;padding:20px max(18px,calc((100vw - 1450px)/2))}header small{letter-spacing:.12em;font-weight:800}h1{font-size:26px;margin:3px 0}h2{font-size:23px}h3{font-size:20px}h4{font-size:17px}main{max-width:1500px;margin:auto;padding:22px}.card,fieldset{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px}.card{margin-bottom:18px}.layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px}.toolbar,nav,.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end}nav{margin-bottom:18px}button,input,textarea,select{font:inherit;max-width:100%}button{min-height:44px;padding:10px 15px;border:1px solid var(--ink);border-radius:8px;background:var(--ink);color:#ffd0e6;font-weight:750;cursor:pointer}button.secondary,nav button{background:var(--paper);color:var(--ink)}nav button[aria-current=page]{background:var(--ink);color:#ffd0e6}button:disabled{opacity:.55;cursor:default}input,textarea,select{min-height:44px;border:1px solid #cda7ad;border-radius:7px;padding:9px;background:white;color:var(--ink)}label{display:block;margin:12px 0}label>input:not([type=checkbox]),label>textarea,label>select{display:block;width:100%}input[type=checkbox]{width:20px;height:20px;min-height:0;accent-color:var(--pink);vertical-align:middle}textarea{min-height:90px;width:100%}fieldset{margin:14px 0;min-width:0}legend{font-weight:750}.muted,small{color:#765e59}header small{color:inherit}.error,[role=alert]{color:#a51b33;font-weight:750}.banner{padding:12px;background:#fff0c7;border-radius:8px}.tag{display:inline-block;padding:3px 9px;border-radius:30px;background:#f8dce5;font-weight:750;font-size:14px}.order-card{display:block;text-align:left;width:100%;background:white;color:var(--ink);margin:10px 0;padding:15px}.order-card[aria-current=true]{outline:2px solid var(--pink)}.order-card span,.order-card strong,.order-card small{display:block}.facts{display:grid;grid-template-columns:165px minmax(0,1fr);gap:8px 15px}.facts dt{font-weight:750}.facts dd{margin:0;white-space:pre-wrap}p,li,dd,pre{overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#f2e8e5;padding:12px;border-radius:8px}.item{border-top:1px solid var(--line);padding:12px 0}details{border-top:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:750}a{color:var(--pink)}table{border-collapse:collapse;width:100%}td,th{padding:9px;border-bottom:1px solid var(--line);text-align:left}.money{text-align:right}.tiles{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.tiles button{flex:1 1 110px}.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.menu-grid label{margin:0}.file-list{padding-left:20px}[hidden]{display:none!important}:focus-visible{outline:3px solid var(--pink);outline-offset:3px}#login{max-width:550px;margin:30px auto}@media(max-width:800px){main{padding:12px}.layout{grid-template-columns:1fr}.card,fieldset{padding:16px}.facts{grid-template-columns:1fr;gap:2px}.facts dd{margin-bottom:9px}h1{font-size:21px}header{padding:16px}.toolbar>label{flex:1 1 140px}}@media print{header,nav,button,#list,.toolbar{display:none}.layout{display:block}.card{border:0}body{background:white}}
++
++/* Compact order controls and grouped order facts. */
++.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
++.bulk-actionbar,.order-actionbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 12px;font-size:14px}
++.bulk-actionbar label{display:flex;align-items:center;gap:5px;margin:0}.bulk-actionbar input[type=checkbox],.order-list-row>input{width:17px;height:17px}
++.bulk-actionbar select,.order-actionbar select{width:auto;max-width:100%;min-height:34px;padding:5px 8px;font-size:14px}.bulk-actionbar [role=status]:empty,.order-actionbar [role=status]:empty{display:none}
++.order-list-row{display:flex;align-items:flex-start;gap:8px}.order-list-row>input{flex:none;margin-top:25px}.order-list-row .order-card{flex:1;min-width:0;padding:11px}
++#detail>.facts{grid-template-columns:repeat(2,minmax(80px,auto) minmax(0,1fr));font-size:14px;gap:5px 12px}#detail h2{margin-bottom:8px}#detail h3{margin:16px 0 8px}.order-spec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 20px;margin:8px 0 16px}.order-spec-grid dt{font-weight:650;font-size:13px}.order-spec-grid dd{margin:2px 0 0;font-size:14px}.order-spec-grid .item{padding:8px 0}.order-spec-grid p{margin:5px 0}#detail>.actions button{min-height:34px;padding:6px 10px;font-size:14px}
++@media(max-width:600px){#detail>.facts{grid-template-columns:110px minmax(0,1fr)}.order-spec-grid{grid-template-columns:1fr}.bulk-actionbar{gap:7px}}
+diff --git a/pages/cake-builder.html b/pages/cake-builder.html
+--- a/pages/cake-builder.html
++++ b/pages/cake-builder.html
+@@ -20,6 +20,7 @@
+     </title>
+ 
+ 
++<style>.builder-service-footer{text-align:center;font:14px/1.5 Arial,sans-serif;padding:15px 20px;color:#421c15}</style>
+ </head>
+ <link
+     rel="stylesheet"
+@@ -28,9 +29,7 @@
+ 
+ 
+ <body>
+-<p role="note" style="text-align:center;padding:12px;background:#f8dce5;color:#421c15">Available for Texas pickup and personal delivery only. We do not ship or deliver outside Texas.</p>
+-
+-    <div class="cake-builder-app">
++<div class="cake-builder-app">
+ 
+         <!-- =========================================
+              HEADER
+@@ -6890,10 +6889,11 @@
+         </section>
+ 
+     </div>
+-<script src="../js/order-time.js?v=finish-1" defer></script>
++<script src="../js/order-time.js?v=qa-20261104-1" defer></script>
+ <script
+ src="../js/cake-builder.js?v=finish-1"
+ ></script>
+ 
++<footer class="builder-service-footer"><p>Texas pickup and delivery only. We do not ship or deliver outside Texas.</p></footer>
+ </body>
+ </html>
+diff --git a/pages/order.html b/pages/order.html
+--- a/pages/order.html
++++ b/pages/order.html
+@@ -10,7 +10,7 @@
+ <style>
+ :root{color-scheme:light;--ink:#421c15;--pink:#b51558;--line:#e9c9ce}*{box-sizing:border-box}body{margin:0;background:#f5e8e5;color:var(--ink);font:16px/1.6 system-ui,sans-serif}header{background:var(--ink);color:#ffd0e6;padding:22px}header div,main{max-width:950px;margin:auto}header small{font-weight:800;letter-spacing:.12em}h1{font-size:28px;margin:5px 0}h2{font-size:23px}h3{font-size:18px}main{padding:20px}.card{background:#fff9f5;border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px}button,input,textarea{font:inherit;max-width:100%}button{min-height:46px;padding:10px 17px;border:1px solid var(--ink);border-radius:8px;background:var(--ink);color:#ffd0e6;font-weight:750;cursor:pointer}button.secondary{background:white;color:var(--ink)}button:disabled{opacity:.55;cursor:default}input,textarea{border:1px solid #cda7ad;border-radius:7px;padding:9px;min-height:44px;background:white;color:var(--ink)}textarea{display:block;width:100%;min-height:100px}.initial{width:85px;margin:8px 0}label{display:block;margin:12px 0}input[type=checkbox]{min-height:auto;width:20px;height:20px;vertical-align:middle;accent-color:var(--pink)}p,li,dd{overflow-wrap:anywhere}.muted{color:#765e59}.error{color:#a51b33;font-weight:750}.banner{padding:14px;background:#fff0c7;border-radius:8px;font-weight:750}.facts{display:grid;grid-template-columns:180px minmax(0,1fr);gap:8px 15px}.facts dt{font-weight:750}.facts dd{margin:0;white-space:pre-wrap}.term{border-top:1px solid var(--line);padding:15px 0}.term p,.preserve{white-space:pre-wrap}.signature{overflow-wrap:anywhere;overflow-wrap:anywhere;background:#ffe7ef;padding:16px;border-radius:8px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin:15px 0}a{color:var(--pink)}:focus-visible{outline:3px solid var(--pink);outline-offset:3px}[hidden]{display:none!important}@media(max-width:600px){main{padding:10px}.card{padding:17px}.facts{grid-template-columns:1fr;gap:2px}.facts dd{margin-bottom:10px}h1{font-size:24px}}@media print{body{background:white;color:black}header{background:white;color:black}.no-print,button,#paymentPanel,#cancelPanel{display:none!important}.card{border:0;padding:0;margin:0 0 20px}.term{break-inside:avoid}.banner{border:1px solid black}a{color:black}main{max-width:none;padding:0}}
+ </style>
+-<script src="../js/order-time.js?v=finish-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script>
++<script src="../js/order-time.js?v=qa-20261104-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script>
+ <script src="../js/signing-ui.js?v=finish-1" defer></script>
+ <script src="../js/order-portal.js?v=finish-1" defer></script>
+ </head>
+diff --git a/pages/orders-admin.html b/pages/orders-admin.html
+--- a/pages/orders-admin.html
++++ b/pages/orders-admin.html
+@@ -4,10 +4,10 @@
+ <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+ <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; connect-src https://tpj-orders-api.business-c3f.workers.dev; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+ <title>Owner dashboard | The Pastry Junkie</title>
+-<link rel="stylesheet" href="../owner-dashboard.css?v=ops-1">
+-<script src="../js/shop/catalog.js?v=ops-1" defer></script><script src="../js/order-terms.js?v=rush-1" defer></script>
+-<script src="../js/order-time.js?v=ops-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script><script src="../js/handoff-receipts.js?v=rush-1" defer></script><script src="../js/product-labels.js?v=rush-1" defer></script><script src="../js/owner-quote.js?v=rush-1" defer></script>
+-<script src="../js/order-workflow-admin.js?v=rush-1" defer></script><script src="../js/menu-editor.js?v=finish-1" defer></script><script src="../js/order-tools.js?v=finish-1" defer></script><script src="../js/owner-dashboard.js?v=finish-1" defer></script>
++<link rel="stylesheet" href="../owner-dashboard.css?v=qa-20261104-1">
++<script src="../js/shop/catalog.js?v=ops-1" defer></script><script src="../js/order-terms.js?v=qa-20261104-1" defer></script>
++<script src="../js/order-time.js?v=qa-20261104-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script><script src="../js/handoff-receipts.js?v=qa-20261104-1" defer></script><script src="../js/product-labels.js?v=qa-20261104-1" defer></script><script src="../js/owner-quote.js?v=rush-1" defer></script>
++<script src="../js/order-workflow-admin.js?v=rush-1" defer></script><script src="../js/menu-editor.js?v=finish-1" defer></script><script src="../js/order-tools.js?v=qa-20261104-1" defer></script><script src="../js/owner-dashboard.js?v=qa-20261104-1" defer></script>
+ </head><body>
+ <header><div><small>THE PASTRY JUNKIE</small><h1>Your business dashboard</h1></div><button id="lock" hidden>Lock dashboard</button></header>
+ <main>
+diff --git a/pages/privacy.html b/pages/privacy.html
+--- a/pages/privacy.html
++++ b/pages/privacy.html
+@@ -9,8 +9,8 @@
+ <style>
+ *{box-sizing:border-box}body{margin:0;background:#f5e8e5;color:#421c15;font:16px/1.65 system-ui,sans-serif}header{background:#421c15;color:#ffd0e6;padding:22px}header div,main{max-width:950px;margin:auto}main{padding:24px}article{background:#fff9f5;border:1px solid #e9c9ce;border-radius:14px;padding:24px}nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px}a{color:#b51558}header a{color:#ffd0e6}h1{font-size:29px}h2{font-size:21px}section{padding:12px 0;border-top:1px solid #e9c9ce}p{white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){main{padding:12px}article{padding:17px}}
+ </style>
+-<script src="../js/order-terms.js?v=rush-1" defer></script>
+-<script src="../js/policy-pages.js?v=ops-1" defer></script>
++<script src="../js/order-terms.js?v=qa-20261104-1" defer></script>
++<script src="../js/policy-pages.js?v=qa-20261104-1" defer></script>
+ </head>
+ <body>
+ <header><div><strong>THE PASTRY JUNKIE</strong> · <a href="shop.html">Shop</a></div></header>
+diff --git a/pages/shop.html b/pages/shop.html
+--- a/pages/shop.html
++++ b/pages/shop.html
+@@ -17,14 +17,12 @@
+     <title>Loaded Desserts | The Pastry Junkie</title>
+ 
+     <link rel="stylesheet" href="../style.css">
+-    <link rel="stylesheet"href="../shop.css?v=20261026-chocolate-2">
+-    <link rel="stylesheet"href="../shop-ordering.css?v=mobile-tray-20261028-1" >
++    <link rel="stylesheet"href="../shop.css?v=qa-20261104-1">
++    <link rel="stylesheet"href="../shop-ordering.css?v=qa-20261104-1" >
+ </head>
+ 
+ <body class="shop-page">
+-<p role="note" style="text-align:center;padding:12px;background:#f8dce5;color:#421c15">Available for Texas pickup and personal delivery only. We do not ship or deliver outside Texas.</p>
+-
+-    <!-- =========================================
++<!-- =========================================
+          HEADER
+     ========================================== -->
+ 
+@@ -1383,6 +1381,8 @@
+         </div>
+ 
+ 
++        <p class="footer-texas">Texas pickup and delivery only. We do not ship or deliver outside Texas.</p>
++
+         <div class="footer-bottom">
+ 
+             <p>
+@@ -1413,14 +1413,14 @@
+ 
+ <script src="../js/shop/catalog.js?v=shop-1"></script>
+ 
+-<script src="../js/shop/model.js?v=finish-1"></script>
++<script src="../js/shop/model.js?v=qa-20261104-1"></script>
+ 
+ <script src="../js/shop/settings.js?v=orders-20261028-1"></script>
+ 
+-<script src="../js/shop/product-info.js?v=shop-info-1"></script>
+-
+-<script src="../js/order-time.js?v=ops-1"></script>
+-<script src="../js/shop/ui.js?v=finish-1"></script>
++<script src="../js/shop/product-info.js?v=qa-20261104-1"></script>
++
++<script src="../js/order-time.js?v=qa-20261104-1"></script>
++<script src="../js/shop/ui.js?v=qa-20261104-1"></script>
+ 
+ </body>
+ 
+diff --git a/pages/terms.html b/pages/terms.html
+--- a/pages/terms.html
++++ b/pages/terms.html
+@@ -10,8 +10,8 @@
+ <style>
+ *{box-sizing:border-box}body{margin:0;background:#f5e8e5;color:#421c15;font:16px/1.65 system-ui,sans-serif}header{background:#421c15;color:#ffd0e6;padding:22px}header div,main{max-width:950px;margin:auto}main{padding:24px}article{background:#fff9f5;border:1px solid #e9c9ce;border-radius:14px;padding:24px}nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px}a{color:#b51558}header a{color:#ffd0e6}h1{font-size:29px}h2{font-size:21px}section{padding:12px 0;border-top:1px solid #e9c9ce}p{white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){main{padding:12px}article{padding:17px}}
+ </style>
+-<script src="../js/order-terms.js?v=rush-1" defer></script>
+-<script src="../js/policy-pages.js?v=ops-1" defer></script>
++<script src="../js/order-terms.js?v=qa-20261104-1" defer></script>
++<script src="../js/policy-pages.js?v=qa-20261104-1" defer></script>
+ </head>
+ <body>
+ <header><div><strong>THE PASTRY JUNKIE</strong> · <a href="shop.html">Shop</a></div></header>
+diff --git a/server/order-worker.js b/server/order-worker.js
+--- a/server/order-worker.js
++++ b/server/order-worker.js
+@@ -1544,15 +1544,7 @@
+                     );
+             }
+ 
+-            if (
+-                body.acknowledged !== true
+-            ) {
+-                fail(
+-                    "Acknowledge the order request, handling and allergen notices."
+-                );
+-            }
+-
+-            const subtotalCents =
++const subtotalCents =
+                 items.reduce(
+                     (sum, item) =>
+                         sum +
+@@ -1584,7 +1576,7 @@
+                     false
+                 ),
+ 
+-                acknowledged: true,
++                acknowledged: false,
+ 
+                 subtotalCents,
+ 
+@@ -2051,6 +2043,8 @@
+       tpjStable(body),
+       env.GOOGLE_BRIDGE_SECRET
+     );
++
++  if(await env.DB.prepare("SELECT 1 FROM tpj_deleted_submissions WHERE source='shop' AND submission_key=?").bind(key).first())throw tpjError('This order was deleted. Start a new order request.',410);
+ 
+   const previous =
+     await env.DB.prepare(
+@@ -3290,6 +3284,8 @@
+ 
+   const combinedHash =
+     receiptHash + "." + fingerprint;
++
++  if(await env.DB.prepare("SELECT 1 FROM tpj_deleted_submissions WHERE source='cake_builder' AND submission_key=?").bind(key).first())throw tpjError('This inquiry was deleted.',410);
+ 
+   const existingKey =
+     await env.DB.prepare(
+@@ -4401,7 +4397,7 @@
+    }
+    const timestamp=now(),id=uuid();
+    await env.DB.batch([
+-    stmt(env,"UPDATE tpj_payment_intents SET status='PROCESSING',updated_at=? WHERE id=? AND status='READY' AND EXISTS(SELECT 1 FROM tpj_offers WHERE id=? AND status='SIGNED' AND payment_review=0 AND (?='balance' OR ?=1 OR expires_at>?))",timestamp,intent.id,o.id,b.phase,isChange?1:0,timestamp),
++    stmt(env,"UPDATE tpj_payment_intents SET status='PROCESSING',updated_at=? WHERE id=? AND status='READY' AND NOT EXISTS(SELECT 1 FROM tpj_order_management m WHERE m.request_id=(SELECT request_id FROM tpj_offers WHERE id=tpj_payment_intents.offer_id) AND m.purging=1) AND EXISTS(SELECT 1 FROM tpj_offers WHERE id=? AND status='SIGNED' AND payment_review=0 AND (?='balance' OR ?=1 OR expires_at>?))",timestamp,intent.id,o.id,b.phase,isChange?1:0,timestamp),
+     stmt(env,"INSERT INTO tpj_payment_attempts (id,intent_id,idempotency_key,source_hash,created_at,updated_at) SELECT ?,?,?,?,?,? WHERE changes()=1",id,intent.id,b.attemptKey,hash,timestamp,timestamp)
+    ]);
+    a=await get(env,'SELECT * FROM tpj_payment_attempts WHERE idempotency_key=?',b.attemptKey);
+@@ -4874,12 +4870,12 @@
+  async function list(e,url){
+   const q=(url.searchParams.get('q')||'').slice(0,200),source=url.searchParams.get('source')||'',stage=url.searchParams.get('stage')||'',from=url.searchParams.get('from')||'',to=url.searchParams.get('to')||'',offset=Math.max(0,Math.min(1000000,Number.parseInt(url.searchParams.get('offset')||'0')||0));
+   if(source&&!['shop','cake_builder'].includes(source)||stage&&!['new','pending','confirmed','fulfilled','canceled'].includes(stage)||[from,to].some(d=>d&&!/^\d{4}-\d{2}-\d{2}$/.test(d)))fail('Invalid order filter.');
+-  const sql=`SELECT r.*,d.reference,d.footprint,${stageSQL} AS stage,m.archived_at,COALESCE(m.is_test,0) AS is_test,CASE WHEN COALESCE(m.seen_version,0)>=r.version THEN 1 ELSE 0 END AS is_read,CASE WHEN EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=r.id AND n.recipient_type='customer' AND n.state='failed') THEN 1 ELSE 0 END AS failed_email,CASE WHEN EXISTS(SELECT 1 FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='initial' WHERE o.request_id=r.id AND o.status!='CLOSED' AND julianday(o.expires_at)<=julianday('now') AND i.status!='PAID') THEN 1 ELSE 0 END AS expired_approval,CASE WHEN EXISTS(SELECT 1 FROM tpj_cancellation_requests cr JOIN tpj_offers co ON co.id=cr.offer_id WHERE co.request_id=r.id AND co.status!='CLOSED') THEN 1 ELSE 0 END AS cancellation_attention,CASE WHEN ${paidSQL} THEN 1 ELSE 0 END AS fully_paid,(SELECT MIN(due) FROM (SELECT o.balance_due_date AS due FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='balance' WHERE o.request_id=r.id AND o.status='SIGNED' AND i.status!='PAID' UNION ALL SELECT c.due_date AS due FROM tpj_order_changes c JOIN tpj_offers o ON o.id=c.offer_id JOIN tpj_payment_intents i ON i.offer_id=o.id WHERE o.request_id=r.id AND c.voided_at IS NULL AND o.status='SIGNED' AND i.status!='PAID')) AS balance_due FROM tpj_requests r LEFT JOIN tpj_display_references d ON d.request_id=r.id LEFT JOIN tpj_fulfillments f ON f.request_id=r.id LEFT JOIN tpj_order_management m ON m.request_id=r.id`;
++  const sql=`SELECT r.*,d.reference,d.footprint,${stageSQL} AS stage,m.archived_at,COALESCE(CASE WHEN m.manual_stage='fulfilled' THEN (SELECT MAX(e.created_at) FROM tpj_request_events e WHERE e.request_id=r.id AND e.event_type='owner_organization_changed' AND json_extract(e.details_json,'$.action')='stage' AND json_extract(e.details_json,'$.value')='fulfilled') END,f.created_at,r.updated_at) AS fulfilled_since,COALESCE(m.is_test,0) AS is_test,CASE WHEN COALESCE(m.seen_version,0)>=r.version THEN 1 ELSE 0 END AS is_read,CASE WHEN EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=r.id AND n.recipient_type='customer' AND n.state='failed') THEN 1 ELSE 0 END AS failed_email,CASE WHEN EXISTS(SELECT 1 FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='initial' WHERE o.request_id=r.id AND o.status!='CLOSED' AND julianday(o.expires_at)<=julianday('now') AND i.status!='PAID') THEN 1 ELSE 0 END AS expired_approval,CASE WHEN EXISTS(SELECT 1 FROM tpj_cancellation_requests cr JOIN tpj_offers co ON co.id=cr.offer_id WHERE co.request_id=r.id AND co.status!='CLOSED') THEN 1 ELSE 0 END AS cancellation_attention,CASE WHEN ${paidSQL} THEN 1 ELSE 0 END AS fully_paid,(SELECT MIN(due) FROM (SELECT o.balance_due_date AS due FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='balance' WHERE o.request_id=r.id AND o.status='SIGNED' AND i.status!='PAID' UNION ALL SELECT c.due_date AS due FROM tpj_order_changes c JOIN tpj_offers o ON o.id=c.offer_id JOIN tpj_payment_intents i ON i.offer_id=o.id WHERE o.request_id=r.id AND c.voided_at IS NULL AND o.status='SIGNED' AND i.status!='PAID')) AS balance_due FROM tpj_requests r LEFT JOIN tpj_display_references d ON d.request_id=r.id LEFT JOIN tpj_fulfillments f ON f.request_id=r.id LEFT JOIN tpj_order_management m ON m.request_id=r.id`;
+   const mode=url.searchParams.get('view')||'';const received=mode==='records';
+   const condition=" WHERE (?='' OR source=?) AND (?='' OR stage=?) AND (?='' OR "+(received?'created_at':'fulfillment_date')+">=?) AND (?='' OR "+(received?'created_at<':'fulfillment_date<=')+"?) AND (?='' OR lower(customer_name||' '||customer_email||' '||customer_phone||' '||COALESCE(reference,'')||' '||id||' '||fulfillment_date||' '||created_at) LIKE ?)";
+   const active=url.searchParams.get('active')==='1',attention=url.searchParams.get('attention')==='1';
+   const archive=url.searchParams.get('archive')||'',unread=url.searchParams.get('unread')==='1',day=TPJWorkflow.plan.day();
+-  const records=mode==='orders'?" AND archived_at IS NULL AND stage NOT IN ('fulfilled','canceled')":'';
++  const records=mode==='orders'?" AND archived_at IS NULL AND stage!='canceled' AND (stage!='fulfilled' OR julianday(fulfilled_since)>julianday('now','-3 days'))":'';
+   const archiveFilter=archive==='archived'?' AND archived_at IS NOT NULL':archive==='not_archived'?' AND archived_at IS NULL':'';
+   const extra=records+archiveFilter+(unread?' AND is_read=0':'')+" AND (?=0 OR stage NOT IN ('fulfilled','canceled')) AND (?=0 OR stage='new' OR status IN ('payment_review','cancellation_requested') OR (balance_due IS NOT NULL AND balance_due<=?) OR cancellation_attention=1 OR failed_email=1 OR expired_approval=1 OR (fulfillment_date<? AND stage NOT IN ('fulfilled','canceled')))";
+   const args=[source,source,stage,stage,from,received&&from?new Date(TPJWorkflow.plan.localMS(from,'00:00')).toISOString():from,to,received&&to?new Date(TPJWorkflow.plan.localMS(TPJWorkflow.plan.shiftDay(to,1),'00:00')).toISOString():to,q,'%'+q.toLowerCase()+'%',active?1:0,attention?1:0,day,day];
+@@ -4988,8 +4984,8 @@
+  const at=()=>new Date().toISOString(),sql=(e,s,...args)=>e.DB.prepare(s).bind(...args),get=(e,s,...a)=>sql(e,s,...a).first(),all=async(e,s,...a)=>(await sql(e,s,...a).all()).results;
+  const fail=(s,n=422)=>{throw tpjError(s,n);};
+  async function state(e,row){const m=await get(e,'SELECT * FROM tpj_order_management WHERE request_id=?',row.id);return {manualStage:m?.manual_stage||null,read:(m?.seen_version||0)>=row.version,archivedAt:m?.archived_at||null,isTest:m?.is_test===1,purging:m?.purging===1};}
+- async function guard(e,id){if((await get(e,'SELECT purging FROM tpj_order_management WHERE request_id=?',id))?.purging)fail('This test record is being removed. Its links and payments are disabled.',410);}
+- async function google(e,payload){const timestamp=Date.now(),raw=JSON.stringify(payload),signature=await tpjHash(timestamp+'\n'+raw,e.GOOGLE_BRIDGE_SECRET),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{let r=await fetch(e.GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessDelivery:1,timestamp,payload:raw,signature}),redirect:'manual',signal:controller.signal});if([301,302,303].includes(r.status)){const u=new URL(r.headers.get('Location')||'');if(u.origin!=='https://script.googleusercontent.com')fail('Unexpected archive-service redirect.',503);r=await fetch(u.href,{redirect:'manual',signal:controller.signal});}const result=await r.json();if(!r.ok||!result.ok)fail('Test file cleanup did not finish. Retry the same record; it remains locked.',503);return result;}finally{clearTimeout(timer);}}
++ async function guard(e,id){if((await get(e,'SELECT purging FROM tpj_order_management WHERE request_id=?',id))?.purging)fail('This order is being removed. Its links and payments are disabled.',410);}
++ async function google(e,payload){const timestamp=Date.now(),raw=JSON.stringify(payload),signature=await tpjHash(timestamp+'\n'+raw,e.GOOGLE_BRIDGE_SECRET),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{let r=await fetch(e.GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessDelivery:1,timestamp,payload:raw,signature}),redirect:'manual',signal:controller.signal});if([301,302,303].includes(r.status)){const u=new URL(r.headers.get('Location')||'');if(u.origin!=='https://script.googleusercontent.com')fail('Unexpected archive-service redirect.',503);r=await fetch(u.href,{redirect:'manual',signal:controller.signal});}const result=await r.json();if(!r.ok||!result.ok)fail('File cleanup did not finish. Retry deletion; the order remains locked.',503);return result;}finally{clearTimeout(timer);}}
+  async function route(request,e){
+   const p=new URL(request.url).pathname,m=p.match(/^\/api\/admin\/business\/orders\/(TPJ-[a-f0-9-]{36})\/(manage|purge)$/i);if(!m)return null;await tpjAdmin(request,e);if(request.method!=='POST')fail('Method not allowed.',405);
+   const id=m[1],b=await tpjReadJSON(request),row=await get(e,'SELECT * FROM tpj_requests WHERE id=?',id);if(!row)fail('Order not found.',404);
+@@ -5008,16 +5004,16 @@
+  }
+  async function purge(e,row,b){
+   const id=row.id,m=await get(e,'SELECT * FROM tpj_order_management WHERE request_id=?',id),reference=(await get(e,'SELECT reference FROM tpj_display_references WHERE request_id=?',id))?.reference||id;
+-  if(String(e.SQUARE_ENVIRONMENT).trim()!=='sandbox'||m?.is_test!==1||b.confirmation!==reference)fail('Permanent deletion requires a marked Sandbox test and its exact displayed order number.',409);
+-  if(await get(e,"SELECT id FROM tpj_offers WHERE request_id=? AND environment!='sandbox' LIMIT 1",id))fail('Production records cannot use test deletion.',409);
+-  if(await get(e,"SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=? AND a.status='PENDING' LIMIT 1",id))fail('Reconcile the pending test payment before deleting this test.',409);
+-  if(await get(e,"SELECT id FROM tpj_notifications WHERE request_id=? AND state='processing' AND lease_until>? LIMIT 1",id,at()))fail('A test email is processing. Let its lease finish, then retry deletion.',409);
+-  const lease=await e.DB.batch([sql(e,'UPDATE tpj_order_management SET purging=1,updated_at=? WHERE request_id=? AND EXISTS(SELECT 1 FROM tpj_requests WHERE id=? AND version=?) RETURNING request_id',at(),id,id,b.version),sql(e,"UPDATE tpj_notifications SET state='failed',last_error='Test deletion in progress',lease_until=NULL WHERE request_id=? AND changes()>0",id)]);if(!lease[0].results?.length)fail('Reload the test before deleting it.',409);
++  if(b.confirmed!==true)fail('Confirm deletion of this order.',409);
++  if(await get(e,"SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=? AND a.status='PENDING' LIMIT 1",id))fail('A payment is processing. Refresh its status before deleting this order.',409);
++  if(await get(e,"SELECT id FROM tpj_notifications WHERE request_id=? AND state='processing' AND lease_until>? LIMIT 1",id,at()))fail('An email is being sent. Retry deletion shortly.',409);
++  const lease=await e.DB.batch([sql(e,"UPDATE tpj_order_management SET purging=1,updated_at=? WHERE request_id=? AND EXISTS(SELECT 1 FROM tpj_requests WHERE id=? AND version=?) AND NOT EXISTS(SELECT 1 FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=tpj_order_management.request_id AND a.status='PENDING') AND NOT EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=tpj_order_management.request_id AND n.state='processing' AND n.lease_until>?) RETURNING request_id",at(),id,id,b.version,at()),sql(e,"UPDATE tpj_notifications SET state='failed',last_error='Order deletion in progress',lease_until=NULL WHERE request_id=? AND changes()>0",id)]);if(!lease[0].results?.length)fail('Reload the order before deleting it.',409);
+   const offers=await all(e,'SELECT id FROM tpj_offers WHERE request_id=?',id),jobs=await all(e,'SELECT id FROM tpj_notifications WHERE request_id=?',id),challenges=await all(e,'SELECT c.id FROM tpj_signing_challenges c JOIN tpj_offers o ON o.id=c.offer_id WHERE o.request_id=?',id),files=await all(e,'SELECT drive_file_id FROM tpj_files WHERE request_id=?',id),fulfillment=await get(e,'SELECT record_json FROM tpj_fulfillments WHERE request_id=?',id);
+   const fileIds=files.map(x=>x.drive_file_id).filter(Boolean);if(fulfillment){const f=JSON.parse(fulfillment.record_json);if(f.photo?.fileId)fileIds.push(f.photo.fileId);}
+   const artifactCount=offers.length+fileIds.length+jobs.length+challenges.length;
+-  if(artifactCount)await google(e,{action:'purge_test_records',sandbox:true,requestId:id,offerIds:offers.map(x=>x.id),jobIds:jobs.map(x=>x.id),challengeIds:challenges.map(x=>x.id),fileIds});
++  if(artifactCount)await google(e,{action:'purge_order_records',authorizedDeletion:true,requestId:id,offerIds:offers.map(x=>x.id),jobIds:jobs.map(x=>x.id),challengeIds:challenges.map(x=>x.id),fileIds});
+   const queries=[sql(e,'INSERT OR REPLACE INTO tpj_test_purge_guard(request_id,expires_at) VALUES(?,?)',id,Math.floor(Date.now()/1000)+60)];
++  queries.push(sql(e,'INSERT OR IGNORE INTO tpj_deleted_submissions(source,submission_key,deleted_at) SELECT source,submission_key,? FROM tpj_submission_keys WHERE request_id=?',at(),id));
+   const offerWhere='SELECT id FROM tpj_offers WHERE request_id=?',intentWhere='SELECT i.id FROM tpj_payment_intents i JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=?',attemptWhere='SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=?';
+   for(const [table,where]of [['tpj_payment_disputes','attempt_id IN ('+attemptWhere+')'],['tpj_payment_attempts','intent_id IN ('+intentWhere+')'],['tpj_payment_intents','offer_id IN ('+offerWhere+')'],['tpj_signing_challenges','offer_id IN ('+offerWhere+')'],['tpj_signed_records','offer_id IN ('+offerWhere+')'],['tpj_cancellation_requests','offer_id IN ('+offerWhere+')'],['tpj_credit_uses','credit_id IN (SELECT id FROM tpj_store_credits WHERE request_id=?)'],['tpj_store_credits','request_id=?'],['tpj_order_changes','offer_id IN ('+offerWhere+')'],['tpj_offers','request_id=?'],['tpj_fulfillments','request_id=?'],['tpj_files','request_id=?'],['tpj_notifications','request_id=?'],['tpj_submission_keys','request_id=?'],['tpj_request_events','request_id=?'],['tpj_display_references','request_id=?'],['tpj_order_management','request_id=?'],['tpj_requests','id=?'],['tpj_test_purge_guard','request_id=?']])queries.push(sql(e,'DELETE FROM '+table+' WHERE '+where,id));
+   await e.DB.batch(queries);return tpjJSON({ok:true,deleted:true,externalCopies:'Square history, previously delivered emails and Google Trash are outside the dashboard deletion.'});
+@@ -5057,7 +5053,7 @@
+   const seq=(await get(e,"SELECT sequence FROM tpj_display_counters WHERE scope='footprint'")).sequence+1,parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),f=k=>parts.find(x=>x.type===k).value,footprint='TPJ'+f('year')+f('day')+f('month')+String(seq).padStart(2,'0');
+   const rootRef=(await get(e,'SELECT reference FROM tpj_display_references WHERE request_id=?',row.id))?.reference||row.id;
+   const change={parentOfferId:parent.id,reference:rootRef+'-C'+String(number).padStart(2,'0'),number,footprint,description:b.description.trim(),dueDate:due,originalTotalCents:parent.total_cents,previousApprovedTotalCents:totals.revisedTotalCents,revisedTotalCents:totals.revisedTotalCents+q.totalCents,paidAtIssueCents:totals.paidTotalCents,originalAgreementHash:await tpjHash(parent.terms_json)};
+-  const terms={version:'2026-10-30-change-1',title:'Order Change Agreement',sections:[{title:'Changes and additional charges',text:'This amendment supplements the original agreement for '+rootRef+'. Approved changes: '+change.description+' Additional charge: '+money(q.totalCents)+'. Revised order total if accepted: '+money(change.revisedTotalCents)+'. Previously received payments remain credited. '+(due>day?'This additional cake payment is due '+due+', on the original final balance deadline.':'The additional payment is due upon approval and before pickup or delivery.')+' The original payment schedule and other terms remain in effect except as expressly changed here. No card will be charged automatically. The customer must accept this amendment and initiate its payment. Unaccepted changes do not amend the original order.'}],initialSectionIndexes:[]};
++  const terms={version:'1',title:'Order Change Agreement',sections:[{title:'Changes and additional charges',text:'This amendment supplements the original agreement for '+rootRef+'. Approved changes: '+change.description+' Additional charge: '+money(q.totalCents)+'. Revised order total if accepted: '+money(change.revisedTotalCents)+'. Previously received payments remain credited. '+(due>day?'This additional cake payment is due '+due+', on the original final balance deadline.':'The additional payment is due upon approval and before pickup or delivery.')+' The original payment schedule and other terms remain in effect except as expressly changed here. No card will be charged automatically. The customer must accept this amendment and initiate its payment. Unaccepted changes do not amend the original order.'}],initialSectionIndexes:[]};
+   const snapshot={business:original.business,businessAcceptance:{name:b.businessSigner.trim(),consent:true,signedAt:created},source:original.source,customer:original.customer,fulfillment:original.fulfillment,items:q.lines,quote:q,change,inquirySummary:{},approvedDescription:change.description};
+   const o={id:b.operationKey,request_id:row.id,environment:parent.environment,status:'OPEN',token_hash:await tpjHash(token),total_cents:q.totalCents,initial_cents:q.totalCents,rush_fee_cents:b.rushFeeCents,fulfillment_date:parent.fulfillment_date,fulfillment_time:parent.fulfillment_time,fulfillment_at:parent.fulfillment_at,balance_due_date:null,contract_required:0,terms_json:JSON.stringify(terms),snapshot_json:JSON.stringify(snapshot),expires_at:new Date(expires).toISOString(),created_at:created,updated_at:created},keys=Object.keys(o);
+   await e.DB.batch([
+diff --git a/shop-ordering.css b/shop-ordering.css
+--- a/shop-ordering.css
++++ b/shop-ordering.css
+@@ -1866,4 +1866,8 @@
+         line-height: 1.35;
+         white-space: normal;
+     }
+-}
+\ No newline at end of file
++}
++/* Plain popup top; preserve the existing mobile height and width limits. */
++.shop-dialog .shop-drizzle-top,.tpj-tray-dialog .shop-drizzle-top,.shop-dialog .shop-button-drizzle{display:none!important}
++
++.shop-dialog.shop-product-dialog .shop-dialog-content{padding-top:24px}
+diff --git a/shop.css b/shop.css
+--- a/shop.css
++++ b/shop.css
+@@ -4430,4 +4430,5 @@
+     -webkit-text-fill-color: #fdade8;
+     -webkit-text-stroke: 4px #3c271a;
+     paint-order: stroke fill;
+-}
+\ No newline at end of file
++}
++.footer-texas{text-align:center;font-size:14px;margin:8px 20px 18px;color:inherit}

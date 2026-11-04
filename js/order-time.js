@@ -43,25 +43,13 @@ window.TPJOrderTime = (() => {
           event.preventDefault(); nudge(event.key === 'ArrowUp' ? 1 : -1);
         }
       });
-      const controls = document.createElement('span');
-      controls.style.cssText = 'display:inline-flex;gap:6px;margin-top:6px';
-      for (const delta of [-1, 1]) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = delta === 1 ? '▲ 1 min' : '▼ 1 min';
-        button.setAttribute('aria-label', delta === 1 ? 'Time forward one minute' : 'Time back one minute');
-        button.style.cssText = 'font:inherit;padding:8px 12px;min-height:44px';
-        button.onmousedown = event => event.preventDefault();
-        button.onclick = () => { nudge(delta); input.focus(); };
-        controls.append(button);
-      }
-      input.insertAdjacentElement('afterend', controls);
       check(true);
     });
   }
   if (typeof document !== 'undefined') {
     new MutationObserver(mount).observe(document.documentElement, {childList: true, subtree: true});
     mount();
+    document.addEventListener('keydown',event=>{const input=event.target;if(input?.tagName==='INPUT'&&['date','datetime-local'].includes(input.type)&&['Backspace','Delete'].includes(event.key)){event.preventDefault();input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}},true);
   }
   return {parse, format, shift};
 })();

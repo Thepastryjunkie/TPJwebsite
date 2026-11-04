@@ -1544,15 +1544,7 @@ const newCakeAssets = {
                     );
             }
 
-            if (
-                body.acknowledged !== true
-            ) {
-                fail(
-                    "Acknowledge the order request, handling and allergen notices."
-                );
-            }
-
-            const subtotalCents =
+const subtotalCents =
                 items.reduce(
                     (sum, item) =>
                         sum +
@@ -1584,7 +1576,7 @@ const newCakeAssets = {
                     false
                 ),
 
-                acknowledged: true,
+                acknowledged: false,
 
                 subtotalCents,
 
@@ -2051,6 +2043,8 @@ async function tpjSaveShop(request, env) {
       tpjStable(body),
       env.GOOGLE_BRIDGE_SECRET
     );
+
+  if(await env.DB.prepare("SELECT 1 FROM tpj_deleted_submissions WHERE source='shop' AND submission_key=?").bind(key).first())throw tpjError('This order was deleted. Start a new order request.',410);
 
   const previous =
     await env.DB.prepare(
@@ -3291,6 +3285,8 @@ async function tpjImportCake(data, env) {
   const combinedHash =
     receiptHash + "." + fingerprint;
 
+  if(await env.DB.prepare("SELECT 1 FROM tpj_deleted_submissions WHERE source='cake_builder' AND submission_key=?").bind(key).first())throw tpjError('This inquiry was deleted.',410);
+
   const existingKey =
     await env.DB.prepare(
       "SELECT request_id, payload_hash " +
@@ -4401,7 +4397,7 @@ const TPJWorkflow = (() => {
    }
    const timestamp=now(),id=uuid();
    await env.DB.batch([
-    stmt(env,"UPDATE tpj_payment_intents SET status='PROCESSING',updated_at=? WHERE id=? AND status='READY' AND EXISTS(SELECT 1 FROM tpj_offers WHERE id=? AND status='SIGNED' AND payment_review=0 AND (?='balance' OR ?=1 OR expires_at>?))",timestamp,intent.id,o.id,b.phase,isChange?1:0,timestamp),
+    stmt(env,"UPDATE tpj_payment_intents SET status='PROCESSING',updated_at=? WHERE id=? AND status='READY' AND NOT EXISTS(SELECT 1 FROM tpj_order_management m WHERE m.request_id=(SELECT request_id FROM tpj_offers WHERE id=tpj_payment_intents.offer_id) AND m.purging=1) AND EXISTS(SELECT 1 FROM tpj_offers WHERE id=? AND status='SIGNED' AND payment_review=0 AND (?='balance' OR ?=1 OR expires_at>?))",timestamp,intent.id,o.id,b.phase,isChange?1:0,timestamp),
     stmt(env,"INSERT INTO tpj_payment_attempts (id,intent_id,idempotency_key,source_hash,created_at,updated_at) SELECT ?,?,?,?,?,? WHERE changes()=1",id,intent.id,b.attemptKey,hash,timestamp,timestamp)
    ]);
    a=await get(env,'SELECT * FROM tpj_payment_attempts WHERE idempotency_key=?',b.attemptKey);
@@ -4874,12 +4870,12 @@ const TPJBusiness=(()=>{
  async function list(e,url){
   const q=(url.searchParams.get('q')||'').slice(0,200),source=url.searchParams.get('source')||'',stage=url.searchParams.get('stage')||'',from=url.searchParams.get('from')||'',to=url.searchParams.get('to')||'',offset=Math.max(0,Math.min(1000000,Number.parseInt(url.searchParams.get('offset')||'0')||0));
   if(source&&!['shop','cake_builder'].includes(source)||stage&&!['new','pending','confirmed','fulfilled','canceled'].includes(stage)||[from,to].some(d=>d&&!/^\d{4}-\d{2}-\d{2}$/.test(d)))fail('Invalid order filter.');
-  const sql=`SELECT r.*,d.reference,d.footprint,${stageSQL} AS stage,m.archived_at,COALESCE(m.is_test,0) AS is_test,CASE WHEN COALESCE(m.seen_version,0)>=r.version THEN 1 ELSE 0 END AS is_read,CASE WHEN EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=r.id AND n.recipient_type='customer' AND n.state='failed') THEN 1 ELSE 0 END AS failed_email,CASE WHEN EXISTS(SELECT 1 FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='initial' WHERE o.request_id=r.id AND o.status!='CLOSED' AND julianday(o.expires_at)<=julianday('now') AND i.status!='PAID') THEN 1 ELSE 0 END AS expired_approval,CASE WHEN EXISTS(SELECT 1 FROM tpj_cancellation_requests cr JOIN tpj_offers co ON co.id=cr.offer_id WHERE co.request_id=r.id AND co.status!='CLOSED') THEN 1 ELSE 0 END AS cancellation_attention,CASE WHEN ${paidSQL} THEN 1 ELSE 0 END AS fully_paid,(SELECT MIN(due) FROM (SELECT o.balance_due_date AS due FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='balance' WHERE o.request_id=r.id AND o.status='SIGNED' AND i.status!='PAID' UNION ALL SELECT c.due_date AS due FROM tpj_order_changes c JOIN tpj_offers o ON o.id=c.offer_id JOIN tpj_payment_intents i ON i.offer_id=o.id WHERE o.request_id=r.id AND c.voided_at IS NULL AND o.status='SIGNED' AND i.status!='PAID')) AS balance_due FROM tpj_requests r LEFT JOIN tpj_display_references d ON d.request_id=r.id LEFT JOIN tpj_fulfillments f ON f.request_id=r.id LEFT JOIN tpj_order_management m ON m.request_id=r.id`;
+  const sql=`SELECT r.*,d.reference,d.footprint,${stageSQL} AS stage,m.archived_at,COALESCE(CASE WHEN m.manual_stage='fulfilled' THEN (SELECT MAX(e.created_at) FROM tpj_request_events e WHERE e.request_id=r.id AND e.event_type='owner_organization_changed' AND json_extract(e.details_json,'$.action')='stage' AND json_extract(e.details_json,'$.value')='fulfilled') END,f.created_at,r.updated_at) AS fulfilled_since,COALESCE(m.is_test,0) AS is_test,CASE WHEN COALESCE(m.seen_version,0)>=r.version THEN 1 ELSE 0 END AS is_read,CASE WHEN EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=r.id AND n.recipient_type='customer' AND n.state='failed') THEN 1 ELSE 0 END AS failed_email,CASE WHEN EXISTS(SELECT 1 FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='initial' WHERE o.request_id=r.id AND o.status!='CLOSED' AND julianday(o.expires_at)<=julianday('now') AND i.status!='PAID') THEN 1 ELSE 0 END AS expired_approval,CASE WHEN EXISTS(SELECT 1 FROM tpj_cancellation_requests cr JOIN tpj_offers co ON co.id=cr.offer_id WHERE co.request_id=r.id AND co.status!='CLOSED') THEN 1 ELSE 0 END AS cancellation_attention,CASE WHEN ${paidSQL} THEN 1 ELSE 0 END AS fully_paid,(SELECT MIN(due) FROM (SELECT o.balance_due_date AS due FROM tpj_offers o JOIN tpj_payment_intents i ON i.offer_id=o.id AND i.phase='balance' WHERE o.request_id=r.id AND o.status='SIGNED' AND i.status!='PAID' UNION ALL SELECT c.due_date AS due FROM tpj_order_changes c JOIN tpj_offers o ON o.id=c.offer_id JOIN tpj_payment_intents i ON i.offer_id=o.id WHERE o.request_id=r.id AND c.voided_at IS NULL AND o.status='SIGNED' AND i.status!='PAID')) AS balance_due FROM tpj_requests r LEFT JOIN tpj_display_references d ON d.request_id=r.id LEFT JOIN tpj_fulfillments f ON f.request_id=r.id LEFT JOIN tpj_order_management m ON m.request_id=r.id`;
   const mode=url.searchParams.get('view')||'';const received=mode==='records';
   const condition=" WHERE (?='' OR source=?) AND (?='' OR stage=?) AND (?='' OR "+(received?'created_at':'fulfillment_date')+">=?) AND (?='' OR "+(received?'created_at<':'fulfillment_date<=')+"?) AND (?='' OR lower(customer_name||' '||customer_email||' '||customer_phone||' '||COALESCE(reference,'')||' '||id||' '||fulfillment_date||' '||created_at) LIKE ?)";
   const active=url.searchParams.get('active')==='1',attention=url.searchParams.get('attention')==='1';
   const archive=url.searchParams.get('archive')||'',unread=url.searchParams.get('unread')==='1',day=TPJWorkflow.plan.day();
-  const records=mode==='orders'?" AND archived_at IS NULL AND stage NOT IN ('fulfilled','canceled')":'';
+  const records=mode==='orders'?" AND archived_at IS NULL AND stage!='canceled' AND (stage!='fulfilled' OR julianday(fulfilled_since)>julianday('now','-3 days'))":'';
   const archiveFilter=archive==='archived'?' AND archived_at IS NOT NULL':archive==='not_archived'?' AND archived_at IS NULL':'';
   const extra=records+archiveFilter+(unread?' AND is_read=0':'')+" AND (?=0 OR stage NOT IN ('fulfilled','canceled')) AND (?=0 OR stage='new' OR status IN ('payment_review','cancellation_requested') OR (balance_due IS NOT NULL AND balance_due<=?) OR cancellation_attention=1 OR failed_email=1 OR expired_approval=1 OR (fulfillment_date<? AND stage NOT IN ('fulfilled','canceled')))";
   const args=[source,source,stage,stage,from,received&&from?new Date(TPJWorkflow.plan.localMS(from,'00:00')).toISOString():from,to,received&&to?new Date(TPJWorkflow.plan.localMS(TPJWorkflow.plan.shiftDay(to,1),'00:00')).toISOString():to,q,'%'+q.toLowerCase()+'%',active?1:0,attention?1:0,day,day];
@@ -4988,8 +4984,8 @@ const TPJOrderManagement=(()=>{
  const at=()=>new Date().toISOString(),sql=(e,s,...args)=>e.DB.prepare(s).bind(...args),get=(e,s,...a)=>sql(e,s,...a).first(),all=async(e,s,...a)=>(await sql(e,s,...a).all()).results;
  const fail=(s,n=422)=>{throw tpjError(s,n);};
  async function state(e,row){const m=await get(e,'SELECT * FROM tpj_order_management WHERE request_id=?',row.id);return {manualStage:m?.manual_stage||null,read:(m?.seen_version||0)>=row.version,archivedAt:m?.archived_at||null,isTest:m?.is_test===1,purging:m?.purging===1};}
- async function guard(e,id){if((await get(e,'SELECT purging FROM tpj_order_management WHERE request_id=?',id))?.purging)fail('This test record is being removed. Its links and payments are disabled.',410);}
- async function google(e,payload){const timestamp=Date.now(),raw=JSON.stringify(payload),signature=await tpjHash(timestamp+'\n'+raw,e.GOOGLE_BRIDGE_SECRET),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{let r=await fetch(e.GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessDelivery:1,timestamp,payload:raw,signature}),redirect:'manual',signal:controller.signal});if([301,302,303].includes(r.status)){const u=new URL(r.headers.get('Location')||'');if(u.origin!=='https://script.googleusercontent.com')fail('Unexpected archive-service redirect.',503);r=await fetch(u.href,{redirect:'manual',signal:controller.signal});}const result=await r.json();if(!r.ok||!result.ok)fail('Test file cleanup did not finish. Retry the same record; it remains locked.',503);return result;}finally{clearTimeout(timer);}}
+ async function guard(e,id){if((await get(e,'SELECT purging FROM tpj_order_management WHERE request_id=?',id))?.purging)fail('This order is being removed. Its links and payments are disabled.',410);}
+ async function google(e,payload){const timestamp=Date.now(),raw=JSON.stringify(payload),signature=await tpjHash(timestamp+'\n'+raw,e.GOOGLE_BRIDGE_SECRET),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);try{let r=await fetch(e.GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessDelivery:1,timestamp,payload:raw,signature}),redirect:'manual',signal:controller.signal});if([301,302,303].includes(r.status)){const u=new URL(r.headers.get('Location')||'');if(u.origin!=='https://script.googleusercontent.com')fail('Unexpected archive-service redirect.',503);r=await fetch(u.href,{redirect:'manual',signal:controller.signal});}const result=await r.json();if(!r.ok||!result.ok)fail('File cleanup did not finish. Retry deletion; the order remains locked.',503);return result;}finally{clearTimeout(timer);}}
  async function route(request,e){
   const p=new URL(request.url).pathname,m=p.match(/^\/api\/admin\/business\/orders\/(TPJ-[a-f0-9-]{36})\/(manage|purge)$/i);if(!m)return null;await tpjAdmin(request,e);if(request.method!=='POST')fail('Method not allowed.',405);
   const id=m[1],b=await tpjReadJSON(request),row=await get(e,'SELECT * FROM tpj_requests WHERE id=?',id);if(!row)fail('Order not found.',404);
@@ -5008,16 +5004,16 @@ const TPJOrderManagement=(()=>{
  }
  async function purge(e,row,b){
   const id=row.id,m=await get(e,'SELECT * FROM tpj_order_management WHERE request_id=?',id),reference=(await get(e,'SELECT reference FROM tpj_display_references WHERE request_id=?',id))?.reference||id;
-  if(String(e.SQUARE_ENVIRONMENT).trim()!=='sandbox'||m?.is_test!==1||b.confirmation!==reference)fail('Permanent deletion requires a marked Sandbox test and its exact displayed order number.',409);
-  if(await get(e,"SELECT id FROM tpj_offers WHERE request_id=? AND environment!='sandbox' LIMIT 1",id))fail('Production records cannot use test deletion.',409);
-  if(await get(e,"SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=? AND a.status='PENDING' LIMIT 1",id))fail('Reconcile the pending test payment before deleting this test.',409);
-  if(await get(e,"SELECT id FROM tpj_notifications WHERE request_id=? AND state='processing' AND lease_until>? LIMIT 1",id,at()))fail('A test email is processing. Let its lease finish, then retry deletion.',409);
-  const lease=await e.DB.batch([sql(e,'UPDATE tpj_order_management SET purging=1,updated_at=? WHERE request_id=? AND EXISTS(SELECT 1 FROM tpj_requests WHERE id=? AND version=?) RETURNING request_id',at(),id,id,b.version),sql(e,"UPDATE tpj_notifications SET state='failed',last_error='Test deletion in progress',lease_until=NULL WHERE request_id=? AND changes()>0",id)]);if(!lease[0].results?.length)fail('Reload the test before deleting it.',409);
+  if(b.confirmed!==true)fail('Confirm deletion of this order.',409);
+  if(await get(e,"SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=? AND a.status='PENDING' LIMIT 1",id))fail('A payment is processing. Refresh its status before deleting this order.',409);
+  if(await get(e,"SELECT id FROM tpj_notifications WHERE request_id=? AND state='processing' AND lease_until>? LIMIT 1",id,at()))fail('An email is being sent. Retry deletion shortly.',409);
+  const lease=await e.DB.batch([sql(e,"UPDATE tpj_order_management SET purging=1,updated_at=? WHERE request_id=? AND EXISTS(SELECT 1 FROM tpj_requests WHERE id=? AND version=?) AND NOT EXISTS(SELECT 1 FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=tpj_order_management.request_id AND a.status='PENDING') AND NOT EXISTS(SELECT 1 FROM tpj_notifications n WHERE n.request_id=tpj_order_management.request_id AND n.state='processing' AND n.lease_until>?) RETURNING request_id",at(),id,id,b.version,at()),sql(e,"UPDATE tpj_notifications SET state='failed',last_error='Order deletion in progress',lease_until=NULL WHERE request_id=? AND changes()>0",id)]);if(!lease[0].results?.length)fail('Reload the order before deleting it.',409);
   const offers=await all(e,'SELECT id FROM tpj_offers WHERE request_id=?',id),jobs=await all(e,'SELECT id FROM tpj_notifications WHERE request_id=?',id),challenges=await all(e,'SELECT c.id FROM tpj_signing_challenges c JOIN tpj_offers o ON o.id=c.offer_id WHERE o.request_id=?',id),files=await all(e,'SELECT drive_file_id FROM tpj_files WHERE request_id=?',id),fulfillment=await get(e,'SELECT record_json FROM tpj_fulfillments WHERE request_id=?',id);
   const fileIds=files.map(x=>x.drive_file_id).filter(Boolean);if(fulfillment){const f=JSON.parse(fulfillment.record_json);if(f.photo?.fileId)fileIds.push(f.photo.fileId);}
   const artifactCount=offers.length+fileIds.length+jobs.length+challenges.length;
-  if(artifactCount)await google(e,{action:'purge_test_records',sandbox:true,requestId:id,offerIds:offers.map(x=>x.id),jobIds:jobs.map(x=>x.id),challengeIds:challenges.map(x=>x.id),fileIds});
+  if(artifactCount)await google(e,{action:'purge_order_records',authorizedDeletion:true,requestId:id,offerIds:offers.map(x=>x.id),jobIds:jobs.map(x=>x.id),challengeIds:challenges.map(x=>x.id),fileIds});
   const queries=[sql(e,'INSERT OR REPLACE INTO tpj_test_purge_guard(request_id,expires_at) VALUES(?,?)',id,Math.floor(Date.now()/1000)+60)];
+  queries.push(sql(e,'INSERT OR IGNORE INTO tpj_deleted_submissions(source,submission_key,deleted_at) SELECT source,submission_key,? FROM tpj_submission_keys WHERE request_id=?',at(),id));
   const offerWhere='SELECT id FROM tpj_offers WHERE request_id=?',intentWhere='SELECT i.id FROM tpj_payment_intents i JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=?',attemptWhere='SELECT a.id FROM tpj_payment_attempts a JOIN tpj_payment_intents i ON i.id=a.intent_id JOIN tpj_offers o ON o.id=i.offer_id WHERE o.request_id=?';
   for(const [table,where]of [['tpj_payment_disputes','attempt_id IN ('+attemptWhere+')'],['tpj_payment_attempts','intent_id IN ('+intentWhere+')'],['tpj_payment_intents','offer_id IN ('+offerWhere+')'],['tpj_signing_challenges','offer_id IN ('+offerWhere+')'],['tpj_signed_records','offer_id IN ('+offerWhere+')'],['tpj_cancellation_requests','offer_id IN ('+offerWhere+')'],['tpj_credit_uses','credit_id IN (SELECT id FROM tpj_store_credits WHERE request_id=?)'],['tpj_store_credits','request_id=?'],['tpj_order_changes','offer_id IN ('+offerWhere+')'],['tpj_offers','request_id=?'],['tpj_fulfillments','request_id=?'],['tpj_files','request_id=?'],['tpj_notifications','request_id=?'],['tpj_submission_keys','request_id=?'],['tpj_request_events','request_id=?'],['tpj_display_references','request_id=?'],['tpj_order_management','request_id=?'],['tpj_requests','id=?'],['tpj_test_purge_guard','request_id=?']])queries.push(sql(e,'DELETE FROM '+table+' WHERE '+where,id));
   await e.DB.batch(queries);return tpjJSON({ok:true,deleted:true,externalCopies:'Square history, previously delivered emails and Google Trash are outside the dashboard deletion.'});
@@ -5057,7 +5053,7 @@ const TPJChanges=(()=>{
   const seq=(await get(e,"SELECT sequence FROM tpj_display_counters WHERE scope='footprint'")).sequence+1,parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),f=k=>parts.find(x=>x.type===k).value,footprint='TPJ'+f('year')+f('day')+f('month')+String(seq).padStart(2,'0');
   const rootRef=(await get(e,'SELECT reference FROM tpj_display_references WHERE request_id=?',row.id))?.reference||row.id;
   const change={parentOfferId:parent.id,reference:rootRef+'-C'+String(number).padStart(2,'0'),number,footprint,description:b.description.trim(),dueDate:due,originalTotalCents:parent.total_cents,previousApprovedTotalCents:totals.revisedTotalCents,revisedTotalCents:totals.revisedTotalCents+q.totalCents,paidAtIssueCents:totals.paidTotalCents,originalAgreementHash:await tpjHash(parent.terms_json)};
-  const terms={version:'2026-10-30-change-1',title:'Order Change Agreement',sections:[{title:'Changes and additional charges',text:'This amendment supplements the original agreement for '+rootRef+'. Approved changes: '+change.description+' Additional charge: '+money(q.totalCents)+'. Revised order total if accepted: '+money(change.revisedTotalCents)+'. Previously received payments remain credited. '+(due>day?'This additional cake payment is due '+due+', on the original final balance deadline.':'The additional payment is due upon approval and before pickup or delivery.')+' The original payment schedule and other terms remain in effect except as expressly changed here. No card will be charged automatically. The customer must accept this amendment and initiate its payment. Unaccepted changes do not amend the original order.'}],initialSectionIndexes:[]};
+  const terms={version:'1',title:'Order Change Agreement',sections:[{title:'Changes and additional charges',text:'This amendment supplements the original agreement for '+rootRef+'. Approved changes: '+change.description+' Additional charge: '+money(q.totalCents)+'. Revised order total if accepted: '+money(change.revisedTotalCents)+'. Previously received payments remain credited. '+(due>day?'This additional cake payment is due '+due+', on the original final balance deadline.':'The additional payment is due upon approval and before pickup or delivery.')+' The original payment schedule and other terms remain in effect except as expressly changed here. No card will be charged automatically. The customer must accept this amendment and initiate its payment. Unaccepted changes do not amend the original order.'}],initialSectionIndexes:[]};
   const snapshot={business:original.business,businessAcceptance:{name:b.businessSigner.trim(),consent:true,signedAt:created},source:original.source,customer:original.customer,fulfillment:original.fulfillment,items:q.lines,quote:q,change,inquirySummary:{},approvedDescription:change.description};
   const o={id:b.operationKey,request_id:row.id,environment:parent.environment,status:'OPEN',token_hash:await tpjHash(token),total_cents:q.totalCents,initial_cents:q.totalCents,rush_fee_cents:b.rushFeeCents,fulfillment_date:parent.fulfillment_date,fulfillment_time:parent.fulfillment_time,fulfillment_at:parent.fulfillment_at,balance_due_date:null,contract_required:0,terms_json:JSON.stringify(terms),snapshot_json:JSON.stringify(snapshot),expires_at:new Date(expires).toISOString(),created_at:created,updated_at:created},keys=Object.keys(o);
   await e.DB.batch([

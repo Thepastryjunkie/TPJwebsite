@@ -1,6 +1,6 @@
 /* TPJ VERSIONED ORDER TERMS — final legal review recommended before production. */
 window.TPJOrderTerms = {
-  "version": "2026-10-30-rush-1",
+  "version": "1",
   "shop": {
     "title": "Shop Order Terms",
     "sections": [
@@ -145,7 +145,7 @@ window.TPJOrderTerms = {
     "sections": [
       {
         "title": "Information we collect",
-        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. We also retain the signed business handoff receipt or its private image, the recipient and business representative names, and confirmation that the customer received their signed copy. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
+        "text": "When you inquire, order, sign or receive an order, we collect the contact details, fulfillment information, design preferences, notes, uploaded reference files, signatures/initials and order records you provide. Signing records include timestamps, email-verification records, browser information and the IP address supplied by our hosting service. Fulfillment records can include the handoff time, recipient name, production date and a product/handoff photograph. Square may collect device and fraud-prevention information. Do not submit photographs of payment cards or identity documents; this workflow does not request them."
       },
       {
         "title": "How we use information",

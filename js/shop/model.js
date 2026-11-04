@@ -1105,15 +1105,7 @@
                     );
             }
 
-            if (
-                body.acknowledged !== true
-            ) {
-                fail(
-                    "Acknowledge the order request, handling and allergen notices."
-                );
-            }
-
-            const subtotalCents =
+const subtotalCents =
                 items.reduce(
                     (sum, item) =>
                         sum +
@@ -1145,7 +1137,7 @@
                     false
                 ),
 
-                acknowledged: true,
+                acknowledged: false,
 
                 subtotalCents,
 

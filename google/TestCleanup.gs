@@ -1,8 +1,8 @@
-/* Called only by the signed Business bridge for explicitly marked Sandbox tests. */
-function tpjPurgeTestRecords_(data){
- if(data.sandbox!==true||!/^TPJ-[a-f0-9-]{36}$/i.test(data.requestId))throw Error('Invalid test cleanup.');
- const ids=['offerIds','jobIds','challengeIds','fileIds'];for(const key of ids)if(!Array.isArray(data[key])||data[key].length>500||!data[key].every(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{5,150}$/.test(x)))throw Error('Invalid test file identifiers.');
- const root=tpjRoot_();if(root.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Test storage must remain private.');
+/* Called only by the signed Business bridge for an explicitly authorized owner deletion. */
+function tpjPurgeOrderRecords_(data){
+ if(data.authorizedDeletion!==true||!/^TPJ-[a-f0-9-]{36}$/i.test(data.requestId))throw Error('Invalid order cleanup.');
+ const ids=['offerIds','jobIds','challengeIds','fileIds'];for(const key of ids)if(!Array.isArray(data[key])||data[key].length>500||!data[key].every(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{5,150}$/.test(x)))throw Error('Invalid order file identifiers.');
+ const root=tpjRoot_();if(root.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Order storage must remain private.');
  const find=(parent,name)=>{const values=parent.getFoldersByName(name);return values.hasNext()?values.next():null;};
  const signed=find(root,'TPJ Signed Agreements');if(signed){if(signed.getSharingAccess()!==DriveApp.Access.PRIVATE)throw Error('Unexpected shared agreement storage.');for(const id of data.offerIds){const folder=find(signed,id);if(folder)folder.setTrashed(true);}}
  const ledgers=[['TPJ Mail Receipts',data.jobIds],['TPJ Verification Receipts',data.challengeIds]];

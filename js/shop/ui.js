@@ -846,7 +846,7 @@ if (!P?.care || typeof P.combine !== "function") {
     const allergenLabels = ids =>
         ids.map(id => P.labels[id] || id).join(", ");
 
-    const combined = P.combine(category, selected);
+    const combined = P.resolve(x, availability.profiles || {});
 
     const storage = selected.map(id => `
         <div class="shop-care-item">
@@ -965,20 +965,17 @@ if (!P?.care || typeof P.combine !== "function") {
         }
 
         ${
-            x.category === "chocolate" && selected.length
+            combined.missing.length
                 ? `
                     <p>
-                        <strong>Topping Additions:</strong>
-                        ${esc(P.toppingNotice)}
+                        <strong>Ingredient information:</strong>
+                        ${esc(combined.missing.length ? 'Ingredient information needs review for: '+combined.missing.join(', ')+'. Please contact us before ordering.' : '')}
                     </p>
                 `
                 : ""
         }
 
-        <p class="shop-allergy-notice">
-            <strong>Allergy Notice:</strong>
-            ${esc(P.notice)}
-        </p>
+
     `;
 }
 
@@ -3444,6 +3441,17 @@ function field(
     `;
 }
 
+function selectedAllergensHTML(item) {
+    const P = window.TPJShopProductInfo;
+    const a = P.resolve(item, availability.profiles || {});
+    const names = values => values.map(x=>P.labels[x] || x).join(', ');
+    return '<div class="shop-selected-allergens"><strong>'+esc(item.title || 'Selected product')+'</strong>'+
+        (a.contains.length?'<p>Contains: '+esc(names(a.contains))+'.</p>':'')+
+        (a.mayContain.length?'<p>May contain: '+esc(names(a.mayContain))+'.</p>':'')+
+        a.notes.map(n=>'<p>'+esc(n)+'</p>').join('')+
+        (a.missing.length?'<p>Ingredient information needs review for '+esc(a.missing.join(', '))+'. Please contact us before ordering.</p>':'')+'</div>';
+}
+
 function openCheckout() {
     const dates = [];
 
@@ -3708,11 +3716,7 @@ function openCheckout() {
                             Allergens and Cross-Contact
                         </summary>
 
-                        <p>
-                            ${esc(
-                                C.messages.allergens
-                            )}
-                        </p>
+                        ${cart.map(item => selectedAllergensHTML(item)).join('')}
                     </details>
 
                     <details>
@@ -3754,17 +3758,7 @@ function openCheckout() {
                     </details>
                 </div>
 
-                <label class="shop-mix-toggle">
-                    <input
-                        name="acknowledged"
-                        type="checkbox"
-                        required
-                    >
 
-                    I have read the allergen, handling
-                    and fulfillment notices and understand
-                    this is an order request.
-                </label>
 
                 <label
                     class="shop-honeypot"
@@ -3949,8 +3943,6 @@ function openCheckout() {
 
             notes: values.notes,
 
-            acknowledged:
-                values.acknowledged === "on",
 
             website:
                 values.website || "",
@@ -4687,7 +4679,7 @@ function renderOwnerMenu(){
 }
 function openCustomProduct(id,item=null){
  config=null;editing=item?.id||null;const p=C.customProducts?.[id];if(!p){openDialog('Product unavailable','<p>This product has been removed from the current menu. Please choose another item.</p>');return;}
- openDialog(p.name,'<p>'+esc(p.description||'')+'</p><p>Price per product/package: '+esc(M.money(p.price))+'</p><label>Quantity<input id="customQuantity" type="number" min="1" max="99" step="1" required value="'+(item?.quantity||1)+'"></label><p id="customTotal"></p><p id="customError" role="alert"></p><button type="button" id="customAdd" class="shop-button">'+(item?'Update cart':'Add to cart')+'</button>');
+ openDialog(p.name,'<p>'+esc(p.description||'')+'</p>'+selectedAllergensHTML({category:'custom',product:id,title:p.name})+'<p>Price per product/package: '+esc(M.money(p.price))+'</p><label>Quantity<input id="customQuantity" type="number" min="1" max="99" step="1" required value="'+(item?.quantity||1)+'"></label><p id="customTotal"></p><p id="customError" role="alert"></p><button type="button" id="customAdd" class="shop-button">'+(item?'Update cart':'Add to cart')+'</button>');
  const field=$('#customQuantity',dialog),total=$('#customTotal',dialog),button=$('#customAdd',dialog);const value=()=>({category:'custom',product:id,quantity:Number(field.value),id:editing||uid()});const update=()=>{try{const q=M.quote(value(),availability);total.textContent=M.money(q.totalCents);button.disabled=false;$('#customError',dialog).textContent='';}catch(e){button.disabled=true;$('#customError',dialog).textContent=e.message;}};field.oninput=update;
  button.onclick=()=>{try{const x=value();M.quote(x,availability);if(editing)cart=cart.map(v=>v.id===editing?x:v);else cart.push(x);persist();openCart();}catch(e){$('#customError',dialog).textContent=e.message;}};update();
 }

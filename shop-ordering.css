@@ -1867,3 +1867,7 @@ body.shop-page *::-webkit-scrollbar-corner {
         white-space: normal;
     }
 }
+/* Plain popup top; preserve the existing mobile height and width limits. */
+.shop-dialog .shop-drizzle-top,.tpj-tray-dialog .shop-drizzle-top,.shop-dialog .shop-button-drizzle{display:none!important}
+
+.shop-dialog.shop-product-dialog .shop-dialog-content{padding-top:24px}

@@ -273,10 +273,36 @@
             };
         }
 
+        function resolve(item, profiles = {}) {
+            const records = [], missing = [];
+            const add = (key, fallback, label) => {
+                const saved = profiles[key];
+                if (saved?.reviewed) records.push({contains:saved.contains || [],mayContain:[],notes:saved.additionalInfo?[saved.additionalInfo]:[]});
+                else if (fallback) records.push({contains:fallback.contains || [],mayContain:fallback.mayContain || [],notes:fallback.notes?[fallback.notes]:[]});
+                else missing.push(label || key);
+            };
+            const category = item.category === 'half' ? 'cakes' : item.category;
+            if (category === 'custom') add('custom:'+item.product,null,item.title || 'This product');
+            else if (category === 'chocolate') {
+                const pieces = item.mixing!==false && item.pieces?.length ? item.pieces : [{type:item.flavor,base:item.base,topping:item.topping}];
+                for (const piece of pieces) {
+                    if(piece.type)add('treat:'+piece.type,care.chocolate[piece.type],piece.type);
+                    if(piece.base && profiles['base:'+piece.base]?.reviewed)add('base:'+piece.base,null,piece.base);
+                    if(piece.topping && !['none','plain'].includes(piece.topping))add('topping:'+piece.topping,null,piece.topping+' topping');
+                }
+            } else {
+                const flavors = item.category === 'half' ? [item.one,item.two] : item.mixing!==false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k=>Number(item.mix[k])>0) : [item.flavor];
+                for (const flavor of new Set(flavors.filter(Boolean)))add('product:'+category+':'+flavor,care[category]?.[flavor],flavor);
+            }
+            const unique = values => [...new Set(values)], allergen = values => unique(values.map(x=>({egg:'eggs',peanut:'peanuts',treeNut:'tree nuts'}[x]||x)));
+            return {contains:allergen(records.flatMap(r=>r.contains)),mayContain:allergen(records.flatMap(r=>r.mayContain)),notes:unique(records.flatMap(r=>r.notes)),missing:unique(missing)};
+        }
+
         return {
             care,
             labels,
             combine,
+            resolve,
 
             toppingNotice:
                 "May add milk, egg, wheat and soy depending on components.",
