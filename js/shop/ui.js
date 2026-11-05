@@ -1044,6 +1044,49 @@ function customerDetails(item) {
             !detail.includes("% box discount:")
     );
 }
+function chocolatePieceArt(id, piece) {
+    const kinds = {
+        pretzel: 'Pretzel',
+        oreo: 'Oreo',
+        strawberry: 'Strawberries',
+        rice: 'Rice-Krispy'
+    };
+
+    const featured = {
+        birthday: 'Birthday',
+        biscoff: 'Biscoff',
+        cookies: 'Oreo',
+        strawberry: 'Strawberry'
+    };
+
+    const bases = {
+        white: 'White',
+        milk: 'Milk',
+        dark: 'Dark'
+    };
+
+    const kind = kinds[id];
+
+    if (!kind) return null;
+
+    const base = bases[piece?.base]
+        ? piece.base
+        : 'white';
+
+    const finishedFlavor = base === 'white'
+        ? featured[piece?.topping]
+        : null;
+
+    const variant = finishedFlavor || bases[base];
+
+    const src = encodeURI(
+        '../images/Shop/Chocolate Treats/' +
+        `Chocolate-${variant}-${kind}.png`
+    );
+
+    return {src, finishedFlavor};
+}
+
 function renderDesktopTray() {
     const compactTray = !matchMedia(
         '(min-width: 1200px) and (hover: hover) and (pointer: fine)'
@@ -1173,49 +1216,6 @@ function renderDesktopTray() {
 
         x.traySlots = slots.slice();
     }
-
-function chocolatePieceArt(id, piece) {
-    const kinds = {
-        pretzel: 'Pretzel',
-        oreo: 'Oreo',
-        strawberry: 'Strawberries',
-        rice: 'Rice-Krispy'
-    };
-
-    const featured = {
-        birthday: 'Birthday',
-        biscoff: 'Biscoff',
-        cookies: 'Oreo',
-        strawberry: 'Strawberry'
-    };
-
-    const bases = {
-        white: 'White',
-        milk: 'Milk',
-        dark: 'Dark'
-    };
-
-    const kind = kinds[id];
-
-    if (!kind) return null;
-
-    const base = bases[piece?.base]
-        ? piece.base
-        : 'white';
-
-    const finishedFlavor = base === 'white'
-        ? featured[piece?.topping]
-        : null;
-
-    const variant = finishedFlavor || bases[base];
-
-    const src = encodeURI(
-        '../images/Shop/Chocolate Treats/' +
-        `Chocolate-${variant}-${kind}.png`
-    );
-
-    return {src, finishedFlavor};
-}
 
 function art(cat, id, piece = null) {
     if (cat === 'chocolate') {
