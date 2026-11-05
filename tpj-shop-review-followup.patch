@@ -1,0 +1,158 @@
+diff --git a/js/shop/ui.js b/js/shop/ui.js
+--- a/js/shop/ui.js
++++ b/js/shop/ui.js
+@@ -1174,52 +1174,54 @@
+         x.traySlots = slots.slice();
+     }
+ 
++function chocolatePieceArt(id, piece) {
++    const kinds = {
++        pretzel: 'Pretzel',
++        oreo: 'Oreo',
++        strawberry: 'Strawberries',
++        rice: 'Rice-Krispy'
++    };
++
++    const featured = {
++        birthday: 'Birthday',
++        biscoff: 'Biscoff',
++        cookies: 'Oreo',
++        strawberry: 'Strawberry'
++    };
++
++    const bases = {
++        white: 'White',
++        milk: 'Milk',
++        dark: 'Dark'
++    };
++
++    const kind = kinds[id];
++
++    if (!kind) return null;
++
++    const base = bases[piece?.base]
++        ? piece.base
++        : 'white';
++
++    const finishedFlavor = base === 'white'
++        ? featured[piece?.topping]
++        : null;
++
++    const variant = finishedFlavor || bases[base];
++
++    const src = encodeURI(
++        '../images/Shop/Chocolate Treats/' +
++        `Chocolate-${variant}-${kind}.png`
++    );
++
++    return {src, finishedFlavor};
++}
++
+ function art(cat, id, piece = null) {
+     if (cat === 'chocolate') {
+-        const kinds = {
+-            pretzel: 'Pretzel',
+-            oreo: 'Oreo',
+-            strawberry: 'Strawberries',
+-            rice: 'Rice-Krispy'
+-        };
+-
+-        const featured = {
+-            birthday: 'Birthday',
+-            biscoff: 'Biscoff',
+-            cookies: 'Oreo',
+-            strawberry: 'Strawberry'
+-        };
+-
+-        const bases = {
+-            white: 'White',
+-            milk: 'Milk',
+-            dark: 'Dark'
+-        };
+-
+-        const kind = kinds[id];
+-
+-        if (!kind) {
+-            return `
+-                <span class="tpj-art-fallback">
+-                    Choose a treat
+-                </span>
+-            `;
+-        }
+-
+-        const base = bases[piece?.base]
+-            ? piece.base
+-            : 'white';
+-
+-        const finishedFlavor = base === 'white'
+-            ? featured[piece?.topping]
+-            : null;
+-
+-        const variant = finishedFlavor || bases[base];
+-
+-        const src = encodeURI(
+-            '../images/Shop/Chocolate Treats/' +
+-            `Chocolate-${variant}-${kind}.png`
+-        );
++        const image = chocolatePieceArt(id, piece);
++        if (!image) return '<span class="tpj-art-fallback">Choose a treat</span>';
++        const {src, finishedFlavor} = image;
+ 
+         let note = '';
+ 
+@@ -3451,11 +3453,16 @@
+         const quoted = safeQuote(item);
+         if (!quoted) return '';
+         const flavors = item.category === 'half' ? [item.one,item.two] : item.mix && Object.keys(item.mix).length ? Object.entries(item.mix).flatMap(([id,n]) => Array(Math.min(Number(n),12)).fill(id)) : [item.flavor];
+-        const images = item.category === 'chocolate' || item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
++        const treatImages = item.category === 'chocolate' ? (quoted.pieces || []).map(piece => chocolatePieceArt(piece.type, piece)).filter(Boolean) : [];
++        const images = item.category === 'chocolate'
++            ? treatImages.map(image => '<img src="'+esc(image.src)+'" alt="">').join('')
++            : item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
+             const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
+             return src ? '<img src="'+esc(src)+'" alt="">' : '';
+         }).join('');
+-        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>':'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
++        const photoNote = treatImages.some(image => !image.finishedFlavor)
++            ? '<small>Where a topping photo isn’t available, the image shows the selected chocolate base.</small>' : '';
++        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>'+photoNote:'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
+     }).join('');
+ }
+ 
+diff --git a/pages/shop.html b/pages/shop.html
+--- a/pages/shop.html
++++ b/pages/shop.html
+@@ -17,7 +17,7 @@
+     <title>Loaded Desserts | The Pastry Junkie</title>
+ 
+     <link rel="stylesheet" href="../style.css">
+-    <link rel="stylesheet"href="../shop.css?v=shop-polish-20261105-1">
++    <link rel="stylesheet"href="../shop.css?v=shop-review-1">
+     <link rel="stylesheet"href="../shop-ordering.css?v=shop-polish-20261105-1" >
+ <link rel="stylesheet" href="../order-time.css?v=shop-fit-1">
+ </head>
+@@ -1421,7 +1421,7 @@
+ <script src="../js/shop/product-info.js?v=shop-polish-20261105-1"></script>
+ 
+ <script src="../js/order-time.js?v=shop-fit-1"></script>
+-<script src="../js/shop/ui.js?v=shop-fit-1"></script>
++<script src="../js/shop/ui.js?v=shop-review-1"></script>
+ 
+ </body>
+ 
+diff --git a/shop.css b/shop.css
+--- a/shop.css
++++ b/shop.css
+@@ -4022,12 +4022,6 @@
+     /* Introduction on the left, beneath the top drip */
+ 
+ 
+-    /* Pick Your Poison already appears in the introduction. */
+-    body.shop-page .cupcake-section
+-    .dessert-section-intro > .dessert-section-kicker {
+-        display: none;
+-    }
+-
+     /* Remove reserved empty height from category introductions. */
+     body.shop-page .cupcake-section .dessert-section-intro,
+     body.shop-page .jar-section .jar-section-intro,
