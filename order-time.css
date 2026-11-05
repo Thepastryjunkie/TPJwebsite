@@ -1,0 +1,48 @@
+/* Compact, in-field minute controls for Shop checkout and order approval. */
+.tpj-time-control {
+    position: relative;
+    min-width: 0;
+}
+.tpj-time-control input[data-tpj-time] {
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 50px;
+}
+.tpj-time-control .tpj-time-steps {
+    position: absolute;
+    inset: 3px 6px 3px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 36px;
+}
+.tpj-time-control .tpj-time-steps button {
+    display: grid;
+    place-items: center;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #6e5e57;
+    cursor: pointer;
+}
+.tpj-time-control .tpj-time-steps button::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-inline: 4px solid transparent;
+    border-bottom: 5px solid currentColor;
+}
+.tpj-time-control .tpj-time-steps button[data-minute-step="-1"]::before {
+    transform: rotate(180deg);
+}
+.tpj-time-control .tpj-time-steps button:hover { background: #f7e7e8; }
+.tpj-time-control .tpj-time-steps button:focus-visible {
+    outline: 2px solid #b51558;
+    outline-offset: -2px;
+}
+.shop-checkout-dialog .tpj-time-control input[data-tpj-time] { padding-right: 50px; }
+.tpj-time-field label { margin-bottom: 2px; }

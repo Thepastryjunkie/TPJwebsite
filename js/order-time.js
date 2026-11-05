@@ -20,6 +20,17 @@ window.TPJOrderTime = (() => {
     const total = (hour * 60 + minute + delta + 1440) % 1440;
     return format(String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0'));
   }
+  // This text field accepts AM/PM and 24-hour typing without a clock popup.
+  function field(id, value = '') {
+    const escape = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return `<div class="tpj-time-control">
+      <input id="${escape(id)}" name="time" type="text" data-tpj-time required autocomplete="off" placeholder="12:05 PM" value="${escape(value)}">
+      <div class="tpj-time-steps">
+        <button type="button" data-minute-step="1" aria-label="Increase time by one minute"></button>
+        <button type="button" data-minute-step="-1" aria-label="Decrease time by one minute"></button>
+      </div>
+    </div>`;
+  }
   function mount() {
     document.querySelectorAll('input[data-tpj-time]:not([data-time-ready])').forEach(input => {
       input.dataset.timeReady = 'true';
@@ -38,6 +49,9 @@ window.TPJOrderTime = (() => {
         catch (_) { input.setCustomValidity(message); input.reportValidity(); return; }
         input.dispatchEvent(new Event('input', {bubbles: true}));
       };
+      input.closest('.tpj-time-control')?.querySelectorAll('[data-minute-step]').forEach(button => {
+        button.addEventListener('click', () => nudge(Number(button.dataset.minuteStep)));
+      });
       input.addEventListener('keydown', event => {
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
           event.preventDefault(); nudge(event.key === 'ArrowUp' ? 1 : -1);
@@ -51,5 +65,5 @@ window.TPJOrderTime = (() => {
     mount();
     document.addEventListener('keydown',event=>{const input=event.target;if(input?.tagName==='INPUT'&&['date','datetime-local'].includes(input.type)&&['Backspace','Delete'].includes(event.key)){event.preventDefault();input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}},true);
   }
-  return {parse, format, shift};
+  return {parse, format, shift, field};
 })();

@@ -3460,53 +3460,9 @@ function checkoutSummary() {
 }
 
 function openCheckout() {
-    const dates = [];
-
-    const start = new Date(
-        now().getTime() +
-        C.preorderHours * 3600000
-    );
-
-    for (
-        let index = 0;
-        index < 366;
-        index++
-    ) {
-        const date = new Date(
-            +start +
-            index * 86400000
-        );
-
-        const key =
-            M.dateKey(date);
-
-        if (
-            !availability.blockedDates
-                .includes(key) &&
-            !(availability.dateRules || []).some(r => r.date === key && r.windows.some(w => w.start === '00:00' && w.end === '24:00')) &&
-            !dates.some(
-                ([value]) =>
-                    value === key
-            )
-        ) {
-            dates.push([
-                key,
-
-                new Intl.DateTimeFormat(
-                    "en-US",
-                    {
-                        timeZone:
-                            C.timeZone,
-
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric"
-                    }
-                ).format(date)
-            ]);
-        }
-    }
+    const first = new Date(now().getTime() + C.preorderHours * 3600000);
+    const minDate = M.dateKey(first);
+    const maxDate = M.dateKey(new Date(+first + 365 * 86400000));
 
     openDialog(
         "Review Your Order Request",
@@ -3558,37 +3514,14 @@ function openCheckout() {
                     <label class="shop-field">
                         Requested Fulfillment Date
 
-                        <select
-                            name="date"
-                            required
-                        >
-                            ${selectOptions(
-                                dates,
-                                ""
-                            )}
-                        </select>
-
-                        <small>
-                            Unavailable dates are omitted.
-                            Your date is not reserved until
-                            approval and payment.
-                        </small>
+                        <input name="date" type="date" min="${minDate}" max="${maxDate}" required>
+                        <small>Your date is reserved after approval and payment.</small>
                     </label>
 
-                    <label class="shop-field">
-                        <span id="shopTimeLabel">
-                            Requested Fulfillment Time
-                        </span>
-
-                        <input
-                            name="time"
-                            type="time"
-                            step="60"
-                            required
-                        >
-
-
-                    </label>
+                    <div class="shop-field">
+                        <label id="shopTimeLabel" for="shopRequestTime">Requested Fulfillment Time</label>
+                        ${window.TPJOrderTime.field('shopRequestTime')}
+                    </div>
                 </div>
 
                 <fieldset
@@ -3795,7 +3728,13 @@ function openCheckout() {
 
         const delivery = method === "delivery";
         $('#shopDeliveryNotice', form).hidden = !delivery;
-        form.elements.time.setCustomValidity('');
+        const date = form.elements.date;
+        const unavailable = date.value && (
+            availability.blockedDates.includes(date.value) ||
+            (availability.dateRules || []).some(rule => rule.date === date.value &&
+                rule.windows.some(window => window.start === '00:00' && window.end === '24:00'))
+        );
+        date.setCustomValidity(unavailable ? 'That date is unavailable. Choose another date.' : '');
 
         $(
             "#shopDeliveryFields",
