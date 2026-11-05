@@ -4022,12 +4022,6 @@ and (pointer: fine) {
     /* Introduction on the left, beneath the top drip */
 
 
-    /* Pick Your Poison already appears in the introduction. */
-    body.shop-page .cupcake-section
-    .dessert-section-intro > .dessert-section-kicker {
-        display: none;
-    }
-
     /* Remove reserved empty height from category introductions. */
     body.shop-page .cupcake-section .dessert-section-intro,
     body.shop-page .jar-section .jar-section-intro,

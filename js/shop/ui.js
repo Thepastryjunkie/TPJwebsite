@@ -1174,52 +1174,54 @@ function renderDesktopTray() {
         x.traySlots = slots.slice();
     }
 
+function chocolatePieceArt(id, piece) {
+    const kinds = {
+        pretzel: 'Pretzel',
+        oreo: 'Oreo',
+        strawberry: 'Strawberries',
+        rice: 'Rice-Krispy'
+    };
+
+    const featured = {
+        birthday: 'Birthday',
+        biscoff: 'Biscoff',
+        cookies: 'Oreo',
+        strawberry: 'Strawberry'
+    };
+
+    const bases = {
+        white: 'White',
+        milk: 'Milk',
+        dark: 'Dark'
+    };
+
+    const kind = kinds[id];
+
+    if (!kind) return null;
+
+    const base = bases[piece?.base]
+        ? piece.base
+        : 'white';
+
+    const finishedFlavor = base === 'white'
+        ? featured[piece?.topping]
+        : null;
+
+    const variant = finishedFlavor || bases[base];
+
+    const src = encodeURI(
+        '../images/Shop/Chocolate Treats/' +
+        `Chocolate-${variant}-${kind}.png`
+    );
+
+    return {src, finishedFlavor};
+}
+
 function art(cat, id, piece = null) {
     if (cat === 'chocolate') {
-        const kinds = {
-            pretzel: 'Pretzel',
-            oreo: 'Oreo',
-            strawberry: 'Strawberries',
-            rice: 'Rice-Krispy'
-        };
-
-        const featured = {
-            birthday: 'Birthday',
-            biscoff: 'Biscoff',
-            cookies: 'Oreo',
-            strawberry: 'Strawberry'
-        };
-
-        const bases = {
-            white: 'White',
-            milk: 'Milk',
-            dark: 'Dark'
-        };
-
-        const kind = kinds[id];
-
-        if (!kind) {
-            return `
-                <span class="tpj-art-fallback">
-                    Choose a treat
-                </span>
-            `;
-        }
-
-        const base = bases[piece?.base]
-            ? piece.base
-            : 'white';
-
-        const finishedFlavor = base === 'white'
-            ? featured[piece?.topping]
-            : null;
-
-        const variant = finishedFlavor || bases[base];
-
-        const src = encodeURI(
-            '../images/Shop/Chocolate Treats/' +
-            `Chocolate-${variant}-${kind}.png`
-        );
+        const image = chocolatePieceArt(id, piece);
+        if (!image) return '<span class="tpj-art-fallback">Choose a treat</span>';
+        const {src, finishedFlavor} = image;
 
         let note = '';
 
@@ -3451,11 +3453,16 @@ function checkoutSummary() {
         const quoted = safeQuote(item);
         if (!quoted) return '';
         const flavors = item.category === 'half' ? [item.one,item.two] : item.mix && Object.keys(item.mix).length ? Object.entries(item.mix).flatMap(([id,n]) => Array(Math.min(Number(n),12)).fill(id)) : [item.flavor];
-        const images = item.category === 'chocolate' || item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
+        const treatImages = item.category === 'chocolate' ? (quoted.pieces || []).map(piece => chocolatePieceArt(piece.type, piece)).filter(Boolean) : [];
+        const images = item.category === 'chocolate'
+            ? treatImages.map(image => '<img src="'+esc(image.src)+'" alt="">').join('')
+            : item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
             const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
             return src ? '<img src="'+esc(src)+'" alt="">' : '';
         }).join('');
-        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>':'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
+        const photoNote = treatImages.some(image => !image.finishedFlavor)
+            ? '<small>Where a topping photo isn’t available, the image shows the selected chocolate base.</small>' : '';
+        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>'+photoNote:'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
     }).join('');
 }
 
