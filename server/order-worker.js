@@ -389,10 +389,10 @@
                 "Keep desserts level, protected from heat, and refrigerated when required. After handoff, you are responsible for proper transport, storage and handling. The Pastry Junkie is not responsible for damage caused by tilting, dropping, heat exposure, improper refrigeration, transportation or handling.",
 
             delivery:
-                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee; confirmed fees are never changed silently.",
+                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee.",
 
             pickup:
-                "Pickup location and instructions are supplied with approval. Arrive within your confirmed pickup window; contact The Pastry Junkie if you are late. Requested dates and times are subject to approval and are reserved only after approval and payment."
+                "Requested dates and times are confirmed after approval and payment. Pickup details are provided with your approval."
         };
 
         /*
@@ -3141,7 +3141,6 @@ async function tpjImportCake(data, env) {
     fulfillment.date,
     "12:00"
   );
-  if((await TPJBusiness.load(env)).config.dateRules?.some(r=>r.date===fulfillment.date)&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(fulfillment.time||''))throw tpjError('Choose a requested pickup/delivery time for this date.');
 
   for (
     const name of [
@@ -4295,6 +4294,7 @@ const TPJWorkflow = (() => {
   if(b.priceConfirmed!==true && b.termsReviewed!==true)throw error('Confirm the final price and fulfillment details before issuing the approval.');
   const fulfillment=localMS(b.fulfillmentDate,b.fulfillmentTime);
   if(fulfillment<=Date.now())throw error('The approved fulfillment time must be in the future.');
+  if(TPJMenuTools.blocked(await tpjAvailability(env),b.fulfillmentDate,b.fulfillmentTime))throw error('That fulfillment date/time is blocked. Choose an available time before issuing approval.');
   const days=(dateMS(b.fulfillmentDate)-dateMS(day()))/86400000,cake=row.source==='cake_builder';
   const rush=cake&&(days<=7||b.rushOrder===true);
   // The owner may adjust or waive the proposed rush fee before approval.
@@ -4830,7 +4830,7 @@ const TPJBusiness=(()=>{
  async function publicConfig(e){const state=await load(e),c=state.config,accepting=await tpjAccepting(e);return {version:state.version,catalog:catalog(state),settings:c.settings,disabled:[...new Set([...c.disabled,...(c.removed||[])])],blockedDates:c.blockedDates,dateRules:c.dateRules||[],profiles:c.profiles,acceptShop:accepting&&c.settings.acceptShop,acceptCake:accepting&&c.settings.acceptCake,allergens,notice,safe};}
  function validate(body){
   const d=defaults(),v=body.config;if(!v||typeof v!=='object')fail('Missing menu settings.');
-  const s=v.settings||{};d.settings={businessName:text(s.businessName,150),supportEmail:'baked@thepastryjunkie.com',phone:text(s.phone,40),registrationId:text(s.registrationId||'',100),ownerEmail:'orders@thepastryjunkie.com',acceptShop:s.acceptShop===true,acceptCake:s.acceptCake===true,shopLeadHours:integer(s.shopLeadHours,72,720),defaultTaxBps:integer(s.defaultTaxBps,0,825)};
+  const s=v.settings||{};d.settings={...d.settings,businessName:text(s.businessName,150),supportEmail:'baked@thepastryjunkie.com',phone:text(s.phone,40),registrationId:text(s.registrationId||'',100),ownerEmail:'orders@thepastryjunkie.com',acceptShop:s.acceptShop===true,acceptCake:s.acceptCake===true,shopLeadHours:integer(s.shopLeadHours,72,720),defaultTaxBps:integer(s.defaultTaxBps,0,825)};
   if(!Array.isArray(s.defaultContains||[])||!(s.defaultContains||[]).every(x=>allergens.includes(x)))fail('Select valid standard allergens.');
   d.settings.defaultContains=[...new Set(s.defaultContains||[])];d.settings.defaultAllergenInfo=text(s.defaultAllergenInfo||'',1500);
   if(!d.settings.businessName||d.settings.phone.replace(/\D/g,'').length!==10)fail('Enter the business name and ten-digit phone number.');
@@ -4972,7 +4972,7 @@ const TPJMenuTools=(()=>{
  function blocked(availability,date,time){
   if((availability.blockedDates||[]).includes(date))return true;
   const r=(availability.dateRules||[]).find(r=>r.date===date);
-  return !!r?.windows?.some(w=>time>=w.start&&time<w.end);
+  return !!r?.windows?.some(w=>time ? time>=w.start&&time<w.end : w.start==='00:00'&&w.end==='24:00');
  }
 
  return {validate,apply,blocked,groups};

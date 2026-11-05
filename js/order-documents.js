@@ -10,7 +10,20 @@ window.TPJRecordDocuments=(()=>{
   else throw Error('Choose invoice or agreement.');
   return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:"><title>'+h(o.reference||o.requestId)+' '+h(kind)+'</title><style>body{max-width:900px;margin:auto;padding:25px;color:#292525;font:16px/1.5 Arial,sans-serif}header{border-bottom:5px solid #efcfeb}p,dd{white-space:pre-wrap;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px}.signature{font:italic 26px Georgia,serif}article{break-inside:avoid}img{max-width:100%;height:auto}@media print{@page{margin:.5in}body{padding:0}}</style></head><body>'+content+'</body></html>';
  }
+ function viewHTML(markup,title){
+  document.getElementById('tpjDocumentViewer')?.close();
+  const modal=document.createElement('dialog');modal.id='tpjDocumentViewer';modal.className='tpj-document-viewer';
+  const bar=document.createElement('div'),heading=document.createElement('h2'),close=document.createElement('button'),frame=document.createElement('iframe');
+  heading.id='tpjDocumentTitle';modal.setAttribute('aria-labelledby',heading.id);heading.textContent=title;close.textContent='Close';close.type='button';close.onclick=()=>modal.close();bar.append(heading,close);
+  frame.title=title;frame.setAttribute('sandbox','');frame.srcdoc=markup;modal.append(bar,frame);document.body.append(modal);
+  const app=document.getElementById('app'),lock=document.getElementById('lock');
+  const clear=()=>{observer?.disconnect();lock?.removeEventListener('click',clear);modal.remove();};
+  const observer=app?new MutationObserver(()=>{if(app.hidden)clear();}):null;
+  observer?.observe(app,{attributes:true,attributeFilter:['hidden']});lock?.addEventListener('click',clear);
+  modal.addEventListener('close',clear,{once:true});modal.showModal();
+ }
+ function view(packet,kind){viewHTML(html(packet,kind),(packet.order.reference||packet.order.id)+' — '+kind);}
  function download(packet,kind){window.TPJRecords.download(html(packet,kind),(packet.order.reference||packet.order.id)+'-'+kind+'.html');}
  function print(kind){const cls=kind==='invoice'?'print-invoice':'print-agreement';document.body.classList.remove('print-invoice','print-agreement');document.body.classList.add(cls);window.addEventListener('afterprint',()=>document.body.classList.remove(cls),{once:true});window.print();}
- return {context,html,download,print};
+ return {context,html,download,print,view,viewHTML};
 })();

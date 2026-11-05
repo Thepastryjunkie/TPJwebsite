@@ -1,0 +1,878 @@
+diff --git a/js/cake-builder.js b/js/cake-builder.js
+--- a/js/cake-builder.js
++++ b/js/cake-builder.js
+@@ -11154,7 +11154,6 @@
+ }
+ 
+ function validateStepOne() {
+-    try {builderState.fulfillmentTime=window.TPJOrderTime.parse(getElement('#requestedCakeTime')?.value||'');}catch(_){showValidationMessage('Enter the requested pickup or delivery time, such as 12:05 PM.');getElement('#requestedCakeTime')?.focus();return false;}
+     builderState.eventDate =
+         getElement("#eventDate")?.value || "";
+ 
+@@ -15363,9 +15362,9 @@
+         const requestSettings=await availabilityResponse.json();
+         if(!availabilityResponse.ok || !requestSettings.acceptCake)throw Error('Custom cake inquiries are temporarily paused. Your selections are saved. Please contact baked@thepastryjunkie.com.');
+         if(builderState.fulfillmentMethod==='Delivery'&&(!['TX','TEXAS'].includes(String(builderState.deliveryState||'').trim().toUpperCase())||!/^(733\d{2}|73960|7[5-9]\d{3}|885\d{2})(-\d{4})?$/.test(String(builderState.deliveryZip||'').trim())))throw Error('Texas delivery only. We do not ship or deliver outside Texas.');
+-        const selectedDate=String(builderState.fulfillmentDate||''),selectedTime=window.TPJOrderTime.parse(getElement('#requestedCakeTime')?.value||'');
+-        builderState.fulfillmentTime=selectedTime;
+-        if((requestSettings.blockedDates||[]).includes(selectedDate)||(requestSettings.dateRules||[]).some(r=>r.date===selectedDate&&(r.windows||[]).some(w=>selectedTime>=w.start&&selectedTime<w.end)))throw Error('That requested date/time is unavailable. Choose another date or time.');
++        const selectedDate=String(builderState.fulfillmentDate||'');
++        delete builderState.fulfillmentTime;
++        if((requestSettings.blockedDates||[]).includes(selectedDate)||(requestSettings.dateRules||[]).some(r=>r.date===selectedDate&&(r.windows||[]).some(w=>w.start==='00:00'&&w.end==='24:00')))throw Error('That requested date is unavailable. Choose another date.');
+         const submissionFiles =
+             await collectSubmissionFiles();
+ 
+diff --git a/js/order-documents.js b/js/order-documents.js
+--- a/js/order-documents.js
++++ b/js/order-documents.js
+@@ -10,7 +10,20 @@
+   else throw Error('Choose invoice or agreement.');
+   return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:"><title>'+h(o.reference||o.requestId)+' '+h(kind)+'</title><style>body{max-width:900px;margin:auto;padding:25px;color:#292525;font:16px/1.5 Arial,sans-serif}header{border-bottom:5px solid #efcfeb}p,dd{white-space:pre-wrap;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px}.signature{font:italic 26px Georgia,serif}article{break-inside:avoid}img{max-width:100%;height:auto}@media print{@page{margin:.5in}body{padding:0}}</style></head><body>'+content+'</body></html>';
+  }
++ function viewHTML(markup,title){
++  document.getElementById('tpjDocumentViewer')?.close();
++  const modal=document.createElement('dialog');modal.id='tpjDocumentViewer';modal.className='tpj-document-viewer';
++  const bar=document.createElement('div'),heading=document.createElement('h2'),close=document.createElement('button'),frame=document.createElement('iframe');
++  heading.id='tpjDocumentTitle';modal.setAttribute('aria-labelledby',heading.id);heading.textContent=title;close.textContent='Close';close.type='button';close.onclick=()=>modal.close();bar.append(heading,close);
++  frame.title=title;frame.setAttribute('sandbox','');frame.srcdoc=markup;modal.append(bar,frame);document.body.append(modal);
++  const app=document.getElementById('app'),lock=document.getElementById('lock');
++  const clear=()=>{observer?.disconnect();lock?.removeEventListener('click',clear);modal.remove();};
++  const observer=app?new MutationObserver(()=>{if(app.hidden)clear();}):null;
++  observer?.observe(app,{attributes:true,attributeFilter:['hidden']});lock?.addEventListener('click',clear);
++  modal.addEventListener('close',clear,{once:true});modal.showModal();
++ }
++ function view(packet,kind){viewHTML(html(packet,kind),(packet.order.reference||packet.order.id)+' — '+kind);}
+  function download(packet,kind){window.TPJRecords.download(html(packet,kind),(packet.order.reference||packet.order.id)+'-'+kind+'.html');}
+  function print(kind){const cls=kind==='invoice'?'print-invoice':'print-agreement';document.body.classList.remove('print-invoice','print-agreement');document.body.classList.add(cls);window.addEventListener('afterprint',()=>document.body.classList.remove(cls),{once:true});window.print();}
+- return {context,html,download,print};
++ return {context,html,download,print,view,viewHTML};
+ })();
+diff --git a/js/order-workflow-admin.js b/js/order-workflow-admin.js
+--- a/js/order-workflow-admin.js
++++ b/js/order-workflow-admin.js
+@@ -24,7 +24,7 @@
+    if(!active&&!offers.some(x=>x.intents.some(i=>i.paid_cents>0))&&!['cancelled','declined','completed'].includes(order.status)){
+     if(!sourceTerms)throw Error('The order-terms.js file did not load.');
+     html+='<form data-issue><h4>Accept this inquiry</h4><label>Approved amount BEFORE any rush fee<br><input name="base" type="number" step="0.01" min="0.01" required value="'+(typeof order.estimatedTotalCents==='number'?(order.estimatedTotalCents/100).toFixed(2):'')+'"></label>'+
+-     '<label>Approved fulfillment date<br><input name="date" type="date" required value="'+e(order.fulfillmentDate)+'"></label> <label>Central time<br><input name="time" type="text" data-tpj-time placeholder="12:05 PM" autocomplete="off" required value="'+e(order.details?.order?.fulfillment?.time||order.details?.fulfillment?.time||'12:00')+'"></label>'+
++     '<label>Approved fulfillment date<br><input name="date" type="date" required value="'+e(order.fulfillmentDate)+'"></label> <label>Central time<br><input name="time" type="time" step="60" required value="'+e(order.details?.order?.fulfillment?.time||order.details?.fulfillment?.time||'12:00')+'"></label>'+
+      (cake?'<p><label><input name="rush" type="checkbox"> Rush order</label></p><label>Rush fee in dollars<br><input name="rushFee" type="number" step="0.01" min="0" value="0" required></label><p class="muted">The proposed rush fee is listed separately and counted once. Set any approved amount, including $0 to waive it. Orders accepted seven days or fewer before fulfillment require full payment of the final approved total.</p>':'<input name="rushFee" type="hidden" value="0">')+
+      '<label>Your name as business signer<br><input name="businessSigner" value="Erykah Williams" required minlength="2" maxlength="150"></label><label><input name="businessConsent" type="checkbox" required> I adopt this name as my electronic signature and authorize this agreement.</label><p data-plan></p><label>Final approved design/order notes<br><textarea name="description" maxlength="10000" placeholder="Document any approved details that differ from the original inquiry."></textarea></label>'+
+           '<p><label><input name="reviewed" type="checkbox" required> I confirm the final charges, fulfillment details and product disclosures are correct and ready to send.</label></p><button class="primary" type="submit">Accept inquiry and send agreement</button></form>';
+diff --git a/js/owner-dashboard.js b/js/owner-dashboard.js
+--- a/js/owner-dashboard.js
++++ b/js/owner-dashboard.js
+@@ -44,11 +44,13 @@
+    html+='<details><summary>Technical records</summary><details><summary>Email delivery</summary>'+h((packet.notifications||[]).map(n=>n.event_key+' · '+n.recipient_type+' · '+n.state+(n.last_error?' · '+n.last_error:'')).join(' / ')||'No email records')+'</details><details><summary>Activity log</summary>'+packet.events.map(e=>'<p>'+h(e.event_type)+' · '+h(stamp(e.created_at))+'</p><pre>'+h(e.details_json)+'</pre>').join('')+'</details><details><summary>Raw saved data</summary><pre>'+h(JSON.stringify(d,null,2))+'</pre></details><form id="correctionForm"><label>Add a record correction<textarea name="note" required minlength="3" maxlength="3000"></textarea></label><button>Add correction to history</button></form><button id="exportJSON" type="button">Download evidence data (JSON)</button></details>';
+    if(tab==='records'){
+     const before=html.indexOf('<div class="actions">');const technical=html.indexOf('<details><summary>Technical records</summary>');
+-    html=html.slice(0,before)+'<h3>Documents & saved evidence</h3><p>Read-only invoices, accepted agreements, verified payments and signed handoff records. Use Orders to manage an active request.</p><div class="actions"><button id="exportRecord">Download complete record</button><button id="exportInvoice">Download invoice</button><button id="exportAgreement">Download agreement</button><button id="labels">Prepare product labels</button><button id="handoffReceipt">Prepare handoff receipt</button></div>'+html.slice(technical);
++    html=html.slice(0,before)+'<h3>Documents & saved evidence</h3><p>Read-only invoices, accepted agreements, verified payments and signed handoff records. Use Orders to manage an active request.</p><div class="actions"><span class="document-actions">Complete record <button id="viewRecord" class="secondary">View</button><button id="exportRecord" class="secondary">Download</button></span><span class="document-actions">Invoice <button id="viewInvoice" class="secondary">View</button><button id="exportInvoice" class="secondary">Download</button></span><span class="document-actions">Agreement <button id="viewAgreement" class="secondary">View</button><button id="exportAgreement" class="secondary">Download</button></span><button id="labels">Prepare product labels</button><button id="handoffReceipt">Prepare handoff receipt</button></div>'+html.slice(technical);
+    }
+    $('detail').innerHTML=html;
+    window.TPJOrderTools.mount($('detail'),packet,api,async change=>{if(change.deleted){current=null;currentPacket=null;await navigate(tab);return;}if(change.action==='archive'||change.stage==='canceled'){await navigate('records');await select(r.id);}else if(change.action==='restore'||change.stage&&['new','pending','confirmed','fulfilled'].includes(change.stage)){await navigate('orders');if(change.stage){$('stage').value=change.stage;await loadOrders();}await select(r.id);}else{await loadOrders();await select(r.id);}});
+-   if(!packet.offers.length){for(const id of ['exportInvoice','exportAgreement','labels','handoffReceipt'])if($(id))$(id).disabled=true;}
++   if(!packet.offers.length){for(const id of ['viewInvoice','viewAgreement','exportInvoice','exportAgreement','labels','handoffReceipt'])if($(id))$(id).disabled=true;}
++   if($('viewRecord'))$('viewRecord').onclick=()=>window.TPJRecordDocuments.viewHTML(window.TPJRecords.html(packet),(packet.order.reference||r.id)+' — complete record');
++   if($('viewInvoice'))$('viewInvoice').onclick=()=>window.TPJRecordDocuments.view(packet,'invoice');if($('viewAgreement'))$('viewAgreement').onclick=()=>window.TPJRecordDocuments.view(packet,'agreement');
+    if($('exportInvoice'))$('exportInvoice').onclick=()=>window.TPJRecordDocuments.download(packet,'invoice');if($('exportAgreement'))$('exportAgreement').onclick=()=>window.TPJRecordDocuments.download(packet,'agreement');
+    $('exportRecord').onclick=()=>window.TPJRecords.download(window.TPJRecords.html(packet),(packet.order.reference||r.id)+'-record.html');$('exportJSON').onclick=()=>window.TPJRecords.download(JSON.stringify(packet,(k,v)=>['orderURL','rootURL'].includes(k)?undefined:v,2),(packet.order.reference||r.id)+'-record.json','application/json');
+    $('handoffReceipt').onclick=()=>{try{window.TPJHandoff.open(packet);}catch(e){notice(e.message,true);}};
+diff --git a/js/shop/catalog.js b/js/shop/catalog.js
+--- a/js/shop/catalog.js
++++ b/js/shop/catalog.js
+@@ -337,10 +337,10 @@
+                 "Keep desserts level, protected from heat, and refrigerated when required. After handoff, you are responsible for proper transport, storage and handling. The Pastry Junkie is not responsible for damage caused by tilting, dropping, heat exposure, improper refrigeration, transportation or handling.",
+ 
+             delivery:
+-                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee; confirmed fees are never changed silently.",
++                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee.",
+ 
+             pickup:
+-                "Pickup location and instructions are supplied with approval. Arrive within your confirmed pickup window; contact The Pastry Junkie if you are late. Requested dates and times are subject to approval and are reserved only after approval and payment."
++                "Requested dates and times are confirmed after approval and payment. Pickup details are provided with your approval."
+         };
+ 
+         /*
+diff --git a/js/shop/product-info.js b/js/shop/product-info.js
+--- a/js/shop/product-info.js
++++ b/js/shop/product-info.js
+@@ -298,11 +298,34 @@
+             return {contains:allergen(records.flatMap(r=>r.contains)),mayContain:allergen(records.flatMap(r=>r.mayContain)),notes:unique(records.flatMap(r=>r.notes)),missing:unique(missing)};
+         }
+ 
++        function storage(item, profiles = {}) {
++            const rows = [];
++            const add = (key, category, flavor) => {
++                const profile = profiles[key];
++                const recipe = care[category]?.[flavor];
++                const text = profile?.reviewed && profile.refrigerated === true
++                    ? 'Keep refrigerated.'
++                    : recipe?.storage;
++                if (text) rows.push(text);
++            };
++            const category = item.category === 'half' ? 'cakes' : item.category;
++            if (category === 'custom') add('custom:'+item.product, category, item.product);
++            else if (category === 'chocolate') {
++                const pieces = item.mixing !== false && item.pieces?.length ? item.pieces : [{type:item.flavor}];
++                pieces.forEach(piece => add('treat:'+piece.type, 'chocolate', piece.type));
++            } else {
++                const flavors = item.category === 'half' ? [item.one,item.two] : item.mixing !== false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k => Number(item.mix[k]) > 0) : [item.flavor];
++                new Set(flavors.filter(Boolean)).forEach(flavor => add('product:'+category+':'+flavor, category, flavor));
++            }
++            return [...new Set(rows)];
++        }
++
+         return {
+             care,
+             labels,
+             combine,
+             resolve,
++            storage,
+ 
+             toppingNotice:
+                 "May add milk, egg, wheat and soy depending on components.",
+diff --git a/js/shop/ui.js b/js/shop/ui.js
+--- a/js/shop/ui.js
++++ b/js/shop/ui.js
+@@ -273,7 +273,8 @@
+ function openDialog(title, content) {
+         dialog.classList.remove(
+     "shop-product-dialog",
+-    "tpj-tray-dialog"
++    "tpj-tray-dialog",
++    "shop-checkout-dialog"
+ );
+     if (!dialog.open) {
+         returnFocus =
+@@ -1115,17 +1116,7 @@
+             ? C.half.prices
+             : C.categories[category].prices;
+ 
+-    const name = pack
+-        ? 'Build your ' + ({
+-            cupcakes: 'cupcake',
+-            jars: 'jar',
+-            apples: 'apple'
+-        }[category]) + ' box'
+-        : treats
+-            ? 'Build your treat box'
+-           : category === 'half'
+-    ? 'Half & Half Cake'
+-    : 'Signature Cake';
++    const name = pack || treats ? 'Build Your Box' : category === 'half' ? 'Half & Half Cake' : 'Signature Cake';
+ 
+     $('#shopDialogTitle', dialog).textContent = name;
+ 
+@@ -1464,19 +1455,15 @@
+                 </div>
+             `;
+         } else {
+-            const columns = treats
+-                ? x.size === 6 ? 3 : 4
+-                : x.size;
++            const columns = x.size;
+ 
+             const tray = !x.size
+                 ? `
+-                    <p class="tpj-tray-hint">
+-                        Choose a pack size to open your tray.
+-                    </p>
++                    <div class="tpj-closed-box" aria-hidden="true"><span></span></div>
+                 `
+                 : `
+-                    <div
+-                        class="tpj-tray-slots ${
++                    <div class="tpj-box-scroll" tabindex="0" aria-label="Your box — scroll to see all spots"><div
++                        class="tpj-tray-slots tpj-real-box ${
+                             treats ? 'tpj-treat-slots' : ''
+                         }"
+                         style="--tray-columns:${columns}"
+@@ -1562,7 +1549,7 @@
+                                 </div>
+                             `;
+                         }).join('')}
+-                    </div>
++                    </div></div>
+                 `;
+ 
+             const palette = `
+@@ -3445,11 +3432,31 @@
+     const P = window.TPJShopProductInfo;
+     const a = P.resolve(item, availability.profiles || {});
+     const names = values => values.map(x=>P.labels[x] || x).join(', ');
+-    return '<div class="shop-selected-allergens"><strong>'+esc(item.title || 'Selected product')+'</strong>'+
++    return '<div class="shop-selected-allergens"><strong>'+esc(safeQuote(item)?.title || item.title || 'Selected product')+'</strong>'+
+         (a.contains.length?'<p>Contains: '+esc(names(a.contains))+'.</p>':'')+
+         (a.mayContain.length?'<p>May contain: '+esc(names(a.mayContain))+'.</p>':'')+
+         a.notes.map(n=>'<p>'+esc(n)+'</p>').join('')+
+         (a.missing.length?'<p>Ingredient information needs review for '+esc(a.missing.join(', '))+'. Please contact us before ordering.</p>':'')+'</div>';
++}
++
++function selectedCareHTML(item) {
++    const quoted = safeQuote(item);
++    const instructions = window.TPJShopProductInfo.storage(item, availability.profiles || {});
++    return '<article><h4>'+esc(quoted?.title || item.title || 'Your item')+'</h4>'+
++        (instructions.length ? instructions.map(text => '<p>'+esc(text)+'</p>').join('') : '<p>Care instructions will be provided with your approval.</p>')+'</article>';
++}
++
++function checkoutSummary() {
++    return cart.map(item => {
++        const quoted = safeQuote(item);
++        if (!quoted) return '';
++        const flavors = item.category === 'half' ? [item.one,item.two] : item.mix && Object.keys(item.mix).length ? Object.entries(item.mix).flatMap(([id,n]) => Array(Math.min(Number(n),12)).fill(id)) : [item.flavor];
++        const images = item.category === 'chocolate' || item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
++            const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
++            return src ? '<img src="'+esc(src)+'" alt="">' : '';
++        }).join('');
++        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>':'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
++    }).join('');
+ }
+ 
+ function openCheckout() {
+@@ -3502,16 +3509,12 @@
+     }
+ 
+     openDialog(
+-        "Request Your Order",
++        "Review Your Order Request",
+ 
+         `
+             <form id="shopCheckoutForm">
+-                <p>
+-                    Everyday sweets, made to order.
+-                    At least ${C.preorderHours} hours’ notice is required.
+-                    All times are Central time
+-                    (Dallas–Fort Worth).
+-                </p>
++                <div class="tpj-checkout-grid"><div class="tpj-checkout-fields">
++                <h3>Your Details</h3>
+ 
+                 <div class="shop-two-col">
+                     ${field(
+@@ -3579,17 +3582,12 @@
+ 
+                         <input
+                             name="time"
+-                            type="text"
+-                            data-tpj-time
+-                            placeholder="12:05 PM"
+-                            autocomplete="off"
++                            type="time"
++                            step="60"
+                             required
+                         >
+ 
+-                        <small>
+-                            Requested time is subject to
+-                            review and approval.
+-                        </small>
++
+                     </label>
+                 </div>
+ 
+@@ -3650,14 +3648,7 @@
+                             required
+                         >
+ 
+-                        <small>
+-                            Enter the estimated one-way
+-                            delivery mileage, as in the
+-                            Cake Builder. Final distance
+-                            and fee are reviewed before
+-                            approval. There is no maximum
+-                            delivery radius.
+-                        </small>
++
+                     </label>
+ 
+                     <label class="shop-mix-toggle">
+@@ -3724,19 +3715,8 @@
+                             Handling and Storage
+                         </summary>
+ 
+-                        <p>
+-                            Cheesecake jars and cheesecake
+-                            apples: Keep Refrigerated.
+-                            Keep cakes and fresh-fruit or
+-                            dairy-topped desserts refrigerated
+-                            until serving.
+-                        </p>
+-
+-                        <p>
+-                            ${esc(
+-                                C.messages.handling
+-                            )}
+-                        </p>
++                        ${cart.map(selectedCareHTML).join('')}
++                        <p>${esc(C.messages.handling)}</p>
+                     </details>
+ 
+                     <details>
+@@ -3750,7 +3730,7 @@
+                             )}
+                         </p>
+ 
+-                        <p>
++                        <p id="shopDeliveryNotice" hidden>
+                             ${esc(
+                                 C.messages.delivery
+                             )}
+@@ -3760,6 +3740,10 @@
+ 
+ 
+ 
++                </div><aside class="tpj-checkout-summary"><h3>Your Order</h3>${checkoutSummary()}
++                    <p id="shopFulfillmentTotal" class="shop-live" aria-live="polite"></p>
++                    <p class="shop-notice">${esc(C.messages.request)}</p>
++                </aside></div>
+                 <label
+                     class="shop-honeypot"
+                     aria-hidden="true"
+@@ -3773,11 +3757,7 @@
+                     >
+                 </label>
+ 
+-                <p
+-                    id="shopFulfillmentTotal"
+-                    class="shop-live"
+-                    aria-live="polite"
+-                ></p>
++
+ 
+                 <p
+                     class="shop-error"
+@@ -3795,12 +3775,15 @@
+                     <button
+                         type="submit"
+                         class="shop-button"
+-                    >Review Order Request</button>
++                    >Submit Order Request</button>
+                 </div>
++                <p class="tpj-checkout-footer">At least ${C.preorderHours} hours’ notice is required.</p>
+             </form>
+         `
+     );
+ 
++    dialog.classList.add('shop-checkout-dialog');
++    $('.shop-dialog-header', dialog).insertAdjacentHTML('afterbegin','<img class="tpj-checkout-logo" src="../images/brand/TPJMascotNameApron.png" alt="The Pastry Junkie">');
+     const form = $(
+         "#shopCheckoutForm",
+         dialog
+@@ -3810,8 +3793,9 @@
+         const method =
+             form.elements.method.value;
+ 
+-        const delivery =
+-            method === "delivery";
++        const delivery = method === "delivery";
++        $('#shopDeliveryNotice', form).hidden = !delivery;
++        form.elements.time.setCustomValidity('');
+ 
+         $(
+             "#shopDeliveryFields",
+@@ -3867,7 +3851,7 @@
+         ).textContent =
+             "Product subtotal " +
+             M.money(subtotal()) +
+-            " · " +
++            "\n" +
+             (
+                 delivery
+                     ? "Estimated delivery " +
+@@ -3875,7 +3859,7 @@
+                     : "Pickup " +
+                       M.money(0)
+             ) +
+-            " · Estimated total " +
++            "\nEstimated total " +
+             M.money(
+                 subtotal() + fee
+             );
+@@ -3965,11 +3949,7 @@
+             payload.expectedTotalCents =
+                 validated.totalCents;
+ 
+-            showReview(
+-                payload,
+-                validated,
+-                clone(values)
+-            );
++            submitOrderRequest(payload, form.querySelector('button[type="submit"]'), $('#shopCheckoutError', form));
+ 
+         } catch (error) {
+             $(
+@@ -3982,253 +3962,12 @@
+ }
+ 
+ 
+-/* =====================================================
+-   RESTORE CUSTOMER DETAILS WHEN EDITING REVIEW
+-===================================================== */
+-
+-function restoreCheckout(values) {
+-    openCheckout();
+-
+-    const form = $(
+-        "#shopCheckoutForm",
+-        dialog
+-    );
+-
+-    for (
+-        const [key, value]
+-        of Object.entries(values)
+-    ) {
+-        const input =
+-            form.elements.namedItem(key);
+-
+-        if (!input) {
+-            continue;
+-        }
+-
+-        if (
+-            input instanceof RadioNodeList
+-        ) {
+-            input.value = value;
+-
+-        } else if (
+-            input.type === "checkbox"
+-        ) {
+-            input.checked = true;
+-
+-        } else {
+-            input.value = value;
+-        }
+-    }
+-
+-    form.dispatchEvent(
+-        new Event("change")
+-    );
+-}
+-
+-
+-/* =====================================================
+-   FINAL REVIEW / REQUEST SUBMISSION
+-===================================================== */
+-
+-function showReview(
+-    payload,
+-    order,
+-    values
+-) {
+-    openDialog(
+-        "Review Your Order Request",
+-
+-        `
+-            <div class="shop-review">
+-                ${order.items.map(item => `
+-                    <article class="shop-cart-row">
+-                        <h3>
+-                            ${esc(item.title)}
+-                        </h3>
+-
+-                                 <ul>
+-                            ${customerDetails(item).map(
+-                                detail => `
+-                                    <li>
+-                                        ${esc(detail)}
+-                                    </li>
+-                                `
+-                            ).join("")}
+-                        </ul>
+-
+-                        <p>
+-                            Quantity ${item.quantity}
+-                            ·
+-                            ${M.money(
+-                                item.totalCents
+-                            )}
+-                        </p>
+-                    </article>
+-                `).join("")}
+-
+-                <h3>
+-                    Requested Fulfillment
+-                </h3>
+-
+-                <p>
+-                    ${esc(
+-                        order.fulfillment.method === "pickup"
+-                            ? "Pickup"
+-                            : "Delivery"
+-                    )}
+-                    ·
+-                    ${esc(
+-                        order.fulfillment.date
+-                    )}
+-                    ·
+-                    ${esc(
+-                        order.fulfillment.time
+-                    )}
+-                    Central
+-                </p>
+-
+-                ${
+-                    order.fulfillment.method === "delivery"
+-                        ? `
+-                            <p>
+-                                ${esc(
+-                                    Object.values(
+-                                        order.fulfillment.address
+-                                    )
+-                                    .filter(Boolean)
+-                                    .join(", ")
+-                                )}
+-
+-                                <br>
+-
+-                                Recipient:
+-                                ${esc(
+-                                    order.fulfillment.recipient.name
+-                                )}
+-                                ·
+-                                ${esc(
+-                                    order.fulfillment.recipient.phone
+-                                )}
+-
+-                                <br>
+-
+-                                Estimated miles:
+-                                ${order.fulfillment.miles}
+-
+-                                <br>
+-
+-                                Instructions:
+-                                ${esc(
+-                                    order.fulfillment.instructions
+-                                )}
+-                            </p>
+-                        `
+-                        : ""
+-                }
+-
+-                <p>
+-                    ${esc(
+-                        order.customer.name
+-                    )}
+-
+-                    <br>
+-
+-                    ${esc(
+-                        order.customer.email
+-                    )}
+-
+-                    <br>
+-
+-                    ${esc(
+-                        order.customer.phone
+-                    )}
+-                </p>
+-
+-                ${
+-                    order.notes
+-                        ? `
+-                            <p>
+-                                Notes:
+-                                ${esc(order.notes)}
+-                            </p>
+-                        `
+-                        : ""
+-                }
+-
+-                <p>
+-                    Product subtotal:
+-                    ${M.money(
+-                        order.subtotalCents
+-                    )}
+-
+-                    <br>
+-
+-                    ${
+-                        order.fulfillment.method === "pickup"
+-                            ? "Pickup"
+-                            : "Estimated delivery fee"
+-                    }:
+-                    ${M.money(
+-                        order.deliveryCents
+-                    )}
+-                </p>
+-
+-                <p class="shop-live">
+-                    Estimated total:
+-                    ${M.money(
+-                        order.totalCents
+-                    )}
+-                </p>
+-
+-                <p class="shop-notice">
+-                    ${esc(
+-                        C.messages.request
+-                    )}
+-                </p>
+-
+-                <p
+-                    class="shop-error"
+-                    id="shopSubmitError"
+-                    role="alert"
+-                ></p>
+-
+-                <div class="shop-cart-actions">
+-                    <button
+-                        class="shop-button secondary"
+-                        id="shopEditDetails"
+-                    >Edit Details</button>
+-
+-                    <button
+-                        class="shop-button"
+-                        id="shopRequest"
+-                    >Request Order</button>
+-                </div>
+-            </div>
+-        `
+-    );
+-
+-    $(
+-        "#shopEditDetails",
+-        dialog
+-    ).onclick =
+-        () => restoreCheckout(values);
+-
+-    const button = $(
+-        "#shopRequest",
+-        dialog
+-    );
+-
+-    button.onclick = async () => {
+-        button.disabled = true;
+-
+-        button.textContent =
+-            "Sending Request…";
+-
+-        $(
+-            "#shopSubmitError",
+-            dialog
+-        ).textContent = "";
+-
++/* Submit the editable review form directly; preserve retry idempotency and the existing receipt message. */
++async function submitOrderRequest(payload, button, errorElement) {
++    if (button.disabled) return;
++    button.disabled = true;
++    button.textContent = 'Sending Request…';
++    errorElement.textContent = '';
+         try {
+             if (!online) {
+                 throw new Error(
+@@ -4342,18 +4081,13 @@
+                 () => dialog.close();
+ 
+         } catch (error) {
+-            $(
+-                "#shopSubmitError",
+-                dialog
+-            ).textContent =
+-                error.message;
++            errorElement.textContent = error.message;
+ 
+             button.disabled = false;
+ 
+             button.textContent =
+-                "Request Order";
+-        }
+-    };
++                "Submit Order Request";
++        }
+ }
+ 
+ 
+diff --git a/owner-dashboard.css b/owner-dashboard.css
+--- a/owner-dashboard.css
++++ b/owner-dashboard.css
+@@ -8,3 +8,7 @@
+ .order-list-row{display:flex;align-items:flex-start;gap:8px}.order-list-row>input{flex:none;margin-top:25px}.order-list-row .order-card{flex:1;min-width:0;padding:11px}
+ #detail>.facts{grid-template-columns:repeat(2,minmax(80px,auto) minmax(0,1fr));font-size:14px;gap:5px 12px}#detail h2{margin-bottom:8px}#detail h3{margin:16px 0 8px}.order-spec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 20px;margin:8px 0 16px}.order-spec-grid dt{font-weight:650;font-size:13px}.order-spec-grid dd{margin:2px 0 0;font-size:14px}.order-spec-grid .item{padding:8px 0}.order-spec-grid p{margin:5px 0}#detail>.actions button{min-height:34px;padding:6px 10px;font-size:14px}
+ @media(max-width:600px){#detail>.facts{grid-template-columns:110px minmax(0,1fr)}.order-spec-grid{grid-template-columns:1fr}.bulk-actionbar{gap:7px}}
++
++.layout{align-items:start}.layout>#detail{min-height:0}
++.document-actions{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;margin:0 12px 8px 0}.document-actions button{min-height:32px;padding:5px 9px;font-size:13px}
++.tpj-document-viewer{width:min(1100px,96vw);height:90vh;max-height:90dvh;border:1px solid #cda7ad;border-radius:12px;padding:0;background:#fff9f5;color:#421c15;overflow:hidden}.tpj-document-viewer::backdrop{background:#24110dcc}.tpj-document-viewer>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid #e9c9ce}.tpj-document-viewer h2{font-size:18px;margin:0}.tpj-document-viewer button{min-height:34px;padding:5px 12px}.tpj-document-viewer iframe{display:block;width:100%;height:calc(100% - 58px);border:0;background:white}
+diff --git a/pages/cake-builder.html b/pages/cake-builder.html
+--- a/pages/cake-builder.html
++++ b/pages/cake-builder.html
+@@ -1302,7 +1302,7 @@
+             </div>
+ 
+         </label>
+-<label class="form-field step-one-field"><span>Requested pickup/delivery time</span><input id="requestedCakeTime" type="text" placeholder="1205pm" autocomplete="off" required><small>Enter a time such as 12:05 PM. Final timing is subject to approval.</small></label>
++
+ 
+     </div>
+ 
+@@ -6891,7 +6891,7 @@
+     </div>
+ <script src="../js/order-time.js?v=qa-20261104-1" defer></script>
+ <script
+-src="../js/cake-builder.js?v=finish-1"
++src="../js/cake-builder.js?v=shop-polish-20261105-1"
+ ></script>
+ 
+ <footer class="builder-service-footer"><p>Texas pickup and delivery only. We do not ship or deliver outside Texas.</p></footer>
+diff --git a/pages/orders-admin.html b/pages/orders-admin.html
+--- a/pages/orders-admin.html
++++ b/pages/orders-admin.html
+@@ -4,10 +4,10 @@
+ <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+ <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; connect-src https://tpj-orders-api.business-c3f.workers.dev; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+ <title>Owner dashboard | The Pastry Junkie</title>
+-<link rel="stylesheet" href="../owner-dashboard.css?v=qa-20261104-1">
+-<script src="../js/shop/catalog.js?v=ops-1" defer></script><script src="../js/order-terms.js?v=qa-20261104-1" defer></script>
+-<script src="../js/order-time.js?v=qa-20261104-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=finish-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script><script src="../js/handoff-receipts.js?v=qa-20261104-1" defer></script><script src="../js/product-labels.js?v=qa-20261104-1" defer></script><script src="../js/owner-quote.js?v=rush-1" defer></script>
+-<script src="../js/order-workflow-admin.js?v=rush-1" defer></script><script src="../js/menu-editor.js?v=finish-1" defer></script><script src="../js/order-tools.js?v=qa-20261104-1" defer></script><script src="../js/owner-dashboard.js?v=qa-20261104-1" defer></script>
++<link rel="stylesheet" href="../owner-dashboard.css?v=shop-polish-20261105-1">
++<script src="../js/shop/catalog.js?v=shop-polish-20261105-1" defer></script><script src="../js/order-terms.js?v=qa-20261104-1" defer></script>
++<script src="../js/order-time.js?v=qa-20261104-1" defer></script><script src="../js/order-changes.js?v=finish-1" defer></script><script src="../js/order-documents.js?v=shop-polish-20261105-1" defer></script><script src="../js/order-records.js?v=rush-1" defer></script><script src="../js/handoff-receipts.js?v=qa-20261104-1" defer></script><script src="../js/product-labels.js?v=qa-20261104-1" defer></script><script src="../js/owner-quote.js?v=rush-1" defer></script>
++<script src="../js/order-workflow-admin.js?v=shop-polish-20261105-1" defer></script><script src="../js/menu-editor.js?v=finish-1" defer></script><script src="../js/order-tools.js?v=qa-20261104-1" defer></script><script src="../js/owner-dashboard.js?v=shop-polish-20261105-1" defer></script>
+ </head><body>
+ <header><div><small>THE PASTRY JUNKIE</small><h1>Your business dashboard</h1></div><button id="lock" hidden>Lock dashboard</button></header>
+ <main>
+diff --git a/pages/shop.html b/pages/shop.html
+--- a/pages/shop.html
++++ b/pages/shop.html
+@@ -17,8 +17,8 @@
+     <title>Loaded Desserts | The Pastry Junkie</title>
+ 
+     <link rel="stylesheet" href="../style.css">
+-    <link rel="stylesheet"href="../shop.css?v=qa-20261104-1">
+-    <link rel="stylesheet"href="../shop-ordering.css?v=qa-20261104-1" >
++    <link rel="stylesheet"href="../shop.css?v=shop-polish-20261105-1">
++    <link rel="stylesheet"href="../shop-ordering.css?v=shop-polish-20261105-1" >
+ </head>
+ 
+ <body class="shop-page">
+@@ -1411,16 +1411,16 @@
+ 
+ <script src="../js/delivery.js?v=shop-1"></script>
+ 
+-<script src="../js/shop/catalog.js?v=shop-1"></script>
++<script src="../js/shop/catalog.js?v=shop-polish-20261105-1"></script>
+ 
+ <script src="../js/shop/model.js?v=qa-20261104-1"></script>
+ 
+ <script src="../js/shop/settings.js?v=orders-20261028-1"></script>
+ 
+-<script src="../js/shop/product-info.js?v=qa-20261104-1"></script>
++<script src="../js/shop/product-info.js?v=shop-polish-20261105-1"></script>
+ 
+ <script src="../js/order-time.js?v=qa-20261104-1"></script>
+-<script src="../js/shop/ui.js?v=qa-20261104-1"></script>
++<script src="../js/shop/ui.js?v=shop-polish-20261105-1"></script>
+ 
+ </body>
+ 
+diff --git a/server/order-worker.js b/server/order-worker.js
+--- a/server/order-worker.js
++++ b/server/order-worker.js
+@@ -389,10 +389,10 @@
+                 "Keep desserts level, protected from heat, and refrigerated when required. After handoff, you are responsible for proper transport, storage and handling. The Pastry Junkie is not responsible for damage caused by tilting, dropping, heat exposure, improper refrigeration, transportation or handling.",
+ 
+             delivery:
+-                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee; confirmed fees are never changed silently.",
++                "Someone must be available to receive delicate or temperature-sensitive desserts. If unavailable, we may attempt contact; another delivery attempt may require another fee. Delivery fees are non-refundable once the trip begins. Customer-caused delays do not automatically qualify for refunds. Address changes require review and may change the fee.",
+ 
+             pickup:
+-                "Pickup location and instructions are supplied with approval. Arrive within your confirmed pickup window; contact The Pastry Junkie if you are late. Requested dates and times are subject to approval and are reserved only after approval and payment."
++                "Requested dates and times are confirmed after approval and payment. Pickup details are provided with your approval."
+         };
+ 
+         /*
+@@ -3141,7 +3141,6 @@
+     fulfillment.date,
+     "12:00"
+   );
+-  if((await TPJBusiness.load(env)).config.dateRules?.some(r=>r.date===fulfillment.date)&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(fulfillment.time||''))throw tpjError('Choose a requested pickup/delivery time for this date.');
+ 
+   for (
+     const name of [
+@@ -4295,6 +4294,7 @@
+   if(b.priceConfirmed!==true && b.termsReviewed!==true)throw error('Confirm the final price and fulfillment details before issuing the approval.');
+   const fulfillment=localMS(b.fulfillmentDate,b.fulfillmentTime);
+   if(fulfillment<=Date.now())throw error('The approved fulfillment time must be in the future.');
++  if(TPJMenuTools.blocked(await tpjAvailability(env),b.fulfillmentDate,b.fulfillmentTime))throw error('That fulfillment date/time is blocked. Choose an available time before issuing approval.');
+   const days=(dateMS(b.fulfillmentDate)-dateMS(day()))/86400000,cake=row.source==='cake_builder';
+   const rush=cake&&(days<=7||b.rushOrder===true);
+   // The owner may adjust or waive the proposed rush fee before approval.
+@@ -4972,7 +4972,7 @@
+  function blocked(availability,date,time){
+   if((availability.blockedDates||[]).includes(date))return true;
+   const r=(availability.dateRules||[]).find(r=>r.date===date);
+-  return !!r?.windows?.some(w=>time>=w.start&&time<w.end);
++  return !!r?.windows?.some(w=>time ? time>=w.start&&time<w.end : w.start==='00:00'&&w.end==='24:00');
+  }
+ 
+  return {validate,apply,blocked,groups};
+diff --git a/shop-ordering.css b/shop-ordering.css
+--- a/shop-ordering.css
++++ b/shop-ordering.css
+@@ -1871,3 +1871,50 @@
+ .shop-dialog .shop-drizzle-top,.tpj-tray-dialog .shop-drizzle-top,.shop-dialog .shop-button-drizzle{display:none!important}
+ 
+ .shop-dialog.shop-product-dialog .shop-dialog-content{padding-top:24px}
++
++/* A single visible row uses the existing dessert cutouts and selection controls. */
++.tpj-box-scroll{max-width:100%;overflow-x:auto;padding:8px 3px 4px;scrollbar-width:thin}
++.shop-dialog.tpj-tray-dialog .tpj-tray-slots.tpj-real-box{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(var(--tray-columns),minmax(0,1fr));gap:6px;width:100%;min-width:calc(var(--tray-columns) * 145px + 42px);max-width:none;margin:0;padding:0 24px 8px;background:none;border-radius:0}
++.tpj-real-box::before{content:"";position:absolute;z-index:-1;inset:65px 0 58px;background:url("images/Shop/Boxes/white-bakery-tray.png") center/100% 100% no-repeat;pointer-events:none}
++.shop-dialog .tpj-real-box .tpj-tray-slot{position:relative;border:0;border-radius:0;background:transparent;min-width:0}
++.shop-dialog .tpj-real-box .tpj-tray-slot::before{content:"";position:absolute;z-index:-1;top:137px;left:4%;right:4%;height:43px;border:2px solid #f9f5f0;border-radius:50%;background:linear-gradient(#d2c7bb,#f6eee5);box-shadow:inset 0 4px 7px #58433329}
++.shop-dialog .tpj-treat-slots .tpj-tray-slot::before{content:none}
++.shop-dialog .tpj-real-box .tpj-slot-open{display:flex;flex-direction:column;justify-content:flex-start;min-height:240px;padding:0 3px 7px;border-radius:8px}
++.shop-dialog .tpj-real-box .tpj-slot-open img{display:block;position:relative;z-index:1;width:100%;height:182px;min-height:182px;object-fit:contain;object-position:center bottom}
++.shop-dialog .tpj-real-box .tpj-slot-plus{flex:none;display:grid;place-items:center;width:100%;height:182px;min-height:182px;padding-top:98px;background:none;color:#63372b;font-size:30px}
++.shop-dialog .tpj-real-box .tpj-slot-open>span:last-child{margin-top:22px;line-height:1.35;font-size:12px;white-space:normal;color:#421c15}
++.shop-dialog .tpj-real-box .tpj-slot-number{top:5px;left:6px;background:#fff9f2d9;border-radius:50%;padding:1px 5px;z-index:2}
++.shop-dialog .tpj-real-box .tpj-slot-remove{top:3px;right:2px;z-index:3}
++.shop-dialog .tpj-real-box .tpj-tray-slot.is-active{outline:2px solid #b51558;outline-offset:0;border-radius:8px}
++.tpj-closed-box{position:relative;width:min(420px,85%);height:115px;margin:45px auto 35px;background:linear-gradient(175deg,#fffdfa,#eee7df);border:1px solid #d3c7bd;border-radius:4px 4px 8px 8px;box-shadow:0 12px 14px #5132251a;transform:perspective(800px) rotateX(18deg)}
++.tpj-closed-box::before{content:"";position:absolute;inset:-20px -2px 18px;background:linear-gradient(165deg,#fffefa,#f1ebe4);border:1px solid #d4c9be;border-radius:5px;box-shadow:0 3px 3px #50352215}
++.tpj-closed-box::after{content:"";position:absolute;bottom:16px;left:calc(50% - 13px);width:26px;height:10px;border:1px solid #d4c9be;border-top:0;border-radius:0 0 12px 12px;background:#f9f4ed}
++/* Keep wide boxes scrollable without squeezing the existing editor or palette. */
++.tpj-pack-layout>div,.tpj-treat-layout>div{min-width:0}
++
++/* One editable review form, followed by the existing received message. */
++.shop-dialog.shop-checkout-dialog{width:min(1120px,calc(100% - 24px));background:#fff9f5;color:#421c15;border:1px solid #dca3b6;border-radius:20px}
++.shop-checkout-dialog .shop-dialog-header{display:flex;align-items:center;gap:18px;padding:20px 26px;border-bottom:2px solid #f0c3d1;background:#fff9f5}
++.shop-checkout-dialog .shop-dialog-header h2{flex:1;margin:0;font-size:clamp(23px,3vw,32px);color:#9b174a}
++.tpj-checkout-logo{width:86px;height:94px;object-fit:contain}
++.shop-checkout-dialog .shop-dialog-content{padding:24px 26px}
++.tpj-checkout-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.85fr);gap:28px;align-items:start}
++.tpj-checkout-fields,.tpj-checkout-summary{min-width:0}
++.tpj-checkout-grid h3{margin:0 0 16px;font-size:20px;color:#421c15}
++.shop-checkout-dialog .shop-field{margin:0 0 16px;font-size:14px;font-weight:650}
++.shop-checkout-dialog input:not([type=radio]):not([type=checkbox]),.shop-checkout-dialog select,.shop-checkout-dialog textarea{background:#fffefd;border:1px solid #d6acae;border-radius:8px;padding:11px;min-height:46px;color:#421c15;font-size:16px}
++.shop-checkout-dialog fieldset{border:1px solid #e6c5cb;border-radius:10px;margin:6px 0 20px;padding:14px}
++.shop-checkout-dialog legend{font-weight:700;padding:0 7px}
++.shop-checkout-dialog small{font-weight:400}
++.tpj-checkout-summary{padding:20px;background:#f9eee9;border:1px solid #e9c6d0;border-radius:13px}
++.tpj-summary-item{border-bottom:1px solid #e7ccd0;padding:0 0 12px;margin-bottom:14px}
++.tpj-summary-item h4{margin:8px 0;font-size:15px}.tpj-summary-item ul{padding-left:18px;font-size:13px;line-height:1.5}.tpj-summary-item p{font-size:14px}.tpj-summary-item strong{float:right}
++.tpj-summary-art{display:flex;align-items:end;overflow-x:auto;gap:4px;padding:4px 0 9px}.tpj-summary-art img{width:76px;height:88px;object-fit:contain;flex:none}
++.shop-checkout-dialog #shopFulfillmentTotal{white-space:pre-line;font-weight:700;font-size:16px;line-height:1.8}
++.shop-checkout-dialog .shop-notice{font-size:13px;line-height:1.6}
++.shop-checkout-dialog .shop-cart-actions{justify-content:space-between;padding-top:18px;border-top:1px solid #e6c5cb}
++.tpj-checkout-footer{margin:18px 0 0;text-align:center;font-size:12px;color:#77564e}
++.shop-checkout-dialog .shop-policies h4{font-size:14px;margin:12px 0 4px}.shop-checkout-dialog .shop-policies p{font-size:13px;line-height:1.6}
++@media(max-width:740px){.tpj-checkout-grid{grid-template-columns:minmax(0,1fr);gap:22px}.shop-checkout-dialog .shop-dialog-header{padding:14px;gap:10px}.tpj-checkout-logo{width:58px;height:68px}.shop-checkout-dialog .shop-dialog-content{padding:16px}.shop-checkout-dialog .shop-cart-actions{flex-wrap:wrap}.shop-checkout-dialog .shop-two-col{grid-template-columns:1fr}}
++
++.shop-dialog.tpj-tray-dialog .tpj-tray-slots.tpj-real-box:has(>.tpj-tray-slot:only-child){width:260px;max-width:100%;margin-inline:auto}
+diff --git a/shop.css b/shop.css
+--- a/shop.css
++++ b/shop.css
+@@ -4432,3 +4432,9 @@
+     paint-order: stroke fill;
+ }
+ .footer-texas{text-align:center;font-size:14px;margin:8px 20px 18px;color:inherit}
++
++/* Restore Shop navigation at every viewport, independently of homepage rules. */
++@media(min-width:1101px){body.shop-page .site-header{height:auto}body.shop-page .header-inner{height:auto;min-height:150px}body.shop-page #mainNavigation{position:static;inset:auto;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:18px;padding:0;opacity:1;visibility:visible;transform:none;overflow:visible;grid-column:2;grid-row:2}body.shop-page #mainNavigation a{width:auto;font-size:15px}body.shop-page #mobileMenuButton{display:none}}
++@media(max-width:1100px){body.shop-page #mobileMenuButton{display:block;grid-column:1;grid-row:1}body.shop-page #mainNavigation{position:fixed;inset:var(--header-height) 0 0;z-index:1001;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:18px;padding:24px;background:var(--dark-chocolate,#2b140e);overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(-15px)}body.shop-page #mainNavigation.is-open{opacity:1;visibility:visible;transform:none}body.shop-page #mainNavigation a{width:100%;font-size:22px}}
++/* Enlarge and lower the category heading groups within the existing artwork. */
++@media(min-width:1200px) and (hover:hover) and (pointer:fine){body.shop-page .cupcake-section .dessert-section-intro{width:84%;margin:490px auto 35px 0}body.shop-page .cupcake-section .dessert-section-title,body.shop-page .jar-section .jar-section-title,body.shop-page .apple-section .apple-section-title,body.shop-page .chocolate-collection .chocolate-collection-title{font-size:clamp(5.4rem,9.2vw,10rem)}body.shop-page .jar-section-intro,body.shop-page .apple-section-intro,body.shop-page .chocolate-collection-intro{padding-top:35px}}

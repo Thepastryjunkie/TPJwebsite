@@ -273,7 +273,8 @@ document.body.append(dialog);
 function openDialog(title, content) {
         dialog.classList.remove(
     "shop-product-dialog",
-    "tpj-tray-dialog"
+    "tpj-tray-dialog",
+    "shop-checkout-dialog"
 );
     if (!dialog.open) {
         returnFocus =
@@ -1115,17 +1116,7 @@ function renderDesktopTray() {
             ? C.half.prices
             : C.categories[category].prices;
 
-    const name = pack
-        ? 'Build your ' + ({
-            cupcakes: 'cupcake',
-            jars: 'jar',
-            apples: 'apple'
-        }[category]) + ' box'
-        : treats
-            ? 'Build your treat box'
-           : category === 'half'
-    ? 'Half & Half Cake'
-    : 'Signature Cake';
+    const name = pack || treats ? 'Build Your Box' : category === 'half' ? 'Half & Half Cake' : 'Signature Cake';
 
     $('#shopDialogTitle', dialog).textContent = name;
 
@@ -1464,19 +1455,15 @@ function sizeButtons() {
                 </div>
             `;
         } else {
-            const columns = treats
-                ? x.size === 6 ? 3 : 4
-                : x.size;
+            const columns = x.size;
 
             const tray = !x.size
                 ? `
-                    <p class="tpj-tray-hint">
-                        Choose a pack size to open your tray.
-                    </p>
+                    <div class="tpj-closed-box" aria-hidden="true"><span></span></div>
                 `
                 : `
-                    <div
-                        class="tpj-tray-slots ${
+                    <div class="tpj-box-scroll" tabindex="0" aria-label="Your box — scroll to see all spots"><div
+                        class="tpj-tray-slots tpj-real-box ${
                             treats ? 'tpj-treat-slots' : ''
                         }"
                         style="--tray-columns:${columns}"
@@ -1562,7 +1549,7 @@ function sizeButtons() {
                                 </div>
                             `;
                         }).join('')}
-                    </div>
+                    </div></div>
                 `;
 
             const palette = `
@@ -3445,11 +3432,31 @@ function selectedAllergensHTML(item) {
     const P = window.TPJShopProductInfo;
     const a = P.resolve(item, availability.profiles || {});
     const names = values => values.map(x=>P.labels[x] || x).join(', ');
-    return '<div class="shop-selected-allergens"><strong>'+esc(item.title || 'Selected product')+'</strong>'+
+    return '<div class="shop-selected-allergens"><strong>'+esc(safeQuote(item)?.title || item.title || 'Selected product')+'</strong>'+
         (a.contains.length?'<p>Contains: '+esc(names(a.contains))+'.</p>':'')+
         (a.mayContain.length?'<p>May contain: '+esc(names(a.mayContain))+'.</p>':'')+
         a.notes.map(n=>'<p>'+esc(n)+'</p>').join('')+
         (a.missing.length?'<p>Ingredient information needs review for '+esc(a.missing.join(', '))+'. Please contact us before ordering.</p>':'')+'</div>';
+}
+
+function selectedCareHTML(item) {
+    const quoted = safeQuote(item);
+    const instructions = window.TPJShopProductInfo.storage(item, availability.profiles || {});
+    return '<article><h4>'+esc(quoted?.title || item.title || 'Your item')+'</h4>'+
+        (instructions.length ? instructions.map(text => '<p>'+esc(text)+'</p>').join('') : '<p>Care instructions will be provided with your approval.</p>')+'</article>';
+}
+
+function checkoutSummary() {
+    return cart.map(item => {
+        const quoted = safeQuote(item);
+        if (!quoted) return '';
+        const flavors = item.category === 'half' ? [item.one,item.two] : item.mix && Object.keys(item.mix).length ? Object.entries(item.mix).flatMap(([id,n]) => Array(Math.min(Number(n),12)).fill(id)) : [item.flavor];
+        const images = item.category === 'chocolate' || item.category === 'custom' ? '' : flavors.filter(Boolean).map(id => {
+            const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
+            return src ? '<img src="'+esc(src)+'" alt="">' : '';
+        }).join('');
+        return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>':'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
+    }).join('');
 }
 
 function openCheckout() {
@@ -3502,16 +3509,12 @@ function openCheckout() {
     }
 
     openDialog(
-        "Request Your Order",
+        "Review Your Order Request",
 
         `
             <form id="shopCheckoutForm">
-                <p>
-                    Everyday sweets, made to order.
-                    At least ${C.preorderHours} hours’ notice is required.
-                    All times are Central time
-                    (Dallas–Fort Worth).
-                </p>
+                <div class="tpj-checkout-grid"><div class="tpj-checkout-fields">
+                <h3>Your Details</h3>
 
                 <div class="shop-two-col">
                     ${field(
@@ -3579,17 +3582,12 @@ function openCheckout() {
 
                         <input
                             name="time"
-                            type="text"
-                            data-tpj-time
-                            placeholder="12:05 PM"
-                            autocomplete="off"
+                            type="time"
+                            step="60"
                             required
                         >
 
-                        <small>
-                            Requested time is subject to
-                            review and approval.
-                        </small>
+
                     </label>
                 </div>
 
@@ -3650,14 +3648,7 @@ function openCheckout() {
                             required
                         >
 
-                        <small>
-                            Enter the estimated one-way
-                            delivery mileage, as in the
-                            Cake Builder. Final distance
-                            and fee are reviewed before
-                            approval. There is no maximum
-                            delivery radius.
-                        </small>
+
                     </label>
 
                     <label class="shop-mix-toggle">
@@ -3724,19 +3715,8 @@ function openCheckout() {
                             Handling and Storage
                         </summary>
 
-                        <p>
-                            Cheesecake jars and cheesecake
-                            apples: Keep Refrigerated.
-                            Keep cakes and fresh-fruit or
-                            dairy-topped desserts refrigerated
-                            until serving.
-                        </p>
-
-                        <p>
-                            ${esc(
-                                C.messages.handling
-                            )}
-                        </p>
+                        ${cart.map(selectedCareHTML).join('')}
+                        <p>${esc(C.messages.handling)}</p>
                     </details>
 
                     <details>
@@ -3750,7 +3730,7 @@ function openCheckout() {
                             )}
                         </p>
 
-                        <p>
+                        <p id="shopDeliveryNotice" hidden>
                             ${esc(
                                 C.messages.delivery
                             )}
@@ -3760,6 +3740,10 @@ function openCheckout() {
 
 
 
+                </div><aside class="tpj-checkout-summary"><h3>Your Order</h3>${checkoutSummary()}
+                    <p id="shopFulfillmentTotal" class="shop-live" aria-live="polite"></p>
+                    <p class="shop-notice">${esc(C.messages.request)}</p>
+                </aside></div>
                 <label
                     class="shop-honeypot"
                     aria-hidden="true"
@@ -3773,11 +3757,7 @@ function openCheckout() {
                     >
                 </label>
 
-                <p
-                    id="shopFulfillmentTotal"
-                    class="shop-live"
-                    aria-live="polite"
-                ></p>
+
 
                 <p
                     class="shop-error"
@@ -3795,12 +3775,15 @@ function openCheckout() {
                     <button
                         type="submit"
                         class="shop-button"
-                    >Review Order Request</button>
+                    >Submit Order Request</button>
                 </div>
+                <p class="tpj-checkout-footer">At least ${C.preorderHours} hours’ notice is required.</p>
             </form>
         `
     );
 
+    dialog.classList.add('shop-checkout-dialog');
+    $('.shop-dialog-header', dialog).insertAdjacentHTML('afterbegin','<img class="tpj-checkout-logo" src="../images/brand/TPJMascotNameApron.png" alt="The Pastry Junkie">');
     const form = $(
         "#shopCheckoutForm",
         dialog
@@ -3810,8 +3793,9 @@ function openCheckout() {
         const method =
             form.elements.method.value;
 
-        const delivery =
-            method === "delivery";
+        const delivery = method === "delivery";
+        $('#shopDeliveryNotice', form).hidden = !delivery;
+        form.elements.time.setCustomValidity('');
 
         $(
             "#shopDeliveryFields",
@@ -3867,7 +3851,7 @@ function openCheckout() {
         ).textContent =
             "Product subtotal " +
             M.money(subtotal()) +
-            " · " +
+            "\n" +
             (
                 delivery
                     ? "Estimated delivery " +
@@ -3875,7 +3859,7 @@ function openCheckout() {
                     : "Pickup " +
                       M.money(0)
             ) +
-            " · Estimated total " +
+            "\nEstimated total " +
             M.money(
                 subtotal() + fee
             );
@@ -3965,11 +3949,7 @@ function openCheckout() {
             payload.expectedTotalCents =
                 validated.totalCents;
 
-            showReview(
-                payload,
-                validated,
-                clone(values)
-            );
+            submitOrderRequest(payload, form.querySelector('button[type="submit"]'), $('#shopCheckoutError', form));
 
         } catch (error) {
             $(
@@ -3982,253 +3962,12 @@ function openCheckout() {
 }
 
 
-/* =====================================================
-   RESTORE CUSTOMER DETAILS WHEN EDITING REVIEW
-===================================================== */
-
-function restoreCheckout(values) {
-    openCheckout();
-
-    const form = $(
-        "#shopCheckoutForm",
-        dialog
-    );
-
-    for (
-        const [key, value]
-        of Object.entries(values)
-    ) {
-        const input =
-            form.elements.namedItem(key);
-
-        if (!input) {
-            continue;
-        }
-
-        if (
-            input instanceof RadioNodeList
-        ) {
-            input.value = value;
-
-        } else if (
-            input.type === "checkbox"
-        ) {
-            input.checked = true;
-
-        } else {
-            input.value = value;
-        }
-    }
-
-    form.dispatchEvent(
-        new Event("change")
-    );
-}
-
-
-/* =====================================================
-   FINAL REVIEW / REQUEST SUBMISSION
-===================================================== */
-
-function showReview(
-    payload,
-    order,
-    values
-) {
-    openDialog(
-        "Review Your Order Request",
-
-        `
-            <div class="shop-review">
-                ${order.items.map(item => `
-                    <article class="shop-cart-row">
-                        <h3>
-                            ${esc(item.title)}
-                        </h3>
-
-                                 <ul>
-                            ${customerDetails(item).map(
-                                detail => `
-                                    <li>
-                                        ${esc(detail)}
-                                    </li>
-                                `
-                            ).join("")}
-                        </ul>
-
-                        <p>
-                            Quantity ${item.quantity}
-                            ·
-                            ${M.money(
-                                item.totalCents
-                            )}
-                        </p>
-                    </article>
-                `).join("")}
-
-                <h3>
-                    Requested Fulfillment
-                </h3>
-
-                <p>
-                    ${esc(
-                        order.fulfillment.method === "pickup"
-                            ? "Pickup"
-                            : "Delivery"
-                    )}
-                    ·
-                    ${esc(
-                        order.fulfillment.date
-                    )}
-                    ·
-                    ${esc(
-                        order.fulfillment.time
-                    )}
-                    Central
-                </p>
-
-                ${
-                    order.fulfillment.method === "delivery"
-                        ? `
-                            <p>
-                                ${esc(
-                                    Object.values(
-                                        order.fulfillment.address
-                                    )
-                                    .filter(Boolean)
-                                    .join(", ")
-                                )}
-
-                                <br>
-
-                                Recipient:
-                                ${esc(
-                                    order.fulfillment.recipient.name
-                                )}
-                                ·
-                                ${esc(
-                                    order.fulfillment.recipient.phone
-                                )}
-
-                                <br>
-
-                                Estimated miles:
-                                ${order.fulfillment.miles}
-
-                                <br>
-
-                                Instructions:
-                                ${esc(
-                                    order.fulfillment.instructions
-                                )}
-                            </p>
-                        `
-                        : ""
-                }
-
-                <p>
-                    ${esc(
-                        order.customer.name
-                    )}
-
-                    <br>
-
-                    ${esc(
-                        order.customer.email
-                    )}
-
-                    <br>
-
-                    ${esc(
-                        order.customer.phone
-                    )}
-                </p>
-
-                ${
-                    order.notes
-                        ? `
-                            <p>
-                                Notes:
-                                ${esc(order.notes)}
-                            </p>
-                        `
-                        : ""
-                }
-
-                <p>
-                    Product subtotal:
-                    ${M.money(
-                        order.subtotalCents
-                    )}
-
-                    <br>
-
-                    ${
-                        order.fulfillment.method === "pickup"
-                            ? "Pickup"
-                            : "Estimated delivery fee"
-                    }:
-                    ${M.money(
-                        order.deliveryCents
-                    )}
-                </p>
-
-                <p class="shop-live">
-                    Estimated total:
-                    ${M.money(
-                        order.totalCents
-                    )}
-                </p>
-
-                <p class="shop-notice">
-                    ${esc(
-                        C.messages.request
-                    )}
-                </p>
-
-                <p
-                    class="shop-error"
-                    id="shopSubmitError"
-                    role="alert"
-                ></p>
-
-                <div class="shop-cart-actions">
-                    <button
-                        class="shop-button secondary"
-                        id="shopEditDetails"
-                    >Edit Details</button>
-
-                    <button
-                        class="shop-button"
-                        id="shopRequest"
-                    >Request Order</button>
-                </div>
-            </div>
-        `
-    );
-
-    $(
-        "#shopEditDetails",
-        dialog
-    ).onclick =
-        () => restoreCheckout(values);
-
-    const button = $(
-        "#shopRequest",
-        dialog
-    );
-
-    button.onclick = async () => {
-        button.disabled = true;
-
-        button.textContent =
-            "Sending Request…";
-
-        $(
-            "#shopSubmitError",
-            dialog
-        ).textContent = "";
-
+/* Submit the editable review form directly; preserve retry idempotency and the existing receipt message. */
+async function submitOrderRequest(payload, button, errorElement) {
+    if (button.disabled) return;
+    button.disabled = true;
+    button.textContent = 'Sending Request…';
+    errorElement.textContent = '';
         try {
             if (!online) {
                 throw new Error(
@@ -4342,18 +4081,13 @@ function showReview(
                 () => dialog.close();
 
         } catch (error) {
-            $(
-                "#shopSubmitError",
-                dialog
-            ).textContent =
-                error.message;
+            errorElement.textContent = error.message;
 
             button.disabled = false;
 
             button.textContent =
-                "Request Order";
+                "Submit Order Request";
         }
-    };
 }
 
 

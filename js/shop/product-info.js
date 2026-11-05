@@ -298,11 +298,34 @@
             return {contains:allergen(records.flatMap(r=>r.contains)),mayContain:allergen(records.flatMap(r=>r.mayContain)),notes:unique(records.flatMap(r=>r.notes)),missing:unique(missing)};
         }
 
+        function storage(item, profiles = {}) {
+            const rows = [];
+            const add = (key, category, flavor) => {
+                const profile = profiles[key];
+                const recipe = care[category]?.[flavor];
+                const text = profile?.reviewed && profile.refrigerated === true
+                    ? 'Keep refrigerated.'
+                    : recipe?.storage;
+                if (text) rows.push(text);
+            };
+            const category = item.category === 'half' ? 'cakes' : item.category;
+            if (category === 'custom') add('custom:'+item.product, category, item.product);
+            else if (category === 'chocolate') {
+                const pieces = item.mixing !== false && item.pieces?.length ? item.pieces : [{type:item.flavor}];
+                pieces.forEach(piece => add('treat:'+piece.type, 'chocolate', piece.type));
+            } else {
+                const flavors = item.category === 'half' ? [item.one,item.two] : item.mixing !== false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k => Number(item.mix[k]) > 0) : [item.flavor];
+                new Set(flavors.filter(Boolean)).forEach(flavor => add('product:'+category+':'+flavor, category, flavor));
+            }
+            return [...new Set(rows)];
+        }
+
         return {
             care,
             labels,
             combine,
             resolve,
+            storage,
 
             toppingNotice:
                 "May add milk, egg, wheat and soy depending on components.",
