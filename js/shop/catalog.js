@@ -203,6 +203,7 @@
             },
 
             toppings: {
+                 none: "No Topping",
                 strawberry: "Strawberry Crunch",
                 biscoff: "Biscoff Cookie Butter",
                 cookies: "Cookies & Cream",

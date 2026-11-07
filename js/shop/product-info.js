@@ -298,26 +298,46 @@
             return {contains:allergen(records.flatMap(r=>r.contains)),mayContain:allergen(records.flatMap(r=>r.mayContain)),notes:unique(records.flatMap(r=>r.notes)),missing:unique(missing)};
         }
 
-        function storage(item, profiles = {}) {
-            const rows = [];
-            const add = (key, category, flavor) => {
-                const profile = profiles[key];
-                const recipe = care[category]?.[flavor];
-                const text = profile?.reviewed && profile.refrigerated === true
-                    ? 'Keep refrigerated.'
-                    : recipe?.storage;
-                if (text) rows.push(text);
+        function storageEntries(item, profiles = {}) {
+            const rows = [], seen = new Set();
+            const treatNames = {
+                pretzel: "Chocolate-Covered Pretzels",
+                oreo: "Chocolate-Covered Oreos",
+                strawberry: "Chocolate-Covered Strawberries",
+                rice: "Chocolate-Covered Rice Krispie Treats"
             };
-            const category = item.category === 'half' ? 'cakes' : item.category;
-            if (category === 'custom') add('custom:'+item.product, category, item.product);
-            else if (category === 'chocolate') {
+            const categoryNames = {cupcakes: "Cupcakes", jars: "Cheesecake Jars", apples: "Cheesecake Apples", cakes: "Cake"};
+            const add = (key, category, flavor) => {
+                if (seen.has(key)) return;
+                seen.add(key);
+                const profile = profiles[key], recipe = care[category]?.[flavor];
+                const text = profile?.reviewed && profile.refrigerated === true
+                    ? "Keep refrigerated." : recipe?.storage;
+                const catalog = typeof window !== "undefined" ? window.TPJShopCatalog : null;
+                const flavorName = catalog?.flavors?.[flavor] || flavor;
+                const label = category === "chocolate" ? treatNames[flavor]
+                    : category === "custom" ? item.title || "Your dessert"
+                    : flavorName + " " + (categoryNames[category] || "");
+                if (text) rows.push({label, text});
+            };
+            const category = item.category === "half" ? "cakes" : item.category;
+            if (category === "custom") add("custom:"+item.product, category, item.product);
+            else if (category === "chocolate") {
                 const pieces = item.mixing !== false && item.pieces?.length ? item.pieces : [{type:item.flavor}];
-                pieces.forEach(piece => add('treat:'+piece.type, 'chocolate', piece.type));
+                pieces.forEach(piece => add("treat:"+piece.type, "chocolate", piece.type));
+                if (seen.has("treat:strawberry") && seen.size > 1) rows.unshift({
+                    label: "Storing this mixed box",
+                    text: "Keep the whole box refrigerated because it contains fresh strawberries. The cool, dry storage instructions below apply only when those treats are stored separately."
+                });
             } else {
-                const flavors = item.category === 'half' ? [item.one,item.two] : item.mixing !== false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k => Number(item.mix[k]) > 0) : [item.flavor];
-                new Set(flavors.filter(Boolean)).forEach(flavor => add('product:'+category+':'+flavor, category, flavor));
+                const flavors = item.category === "half" ? [item.one,item.two] : item.mixing !== false && item.mix && Object.keys(item.mix).length ? Object.keys(item.mix).filter(k => Number(item.mix[k]) > 0) : [item.flavor];
+                new Set(flavors.filter(Boolean)).forEach(flavor => add("product:"+category+":"+flavor, category, flavor));
             }
-            return [...new Set(rows)];
+            return rows;
+        }
+
+        function storage(item, profiles = {}) {
+            return [...new Set(storageEntries(item, profiles).map(row => row.text))];
         }
 
         return {
@@ -326,6 +346,7 @@
             combine,
             resolve,
             storage,
+            storageEntries,
 
             toppingNotice:
                 "May add milk, egg, wheat and soy depending on components.",

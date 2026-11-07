@@ -648,19 +648,19 @@ const SHOP_COPY = {
     chocolate: {
         strawberry: [
             "Fresh strawberries dressed for dessert.",
-            "Fresh strawberries dipped in your choice of milk, white, or dark chocolate, then finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping."
+            "Fresh strawberries dipped in your choice of milk, white, or dark chocolate, then finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping—or choose No Topping."
         ],
         oreo: [
             "Classic Oreos dipped, drizzled, and loaded.",
-            "Oreo cookies coated in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping."
+            "Oreo cookies coated in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping—or choose No Topping."
         ],
         pretzel: [
             "Salty crunch covered in loaded chocolate.",
-            "Crisp pretzel rods dipped in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping."
+            "Crisp pretzel rods dipped in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping—or choose No Topping."
         ],
         rice: [
             "Crispy, chewy, chocolate-covered goodness.",
-            "Classic crispy marshmallow treats coated in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping."
+            "Classic crispy marshmallow treats coated in your choice of milk, white, or dark chocolate and finished with your choice of Strawberry Crunch, Biscoff Cookie Butter, Cookies & Cream, or Birthday Cake topping—or choose No Topping."
         ]
     }
 };
@@ -1084,7 +1084,7 @@ function chocolatePieceArt(id, piece) {
         `Chocolate-${variant}-${kind}.png`
     );
 
-    return {src, finishedFlavor};
+    return {src, finishedFlavor, noTopping: piece?.topping === 'none'};
 }
 
 function renderDesktopTray() {
@@ -1227,7 +1227,7 @@ function art(cat, id, piece = null) {
 
         if (piece && !piece.base) {
             note = 'White chocolate preview';
-        } else if (piece?.topping && !finishedFlavor) {
+        } else if (piece?.topping && piece.topping !== 'none' && !finishedFlavor) {
             note = 'Base preview';
         }
 
@@ -3443,9 +3443,9 @@ function selectedAllergensHTML(item) {
 
 function selectedCareHTML(item) {
     const quoted = safeQuote(item);
-    const instructions = window.TPJShopProductInfo.storage(item, availability.profiles || {});
+    const instructions = window.TPJShopProductInfo.storageEntries(item, availability.profiles || {});
     return '<article><h4>'+esc(quoted?.title || item.title || 'Your item')+'</h4>'+
-        (instructions.length ? instructions.map(text => '<p>'+esc(text)+'</p>').join('') : '<p>Care instructions will be provided with your approval.</p>')+'</article>';
+        (instructions.length ? instructions.map(row => '<p><strong>'+esc(row.label)+':</strong> '+esc(row.text)+'</p>').join('') : '<p>Care instructions will be provided with your approval.</p>')+'</article>';
 }
 
 function checkoutSummary() {
@@ -3460,7 +3460,7 @@ function checkoutSummary() {
             const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
             return src ? '<img src="'+esc(src)+'" alt="">' : '';
         }).join('');
-        const photoNote = treatImages.some(image => !image.finishedFlavor)
+        const photoNote = treatImages.some(image => !image.finishedFlavor && !image.noTopping)
             ? '<small>Where a topping photo isn’t available, the image shows the selected chocolate base.</small>' : '';
         return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>'+photoNote:'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
     }).join('');

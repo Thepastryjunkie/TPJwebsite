@@ -1246,7 +1246,7 @@ const subtotalCents =
                     C.chocolate.toppings
                 )
             ) {
-                targets.push([
+                if (id !== "none") targets.push([
                     "topping:" + id,
                     name + " topping"
                 ]);

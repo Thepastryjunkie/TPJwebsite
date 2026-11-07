@@ -255,6 +255,7 @@
             },
 
             toppings: {
+                none: "No Topping",
                 strawberry: "Strawberry Crunch",
                 biscoff: "Biscoff Cookie Butter",
                 cookies: "Cookies & Cream",
@@ -1685,7 +1686,7 @@ const subtotalCents =
                     C.chocolate.toppings
                 )
             ) {
-                targets.push([
+                if (id !== "none") targets.push([
                     "topping:" + id,
                     name + " topping"
                 ]);
@@ -3358,6 +3359,7 @@ async function tpjImportCake(data, env) {
       customer,
       fulfillment,
       inquirySummary: summary,
+      cupcakePreviews: files.filter(file => file.role === "Cupcake Design Preview").map(file => ({url:file.url, name:file.name, driveFileId:file.driveFileId})),
       estimatedTotalCents: estimated,
       driveFolder,
       businessName: env.BUSINESS_NAME,
@@ -4738,7 +4740,7 @@ const TPJDisplay = (() => {
         "(id,request_id,event_key,recipient_type,payload_json,next_attempt_at,created_at) " +
         "SELECT ?,r.id,'owner_new_request','owner'," +
         "json_object('event','owner_new_request','source',r.source,'requestId',r.id," +
-        "'reference',p.reference,'footprint',p.footprint,'sandbox',json(?)),?,? " +
+        "'reference',p.reference,'footprint',p.footprint,'cupcakePreviews',json(COALESCE((SELECT json_group_array(json_object('driveFileId',drive_file_id,'url',private_url,'name',name)) FROM tpj_files WHERE request_id=r.id AND role='Cupcake Design Preview'),'[]')),'sandbox',json(?)),?,? " +
         "FROM tpj_requests r JOIN tpj_display_references p ON p.request_id=r.id WHERE r.id=?",
         crypto.randomUUID(),
         JSON.stringify(
@@ -4877,11 +4879,11 @@ const TPJBusiness=(()=>{
   const archive=url.searchParams.get('archive')||'',unread=url.searchParams.get('unread')==='1',day=TPJWorkflow.plan.day();
   const records=mode==='orders'?" AND archived_at IS NULL AND stage!='canceled' AND (stage!='fulfilled' OR julianday(fulfilled_since)>julianday('now','-3 days'))":'';
   const archiveFilter=archive==='archived'?' AND archived_at IS NOT NULL':archive==='not_archived'?' AND archived_at IS NULL':'';
-  const extra=records+archiveFilter+(unread?' AND is_read=0':'')+" AND (?=0 OR stage NOT IN ('fulfilled','canceled')) AND (?=0 OR stage='new' OR status IN ('payment_review','cancellation_requested') OR (balance_due IS NOT NULL AND balance_due<=?) OR cancellation_attention=1 OR failed_email=1 OR expired_approval=1 OR (fulfillment_date<? AND stage NOT IN ('fulfilled','canceled')))";
+  const extra=records+archiveFilter+(unread?' AND is_read=0':'')+" AND (?=0 OR (archived_at IS NULL AND stage NOT IN ('fulfilled','canceled'))) AND (?=0 OR (archived_at IS NULL AND (stage='new' OR status IN ('payment_review','cancellation_requested') OR (balance_due IS NOT NULL AND balance_due<=?) OR cancellation_attention=1 OR failed_email=1 OR expired_approval=1 OR (fulfillment_date<? AND stage NOT IN ('fulfilled','canceled')))))";
   const args=[source,source,stage,stage,from,received&&from?new Date(TPJWorkflow.plan.localMS(from,'00:00')).toISOString():from,to,received&&to?new Date(TPJWorkflow.plan.localMS(TPJWorkflow.plan.shiftDay(to,1),'00:00')).toISOString():to,q,'%'+q.toLowerCase()+'%',active?1:0,attention?1:0,day,day];
   const rows=await all(e,'SELECT * FROM ('+sql+')'+condition+extra+(received?' ORDER BY created_at DESC,id DESC':' ORDER BY fulfillment_date,created_at,id')+' LIMIT 51 OFFSET ?',...args,offset);
   const counts=await all(e,'SELECT stage,COUNT(*) count FROM ('+sql+') WHERE 1=1'+records+archiveFilter+' GROUP BY stage');
-  return tpjJSON({ok:true,orders:rows.slice(0,50).map(r=>({...tpjRecord(r),reference:r.reference,footprint:r.footprint,stage:r.stage,read:!!r.is_read,archivedAt:r.archived_at,isTest:!!r.is_test,attentionReasons:[r.stage==='new'?'New inquiry':null,r.status==='payment_review'?'Payment review required':null,r.status==='cancellation_requested'||r.cancellation_attention?'Cancellation requested':null,r.balance_due&&r.balance_due<=day?'Balance due / overdue':null,r.failed_email?'Customer email failed':null,r.expired_approval?'Unpaid approval expired':null,r.fulfillment_date<day&&!['fulfilled','canceled'].includes(r.stage)?'Fulfillment date passed; order unfinished':null].filter(Boolean),fullyPaid:!!r.fully_paid,balanceDue:r.balance_due})),nextOffset:rows.length>50?offset+50:null,counts:Object.fromEntries(counts.map(r=>[r.stage,r.count]))});
+  return tpjJSON({ok:true,orders:rows.slice(0,50).map(r=>({...tpjRecord(r),reference:r.reference,footprint:r.footprint,stage:r.stage,read:!!r.is_read,archivedAt:r.archived_at,isTest:!!r.is_test,attentionReasons:r.archived_at?[]:[r.stage==='new'?'New inquiry':null,r.status==='payment_review'?'Payment review required':null,r.status==='cancellation_requested'||r.cancellation_attention?'Cancellation requested':null,r.balance_due&&r.balance_due<=day?'Balance due / overdue':null,r.failed_email?'Customer email failed':null,r.expired_approval?'Unpaid approval expired':null,r.fulfillment_date<day&&!['fulfilled','canceled'].includes(r.stage)?'Fulfillment date passed; order unfinished':null].filter(Boolean),fullyPaid:!!r.fully_paid,balanceDue:r.balance_due})),nextOffset:rows.length>50?offset+50:null,counts:Object.fromEntries(counts.map(r=>[r.stage,r.count]))});
  }
  async function packet(e,id){
   const row=await get(e,`SELECT r.*,d.reference,d.footprint,${stageSQL} AS stage FROM tpj_requests r LEFT JOIN tpj_display_references d ON d.request_id=r.id LEFT JOIN tpj_fulfillments f ON f.request_id=r.id LEFT JOIN tpj_order_management m ON m.request_id=r.id WHERE r.id=?`,id);if(!row)fail('Order not found.',404);

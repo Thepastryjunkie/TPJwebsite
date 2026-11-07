@@ -486,6 +486,7 @@ sculptedPiecesDetails: "",
     preferredContactMethod: "",
 
     fulfillmentMethod: "",
+    fulfillmentTime: "",
     deliveryStreet: "",
     deliveryCity: "",
     deliveryState: "Texas",
@@ -10764,6 +10765,147 @@ updateDecorationVisibility();
    STEP NAVIGATION
 ========================================= */
 const stepResetSnapshots = new Map();
+const stepResetStateKeys = {
+    "1": [
+        "eventDate",
+        "fulfillmentDate",
+        "guestCount"
+    ],
+    "2": [
+        "stepTwoConfirmed",
+        "cakeShape",
+        "cakeProductId",
+        "bentoCupcakeCount",
+        "isTall",
+        "numberLetterKind",
+        "numberCakeFirst",
+        "numberCakeSecond",
+        "letterCakeText",
+        "cakeCoverage",
+        "cakeBoardStyle",
+        "cakeBoardColor",
+        "matchBoardToCakePalette",
+        "matchedBoardColor",
+        "matchedBoardUsesCustomShade",
+        "customMatchedBoardColor"
+    ],
+    "3": [
+        "cakeFlavor",
+        "customCakeFlavor",
+        "buttercreamStyle",
+        "buttercreamFlavor",
+        "cakeFilling",
+        "customFilling",
+        "premiumFillings"
+    ],
+    "4": [
+        "fondantEnabled",
+        "numberLetterStyle",
+        "mainCakeColor",
+        "customMainColor",
+        "mainCakeUsesCustomShade",
+        "accentColor",
+        "cakeBorderStyle",
+        "ruffleUnderlay",
+        "cakeBorderPlacement",
+        "cakeBorderColor",
+        "cakeBorderUsesCustomShade",
+        "customCakeBorderColor",
+        "cakeBorderShadeIntensity",
+        "cakeBorderBottomColor",
+        "cakeBorderBottomUsesCustomShade",
+        "customCakeBorderBottomColor",
+        "cakeBorderBottomShadeIntensity",
+        "cakeBorderSprinkles",
+        "cakeBorderSprinklePlacement",
+        "cakeBorderSprinkleColor",
+        "finishAccentOne",
+        "finishAccentTwo",
+        "cakeFinish",
+        "tierTopColor",
+        "tierBottomColor",
+        "characterOneColor",
+        "characterTwoColor",
+        "decorations",
+        "decorationQuantities",
+        "flowerSource",
+        "flowerMaterial",
+        "bowColor",
+        "butterflyColor",
+        "macaronColor",
+        "cherryColor",
+        "cherryGlitter",
+        "dripChocolateType",
+        "whiteChocolateColored",
+        "whiteChocolateDripColor",
+        "dripColor",
+        "pearlColor",
+        "flowerColor",
+        "flowerType",
+        "customFlowerType",
+        "metallicLeafType",
+        "cakeTopperEnabled",
+        "topperType",
+        "topperPrice",
+        "topperWording",
+        "edibleImageEnabled",
+        "edibleImageQuantity",
+        "edibleImages",
+        "edibleImageFile",
+        "edibleImageUrl",
+        "edibleImagePlacement",
+        "edibleImageTier",
+        "edibleImageShape",
+        "edibleImageScale",
+        "edibleImageX",
+        "edibleImageY",
+        "edibleImageRotation"
+    ],
+    "5": [
+        "extraCustomization",
+        "extras",
+        "quantityExtras"
+    ],
+    "6": [
+        "inspirationFiles"
+    ],
+    "7": [
+        "occasion",
+        "otherOccasion",
+        "toyFigurineEnabled",
+        "toyFigurineDetails",
+        "sculptedPiecesEnabled",
+        "sculptedPiecesDetails",
+        "cakeNameText",
+        "cakeAgeText",
+        "cakeWording",
+        "cakeTheme",
+        "cakeVision",
+        "mustHaveDetails",
+        "doNotInclude",
+        "customerName",
+        "customerPhone",
+        "customerEmail",
+        "preferredContactMethod",
+        "fulfillmentMethod",
+        "fulfillmentTime",
+        "deliveryStreet",
+        "deliveryCity",
+        "deliveryState",
+        "deliveryZip",
+        "deliveryMiles",
+        "customerBudget"
+    ],
+    "8": []
+};
+const cupcakeResetStateKeys = ["cupcakeLinerStyle", "cupcakeFrostingStyle", "cupcakeLinerColor", "cupcakeFrostingColor", "cupcakeFrostingUsesCustomShade", "customCupcakeFrostingColor"];
+function resetStateKeysForStep(stepNumber) {
+    const keys = [...(stepResetStateKeys[stepNumber] || [])];
+    const studio = getElement("#cupcakeStudio");
+    const owner = studio?.closest(".builder-step")?.dataset.step;
+    if (Number(owner) === stepNumber) keys.push(...cupcakeResetStateKeys);
+    return keys;
+}
 
 
 function captureStepResetSnapshot(stepNumber) {
@@ -10781,6 +10923,9 @@ function captureStepResetSnapshot(stepNumber) {
         )
     ).map((control) => ({
         control,
+        id: control.id,
+        name: control.name,
+        type: control.type,
         value: control.value,
         checked:
             typeof control.checked === "boolean"
@@ -11442,6 +11587,10 @@ function validateStepSix() {
 
 
 function validateStepSeven() {
+    // Read the displayed customer details, including browser autofill.
+    for (const key of ["customerName", "customerPhone", "customerEmail", "fulfillmentTime"])
+        builderState[key] = getElement("#"+key)?.value || "";
+
    builderState.occasion =
     getElement(
         "#occasionText"
@@ -13507,6 +13656,12 @@ function calculateDeliveryFee(miles) {
 
 
 function updateDeliveryFieldsVisibility() {
+    const timeField = getElement("#cakeFulfillmentTimeField");
+    if (timeField) timeField.hidden = !builderState.fulfillmentMethod;
+    const timeLabel = getElement("#cakeFulfillmentTimeLabel");
+    if (timeLabel) timeLabel.textContent = builderState.fulfillmentMethod === "Delivery"
+        ? "Requested delivery time (optional)" : "Requested pickup time (optional)";
+
     const isDelivery =
         builderState.fulfillmentMethod ===
         "Delivery";
@@ -14390,7 +14545,7 @@ const quantityLabel =
 
     setText(
         "#reviewFulfillmentMethod",
-        fulfillmentSummary
+        fulfillmentSummary + (builderState.fulfillmentTime ? " · " + formatRequestedCakeTime() : "")
     );
 
     setText(
@@ -14587,6 +14742,13 @@ function readSubmissionFileAsDataUrl(file) {
 }
 
 
+function formatRequestedCakeTime() {
+    const value = builderState.fulfillmentTime;
+    if (!value) return "";
+    const [hour, minute] = value.split(":").map(Number);
+    return `${hour % 12 || 12}:${String(minute).padStart(2, "0")} ${hour >= 12 ? "PM" : "AM"}`;
+}
+
 function createSerializableBuilderState() {
     return JSON.parse(
         JSON.stringify(
@@ -14660,7 +14822,7 @@ function getSubmissionAcknowledgments() {
             termsAccepted,
 
         termsUrl:
-            "https://www.thepastryjunkie.com/pages/terms.html",
+            "https://www.thepastryjunkie.com/pages/terms.html#cake",
 
         termsAcceptedAt:
             termsAccepted
@@ -14672,6 +14834,14 @@ function getSubmissionAcknowledgments() {
 
 async function collectSubmissionFiles() {
     const files = [];
+    const includesCupcakes = getSelectedCakeProduct().shape === "cupcakes" ||
+        builderState.cakeProductId === "heart-5-bento" ||
+        builderState.extras.some(extra => /^\d+ Gourmet Cupcakes$/.test(extra.name));
+    if (includesCupcakes) {
+        const preview = await renderCupcakeDesignCanvas();
+        files.push({role: "Cupcake Design Preview", name: "cupcake-design-preview.png",
+            mimeType: "image/png", dataUrl: preview.toDataURL("image/png")});
+    }
 
     for (
         let index = 0;
@@ -14835,6 +15005,7 @@ function buildReadableInquirySummary() {
     add("Email", builderState.customerEmail);
     add("Phone", builderState.customerPhone);
     add("Preferred contact", builderState.preferredContactMethod);
+    add("Requested " + (builderState.fulfillmentMethod === "Delivery" ? "delivery" : "pickup") + " time", formatRequestedCakeTime());
 
     document.querySelectorAll(
         ".review-section"
@@ -15512,174 +15683,23 @@ function resetBuilder() {
     }
 
 
-    /*
-        Revoke any temporary image URLs
-        currently being used before
-        restoring this step.
-    */
-
-    builderState.inspirationFiles.forEach(
-        (upload) => {
-            if (upload?.previewUrl) {
-                URL.revokeObjectURL(
-                    upload.previewUrl
-                );
+    const keys = resetStateKeysForStep(stepNumber);
+    for (const key of keys) {
+        if (key === "inspirationFiles" || key === "edibleImages") {
+            for (const upload of builderState[key]) {
+                const url = upload?.previewUrl || upload?.url;
+                if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
             }
         }
-    );
-
-    builderState.edibleImages.forEach(
-        (upload) => {
-            if (upload?.url) {
-                URL.revokeObjectURL(
-                    upload.url
-                );
-            }
-        }
-    );
-
-
-    /*
-        Keep navigation unlocked.
-        Resetting a page should NOT
-        send the customer backward.
-    */
-
-    const highestUnlockedStep =
-        builderState.highestUnlockedStep;
-
-const preservedCakeSetup =
-    stepNumber === 4
-        ? {
-            cakeShape:
-                builderState.cakeShape,
-
-            cakeProductId:
-                builderState.cakeProductId,
-
-            bentoCupcakeCount:
-                builderState.bentoCupcakeCount,
-
-            isTall:
-                builderState.isTall,
-
-            numberLetterKind:
-                builderState.numberLetterKind,
-
-            numberCakeFirst:
-                builderState.numberCakeFirst,
-
-            numberCakeSecond:
-                builderState.numberCakeSecond,
-
-            letterCakeText:
-                builderState.letterCakeText,
-
-            cakeCoverage:
-                builderState.cakeCoverage,
-
-            cakeBoardStyle:
-                builderState.cakeBoardStyle,
-
-            cakeBoardColor:
-                builderState.cakeBoardColor,
-
-            matchBoardToCakePalette:
-                builderState
-                    .matchBoardToCakePalette,
-
-            matchedBoardColor:
-                builderState.matchedBoardColor,
-
-            matchedBoardUsesCustomShade:
-                builderState
-                    .matchedBoardUsesCustomShade,
-
-            customMatchedBoardColor:
-                builderState
-                    .customMatchedBoardColor
-        }
-        : null;
-    /*
-        Restore the builder data to
-        how it looked when this page
-        was entered.
-    */
-
-    const restoredState =
-        structuredClone(
-            snapshot.state
-        );
-
-    Object.keys(
-        builderState
-    ).forEach((key) => {
-        delete builderState[key];
-    });
-
-Object.assign(
-    builderState,
-    restoredState
-);
-
-if (preservedCakeSetup) {
-    Object.assign(
-        builderState,
-        preservedCakeSetup
-    );
-}
-
-builderState.currentStep =
-    stepNumber;
-
-    builderState.highestUnlockedStep =
-        highestUnlockedStep;
-
-
-    /*
-        Re-create image URLs from any
-        files that existed when the
-        page was entered.
-    */
-
-    builderState.inspirationFiles =
-        builderState.inspirationFiles.map(
-            (upload) => {
-                if (!upload?.file) {
-                    return upload;
-                }
-
-                return {
-                    ...upload,
-                    previewUrl:
-                        URL.createObjectURL(
-                            upload.file
-                        )
-                };
-            }
-        );
-
-
-    builderState.edibleImages =
-        builderState.edibleImages.map(
-            (upload) => {
-                if (!upload?.file) {
-                    return upload;
-                }
-
-                return {
-                    ...upload,
-                    url:
-                        URL.createObjectURL(
-                            upload.file
-                        )
-                };
-            }
-        );
-
-
-    syncPrimaryEdibleImage();
-
+        builderState[key] = structuredClone(snapshot.state[key]);
+    }
+    if (keys.includes("inspirationFiles")) builderState.inspirationFiles = builderState.inspirationFiles.map(upload =>
+        upload?.file ? {...upload, previewUrl:URL.createObjectURL(upload.file)} : upload);
+    if (keys.includes("edibleImages")) {
+        builderState.edibleImages = builderState.edibleImages.map(upload =>
+            upload?.file ? {...upload, url:URL.createObjectURL(upload.file)} : upload);
+        syncPrimaryEdibleImage();
+    }
 
     /*
         Restore the actual fields,
@@ -15689,17 +15709,16 @@ builderState.currentStep =
 
     snapshot.controls.forEach(
         ({
-            control,
-            value,
+            control: savedControl,
+            id, name, type, value,
             checked
         }) => {
-            if (
-                !document.contains(
-                    control
-                )
-            ) {
-                return;
-            }
+            const step = getElement(`.builder-step[data-step="${stepNumber}"]`);
+            const control = document.contains(savedControl) && step?.contains(savedControl)
+                ? savedControl : Array.from(step?.querySelectorAll("input, select, textarea") || []).find(field =>
+                    id ? field.id === id : name && field.name === name && field.type === type &&
+                    (!["radio", "checkbox"].includes(type) || field.value === value));
+            if (!control) return;
 
             if (
                 control.type === "file"
@@ -15765,6 +15784,8 @@ builderState.currentStep =
     renderInspirationPreviews();
 
     showValidationMessage("");
+    updateSelectedCardStates();
+    rememberBuilderFields();
 
     renderCakePreview();
 
@@ -18573,6 +18594,7 @@ const simpleFieldBindings = {
     customerName: "customerName",
     customerPhone: "customerPhone",
     customerEmail: "customerEmail",
+    fulfillmentTime: "fulfillmentTime",
 
     deliveryStreet: "deliveryStreet",
     deliveryCity: "deliveryCity",
