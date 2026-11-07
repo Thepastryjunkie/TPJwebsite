@@ -3445,11 +3445,47 @@ function selectedAllergensHTML(item) {
         (a.missing.length?'<p>Ingredient information needs review for '+esc(a.missing.join(', '))+'. Please contact us before ordering.</p>':'')+'</div>';
 }
 
-function selectedCareHTML(item) {
-    const quoted = safeQuote(item);
-    const instructions = window.TPJShopProductInfo.storageEntries(item, availability.profiles || {});
-    return '<article><h4>'+esc(quoted?.title || item.title || 'Your item')+'</h4>'+
-        (instructions.length ? instructions.map(row => '<p><strong>'+esc(row.label)+':</strong> '+esc(row.text)+'</p>').join('') : '<p>Care instructions will be provided with your approval.</p>')+'</article>';
+function selectedCareHTML(items) {
+    const groups = new Map();
+    const allLabels = new Set();
+    const missing = [];
+
+    items.forEach(item => {
+        const rows = window.TPJShopProductInfo.storageEntries(
+            item, availability.profiles || {}
+        );
+
+        if (!rows.length) {
+            missing.push(safeQuote(item)?.title || item.title || 'Your item');
+        }
+
+        rows.forEach(({label, text}) => {
+            allLabels.add(label);
+
+            String(text).split(/(?<=[.!?])\s+(?=[A-Z])/).forEach(sentence => {
+                sentence = sentence.trim();
+                if (!sentence) return;
+
+                if (!groups.has(sentence)) {
+                    groups.set(sentence, new Set());
+                }
+
+                groups.get(sentence).add(label);
+            });
+        });
+    });
+
+    return [...groups].map(([text, labels]) => {
+        const heading = !missing.length && labels.size === allLabels.size
+            ? 'All selected desserts'
+            : [...labels].join(', ');
+
+        return '<p><strong>' + esc(heading) + ':</strong> ' +
+            esc(text) + '</p>';
+    }).join('') + (missing.length
+        ? '<p><strong>' + esc([...new Set(missing)].join(', ')) +
+          ':</strong> Care instructions will be provided with your approval.</p>'
+        : '');
 }
 
 function checkoutSummary() {
@@ -3659,7 +3695,7 @@ function openCheckout() {
                             Handling and Storage
                         </summary>
 
-                        ${cart.map(selectedCareHTML).join('')}
+                        ${selectedCareHTML(cart)}
                         <p>${esc(C.messages.handling)}</p>
                     </details>
 
