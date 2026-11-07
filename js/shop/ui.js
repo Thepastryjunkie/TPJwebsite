@@ -1461,7 +1461,11 @@ function sizeButtons() {
 
             const tray = !x.size
                 ? `
-                    <div class="tpj-closed-box" aria-hidden="true"><span></span></div>
+                    <img
+    src="../images/Shop/Boxes/white-bakery-box-open.png"
+    alt="Empty open bakery box"
+    style="display:block;width:min(420px,85%);height:auto;margin:24px auto;"
+>
                 `
                 : `
                     <div class="tpj-box-scroll" tabindex="0" aria-label="Your box — scroll to see all spots"><div
