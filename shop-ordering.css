@@ -1918,3 +1918,14 @@ body.shop-page *::-webkit-scrollbar-corner {
 @media(max-width:740px){.tpj-checkout-grid{grid-template-columns:minmax(0,1fr);gap:22px}.shop-checkout-dialog .shop-dialog-header{padding:14px;gap:10px}.tpj-checkout-logo{width:58px;height:68px}.shop-checkout-dialog .shop-dialog-content{padding:16px}.shop-checkout-dialog .shop-cart-actions{flex-wrap:wrap}.shop-checkout-dialog .shop-two-col{grid-template-columns:1fr}}
 
 .shop-dialog.tpj-tray-dialog .tpj-tray-slots.tpj-real-box:has(>.tpj-tray-slot:only-child){width:260px;max-width:100%;margin-inline:auto}
+/* Smaller empty opening for a single-item box */
+.shop-dialog .tpj-real-box:not(.tpj-treat-slots)
+> .tpj-tray-slot:only-child:has(.tpj-slot-plus)::before {
+    width: 110px;
+    max-width: 65%;
+    height: 30px;
+    top: 125px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+}
