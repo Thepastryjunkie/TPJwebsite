@@ -1929,3 +1929,7 @@ body.shop-page *::-webkit-scrollbar-corner {
     right: auto;
     transform: translateX(-50%);
 }
+/* Remove the oval inserts; keep the existing plus signs. */
+.shop-dialog .tpj-real-box .tpj-tray-slot::before {
+    content: none !important;
+}
