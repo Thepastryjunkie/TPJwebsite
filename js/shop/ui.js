@@ -1052,7 +1052,7 @@ function chocolatePieceArt(id, piece) {
         rice: 'Rice-Krispy'
     };
 
-    const featured = {
+    const flavors = {
         birthday: 'Birthday',
         biscoff: 'Biscoff',
         cookies: 'Oreo',
@@ -1066,25 +1066,29 @@ function chocolatePieceArt(id, piece) {
     };
 
     const kind = kinds[id];
-
     if (!kind) return null;
 
     const base = bases[piece?.base]
         ? piece.base
         : 'white';
 
-    const finishedFlavor = base === 'white'
-        ? featured[piece?.topping]
-        : null;
+    const finishedFlavor =
+        flavors[piece?.topping] || null;
 
-    const variant = finishedFlavor || bases[base];
+    const variant = finishedFlavor
+        ? (base === 'white'
+            ? finishedFlavor
+            : bases[base] + '-' + finishedFlavor)
+        : bases[base];
 
-    const src = encodeURI(
-        '../images/Shop/Chocolate Treats/' +
-        `Chocolate-${variant}-${kind}.png`
-    );
-
-    return {src, finishedFlavor, noTopping: piece?.topping === 'none'};
+    return {
+        src: encodeURI(
+            '../images/Shop/Chocolate Treats/' +
+            'Chocolate-' + variant + '-' + kind + '.png'
+        ),
+        finishedFlavor,
+        noTopping: piece?.topping === 'none'
+    };
 }
 
 function renderDesktopTray() {
@@ -1221,15 +1225,7 @@ function art(cat, id, piece = null) {
     if (cat === 'chocolate') {
         const image = chocolatePieceArt(id, piece);
         if (!image) return '<span class="tpj-art-fallback">Choose a treat</span>';
-        const {src, finishedFlavor} = image;
-
-        let note = '';
-
-        if (piece && !piece.base) {
-            note = 'White chocolate preview';
-        } else if (piece?.topping && piece.topping !== 'none' && !finishedFlavor) {
-            note = 'Base preview';
-        }
+const {src} = image;
 
         return `
             <img
@@ -1238,11 +1234,6 @@ function art(cat, id, piece = null) {
                 loading="lazy"
             >
 
-            ${note ? `
-                <small class="tpj-preview-note">
-                    ${esc(note)}
-                </small>
-            ` : ''}
         `;
     }
 
@@ -3500,8 +3491,7 @@ function checkoutSummary() {
             const src = popupImageFor(item.category === 'half' ? 'cakes' : item.category,id);
             return src ? '<img src="'+esc(src)+'" alt="">' : '';
         }).join('');
-        const photoNote = treatImages.some(image => !image.finishedFlavor && !image.noTopping)
-            ? '<small>Where a topping photo isn’t available, the image shows the selected chocolate base.</small>' : '';
+const photoNote = '';
         return '<article class="tpj-summary-item">'+(images?'<div class="tpj-summary-art">'+images+'</div>'+photoNote:'')+'<h4>'+esc(quoted.title)+'</h4><ul>'+customerDetails(quoted).map(text => '<li>'+esc(text)+'</li>').join('')+'</ul><p>Quantity '+quoted.quantity+' <strong>'+M.money(quoted.totalCents)+'</strong></p></article>';
     }).join('');
 }
