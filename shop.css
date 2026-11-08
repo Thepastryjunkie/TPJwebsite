@@ -4432,3 +4432,10 @@ body.shop-page .signature-cake-tagline {
 @media(max-width:1100px){body.shop-page #mobileMenuButton{display:block;grid-column:1;grid-row:1}body.shop-page #mainNavigation{position:fixed;inset:var(--header-height) 0 0;z-index:1001;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:18px;padding:24px;background:var(--dark-chocolate,#2b140e);overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(-15px)}body.shop-page #mainNavigation.is-open{opacity:1;visibility:visible;transform:none}body.shop-page #mainNavigation a{width:100%;font-size:22px}}
 /* Enlarge and lower the category heading groups within the existing artwork. */
 @media(min-width:1200px) and (hover:hover) and (pointer:fine){body.shop-page .cupcake-section .dessert-section-intro{width:84%;margin:490px auto 35px 0}body.shop-page .cupcake-section .dessert-section-title,body.shop-page .jar-section .jar-section-title,body.shop-page .apple-section .apple-section-title,body.shop-page .chocolate-collection .chocolate-collection-title{font-size:clamp(5.4rem,9.2vw,10rem)}body.shop-page .jar-section-intro,body.shop-page .apple-section-intro,body.shop-page .chocolate-collection-intro{padding-top:35px}}
+/* Enlarge the Shop artwork without scaling the text or page. */
+@media (max-width: 700px) and (orientation: portrait) {
+    body.shop-page .tpj-banner-image {
+        transform: scale(1.25);
+        transform-origin: center bottom;
+    }
+}

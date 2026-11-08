@@ -2584,3 +2584,31 @@ and (pointer: coarse) {
         zoom: 2;
     }
 }
+/* Rounded rectangle action buttons throughout the homepage. */
+.home-page .button,
+.home-page .newsletter-form button {
+    border-radius: 12px;
+}
+
+/* Move the homepage hero buttons down on mobile. */
+@media (max-width: 760px) {
+    .home-page .editorial-hero .hero-buttons {
+        position: absolute;
+        bottom: 28px;
+        left: var(--side-padding);
+        right: var(--side-padding);
+
+        width: auto;
+        max-width: 420px;
+        margin: 0 auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .home-page .editorial-hero .hero-buttons .button {
+        min-height: 48px;
+        padding: 14px 18px;
+    }
+}
