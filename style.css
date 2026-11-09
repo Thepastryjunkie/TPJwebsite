@@ -238,7 +238,7 @@ main,
 ========================================= */
 
 .site-header {
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 1000;
 
@@ -2843,8 +2843,8 @@ and (pointer: coarse) {
 }
 
 .home-page .cake-showcase-white .cake-showcase-photo img {
-    object-position: center 35%;
-    transform: translateY(-7%) scale(1.27);
+    object-position: center 32%;
+    transform: translateY(-2%) scale(1.02);
 }
 
 @media (max-width: 500px) {
