@@ -102,16 +102,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 document.addEventListener("DOMContentLoaded", () => {
-    const footer = document.querySelector("footer");
-
+    const footer = document.querySelector(".site-footer");
     if (!footer || footer.querySelector("[data-tpj-contact]")) return;
 
-    const contact = document.createElement("p");
+    const contact = document.createElement("div");
+    contact.className = "footer-contact";
     contact.dataset.tpjContact = "";
-    contact.innerHTML =
-        'For questions or assistance, email <a href="mailto:baked@thepastryjunkie.com">' +
-        'baked@thepastryjunkie.com</a> or call ' +
-        '<a href="tel:+16823738842">(682) 373-8842</a>.';
+    contact.innerHTML = `
+        <a href="mailto:baked@thepastryjunkie.com">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="m3 7 9 6 9-6"/>
+            </svg>
+            <span>baked@thepastryjunkie.com</span>
+        </a>
+        <a href="tel:+16823738842">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M8 3H5a2 2 0 0 0-2 2c0 8.8 7.2 16 16 16a2 2 0 0 0 2-2v-3l-5-2-2 2a12 12 0 0 1-6-6l2-2-2-5Z"/>
+            </svg>
+            <span>(682) 373-8842</span>
+        </a>`;
 
-    footer.append(contact);
+    const bottom = footer.querySelector(".footer-bottom");
+    if (bottom) bottom.before(contact);
+    else footer.append(contact);
 });

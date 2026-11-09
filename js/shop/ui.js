@@ -1162,7 +1162,27 @@ function renderDesktopTray() {
         : category === 'half'
             ? C.half.prices
             : C.categories[category].prices;
+    function starterItem() {
+        if (!ids.includes(x.flavor) || !allowed(x.flavor)) {
+            return treats ? blank() : null;
+        }
 
+        if (!treats) return x.flavor;
+
+        return enabled('base:white') &&
+            enabled('topping:none') &&
+            enabled('flavor:none')
+            ? { type: x.flavor, base: 'white', topping: 'none' }
+            : blank();
+    }
+
+    function isStarter(item) {
+        return treats
+            ? item?.type === x.flavor &&
+                item?.base === 'white' &&
+                item?.topping === 'none'
+            : item === x.flavor;
+    }
     const name = pack || treats ? 'Build Your Box' : category === 'half' ? 'Half & Half Cake' : 'Signature Cake';
 
     $('#shopDialogTitle', dialog).textContent = name;
@@ -1312,10 +1332,11 @@ if (selected === null) {
     }
 </div>
 
-                <p>
-                    Choose all three options,
-                    then save this spot.
-                </p>
+<p>
+    You can change just the chocolate, just the topping, or both.
+    To keep the same treat, leave Treat type as it is.
+    When you're done, select Save this spot.
+</p>
 
                 ${select(
                     'type',
@@ -1549,24 +1570,29 @@ function sizeButtons() {
                     </div></div>
                 `;
 
+            const treatPlural = {
+                pretzel: 'pretzels',
+                oreo: 'Oreos',
+                strawberry: 'strawberries',
+                rice: 'Rice Krispie treats'
+            }[x.flavor] || 'treats';
+
+            const hint = !x.size
+                ? 'Choose a box size to get started.'
+                : treats
+                    ? complete(starterItem())
+                        ? 'Your box starts with white chocolate ' + treatPlural +
+                           ' with no topping. Tap any treat in the box to change just its chocolate or topping. You can also swap it for a different treat.'
+                        : 'Tap a spot, then use the options below to choose its treat, chocolate, or topping.'
+                    : starterItem()
+                        ? 'Your box starts with the flavor you picked. Tap any ' +
+                            C.categories[category].singular + ' in the box to swap its flavor.'
+                        : 'Tap a spot and choose an available flavor.';
+
             const palette = `
                 <section class="tpj-tray-palette">
-                    <h3>
-                        ${treats
-                            ? 'Choose a treat type'
-                           : compactTray ? 'Tap a flavor' : 'Click or drag a flavor'
-                        }
-                    </h3>
-
-                    <p>
-                        Repeats are welcome.
-                        ${treats
-                            ? 'Images represent treat types; labels show your exact choices.'
-                            : compactTray
-    ? 'Tap a filled spot to choose its replacement.'
-    : 'Click a filled spot to choose its replacement.'
-                        }
-                    </p>
+                    <h3>Mix &amp; match</h3>
+                    <p>${esc(hint)}</p>
 
 <div
     class="tpj-tray-picks ${
@@ -1793,40 +1819,40 @@ function sizeButtons() {
                     return;
                 }
 
-                const kept = (
-                    treats ? x.pieces : slots
-                ).filter(item =>
-                    treats
-                        ? Boolean(
-                            item.type ||
-                            item.base ||
-                            item.topping
-                        )
-                        : Boolean(item)
-                );
+                let kept = (treats ? x.pieces : slots).slice();
 
                 if (kept.length > number) {
-                    message =
-                        'Remove ' +
-                        (kept.length - number) +
-                        ' item(s) before choosing this smaller pack.';
+                    kept = kept.filter(item => treats
+                        ? Boolean(item?.type || item?.base || item?.topping)
+                        : Boolean(item));
 
-                    draw('size:' + value);
-                    return;
+                    let overflow = kept.length - number;
+                    kept = kept.filter(item => {
+                        if (overflow > 0 && isStarter(item)) {
+                            overflow--;
+                            return false;
+                        }
+                        return true;
+                    });
+
+                    if (kept.length > number) {
+                        message = 'Remove ' + (kept.length - number) +
+                            ' customized item(s) before choosing this smaller pack.';
+                        draw('size:' + value);
+                        return;
+                    }
                 }
 
                 x.size = number;
 
+                const resized = Array.from({ length: number }, (_, index) =>
+                    index < kept.length ? kept[index] : starterItem()
+                );
+
                 if (treats) {
-                    x.pieces = Array.from(
-                        { length: number },
-                        (_, index) => kept[index] || blank()
-                    );
+                    x.pieces = resized;
                 } else {
-                    slots = Array.from(
-                        { length: number },
-                        (_, index) => kept[index] || null
-                    );
+                    slots = resized;
                 }
 
                 selected = null;
