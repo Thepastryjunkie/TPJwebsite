@@ -2631,6 +2631,31 @@ and (pointer: coarse) {
     background-repeat: no-repeat;
     filter: blur(9px);
 }
+/* Homepage phones: let the real hero continue behind the logo bar. */
+@media (max-width: 760px),
+       (max-width: 980px) and (orientation: landscape) and (pointer: coarse) {
+    .home-page .site-header {
+        margin-bottom: calc(0px - var(--header-height));
+        box-shadow: none;
+    }
+
+    .home-page .editorial-hero {
+        padding-top: var(--header-height);
+    }
+
+    .home-page .site-header::before {
+        inset: 0;
+        clip-path: none;
+        background: linear-gradient(
+            to bottom,
+            rgba(255, 239, 235, .32),
+            rgba(255, 239, 235, .12)
+        );
+        filter: none;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+    }
+}
 .home-page .site-header .main-navigation:not(.is-open) a,
 .home-page .site-header .header-icon-button {
     color: var(--deep-chocolate);
