@@ -2963,7 +2963,14 @@ align-items: var(--shop-grid-align, end);
     margin: 0 auto;
     padding: var(--shop-chocolate-padding, 125px 0 155px);
 }
-
+.shop-image-note {
+    margin: 24px auto 0;
+    padding-inline: 12px;
+    color: #72514a;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
 /* Decorative splashes — mobile stays hidden for now. */
 .treat-splash-art {
     display: none;

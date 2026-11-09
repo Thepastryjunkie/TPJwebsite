@@ -1421,7 +1421,7 @@ function sizeButtons() {
                     <figure>
                         ${art(category, x.flavor)}
 
-<figcaption>Example appearance.</figcaption>
+${category === 'half' ? '<figcaption>Example appearance.</figcaption>' : ''}
                     </figure>
 
 <div>
