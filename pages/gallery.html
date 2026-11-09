@@ -1,28 +1,468 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Explore custom cakes and loaded desserts from The Pastry Junkie in Dallas–Fort Worth.">
     <title>Gallery | The Pastry Junkie</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../style.css?v=gallery-1">
+
+    <style>
+        .gallery-page .site-header {
+            position: relative;
+            top: auto;
+        }
+
+        .gallery-main {
+            --gallery-ink: #53271e;
+            --gallery-muted: #744f44;
+            --gallery-border: #e6c3c8;
+            background: #fff8f2;
+            color: var(--gallery-ink);
+        }
+
+        .gallery-shell {
+            width: min(calc(100% - 2 * var(--side-padding, 24px)), 1260px);
+            margin-inline: auto;
+        }
+
+        .gallery-hero {
+            background:
+                radial-gradient(ellipse at 91% 22%, #f8cade 0%, transparent 56%),
+                linear-gradient(148deg, #fff8f2 12%, #fde8ed 100%);
+            border-bottom: 1px solid var(--gallery-border);
+        }
+
+        .gallery-hero-inner {
+            display: grid;
+            grid-template-columns: minmax(0, 1.13fr) minmax(0, .87fr);
+            align-items: center;
+            gap: clamp(28px, 6vw, 92px);
+            padding-block: clamp(42px, 6vw, 88px);
+        }
+
+        .gallery-kicker {
+            margin: 0 0 12px;
+            color: #84294e;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .gallery-main h1,
+        .gallery-section h2 {
+            margin: 0;
+            font-family: "Lilita One", "Arial Black", sans-serif;
+            font-weight: 400;
+            letter-spacing: -.025em;
+            line-height: 1;
+        }
+
+        .gallery-main h1 { font-size: clamp(46px, 6.7vw, 106px); }
+        .gallery-main h1 span { color: #84294e; }
+        .gallery-section h2 { font-size: clamp(34px, 4.4vw, 68px); }
+
+        .gallery-description {
+            max-width: 52ch;
+            margin: 16px 0 0;
+            color: var(--gallery-muted);
+            line-height: 1.65;
+        }
+
+        .gallery-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .gallery-actions .button { border-radius: 12px; }
+
+        .gallery-main figure {
+            min-width: 0;
+            margin: 0;
+            overflow: hidden;
+            border: 1px solid var(--gallery-border);
+            border-radius: 18px;
+            background: #fff9f5;
+        }
+
+        .gallery-photo {
+            position: relative;
+            display: block;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: radial-gradient(ellipse, #fff9f5, #f8dce5);
+        }
+
+        .gallery-feature .gallery-photo { aspect-ratio: 1 / 1; }
+        .gallery-photo-cross { background: radial-gradient(ellipse, #fff9f5, #f5e0d5); }
+        .gallery-photo-heart { background: radial-gradient(ellipse, #fff9f5, #eed3e1); }
+
+        .gallery-photo img {
+            width: 100%;
+            height: 100%;
+            padding: clamp(10px, 2vw, 28px);
+            object-fit: contain;
+        }
+
+        .gallery-feature .gallery-photo img {
+            padding: 0;
+            transform: scale(1.16);
+        }
+
+        .gallery-expand {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid #ead0d2;
+            border-radius: 50%;
+            background: #fff8f2;
+            color: #53271e;
+            font-size: 20px;
+        }
+
+        .gallery-photo:hover .gallery-expand,
+        .gallery-photo:focus-visible .gallery-expand {
+            background: #53271e;
+            color: #fff8f2;
+        }
+
+        .gallery-photo:focus-visible {
+            outline: 3px solid #84294e;
+            outline-offset: -4px;
+        }
+
+        .gallery-main figcaption {
+            display: grid;
+            gap: 3px;
+            padding: 14px 18px 16px;
+            line-height: 1.4;
+        }
+
+        .gallery-main figcaption span {
+            color: #84294e;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+        }
+
+        .gallery-section { padding-block: clamp(38px, 6vw, 78px); }
+        .gallery-section-heading { margin-bottom: clamp(20px, 3vw, 36px); }
+
+        .gallery-cake-grid,
+        .gallery-dessert-grid {
+            display: grid;
+            gap: clamp(12px, 2.5vw, 24px);
+        }
+
+        .gallery-cake-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gallery-dessert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .gallery-desserts { background: #fbe8ed; border-block: 1px solid var(--gallery-border); }
+
+        .gallery-note {
+            margin: 20px 0 0;
+            color: var(--gallery-muted);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .gallery-next {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .gallery-next .gallery-actions { margin-top: 0; }
+
+        .gallery-viewer {
+            width: min(860px, calc(100% - 28px));
+            max-height: calc(100% - 28px);
+            padding: 0;
+            border: 1px solid var(--gallery-border);
+            border-radius: 16px;
+            background: #fff8f2;
+            color: var(--gallery-ink);
+        }
+
+        .gallery-viewer::backdrop { background: rgba(45, 15, 10, .76); }
+
+        .gallery-viewer-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+        }
+
+        .gallery-viewer-bar h2 {
+            margin: 0;
+            font-size: clamp(15px, 3vw, 22px);
+        }
+
+        .gallery-viewer-bar button {
+            min-height: 44px;
+            padding: 7px 12px;
+            border: 1px solid #84294e;
+            border-radius: 10px;
+            background: #fff8f2;
+            color: #6a2344;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .gallery-viewer-photo {
+            display: grid;
+            place-items: center;
+            padding: 12px;
+            background: #f8e3e8;
+        }
+
+        .gallery-viewer-photo img {
+            max-height: 72vh;
+            max-height: 72dvh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .gallery-page:has(.gallery-viewer[open]) { overflow: hidden; }
+
+        @media (max-width: 850px) {
+            .gallery-hero-inner { grid-template-columns: 1fr; }
+            .gallery-feature { width: min(100%, 520px); }
+            .gallery-next { align-items: flex-start; flex-direction: column; }
+        }
+
+        @media (max-width: 620px) {
+            .gallery-shell { width: calc(100% - 32px); }
+            .gallery-cake-grid, .gallery-dessert-grid { grid-template-columns: 1fr; }
+            .gallery-actions { align-items: stretch; flex-direction: column; }
+        }
+    </style>
 </head>
 
-<body>
-<nav>
-    <a href="../index.html">Home</a>
-    <a href="gallery.html">Gallery</a>
-    <a href="shop.html">Menu</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
-</nav>
+<body class="gallery-page">
+    <header class="site-header">
+        <div class="header-inner">
+            <button class="mobile-menu-button" id="mobileMenuButton" type="button"
+                aria-label="Open navigation menu" aria-controls="mainNavigation" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
 
-<h1>Gallery</h1>
+            <a href="../index.html" class="header-logo-link" aria-label="The Pastry Junkie homepage">
+                <img src="../images/brand/TPJ-Wordmark-Light1.png" alt="The Pastry Junkie" class="header-logo">
+            </a>
 
-<div class="gallery-grid">
+            <nav class="main-navigation" id="mainNavigation" aria-label="Main navigation">
+                <a href="../index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="cake-builder.html">Custom Cakes</a>
+                <a href="gallery.html" class="active-nav-link" aria-current="page">Gallery</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
 
-    <img src="../images/TPJ Mascot.PNG" alt="Cake 1">
-    <img src="../images/TPJ Mascot.PNG" alt="Cake 2">
-    <img src="../images/TPJ Mascot.PNG" alt="Cake 3">
+            <div class="header-actions">
+                <a href="shop.html" class="header-icon-button search-button" aria-label="Search desserts">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+                </a>
+                <a href="contact.html" class="header-icon-button account-button" aria-label="Contact The Pastry Junkie">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+                </a>
+                <a href="shop.html" class="header-icon-button cart-button" aria-label="Go to the Shop">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
 
-</div>
+    <main class="gallery-main">
+        <section class="gallery-hero" aria-labelledby="gallery-title">
+            <div class="gallery-shell gallery-hero-inner">
+                <div>
+                    <p class="gallery-kicker">The Pastry Junkie · Gallery</p>
+                    <h1 id="gallery-title">The Sweet Side,<br><span>Up Close.</span></h1>
+                    <p class="gallery-description">From gold crowns to black buttercream, take a closer look at the details that make each cake its own. There’s a little something for the dessert table, too.</p>
 
+                    <div class="gallery-actions">
+                        <a class="button button-primary" href="cake-builder.html">Build Your Cake</a>
+                        <a class="button button-secondary" href="#gallery-cakes">Explore the Gallery</a>
+                    </div>
+                </div>
+
+                <figure class="gallery-feature">
+                    <a class="gallery-photo" href="../images/products/TPJBlueCrownCake.png" data-gallery-photo>
+                        <img src="../images/products/TPJBlueCrownCake.png" alt="Blue and gold birthday cake with a crown on a black pedestal" fetchpriority="high" decoding="async">
+                        <span class="gallery-expand" aria-hidden="true">↗</span>
+                    </a>
+                    <figcaption><span>Featured design</span><strong>Blue &amp; Gold Crown Cake</strong></figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="gallery-shell gallery-section" id="gallery-cakes" aria-labelledby="gallery-cakes-title">
+            <div class="gallery-section-heading">
+                <p class="gallery-kicker">01 · The Cake Portfolio</p>
+                <h2 id="gallery-cakes-title">Custom Cakes</h2>
+                <p class="gallery-description">Two very different moods, both made for a celebration.</p>
+            </div>
+
+            <div class="gallery-cake-grid">
+                <figure>
+                    <a class="gallery-photo gallery-photo-cross" href="../images/products/cross-cake1.png" data-gallery-photo>
+                        <img src="../images/products/cross-cake1.png" alt="White buttercream cake with a gold cross and piped accents" loading="lazy" decoding="async">
+                        <span class="gallery-expand" aria-hidden="true">↗</span>
+                    </a>
+                    <figcaption><strong>White &amp; Gold Cross Cake</strong></figcaption>
+                </figure>
+
+                <figure>
+                    <a class="gallery-photo gallery-photo-heart" href="../images/products/TPJ_BlackHeart_Hero1.png" data-gallery-photo>
+                        <img src="../images/products/TPJ_BlackHeart_Hero1.png" alt="Black heart cake with ornate vintage buttercream piping" loading="lazy" decoding="async">
+                        <span class="gallery-expand" aria-hidden="true">↗</span>
+                    </a>
+                    <figcaption><strong>Black Vintage Heart Cake</strong></figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="gallery-desserts" aria-labelledby="gallery-desserts-title">
+            <div class="gallery-shell gallery-section">
+                <div class="gallery-section-heading">
+                    <p class="gallery-kicker">02 · From the Shop</p>
+                    <h2 id="gallery-desserts-title">The Loaded Lineup</h2>
+                    <p class="gallery-description">A peek at the cupcakes, cheesecake jars, and stuffed apples on the menu.</p>
+                </div>
+
+                <div class="gallery-dessert-grid">
+                    <figure>
+                        <a class="gallery-photo" href="../images/Shop/Loaded%20Cupcakes/Strawberry%20Cupcake.webp" data-gallery-photo>
+                            <img src="../images/Shop/Loaded%20Cupcakes/Strawberry%20Cupcake.webp" alt="Strawberry Crunch loaded cupcake" loading="lazy" decoding="async">
+                            <span class="gallery-expand" aria-hidden="true">↗</span>
+                        </a>
+                        <figcaption><strong>Strawberry Crunch Cupcake</strong></figcaption>
+                    </figure>
+
+                    <figure>
+                        <a class="gallery-photo" href="../images/Shop/Cheesecake%20Jars/Biscoff%20Cheesecake%20Jar.webp" data-gallery-photo>
+                            <img src="../images/Shop/Cheesecake%20Jars/Biscoff%20Cheesecake%20Jar.webp" alt="Biscoff cheesecake jar with cookie butter and crumbs" loading="lazy" decoding="async">
+                            <span class="gallery-expand" aria-hidden="true">↗</span>
+                        </a>
+                        <figcaption><strong>Biscoff Cheesecake Jar</strong></figcaption>
+                    </figure>
+
+                    <figure>
+                        <a class="gallery-photo" href="../images/Shop/Stuffed%20Apples/Oreo%20Apple.webp" data-gallery-photo>
+                            <img src="../images/Shop/Stuffed%20Apples/Oreo%20Apple.webp" alt="Loaded Oreo stuffed apple" loading="lazy" decoding="async">
+                            <span class="gallery-expand" aria-hidden="true">↗</span>
+                        </a>
+                        <figcaption><strong>Oreo Stuffed Apple</strong></figcaption>
+                    </figure>
+                </div>
+
+                <p class="gallery-note">Product images are for illustration purposes only. Actual appearance may vary.</p>
+            </div>
+        </section>
+
+        <section class="gallery-shell gallery-section gallery-next" aria-labelledby="gallery-next-title">
+            <div>
+                <p class="gallery-kicker">Your turn</p>
+                <h2 id="gallery-next-title">What are we celebrating?</h2>
+                <p class="gallery-description">Start with a cake idea or see what’s baking in the Shop.</p>
+            </div>
+            <div class="gallery-actions">
+                <a class="button button-primary" href="cake-builder.html">Build Your Cake</a>
+                <a class="button button-secondary" href="shop.html">Shop Desserts</a>
+            </div>
+        </section>
+
+        <dialog class="gallery-viewer" id="gallery-viewer" aria-labelledby="gallery-viewer-title">
+            <div class="gallery-viewer-bar">
+                <h2 id="gallery-viewer-title">Gallery photo</h2>
+                <form method="dialog">
+                    <button type="submit" autofocus>Close <span aria-hidden="true">×</span></button>
+                </form>
+            </div>
+            <div class="gallery-viewer-photo"><img alt=""></div>
+        </dialog>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <p>Custom cakes and loaded desserts made for serious sweet-tooth celebrations.</p>
+                <p class="footer-love-line">Made with ♥ by The Pastry Junkie.</p>
+            </div>
+            <div class="footer-column">
+                <h3>Welcome to the Sweet Side</h3>
+                <a href="shop.html">Menu</a>
+                <a href="gallery.html">Gallery</a>
+                <a href="cake-builder.html">Start An Inquiry</a>
+            </div>
+            <div class="footer-column">
+                <h3>The Fine Crumbs</h3>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="faq.html">FAQ</a>
+                <a href="policies.html">Order Policies</a>
+            </div>
+            <div class="footer-column">
+                <h3>Still thinking about dessert? We are too.</h3>
+                <p>Dallas–Fort Worth, Texas</p>
+                <p>Pickup and delivery by appointment</p>
+            </div>
+        </div>
+
+        <div class="footer-notice">
+            <p>This food is made in a home kitchen and is not inspected by the Department of State Health Services or a local health department.</p>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© <span id="currentYear"></span> The Pastry Junkie. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js?v=footer-contact-1"></script>
+    <script>
+        (() => {
+            const viewer = document.getElementById('gallery-viewer');
+            if (typeof viewer.showModal !== 'function') return;
+
+            const fullPhoto = viewer.querySelector('img');
+            const title = document.getElementById('gallery-viewer-title');
+            let trigger;
+
+            document.querySelectorAll('[data-gallery-photo]').forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    if (event.defaultPrevented || event.button !== 0 ||
+                        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+                    trigger = link;
+                    fullPhoto.alt = link.querySelector('img').alt;
+                    fullPhoto.src = link.href;
+                    title.textContent = link.closest('figure').querySelector('figcaption strong').textContent;
+                    viewer.showModal();
+                    event.preventDefault();
+                });
+            });
+
+            viewer.addEventListener('close', () => {
+                fullPhoto.removeAttribute('src');
+                trigger?.focus({ preventScroll: true });
+            });
+        })();
+    </script>
 </body>
 </html>
