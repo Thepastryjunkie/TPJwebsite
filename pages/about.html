@@ -1,23 +1,484 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>About | The Pastry Junkie</title>
-    <link rel="stylesheet" href="../style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Meet Erykah Williams, the cake artist behind The Pastry Junkie, through a scrapbook of the people and moments that shaped her.">
+<title>Meet Erykah | The Pastry Junkie</title>
+<link rel="stylesheet" href="../style.css">
+
+<style>
+.about-page .site-header { position: relative; top: auto; }
+
+.tpj-book, .tpj-book * { box-sizing: border-box; }
+.tpj-book {
+  --tpj-ink: #49251d;
+  --tpj-berry: #782c4c;
+  --tpj-pad: clamp(24px, 4.4vw, 58px);
+  --tpj-gap: clamp(30px, 5vw, 62px);
+  --tpj-panel-width: 1120px;
+  padding: clamp(28px, 5vw, 72px) clamp(13px, 3vw, 32px);
+  color: var(--tpj-ink);
+  background: radial-gradient(ellipse at top, #fad8e5, transparent 760px), #fcf3e9;
+}
+.tpj-book h1, .tpj-book h2 {
+  margin: 0 0 .32em;
+  font: 400 clamp(2.05rem, 4.6vw, 3.9rem)/1.02 "Lilita One", Georgia, serif;
+  color: inherit;
+}
+.tpj-book h1 { font-size: clamp(2.75rem, 6.5vw, 5.7rem); }
+.tpj-book p { margin: 0 0 .85em; line-height: 1.65; }
+.tpj-book p:last-child { margin-bottom: 0; }
+
+.tpj-panel {
+  width: min(100%, var(--tpj-panel-width));
+  margin: 0 auto var(--tpj-gap);
+  padding: var(--tpj-pad);
+  border: 1px solid #dfbfae;
+  border-radius: 8px 18px 18px 8px;
+  background: linear-gradient(90deg, #f0d8c3 0, transparent 15px), #fffbf4;
+  box-shadow: 0 8px 0 -4px #efd8c8, 0 18px 32px -19px #845647;
+}
+.tpj-pink { background: linear-gradient(125deg, #ffeedf, #f7c6d9); }
+.tpj-spread {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: clamp(22px, 4.6vw, 62px);
+  align-items: center;
+}
+.tpj-book .tpj-kicker {
+  margin-bottom: .9em;
+  font-size: .73rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--tpj-berry);
+}
+.tpj-book .tpj-hand {
+  font: 700 clamp(1.35rem, 3vw, 1.9rem)/1.2 "Caveat", Georgia, serif;
+  color: var(--tpj-berry);
+}
+
+.tpj-photo {
+  --tpj-turn: -2deg;
+  --tpj-ratio: 4 / 3;
+  --tpj-fit: cover;
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 8px 10px;
+  border: 1px solid #e5d3c7;
+  background: #fffdf8;
+  box-shadow: 2px 7px 14px #59342526;
+  transform: rotate(var(--tpj-turn));
+}
+.tpj-photo::before, .tpj-pause::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.tpj-photo::before {
+  top: -8px;
+  left: 34%;
+  width: 32%;
+  height: 16px;
+  background: #ebafaccc;
+  transform: rotate(-4deg);
+}
+.tpj-photo img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  aspect-ratio: var(--tpj-ratio);
+  object-fit: var(--tpj-fit);
+  object-position: var(--tpj-position, center);
+  background: #f6e9e0;
+}
+.tpj-photo figcaption {
+  margin: 7px 2px 0;
+  font: 700 clamp(1rem, 2.15vw, 1.34rem)/1.1 "Caveat", Georgia, serif;
+}
+.tpj-photo--right { --tpj-turn: 2deg; }
+.tpj-photo--tall { --tpj-ratio: 4 / 5; }
+.tpj-photo--wide { --tpj-ratio: 3 / 2; }
+.tpj-photo--square { --tpj-ratio: 1; }
+.tpj-photo--whole { --tpj-fit: contain; }
+.tpj-photo--natural img { aspect-ratio: auto; }
+.tpj-cover .tpj-photo { width: min(100%, 485px); justify-self: center; }
+
+.tpj-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(13px, 2vw, 24px);
+  align-items: center;
+}
+.tpj-child-grid { grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); }
+.tpj-book .tpj-memory {
+  margin: 0;
+  padding: 14px;
+  background: repeating-linear-gradient(#fff2db 0 25px, #efdcbf 26px 27px);
+  border: 1px solid #eddbc8;
+  box-shadow: 2px 5px 10px #5934251c;
+  transform: rotate(3deg);
+}
+.tpj-school-grid .tpj-photo:first-child { grid-row: span 2; }
+.tpj-work-grid, .tpj-now-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tpj-work-grid .tpj-photo:nth-child(2) { margin-top: 24px; }
+.tpj-early-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: clamp(27px, 4vw, 48px);
+}
+.tpj-now-grid { margin-top: clamp(26px, 4vw, 46px); }
+.tpj-future-spread {
+  margin-top: clamp(40px, 7vw, 85px);
+  padding-top: clamp(29px, 5vw, 54px);
+  border-top: 1px dashed #b9848c;
+}
+.tpj-autumn-grid .tpj-photo:last-child {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.tpj-bridge {
+  --tpj-note-size: clamp(182px, 22vw, 220px);
+  --tpj-seam: clamp(22px, 3vw, 34px);
+  --tpj-note-clearance: calc(var(--tpj-note-size) / 2 - var(--tpj-seam) / 2 + 21px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto var(--tpj-seam) auto;
+  width: min(100%, var(--tpj-panel-width));
+  margin: 0 auto var(--tpj-gap);
+  isolation: isolate;
+}
+.tpj-bridge > * { grid-column: 1; }
+.tpj-archive { grid-row: 1; margin: 0; padding-bottom: var(--tpj-note-clearance); }
+.tpj-present { grid-row: 3; margin: 0; padding-top: var(--tpj-note-clearance); }
+.tpj-pause {
+  position: relative;
+  z-index: 2;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  width: var(--tpj-note-size);
+  height: var(--tpj-note-size);
+  aspect-ratio: 1;
+  margin-right: clamp(46px, 11vw, 154px);
+  padding: clamp(17px, 2.5vw, 25px);
+  border: 1px solid #d67da1;
+  background: linear-gradient(#f8b9d0, #f4a9c5);
+  box-shadow: 3px 7px 13px #703d3440;
+  transform: rotate(-4deg);
+}
+.tpj-pause::before {
+  top: -9px;
+  left: 27%;
+  width: 46%;
+  height: 22px;
+  background-color: #d86696;
+  background-image: repeating-linear-gradient(90deg, #f7c5d980 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(0deg, #f7c5d980 0 8px, transparent 8px 16px);
+  clip-path: polygon(0 0, 100% 0, 97% 27%, 100% 47%, 97% 70%, 100% 100%, 0 100%, 3% 73%, 0 51%, 3% 28%);
+  opacity: .86;
+  transform: rotate(-2deg);
+}
+.tpj-book .tpj-pause h3 { margin: 0 0 .3em; color: #54232d; }
+.tpj-book .tpj-pause p { font-size: clamp(.76rem, 1.45vw, .92rem); line-height: 1.42; }
+.tpj-end { margin-bottom: 0; text-align: center; }
+.tpj-end .tpj-hand { margin-bottom: 10px; }
+.tpj-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; }
+
+@media (max-width: 760px) {
+  .tpj-spread { grid-template-columns: minmax(0, 1fr); }
+  .tpj-early-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tpj-school-grid, .tpj-child-grid, .tpj-autumn-grid { max-width: 490px; margin-inline: auto; }
+  .tpj-pause { justify-self: center; margin-right: 0; }
+}
+@media (max-width: 430px) {
+  .tpj-book { --tpj-pad: 19px; }
+  .tpj-photo { padding: 5px 5px 8px; }
+  .tpj-work-grid, .tpj-now-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tpj-work-grid .tpj-photo:last-child, .tpj-now-grid .tpj-photo:last-child {
+    grid-column: 1 / -1;
+    width: 62%;
+    justify-self: center;
+  }
+  .tpj-book .tpj-memory { font-size: 1.18rem; }
+}
+</style>
 </head>
 
-<body>
+<body class="about-page">
+<header class="site-header">
+  <div class="header-inner">
+    <button class="mobile-menu-button" id="mobileMenuButton" type="button"
+      aria-label="Open navigation menu" aria-controls="mainNavigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo-link">
+      <img src="../images/brand/TPJ-Wordmark-Light1.png" alt="The Pastry Junkie" class="header-logo">
+    </a>
+    <nav class="main-navigation" id="mainNavigation" aria-label="Main navigation">
+      <a href="../index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="cake-builder.html">Custom Cakes</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="about.html" class="active-nav-link" aria-current="page">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <a href="shop.html" class="header-icon-button search-button" aria-label="Search desserts">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      </a>
+      <a href="contact.html" class="header-icon-button account-button" aria-label="Contact The Pastry Junkie">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      </a>
+      <a href="shop.html" class="header-icon-button cart-button" aria-label="Go to the shop">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
 
-<nav>
-    <a href="../index.html">Home</a>
-    <a href="gallery.html">Gallery</a>
-    <a href="shop.html">Menu</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
-</nav>
+<main class="tpj-book">
+  <section class="tpj-panel tpj-pink tpj-spread tpj-cover" aria-labelledby="tpj-meet">
+    <div>
+      <p class="tpj-kicker">From my scrapbook</p>
+      <h1 id="tpj-meet">Meet the Pastry Junkie</h1>
+      <p>I’m Erykah Williams, a pastry chef and cake artist from Baltimore, Maryland, the face behind The Pastry Junkie. I’ve been baking since I was five, when I used to bring cakes home from my grandma’s house just so I could decorate them.</p>
+    </div>
+    <!-- Erykah, today · erykah-meet-the-pastry-junkie.jpg -->
+    <figure class="tpj-photo tpj-photo--natural">
+      <img src="../images/about/scrapbook/erykah-meet-the-pastry-junkie.jpg" alt="Erykah Williams smiling behind a counter of cakes and desserts" width="1350" height="1105" fetchpriority="high" decoding="async">
+      <figcaption>Erykah, today</figcaption>
+    </figure>
+  </section>
 
-<h1>About</h1>
+  <section class="tpj-panel tpj-spread" aria-labelledby="tpj-childhood">
+    <div>
+      <p class="tpj-kicker"></p>
+      <h2 id="tpj-childhood">Little Erykah</h2>
+      <p>My Grandma Retta and I spent a lot of time baking together. I loved the sweets we made, but I especially loved taking a cake home and deciding what it was going to look like. My mom encouraged me at every stage. First it was Easy-Bake ovens and baking kits. Eventually it was piping bags and cake pans in every shape.</p>
+    </div>
+    <div class="tpj-photo-grid tpj-child-grid">
+      <!-- Little Erykah · erykah-childhood.jpg -->
+      <figure class="tpj-photo tpj-photo--tall">
+        <img src="../images/about/scrapbook/erykah-childhood.jpg" alt="Childhood portrait of Erykah Williams" width="720" height="960" loading="lazy" decoding="async">
+        <figcaption>Little Erykah</figcaption>
+      </figure>
+      <p class="tpj-memory tpj-hand">I’d take the cakes home just so I could decorate them.</p>
+    </div>
+  </section>
 
-<p>Coming soon: your bakery story</p>
+  <section class="tpj-panel tpj-spread" aria-labelledby="tpj-school">
+    <div>
+      <p class="tpj-kicker"></p>
+      <h2 id="tpj-school">Me in High School</h2>
+      <p>At Carver Voc-Tech, I studied culinary arts and gravitated toward baking. I’d always loved to draw, and once I started taking cake decorating classes at The Cake and Wedding Cottage, I had a way to bring that into the kitchen. By the time I competed in SkillsUSA, I was already thinking about how to make a career out of something I’d been doing for fun for years.</p>
+    </div>
+    <div class="tpj-photo-grid tpj-school-grid">
+      <!-- Me, back at Carver · erykah-high-school.jpg -->
+      <figure class="tpj-photo tpj-photo--tall">
+        <img src="../images/about/scrapbook/erykah-high-school.jpg" alt="Erykah in high school wearing glasses" width="461" height="820" loading="lazy" decoding="async">
+        <figcaption>Me, back at Carver</figcaption>
+      </figure>
+      <!-- Early piping practice · high-school-clown-cupcakes.jpg -->
+      <figure class="tpj-photo tpj-photo--wide tpj-photo--right">
+        <img src="../images/about/scrapbook/high-school-clown-cupcakes.jpg" alt="Cupcakes with colorful piped frosting and clown toppers" width="850" height="691" loading="lazy" decoding="async">
+        <figcaption>Early piping practice</figcaption>
+      </figure>
+      <!-- SkillsUSA, badge and all · skillsusa-competition-cake.jpg -->
+      <figure class="tpj-photo tpj-photo--wide tpj-photo--whole">
+        <img src="../images/about/scrapbook/skillsusa-competition-cake.jpg" alt="SkillsUSA sheet cake next to Erykah’s Carver Voc-Tech badge" width="850" height="839" loading="lazy" decoding="async">
+        <figcaption>SkillsUSA, badge and all</figcaption>
+      </figure>
+    </div>
+  </section>
 
+  <section class="tpj-panel tpj-spread" aria-labelledby="tpj-work">
+    <div>
+      <p class="tpj-kicker"></p>
+      <h2 id="tpj-work">My First Baking Job</h2>
+      <p>My first professional baking job was at Johns Hopkins Hospital. I worked alongside skilled pastry chefs, decorated hundreds of cupcakes a day, and got to make desserts for hospital events. I’d spent years practicing on my own cakes. Now I had other bakers to learn from and hundreds of chances a day to put what I learned to use.</p>
+    </div>
+    <div class="tpj-photo-grid tpj-work-grid">
+      <!-- At work · erykah-first-baking-job.jpg -->
+      <figure class="tpj-photo tpj-photo--tall">
+        <img src="../images/about/scrapbook/erykah-first-baking-job.jpg" alt="Erykah in a hairnet at work in 2015" width="706" height="644" loading="lazy" decoding="async">
+        <figcaption>At work · 2015</figcaption>
+      </figure>
+      <!-- From the trays… · heart-cupcake-trays.jpg -->
+      <figure class="tpj-photo tpj-photo--tall tpj-photo--right">
+        <img src="../images/about/scrapbook/heart-cupcake-trays.jpg" alt="Trays of blue, white, and chocolate cupcakes with heart toppers" width="810" height="1080" loading="lazy" decoding="async">
+        <figcaption>From the trays…</figcaption>
+      </figure>
+      <!-- …to the dessert table · dessert-table.jpg -->
+      <figure class="tpj-photo tpj-photo--tall tpj-photo--right">
+        <img src="../images/about/scrapbook/dessert-table.jpg" alt="Tiered cupcake display and trays of desserts" width="810" height="1080" loading="lazy" decoding="async">
+        <figcaption>…to the dessert table</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="tpj-bridge">
+    <section class="tpj-panel tpj-archive" aria-labelledby="tpj-original">
+      <div class="tpj-spread">
+        <div>
+          <p class="tpj-kicker"></p>
+          <h2 id="tpj-original">The Original Pastry Junkie</h2>
+          <p>My sister came up with the name “The Pastry Junkie.” The girl in the logo was inspired by me as a kid: the gap in my teeth, the puff balls, and always having something sweet in my hand.</p>
+          <p>I went from being the family baker to putting together menus, making cake jars, and taking on all kinds of cakes. I still have the pictures. There’s Minnie Mouse, Pokémon, and a cake I covered in crayons and paint palettes. Looking at those cakes now, I can see how much I was willing to try while I was still figuring things out.</p>
+        </div>
+        <div class="tpj-photo-grid tpj-brand-grid">
+          <!-- My first logo · original-pastry-junkie-logo.jpg -->
+          <figure class="tpj-photo tpj-photo--square tpj-photo--whole">
+            <img src="../images/about/scrapbook/original-pastry-junkie-logo.jpg" alt="Early Pastry Junkie logo with a girl with puff balls holding sweets" width="850" height="854" loading="lazy" decoding="async">
+            <figcaption>My first logo</figcaption>
+          </figure>
+          <!-- An early menu · original-pastry-junkie-menu.jpg -->
+          <figure class="tpj-photo tpj-photo--natural tpj-photo--right">
+            <img src="../images/about/scrapbook/original-pastry-junkie-menu.jpg" alt="Pink and purple early Pastry Junkie menu" width="850" height="795" loading="lazy" decoding="async">
+            <figcaption>An early menu</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="tpj-photo-grid tpj-early-grid">
+        <!-- Minnie Mouse · early-minnie-mouse-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square">
+          <img src="../images/about/scrapbook/early-minnie-mouse-cake.jpg" alt="Minnie Mouse cake with a pink frosting bow" width="850" height="759" loading="lazy" decoding="async">
+          <figcaption>Minnie Mouse</figcaption>
+        </figure>
+        <!-- Paint-palette cake · early-paint-palette-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square tpj-photo--right">
+          <img src="../images/about/scrapbook/early-paint-palette-cake.jpg" alt="Birthday cake decorated with crayons and paint palettes" width="850" height="824" loading="lazy" decoding="async">
+          <figcaption>Paint-palette cake</figcaption>
+        </figure>
+        <!-- Pokémon cake + cupcakes · early-pokemon-cake-and-cupcakes.jpg -->
+        <figure class="tpj-photo tpj-photo--square tpj-photo--whole">
+          <img src="../images/about/scrapbook/early-pokemon-cake-and-cupcakes.jpg" alt="Poké Ball cake and matching cupcakes" width="810" height="1080" loading="lazy" decoding="async">
+          <figcaption>Pokémon cake + cupcakes</figcaption>
+        </figure>
+        <!-- Ice cream cone cake · early-ice-cream-cone-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square tpj-photo--whole tpj-photo--right">
+          <img src="../images/about/scrapbook/early-ice-cream-cone-cake.jpg" alt="Two-tier candy cake with lollipops and an upside-down ice cream cone" width="607" height="1080" loading="lazy" decoding="async">
+          <figcaption>Ice cream cone cake</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Pink sticky note: no image needed -->
+    <aside class="tpj-pause" aria-labelledby="tpj-stopped">
+      <h3 class="tpj-hand" id="tpj-stopped">Then I Stopped</h3>
+      <p>I was working a full-time job and trying to build a business at the same time. I burned out. For a while, I put down the piping bag.</p>
+    </aside>
+
+    <section class="tpj-panel tpj-pink tpj-present" aria-labelledby="tpj-building">
+      <div class="tpj-spread">
+        <div>
+          <p class="tpj-kicker"></p>
+          <h2 id="tpj-building">What I’m Building</h2>
+          <p>I came back to baking because I still wanted to see my dream come true. I still get excited about figuring out how to pull off a cake someone has in their head. Put that old Minnie Mouse cake next to the silver Sweet 16 cake and you can see how much I’ve learned. They’re both mine, and I’m proud of what it took to get from one to the other.</p>
+        </div>
+        <!-- Back to what I love · erykah-with-cupcake.jpg -->
+        <figure class="tpj-photo tpj-photo--tall tpj-photo--right">
+          <img src="../images/about/scrapbook/erykah-with-cupcake.jpg" alt="Erykah holding a cupcake beside her cakes and desserts" width="850" height="1007" loading="lazy" decoding="async">
+          <figcaption>Back to what I love</figcaption>
+        </figure>
+      </div>
+
+      <div class="tpj-photo-grid tpj-now-grid">
+        <!-- Flowers and piped swags · current-floral-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square">
+          <img src="../images/about/scrapbook/current-floral-cake.jpg" alt="Cake with piped swags and cream and peach roses" width="850" height="638" loading="lazy" decoding="async">
+          <figcaption>Flowers and piped swags</figcaption>
+        </figure>
+        <!-- Silver Sweet 16 · current-silver-sweet-sixteen-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square tpj-photo--right">
+          <img src="../images/about/scrapbook/current-silver-sweet-sixteen-cake.jpg" alt="Silver star-shaped Sweet 16 cake with black bows" width="850" height="672" loading="lazy" decoding="async">
+          <figcaption>Silver Sweet 16</figcaption>
+        </figure>
+        <!-- Gold and black celebration cake · current-gold-and-black-cake.jpg -->
+        <figure class="tpj-photo tpj-photo--square tpj-photo--whole">
+          <img src="../images/about/scrapbook/current-gold-and-black-cake.jpg" alt="Black and gold celebration cake with a gold 50 topper" width="810" height="1080" loading="lazy" decoding="async">
+          <figcaption>Gold and black celebration cake</figcaption>
+        </figure>
+      </div>
+
+      <div class="tpj-spread tpj-future-spread">
+        <div>
+          <p>One day, I want to walk into a grocery store and see The Pastry Junkie on the shelf. And I want another little Black girl to see those puff balls on the package and think, <em>She looks like me.</em></p>
+          <p>The Pastry Junkie is more than a bakery to me. I’m grateful to finally be building something that reflects who I am and where I came from.</p>
+        </div>
+        <div class="tpj-photo-grid tpj-autumn-grid">
+          <!-- Autumn, cake and cupcake in hand · autumn-cake-and-cupcake.jpg -->
+          <figure class="tpj-photo tpj-photo--wide tpj-photo--whole">
+            <img src="../images/about/scrapbook/autumn-cake-and-cupcake.jpg" alt="Autumn in a pink apron holding a cake and a cupcake" width="850" height="563" loading="lazy" decoding="async">
+            <figcaption>Autumn, cake and cupcake in hand</figcaption>
+          </figure>
+          <!-- Chef Autumn · autumn-chef-whisk.jpg -->
+          <figure class="tpj-photo tpj-photo--wide tpj-photo--whole tpj-photo--right">
+            <img src="../images/about/scrapbook/autumn-chef-whisk.jpg" alt="Autumn in a white chef coat holding a whisk beside a pink cake" width="850" height="567" loading="lazy" decoding="async">
+            <figcaption>Chef Autumn</figcaption>
+          </figure>
+          <!-- Sweet tooth runs in the family · autumn-donuts-and-cupcakes.jpg -->
+          <figure class="tpj-photo tpj-photo--tall tpj-photo--whole tpj-photo--right">
+            <img src="../images/about/scrapbook/autumn-donuts-and-cupcakes.jpg" alt="Autumn surrounded by donuts and cupcakes in a pink apron" width="834" height="1080" loading="lazy" decoding="async">
+            <figcaption>Sweet tooth runs in the family</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="tpj-panel tpj-end" aria-labelledby="tpj-edible-art">
+    <p class="tpj-hand">With love,<br>Erykah</p>
+    <h2 id="tpj-edible-art"> We create edible art with purpose.</h2>
+    <div class="tpj-actions">
+      <a class="button button-primary" href="cake-builder.html">Build Your Cake</a>
+      <a class="button button-secondary" href="shop.html">Shop Desserts</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <p>Custom cakes and loaded desserts made for serious sweet-tooth celebrations.</p>
+      <p class="footer-love-line">Made with ♥ by The Pastry Junkie.</p>
+    </div>
+    <div class="footer-column">
+      <h3>Welcome to the Sweet Side</h3>
+      <a href="shop.html">Menu</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="cake-builder.html">Start An Inquiry</a>
+    </div>
+    <div class="footer-column">
+      <h3>The Fine Crumbs</h3>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">FAQ</a>
+      <a href="policies.html">Order Policies</a>
+    </div>
+    <div class="footer-column">
+      <h3>Still thinking about dessert? We are too.</h3>
+      <p>Dallas–Fort Worth, Texas</p>
+      <p>Pickup and delivery by appointment</p>
+    </div>
+  </div>
+  <div class="footer-notice">
+    <p>This food is made in a home kitchen and is not inspected by the Department of State Health Services or a local health department.</p>
+  </div>
+  <div class="footer-bottom">
+    <p>© <span id="currentYear"></span> The Pastry Junkie. All rights reserved.</p>
+    <div class="footer-bottom-links">
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js?v=footer-contact-1"></script>
 </body>
 </html>
